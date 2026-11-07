@@ -5,7 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
     xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons"
-    xmlns:local="using:DelphiModernizer.Studio.Modules.Inventory.UI.Views"
     xmlns:vm="using:DelphiModernizer.Studio.Modules.Inventory.UI.ViewModels"
     Loaded="OnLoaded">
 
@@ -41,6 +40,13 @@
                 BasedOn="{StaticResource TableHeaderTextStyle}"
                 TargetType="TextBlock">
                 <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style>
+            <!--  A connection setting's value: Cascadia Mono in the primary text colour.  -->
+            <Style
+                x:Key="ValueTextStyle"
+                BasedOn="{StaticResource MonoTextStyle}"
+                TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
             </Style>
             <Style x:Key="LinkStyle" TargetType="HyperlinkButton">
                 <Setter Property="Padding" Value="0" />
@@ -241,7 +247,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <HyperlinkButton
-                        AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                        AutomationProperties.Name="{x:Bind LinkName}"
                         Click="OnLinkClicked"
                         Content="{x:Bind Link}"
                         Style="{StaticResource LinkStyle}"
@@ -284,7 +290,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <HyperlinkButton
-                        AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                        AutomationProperties.Name="{x:Bind LinkName}"
                         Click="OnLinkClicked"
                         Content="{x:Bind Link}"
                         Style="{StaticResource LinkStyle}"
@@ -986,7 +992,7 @@
                                                         <DataTemplate x:DataType="vm:Place">
                                                             <StackPanel Orientation="Horizontal" Spacing="8">
                                                                 <HyperlinkButton
-                                                                    AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                                                                    AutomationProperties.Name="{x:Bind LinkName}"
                                                                     Click="OnLinkClicked"
                                                                     Content="{x:Bind Link}"
                                                                     Style="{StaticResource LinkStyle}"
@@ -1046,7 +1052,7 @@
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
                                                         Text="{x:Bind Meta}" />
                                                     <HyperlinkButton
-                                                        AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                                                        AutomationProperties.Name="{x:Bind LinkName}"
                                                         Click="OnLinkClicked"
                                                         Content="{x:Bind Link}"
                                                         Style="{StaticResource LinkStyle}"
@@ -1067,8 +1073,7 @@
                                                                 <TextBlock
                                                                     Grid.Column="1"
                                                                     AutomationProperties.Name="{x:Bind AnnouncedName}"
-                                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                                    Style="{StaticResource MonoTextStyle}"
+                                                                    Style="{StaticResource ValueTextStyle}"
                                                                     Text="{x:Bind Value}" />
                                                             </Grid>
                                                         </DataTemplate>
@@ -1109,7 +1114,7 @@
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
                                                         Text="{x:Bind Library}" />
                                                     <HyperlinkButton
-                                                        AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                                                        AutomationProperties.Name="{x:Bind LinkName}"
                                                         Click="OnLinkClicked"
                                                         Content="{x:Bind Link}"
                                                         Style="{StaticResource LinkStyle}"
@@ -1230,7 +1235,7 @@
                                                         Text="{x:Bind Kind}" />
                                                     <HyperlinkButton
                                                         Grid.Column="1"
-                                                        AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                                                        AutomationProperties.Name="{x:Bind LinkName}"
                                                         Click="OnLinkClicked"
                                                         Content="{x:Bind Link}"
                                                         Style="{StaticResource LinkStyle}"
@@ -1306,7 +1311,7 @@
                                                 Style="{StaticResource IconStyle}" />
                                             <HyperlinkButton
                                                 Grid.Column="1"
-                                                AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                                                AutomationProperties.Name="{x:Bind LinkName}"
                                                 Click="OnLinkClicked"
                                                 Content="{x:Bind Link}"
                                                 Style="{StaticResource LinkStyle}"

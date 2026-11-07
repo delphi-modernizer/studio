@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-using DelphiModernizer.Studio.Modules.Inventory.Application;
 using DelphiModernizer.Studio.Modules.Inventory.UI.ViewModels;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
@@ -29,12 +28,6 @@ public sealed partial class InventoryPage : Page, IHasViewModel
     public InventoryViewModel ViewModel { get; }
 
     DelphiModernizer.Studio.UI.Contracts.ViewModel IHasViewModel.ViewModel => ViewModel;
-
-    /// <summary>What Narrator reads for a link into legacy/; x:Bind calls it from the row templates.</summary>
-    public static string EvidenceName(string link)
-    {
-        return InventoryWords.Evidence(link);
-    }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
