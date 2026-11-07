@@ -245,9 +245,17 @@ public sealed partial class ShellPage : Page
 
         return next switch {
             AutoSuggestBox search => search.Focus(FocusState.Keyboard),
-            NavigationView => (NavView.SelectedItem as Control ?? NavView.MenuItems.OfType<Control>().First()).Focus(FocusState.Keyboard),
+            NavigationView => PaneItemToFocus().Focus(FocusState.Keyboard),
             _ => FocusManager.FindFirstFocusableElement(NavFrame) is UIElement first && first.Focus(FocusState.Keyboard),
         };
+    }
+
+    /// <summary>The pane is one tab stop, entered at the selected item.</summary>
+    private Control PaneItemToFocus()
+    {
+        return NavView.SelectedItem as Control ?? NavView.MenuItems
+            .OfType<Control>()
+            .First();
     }
 
     private static bool Contains(DependencyObject region, DependencyObject? element)
