@@ -23,10 +23,13 @@ public sealed record TraceabilityReport(TraceReport Trace, IReadOnlyList<Problem
 
 /// <summary>A trace issue in words people read.</summary>
 /// <param name="Description">The sentence about the problem; an open question reads as the question it asks.</param>
-/// <param name="Subject">The record it is about, such as <c>business rule BR-003</c>; null when there is none to name.</param>
+/// <param name="Subject">
+/// The record it is about, such as <c>business rule BR-003</c>; null when there is none to name.
+/// </param>
 public sealed record Problem(TraceIssue Issue, ProblemWording Wording, string Description, string? Subject);
 
-internal sealed class RunTraceQueryHandler(IWorkspaceSession session) : IRequestHandler<RunTraceQuery, Result<TraceabilityReport>>
+internal sealed class RunTraceQueryHandler(IWorkspaceSession session)
+    : IRequestHandler<RunTraceQuery, Result<TraceabilityReport>>
 {
     private const string _openQuestion = "open-question";
 
@@ -45,9 +48,14 @@ internal sealed class RunTraceQueryHandler(IWorkspaceSession session) : IRequest
         var trace = new TraceChecker(spec).Check(workspace.Root, strict);
         var heldUp = new GateEvaluator(workspace)
             .Evaluate()
-            .Count(g => g.State != "approved" && g.Checks.Any(c => !c.Passed && c.Name.StartsWith("trace", StringComparison.Ordinal)));
+            .Count(g => g.State != "approved"
+                && g.Checks.Any(c => !c.Passed && c.Name.StartsWith("trace", StringComparison.Ordinal)));
 
-        return new TraceabilityReport(trace, [.. trace.Issues.Select(i => Describe(workspace, i))], heldUp, spec.TraceRules.Rules.Length);
+        return new TraceabilityReport(
+            trace,
+            [.. trace.Issues.Select(i => Describe(workspace, i))],
+            heldUp,
+            spec.TraceRules.Rules.Length);
     }
 
     private static Problem Describe(Workspace workspace, TraceIssue issue)
@@ -66,7 +74,8 @@ internal sealed class RunTraceQueryHandler(IWorkspaceSession session) : IRequest
 
         var kind = issue.RecordId is null
             ? null
-            : KitBundle.Embedded.Spec.Ids.Kinds.FirstOrDefault(k => issue.RecordId.StartsWith(k.Prefix + "-", StringComparison.Ordinal));
+            : KitBundle.Embedded.Spec.Ids.Kinds.FirstOrDefault(
+                k => issue.RecordId.StartsWith(k.Prefix + "-", StringComparison.Ordinal));
         var subject = kind is null ? issue.RecordId : $"{kind.Name.ToLowerInvariant()} {issue.RecordId}";
 
         return new Problem(issue, wording, wording.Description, subject);

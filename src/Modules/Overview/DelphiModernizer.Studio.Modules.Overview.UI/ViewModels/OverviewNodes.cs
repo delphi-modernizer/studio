@@ -20,7 +20,13 @@ public enum NextStepAction
     Traceability,
 }
 
-public sealed record NextStep(NextStepTone Tone, string Title, string Message, string ActionText, NextStepAction Action, string? Gate)
+public sealed record NextStep(
+    NextStepTone Tone,
+    string Title,
+    string Message,
+    string ActionText,
+    NextStepAction Action,
+    string? Gate)
 {
     public bool HasAction => Action != NextStepAction.None;
 
@@ -33,7 +39,13 @@ public sealed record NextStep(NextStepTone Tone, string Title, string Message, s
 }
 
 /// <summary>A team or the Principal Architect on the diagram.</summary>
-public sealed record TeamNode(string Code, string Name, string Glyph, string Progress, string AnnouncedName, string ToolTip);
+public sealed record TeamNode(
+    string Code,
+    string Name,
+    string Glyph,
+    string Progress,
+    string AnnouncedName,
+    string ToolTip);
 
 /// <summary>A sign-off on the diagram, in order; the next one carries the accent.</summary>
 public sealed record GateNode(string Gate, string Name, PillState Pill, bool IsNext, string AnnouncedName)

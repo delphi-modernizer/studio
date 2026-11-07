@@ -25,7 +25,11 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
     private readonly INavigationService _navigation;
     private List<SignOffGroup> _all = [];
 
-    public DeliverablesViewModel(IWorkspaceSession session, ISender sender, IEditorLauncher editor, INavigationService navigation)
+    public DeliverablesViewModel(
+        IWorkspaceSession session,
+        ISender sender,
+        IEditorLauncher editor,
+        INavigationService navigation)
         : base(session)
     {
         ArgumentNullException.ThrowIfNull(sender);
@@ -63,7 +67,8 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
 
     public string MissingMessage => Missing is null
         ? string.Empty
-        : $"It isn’t at {Missing.Path}. Restore it from git or from the template; until then it counts as a problem in the documents.";
+        : $"It isn’t at {Missing.Path}. Restore it from git or from the template; "
+            + "until then it counts as a problem in the documents.";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasProblem))]
@@ -174,7 +179,14 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
     {
         var name = $"{group.Name}, {group.Number}, {PillLook.Of(group.Pill).Word}";
 
-        return new DeliverableRow(string.Empty, group.Name, group.Number, string.Empty, group.Pill, name, IsGroup: true);
+        return new DeliverableRow(
+            string.Empty,
+            group.Name,
+            group.Number,
+            string.Empty,
+            group.Pill,
+            name,
+            IsGroup: true);
     }
 
     private bool Matches(DeliverableRow row)
@@ -189,10 +201,14 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
         };
     }
 
-    /// <remarks>Approved shows only while the sign-off's approval is current; otherwise the file's own status.</remarks>
+    /// <remarks>
+    /// Approved shows only while the sign-off's approval is current; otherwise the file's own status.
+    /// </remarks>
     private static DeliverableRow Row(DeliverableState deliverable, bool approved)
     {
-        var pill = approved && deliverable.Status != "missing" ? PillState.Approved : PillStates.OfDeliverable(deliverable.Status);
+        var pill = approved && deliverable.Status != "missing"
+            ? PillState.Approved
+            : PillStates.OfDeliverable(deliverable.Status);
         var owner = WorkstreamRole.All.FirstOrDefault(r => r.Code == deliverable.Owner)?.Name ?? deliverable.Owner;
         var gate = SignOffNames.Of(deliverable.Gate);
 

@@ -83,7 +83,11 @@ internal sealed class GetOverviewQueryHandler(IWorkspaceSession session)
     {
         return [.. trace.Issues
             .Where(i => i.Rule == "open-question" && i.RecordId is not null)
-            .Select(i => new OpenQuestion(i.RecordId!, RegisterRows.Cell(workspace.Root, i.Path, i.Line, 0) ?? i.Message, i.Path, i.Line))];
+            .Select(i => new OpenQuestion(
+                i.RecordId!,
+                RegisterRows.Cell(workspace.Root, i.Path, i.Line, 0) ?? i.Message,
+                i.Path,
+                i.Line))];
     }
 
     private static WorkstreamProgress Progress(WorkstreamRole role, TraceReport trace)

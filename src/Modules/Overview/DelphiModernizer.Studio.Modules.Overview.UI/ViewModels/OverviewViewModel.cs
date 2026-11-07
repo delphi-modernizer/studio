@@ -20,14 +20,18 @@ using DelphiModernizer.Studio.UI.Contracts.Services;
 
 namespace DelphiModernizer.Studio.Modules.Overview.UI.ViewModels;
 
-/// <summary>The Overview: from the Delphi code, through six teams and the Principal Architect, to five sign-offs.</summary>
+/// <summary>The Overview: from the Delphi code, via six teams and the Principal Architect, to five sign-offs.</summary>
 public sealed partial class OverviewViewModel : WorkspacePageViewModel
 {
     private readonly ISender _sender;
     private readonly INavigationService _navigation;
     private readonly IEditorLauncher _editor;
 
-    public OverviewViewModel(IWorkspaceSession session, ISender sender, INavigationService navigation, IEditorLauncher editor)
+    public OverviewViewModel(
+        IWorkspaceSession session,
+        ISender sender,
+        INavigationService navigation,
+        IEditorLauncher editor)
         : base(session)
     {
         ArgumentNullException.ThrowIfNull(sender);
@@ -64,15 +68,27 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     public bool HasLoadProblem => LoadProblem is not null;
 
     [ObservableProperty]
-    public partial NextStep NextStep { get; set; } = new(NextStepTone.Informational, string.Empty, string.Empty, string.Empty, NextStepAction.None, null);
+    public partial NextStep NextStep { get; set; } = new(
+        NextStepTone.Informational,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        NextStepAction.None,
+        null);
 
     [ObservableProperty]
     public partial string Summary { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial DelphiCodeWords Legacy { get; set; } = new(string.Empty, string.Empty, string.Empty, string.Empty, "Delphi code");
+    public partial DelphiCodeWords Legacy { get; set; } = new(
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        "Delphi code");
 
-    /// <summary>The six teams in the kit's order; an <c>IList</c> because the diagram binds each one by index.</summary>
+    /// <summary>The six teams in the kit's order.</summary>
+    /// <remarks>An <c>IList</c> because the diagram binds each one by index.</remarks>
     [ObservableProperty]
     public partial IList<TeamNode> Teams { get; set; }
 
@@ -112,8 +128,10 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     public string RunsEmptyTitle => Claude is { IsReady: false } ? "Claude Code isn’t set up" : "No agent runs yet";
 
     public string RunsEmptyText => Claude is { IsReady: false }
-        ? "Everything on this page works without it. With it, agents draft the teams’ deliverables, with evidence, for people to review."
-        : "Agents draft deliverables with evidence and a label on every claim. People review the drafts and approve every sign-off.";
+        ? "Everything on this page works without it. "
+            + "With it, agents draft the teams’ deliverables, with evidence, for people to review."
+        : "Agents draft deliverables with evidence and a label on every claim. "
+            + "People review the drafts and approve every sign-off.";
 
     public string RunsEmptyLink => Claude is { IsReady: false } ? "Set up Claude Code" : "Go to Workstreams";
 
@@ -194,7 +212,11 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
             .Where(w => w.Role.Code != WorkstreamRole.All[0].Code)
             .Select(w => Team(w.Role, w, approved))];
         Architect = Team(WorkstreamRole.All[0], architect, approved);
-        Gates = [.. overview.Gates.Select((gate, index) => GateOf(gate, index, index == nextIndex, overview.Gates.Count))];
+        Gates = [.. overview.Gates.Select((gate, index) => GateOf(
+            gate,
+            index,
+            index == nextIndex,
+            overview.Gates.Count))];
         Build = overview.Gates.Count > 0 && overview.Gates[^1].State == "approved" ? Unlocked() : Locked();
         Questions = [.. overview.Questions.Select(q => new QuestionRow(q.Id, q.Text, q.Path, q.Line))];
         Runs = [.. overview.RecentRuns.Select(RunOf)];
@@ -207,7 +229,8 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
             return new NextStep(
                 NextStepTone.Success,
                 "Every sign-off is approved and current.",
-                "The team may build the new system while these approvals stay current. Changing a signed-off document makes its approval stale.",
+                "The team may build the new system while these approvals stay current. "
+                + "Changing a signed-off document makes its approval stale.",
                 string.Empty,
                 NextStepAction.None,
                 null);
@@ -217,24 +240,51 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
 
         if (next.State == "ready")
         {
-            var scan = overview.Inventory is null ? " After that, scan the Delphi code to start discovery." : string.Empty;
+            var scan = overview.Inventory is null
+                ? " After that, scan the Delphi code to start discovery."
+                : string.Empty;
 
-            return new NextStep(NextStepTone.Informational, $"{name} is ready for sign-off.", $"Every check passes; a person needs to approve it.{scan}", $"Review {name}", NextStepAction.SignOffs, next.Gate);
+            return new NextStep(
+                NextStepTone.Informational,
+                $"{name} is ready for sign-off.",
+                $"Every check passes; a person needs to approve it.{scan}",
+                $"Review {name}",
+                NextStepAction.SignOffs,
+                next.Gate);
         }
 
         if (next.State == "stale")
         {
-            return new NextStep(NextStepTone.Caution, $"{name} needs a new sign-off.", "A document it covers changed after it was approved, so the approval no longer holds.", $"Review {name}", NextStepAction.SignOffs, next.Gate);
+            return new NextStep(
+                NextStepTone.Caution,
+                $"{name} needs a new sign-off.",
+                "A document it covers changed after it was approved, so the approval no longer holds.",
+                $"Review {name}",
+                NextStepAction.SignOffs,
+                next.Gate);
         }
 
         if (overview.Trace.Errors > 0)
         {
-            return new NextStep(NextStepTone.Critical, $"{name} can’t be signed off yet.", $"{Count(overview.Trace.Errors, "problem")} in the documents {(overview.Trace.Errors == 1 ? "needs" : "need")} fixing first.", "Show the problems", NextStepAction.Traceability, next.Gate);
+            return new NextStep(
+                NextStepTone.Critical,
+                $"{name} can’t be signed off yet.",
+                $"{Count(overview.Trace.Errors, "problem")} in the documents "
+                + $"{(overview.Trace.Errors == 1 ? "needs" : "need")} fixing first.",
+                "Show the problems",
+                NextStepAction.Traceability,
+                next.Gate);
         }
 
         var passed = next.Checks.Count(c => c.Passed);
 
-        return new NextStep(NextStepTone.Informational, $"{name} is the next sign-off.", $"{passed} of {next.Checks.Length} checks pass.", $"Review {name}", NextStepAction.SignOffs, next.Gate);
+        return new NextStep(
+            NextStepTone.Informational,
+            $"{name} is the next sign-off.",
+            $"{passed} of {next.Checks.Length} checks pass.",
+            $"Review {name}",
+            NextStepAction.SignOffs,
+            next.Gate);
     }
 
     /// <param name="approved">Whether every sign-off is approved, so every deliverable counts as approved.</param>
@@ -271,17 +321,30 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         var pill = PillStates.OfGate(gate.State);
         var next = isNext ? ", next" : string.Empty;
 
-        return new GateNode(gate.Gate, name, pill, isNext, $"{name} sign-off, {PillLook.Of(pill).Word}{next}, {index + 1} of {count}. Opens Sign-offs.");
+        return new GateNode(
+            gate.Gate,
+            name,
+            pill,
+            isNext,
+            $"{name} sign-off, {PillLook.Of(pill).Word}{next}, {index + 1} of {count}. Opens Sign-offs.");
     }
 
     private static BuildNode Locked()
     {
-        return new BuildNode(PillState.Locked, "Starts once a person approves the final plan", false, "Build the new system, Locked. Starts once a person approves the final plan.");
+        return new BuildNode(
+            PillState.Locked,
+            "Starts once a person approves the final plan",
+            false,
+            "Build the new system, Locked. Starts once a person approves the final plan.");
     }
 
     private static BuildNode Unlocked()
     {
-        return new BuildNode(PillState.Unlocked, "Allowed while the final plan stays approved", true, "Build the new system, Unlocked. Allowed while the final plan stays approved.");
+        return new BuildNode(
+            PillState.Unlocked,
+            "Allowed while the final plan stays approved",
+            true,
+            "Build the new system, Unlocked. Allowed while the final plan stays approved.");
     }
 
     private static RunRow RunOf(RunSummary run)
@@ -295,7 +358,10 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
             _ => PillState.Failed,
         };
 
-        return new RunRow(role?.Name ?? run.Agent, $"{run.StartedAt.LocalDateTime.ToString("g", CultureInfo.CurrentCulture)}{cost}", pill);
+        return new RunRow(
+            role?.Name ?? run.Agent,
+            $"{run.StartedAt.LocalDateTime.ToString("g", CultureInfo.CurrentCulture)}{cost}",
+            pill);
     }
 
     private static string Count(int value, string singular)

@@ -78,13 +78,16 @@ public static class OverviewWords
         var screens = Count(inventory.Forms - inventory.DataModules, "screen");
         var first = Count(inventory.Units, "code module");
         var second = $"{screens}, {Count(inventory.DataModules, "data module")}";
-        var third = cycles == 0 ? "No circular dependencies" : Count(cycles, "circular dependency", "circular dependencies");
+        var third = cycles == 0
+            ? "No circular dependencies"
+            : Count(cycles, "circular dependency", "circular dependencies");
         var withData = inventory.DataModules switch {
             0 => screens,
             1 => $"{screens} and a data module",
             _ => $"{screens} and {Count(inventory.DataModules, "data module")}",
         };
-        var announced = $"Delphi code, {version}: {Count(inventory.Files, "file")}, {first}, {withData}, {third}. Opens Inventory.";
+        var announced = $"Delphi code, {version}: {Count(inventory.Files, "file")}, {first}, {withData}, {third}. "
+            + "Opens Inventory.";
 
         return new DelphiCodeWords(version, first, second, third, announced);
     }

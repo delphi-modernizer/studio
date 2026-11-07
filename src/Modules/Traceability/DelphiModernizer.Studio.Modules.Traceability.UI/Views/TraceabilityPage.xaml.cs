@@ -46,7 +46,7 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
         await ViewModel.CheckCommand.ExecuteAsync(parameter: null);
     }
 
-    /// <summary>The selector bars are rebuilt with their counts after every check, keeping the person's choice.</summary>
+    /// <summary>The selector bars are rebuilt with counts after every check, keeping the person's choice.</summary>
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(TraceabilityViewModel.Views))

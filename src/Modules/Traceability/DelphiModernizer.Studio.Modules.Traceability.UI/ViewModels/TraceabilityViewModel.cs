@@ -156,8 +156,22 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
                 WarningsDetail(trace.Warnings, questions),
                 StudioIcons.WarningFilled,
                 trace.Warnings == 0 ? StatTone.None : StatTone.Caution),
-            new StatCard("Sign-offs", StudioIcons.SignOffs, Number(report.HeldUp), "held up", "by problems in the documents", string.Empty, StatTone.None),
-            new StatCard("Checks", StudioIcons.Traceability, Number(report.Checks), "checks", "Run over every document in docs/", string.Empty, StatTone.None),
+            new StatCard(
+                "Sign-offs",
+                StudioIcons.SignOffs,
+                Number(report.HeldUp),
+                "held up",
+                "by problems in the documents",
+                string.Empty,
+                StatTone.None),
+            new StatCard(
+                "Checks",
+                StudioIcons.Traceability,
+                Number(report.Checks),
+                "checks",
+                "Run over every document in docs/",
+                string.Empty,
+                StatTone.None),
         ];
         Views = [new(TraceView.Issues, "Issues", _all.Count), new(TraceView.Matrix, "Matrix", trace.Matrix.Length)];
         Severities = [
@@ -210,7 +224,9 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
         var issue = problem.Issue;
         var pill = issue.Severity == "error" ? PillState.Error : PillState.Warning;
         var rule = problem.Subject is null ? problem.Wording.Label : $"{problem.Wording.Label} · {problem.Subject}";
-        var folder = Path.GetDirectoryName(issue.Path)?.Replace('\\', '/') is { Length: > 0 } directory ? directory + "/" : string.Empty;
+        var folder = Path.GetDirectoryName(issue.Path)?.Replace('\\', '/') is { Length: > 0 } directory
+            ? directory + "/"
+            : string.Empty;
         var file = Path.GetFileName(issue.Path);
         var link = issue.Line > 0 ? $"{file}#L{issue.Line}" : file;
         var announced = ProblemWordings.Announced(

@@ -26,7 +26,14 @@ public enum StatTone
 }
 
 /// <summary>One of the four summary cards: errors, warnings, sign-offs held up, checks.</summary>
-public sealed record StatCard(string Label, string Glyph, string Number, string Unit, string Detail, string StatusGlyph, StatTone Tone)
+public sealed record StatCard(
+    string Label,
+    string Glyph,
+    string Number,
+    string Unit,
+    string Detail,
+    string StatusGlyph,
+    StatTone Tone)
 {
     public bool HasStatus => Tone != StatTone.None;
 }

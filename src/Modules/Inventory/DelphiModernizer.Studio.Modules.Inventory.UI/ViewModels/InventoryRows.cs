@@ -90,7 +90,12 @@ public sealed record Place(string Link, string Detail);
 public sealed record TechnologyCard(string Name, string Category, string Places, IReadOnlyList<Place> Evidence);
 
 /// <summary>A connection a form declares; secret values arrive as *** and stay that way.</summary>
-public sealed record ConnectionCard(string Name, string Meta, string Link, bool HasEmbeddedPassword, IReadOnlyList<Setting> Settings);
+public sealed record ConnectionCard(
+    string Name,
+    string Meta,
+    string Link,
+    bool HasEmbeddedPassword,
+    IReadOnlyList<Setting> Settings);
 
 /// <summary>A setting of a connection; a redacted value reads as "PASSWORD, redacted".</summary>
 public sealed record Setting(string Key, string Value)
@@ -102,7 +107,8 @@ public sealed record ExternalRow(string Routine, string Library, string Link);
 
 public sealed record SqlRow(string Link, string Kind, string Text, string Note, bool BuiltByConcatenation)
 {
-    public string AnnouncedName => $"{Kind}: {Text}. {Note}{(BuiltByConcatenation ? ", built by concatenation" : string.Empty)}";
+    public string AnnouncedName =>
+        $"{Kind}: {Text}. {Note}{(BuiltByConcatenation ? ", built by concatenation" : string.Empty)}";
 }
 
 public sealed record RiskRow(string Kind, string Link, int Count, string Detail)
