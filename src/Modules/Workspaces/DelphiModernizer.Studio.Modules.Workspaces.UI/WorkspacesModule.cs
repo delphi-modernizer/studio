@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using DelphiModernizer.Studio.Application.Abstractions;
 using DelphiModernizer.Studio.Modules.Workspaces.Application;
+using DelphiModernizer.Studio.Modules.Workspaces.UI.ViewModels;
 using DelphiModernizer.Studio.Modules.Workspaces.UI.Views;
 using DelphiModernizer.Studio.UI.Common.Icons;
 using DelphiModernizer.Studio.UI.Contracts;
@@ -20,7 +21,10 @@ public sealed class WorkspacesModule : IModule
         ArgumentNullException.ThrowIfNull(services);
         services.AddWorkspacesApplication(StudioPaths.DataDirectory);
         services.AddSingleton<IWorkspaceActions, WorkspaceActions>();
+        services.AddTransient<StartViewModel>();
         services.AddTransient<StartPage>();
+        services.AddTransient<NewWorkspaceViewModel>();
+        services.AddTransient<NewWorkspacePage>();
     }
 
     public IReadOnlyList<NavigationItem> GetNavigationItems()
@@ -28,5 +32,10 @@ public sealed class WorkspacesModule : IModule
         return [
             new NavigationItem("Start", StudioIcons.Start, StudioIcons.StartFilled, typeof(StartPage), 0),
         ];
+    }
+
+    public IReadOnlyList<Type> GetPages()
+    {
+        return [typeof(NewWorkspacePage)];
     }
 }

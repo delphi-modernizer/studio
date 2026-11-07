@@ -10,7 +10,10 @@ change.
 | What does title-bar search cover? | The studio's pages by name | `ShellPage.OnSearchTextChanged` |
 | Do evidence links open in the person's editor or a read-only viewer? | The app Windows associates with the file, without the line; other file types are shown in Explorer, never run | `EditorLauncher` |
 | What do Workstreams, Deliverables, Traceability and Sign-offs say with no workspace open? The canvas draws only Overview and Inventory | A line saying what the page would show, in the style of the drawn two | Each page's `NoWorkspaceState` |
-| Clone from Git has an action card and a link but no drawn flow | Not offered yet | Start, Overview |
+| Clone from Git has an action card and a link but no drawn flow | The card is shown, turned off | Start, Overview |
+| The target tag for a workspace that decided to choose after discovery | "Undecided" | `TargetStackNames` |
+| Browse… for the workspace folder when the folder picked already holds files | A new folder named after the workspace inside it, shown in the box before Next | `NewWorkspaceViewModel.BrowseFolder` |
+| The preview's "[n] of [total] files" while scanning: the engine's scanner reports no progress | "Scanning the folder…" with an indeterminate bar | `NewWorkspacePage` |
 | Problem wording: the canvas words three trace rules (broken evidence, missing evidence, open question); the other eleven are new | Labels and sentences in the same style, one place to change | `ProblemWordings` |
 | Default window height | 760, as the brief says | `MainWindow.xaml` |
 | When does the pane collapse on its own? | Never; only from the title-bar toggle | `ShellPage` |

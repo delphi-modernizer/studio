@@ -10,10 +10,10 @@ namespace DelphiModernizer.Studio.Modules.Workspaces.UI;
 internal sealed class WorkspaceActions : IWorkspaceActions
 {
     private readonly ISender _sender;
-    private readonly IFolderPickerService _picker;
+    private readonly IPickerService _picker;
     private readonly INavigationService _navigation;
 
-    public WorkspaceActions(ISender sender, IFolderPickerService picker, INavigationService navigation)
+    public WorkspaceActions(ISender sender, IPickerService picker, INavigationService navigation)
     {
         ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(picker);
@@ -25,7 +25,7 @@ internal sealed class WorkspaceActions : IWorkspaceActions
 
     public void StartNewWorkspace()
     {
-        _navigation.NavigateTo("Start");
+        _navigation.NavigateTo("NewWorkspace");
     }
 
     /// <remarks>Opening a workspace forgets the pages before it and lands on Overview (navigation model).</remarks>

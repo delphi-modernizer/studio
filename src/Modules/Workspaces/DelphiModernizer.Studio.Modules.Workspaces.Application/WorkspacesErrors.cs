@@ -8,4 +8,9 @@ public static class WorkspacesErrors
     {
         return new Error("Workspaces.FolderMissing", $"The folder {folder} does not exist.");
     }
+
+    public static Error FolderNotEmpty(string folder)
+    {
+        return new Error("Workspaces.FolderNotEmpty", $"{folder} isn’t empty. Pick a new folder or an empty one.");
+    }
 }

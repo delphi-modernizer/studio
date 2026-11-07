@@ -46,7 +46,7 @@ internal sealed class TestWorkspace : IDisposable
             "Test Person <test@example.com>",
             null,
             InitializeGit: false);
-        var created = await WorkspaceInitializer.InitializeAsync(request, CancellationToken.None);
+        var created = await WorkspaceInitializer.InitializeAsync(request, null, CancellationToken.None);
 
         return new TestWorkspace(parent, created.Value);
     }

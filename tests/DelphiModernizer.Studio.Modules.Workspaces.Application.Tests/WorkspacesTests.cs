@@ -35,7 +35,7 @@ public sealed class WorkspacesTests : IDisposable
             null,
             InitializeGit: false);
 
-        var created = await _sender.Send(new CreateWorkspaceCommand(request), TestContext.Current.CancellationToken);
+        var created = await _sender.Send(new CreateWorkspaceCommand(request, null), TestContext.Current.CancellationToken);
         var recent = await _sender.Send(new GetRecentWorkspacesQuery(), TestContext.Current.CancellationToken);
 
         Assert.True(created.IsSuccess, created.Error.Message);
@@ -69,8 +69,32 @@ public sealed class WorkspacesTests : IDisposable
         var preview = await _sender.Send(new PreviewLegacyQuery(TestWorkspace.CreateLegacyTree(_folder), 1252), TestContext.Current.CancellationToken);
 
         Assert.True(preview.IsSuccess, preview.Error.Message);
-        Assert.Equal(2, preview.Value.Units);
-        Assert.Equal(1, preview.Value.Cycles);
+        Assert.Equal(2, preview.Value.Summary.Units);
+        Assert.Equal(["ErpApp"], preview.Value.ProjectNames);
+        Assert.Equal(2, Assert.Single(preview.Value.Cycles).Count);
+    }
+
+    [Fact]
+    public async Task A_folder_without_Delphi_source_is_not_previewed()
+    {
+        var empty = Directory.CreateDirectory(Path.Combine(_folder, "empty")).FullName;
+
+        var preview = await _sender.Send(new PreviewLegacyQuery(empty, 1252), TestContext.Current.CancellationToken);
+
+        Assert.Equal("Workspace.LegacySourceMissing", preview.Error.Code);
+    }
+
+    [Fact]
+    public async Task Only_a_new_or_empty_folder_can_hold_a_workspace()
+    {
+        var used = Directory.CreateDirectory(Path.Combine(_folder, "used")).FullName;
+        await File.WriteAllTextAsync(Path.Combine(used, "notes.txt"), "kept", TestContext.Current.CancellationToken);
+
+        var fresh = await _sender.Send(new CheckWorkspaceFolderQuery(Path.Combine(_folder, "fresh")), TestContext.Current.CancellationToken);
+        var taken = await _sender.Send(new CheckWorkspaceFolderQuery(used), TestContext.Current.CancellationToken);
+
+        Assert.True(fresh.IsSuccess);
+        Assert.Equal("Workspaces.FolderNotEmpty", taken.Error.Code);
     }
 
     [Fact]
