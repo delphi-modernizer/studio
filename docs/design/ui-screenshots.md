@@ -37,7 +37,7 @@ the Narrator contract the handoff asks for anyway.
    run and put back afterwards.
 4. It starts the app once per theme, opens the workspace from Start, visits each page through the pane, and sizes the
    window with `SetWindowPos` before each capture.
-5. It uploads `out/screenshots` as the artifact `screenshots`, with the app's log under `logs/`.
+5. It uploads `out/screenshots` as the artifact `screenshots`, with the app's log under `logs/` when it wrote one.
 
 The window size is the size of its visible frame, title bar included, without the invisible resize borders: a
 1280 × 800 capture is a 1280 × 800 PNG. Hosted runners start at 1024 × 768, so the harness sets the display to
@@ -52,10 +52,10 @@ The window size is the size of its visible frame, title bar included, without th
 | `start` | `default`: the one recent workspace |
 | `newworkspace` | `step1` |
 | `overview` | `default` |
-| `inventory` | One per SelectorBar section, named after it, as `code-modules` |
+| `inventory` | One per SelectorBar section, named after it without its count: `code-modules`, `screens`, `data-and-libraries`, `sql-and-risks`, `cycles`, `diagnostics` |
 | `workstreams` | `default`: Claude Code is not installed on the runner |
 | `deliverables` | `default` |
-| `traceability` | One per SelectorBar view, as `issues` and `matrix` |
+| `traceability` | One per SelectorBar view: `issues`, `matrix` |
 | `signoffs` | `expanded`: one sign-off open |
 | `settings` | `default` |
 
@@ -63,13 +63,18 @@ Themes are `light`, `dark` and `highcontrast`; high contrast covers Overview and
 opens only for an agent run, and a fresh workspace has none; starting one needs Claude Code, which the runner does not
 have.
 
-## High contrast
+## High contrast and Mica
 
 The harness turns high contrast on with `SystemParametersInfo(SPI_SETHIGHCONTRAST)` before it starts the app with the
-Theme setting following Windows, and turns it off afterwards. When Windows refuses, the job logs "High contrast cannot
-be turned on here" and skips those screenshots.
+Theme setting following Windows, and turns it off afterwards. Hosted runners allow it and apply Windows' default
+contrast theme. Where Windows refuses, the job logs "High contrast cannot be turned on here" and skips those
+screenshots.
+
+The backdrop in the screenshots is a flat colour, whether Mica over the runner's plain desktop or its fallback, so they
+show layout, type, colour roles and states, not the tint a person's wallpaper gives Mica.
 
 ## Download
 
-From the run's summary page on GitHub, or through the API: list the run's artifacts, then download the one named
-`screenshots`. It is a zip of the PNGs and `logs/`.
+From the run's summary page on GitHub (Artifacts, `screenshots`), or through the API: list the run's artifacts, then
+download the one named `screenshots`. It is a zip of 64 PNGs: 30 per theme for light and dark, and 4 for high contrast.
+The job takes about 4 minutes after the app is published.

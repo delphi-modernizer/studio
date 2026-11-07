@@ -24,7 +24,8 @@ internal sealed class StudioDriver : IDisposable
 {
     private static readonly TimeSpan _startTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan _findTimeout = TimeSpan.FromSeconds(20);
-    private static readonly Point _origin = new(16, 16);
+    /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
+    private static readonly Point _origin = new(480, 120);
     private const string _expanderClass = "Microsoft.UI.Xaml.Controls.Expander";
 
     private readonly UIA3Automation _automation = new();
@@ -177,7 +178,10 @@ internal sealed class StudioDriver : IDisposable
             text = text.Replace("--", "-", StringComparison.Ordinal);
         }
 
-        return text.Trim('-');
+        // A section's name ends with its count, as "Code modules 7"; the file name must not change with the data.
+        return text
+            .TrimEnd("0123456789".ToCharArray())
+            .Trim('-');
     }
 
     public void Dispose()
