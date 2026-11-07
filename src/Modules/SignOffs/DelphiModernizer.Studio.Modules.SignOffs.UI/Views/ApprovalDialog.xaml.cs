@@ -30,9 +30,13 @@ public sealed partial class ApprovalDialog : ContentDialog
 
     public ApprovalDialogViewModel ViewModel { get; }
 
+    /// <summary>Focus starts in the note; without a git identity the note is disabled and Cancel takes it.</summary>
     private void OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
     {
-        NoteBox.Focus(FocusState.Programmatic);
+        if (ViewModel.HasIdentity)
+        {
+            NoteBox.Focus(FocusState.Programmatic);
+        }
     }
 
     /// <summary>
