@@ -13,14 +13,14 @@ concurrency:
 
 jobs:
   comments:
-    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@f30fa172da63c775c05b12970b6aa66d3b3495b9
+    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
     with:
-      standards-ref: f30fa172da63c775c05b12970b6aa66d3b3495b9
+      standards-ref: 539243d668f72d31bbf8ee5c6ee732d0ed76bd95
 
   drift:
-    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@f30fa172da63c775c05b12970b6aa66d3b3495b9
+    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
     with:
-      standards-ref: f30fa172da63c775c05b12970b6aa66d3b3495b9
+      standards-ref: 539243d668f72d31bbf8ee5c6ee732d0ed76bd95
       files: |
         .editorconfig=standards/csharp/.editorconfig
         tests/.editorconfig=standards/csharp/tests.editorconfig
@@ -28,7 +28,7 @@ jobs:
         docs/csharp-style.md=standards/csharp/csharp-style.md
 
   dependencies:
-    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@f30fa172da63c775c05b12970b6aa66d3b3495b9
+    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
 
   # The engine is built from source at the commit engine.lock pins (docs/BUILDING.md).
   engine:
@@ -42,9 +42,14 @@ jobs:
       - id: lock
         run: echo "ref=$(tr -d '[:space:]' < engine.lock)" >> "$GITHUB_OUTPUT"
 
+  python:
+    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+    with:
+      sources: scripts
+
   build:
     needs: engine
-    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@f30fa172da63c775c05b12970b6aa66d3b3495b9
+    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
     with:
       solution: DelphiModernizer.Studio.slnx
       os: '["windows-latest"]'
@@ -103,15 +108,12 @@ jobs:
       - name: Require icon glyphs to be written as escapes
         run: |
           if grep -rnP '[\x{E000}-\x{F8FF}]' --include='*.cs' --include='*.xaml' src tests; then exit 1; fi
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: '0.13.6'
       - name: Require the committed icon font to match its sources
         run: |
-          python3 -m pip install --quiet fonttools==4.60.1
-          python3 scripts/build-icon-font.py
+          uv run --frozen python scripts/build_icon_font.py
           git diff --exit-code -- src
-      - name: Lint the scripts
-        run: |
-          python3 -m pip install --quiet ruff==0.16.9
-          ruff format --check scripts
-          ruff check scripts
       - name: Lint the Markdown
         run: npx --yes markdownlint-cli2@0.24.0

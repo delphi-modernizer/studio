@@ -15,7 +15,9 @@ The studio is the Windows app over the engine. These rules apply to people and A
    modules. `tests/DelphiModernizer.Studio.ArchitectureTests` enforces it.
 5. **Minimum code and surgical changes.** No abstraction for code used once; mention unrelated problems instead of
    fixing them silently.
-6. **Comments** follow [docs/COMMENTS.md](docs/COMMENTS.md); style follows [docs/csharp-style.md](docs/csharp-style.md).
+6. **Comments** follow [docs/COMMENTS.md](docs/COMMENTS.md); style follows [docs/csharp-style.md](docs/csharp-style.md),
+   and the scripts follow the organization's
+   [Python style](https://github.com/delphi-modernizer/.github/blob/main/standards/python/PYTHON-STYLE.md).
    Icons are Studio Icons glyphs written as escapes ([docs/icons.md](docs/icons.md)).
 
 ## Gates
@@ -29,8 +31,10 @@ dotnet build-server shutdown
 dotnet build DelphiModernizer.Studio.slnx -c Release
 dotnet test DelphiModernizer.Studio.slnx -c Release --no-build
 dotnet list DelphiModernizer.Studio.slnx package --vulnerable --include-transitive
-python3 scripts/build-icon-font.py && git diff --exit-code -- src
-ruff format --check scripts && ruff check scripts
+uv run python scripts/build_icon_font.py && git diff --exit-code -- src
+uv run isort --check-only scripts && uv run pyink --check scripts
+uv run pylint scripts
+uv run mypy && uv run pyright
 markdownlint-cli2
 ```
 
