@@ -253,10 +253,7 @@
                         <AdaptiveTrigger MinWindowWidth="1100" />
                     </VisualState.StateTriggers>
                 </VisualState>
-                <!--
-                    Under 1100 the session strip keeps Model, Claude Code and Cost, and the side cards move below
-                    the transcript in 3 columns, 12 apart.
-                -->
+                <!--  Under 1100 the strip keeps Model, Claude Code and Cost; the side cards go below in 3 columns.  -->
                 <VisualState x:Name="Narrow">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0" />
@@ -530,10 +527,7 @@
                                     Click="OnExpandAll"
                                     Content="{x:Bind ViewModel.ExpandAllText, Mode=OneWay}" />
                             </Grid>
-                            <!--
-                                One tab stop: arrows move by item, Enter or Space expands a tool call, Tab reaches the
-                                focused item's links. No live setting: new items are not read one by one.
-                            -->
+                            <!--  One tab stop with arrows by item; no live setting, so new items are not read out.  -->
                             <ListView
                                 AutomationProperties.Name="Transcript"
                                 IsItemClickEnabled="True"
