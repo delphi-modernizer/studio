@@ -129,7 +129,9 @@
                         Style="{StaticResource SubtleButtonStyle}"
                         Tag="{x:Bind Path}"
                         ToolTipService.ToolTip="Open in your editor">
-                        <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
+                        <FontIcon
+                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                            Style="{StaticResource IconStyle}" />
                     </Button>
                 </Grid>
             </Grid>
@@ -203,7 +205,9 @@
                         Style="{StaticResource SubtleButtonStyle}"
                         Tag="{x:Bind Path}"
                         ToolTipService.ToolTip="Open in your editor">
-                        <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
+                        <FontIcon
+                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                            Style="{StaticResource IconStyle}" />
                     </Button>
                 </Grid>
             </Grid>
@@ -320,7 +324,9 @@
 
         <ScrollViewer>
             <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
-                <controls:PageHeader Purpose="What the scanner found in legacy/. Findings to confirm, not compiler output." Title="Inventory">
+                <controls:PageHeader
+                    Purpose="What the scanner found in legacy/. Findings to confirm, not compiler output."
+                    Title="Inventory">
                     <controls:PageHeader.Actions>
                         <StackPanel
                             Orientation="Horizontal"
@@ -328,13 +334,17 @@
                             Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
                             <Button Click="OnOpenMarkdown" IsEnabled="{x:Bind ViewModel.IsScanned, Mode=OneWay}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Deliverables}" Style="{StaticResource IconStyle}" />
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Deliverables}"
+                                        Style="{StaticResource IconStyle}" />
                                     <TextBlock Text="Open inventory.md" />
                                 </StackPanel>
                             </Button>
                             <Button Command="{x:Bind ViewModel.ScanCommand}" Style="{StaticResource AccentButtonStyle}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Refresh}" Style="{StaticResource IconStyle}" />
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Refresh}"
+                                        Style="{StaticResource IconStyle}" />
                                     <TextBlock Text="{x:Bind ViewModel.ScanLabel, Mode=OneWay}" />
                                 </StackPanel>
                             </Button>
@@ -344,8 +354,12 @@
 
                 <controls:NoWorkspaceState
                     Glyph="{x:Bind icons:StudioIcons.Inventory}"
-                    Message="The inventory lists what the scanner found in a workspace’s legacy/ folder: code modules, screens, database access, SQL and risks. Open or start a workspace to see it."
-                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        The inventory lists what the scanner found in a workspace’s legacy/ folder: code modules,
+                        screens, database access, SQL and risks. Open or start a workspace to see it.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
 
                 <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
                     <InfoBar
@@ -355,7 +369,9 @@
                         Severity="Error"
                         Title="The scan didn’t finish.">
                         <InfoBar.IconSource>
-                            <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                         </InfoBar.IconSource>
                     </InfoBar>
 
@@ -372,11 +388,16 @@
                                 <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Scanning legacy/…" />
                             </StackPanel>
                             <ProgressBar IsIndeterminate="True" />
-                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="The scan only reads legacy/. Results replace the previous inventory when it finishes." />
+                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                The scan only reads legacy/. Results replace the previous inventory when it
+                                finishes.
+                            </TextBlock>
                         </StackPanel>
                     </Border>
 
-                    <ItemsRepeater AutomationProperties.Name="Summary" ItemsSource="{x:Bind ViewModel.Stats, Mode=OneWay}">
+                    <ItemsRepeater
+                        AutomationProperties.Name="Summary"
+                        ItemsSource="{x:Bind ViewModel.Stats, Mode=OneWay}">
                         <ItemsRepeater.Layout>
                             <UniformGridLayout
                                 x:Name="StatsLayout"
@@ -397,10 +418,14 @@
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 Glyph="{x:Bind Glyph}"
                                                 Style="{StaticResource IconStyle}" />
-                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
+                                            <TextBlock
+                                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                Text="{x:Bind Label}" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind Number}" />
+                                            <TextBlock
+                                                Style="{StaticResource TitleTextBlockStyle}"
+                                                Text="{x:Bind Number}" />
                                             <TextBlock
                                                 Margin="0,0,0,5"
                                                 VerticalAlignment="Bottom"
@@ -408,21 +433,31 @@
                                                 Style="{StaticResource BodyTextBlockStyle}"
                                                 Text="{x:Bind Unit}" />
                                         </StackPanel>
-                                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
+                                        <TextBlock
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="{x:Bind Detail}" />
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>
 
-                    <Border Style="{StaticResource CardStyle}" Visibility="{x:Bind ViewModel.IsNotScanned, Mode=OneWay}">
+                    <Border
+                        Style="{StaticResource CardStyle}"
+                        Visibility="{x:Bind ViewModel.IsNotScanned, Mode=OneWay}">
                         <controls:EmptyState
                             Glyph="{x:Bind icons:StudioIcons.Discover}"
-                            Message="The scan reads every .pas, .dfm, .dpr and project file and lists code modules, screens, database access, SQL and risks. It never changes legacy/. With Claude Code, the Legacy discovery agent can then draft D02 from it."
                             Title="legacy/ hasn’t been scanned">
+                            <controls:EmptyState.Message>
+                                The scan reads every .pas, .dfm, .dpr and project file and lists code modules, screens,
+                                database access, SQL and risks. It never changes legacy/. With Claude Code, the Legacy
+                                discovery agent can then draft D02 from it.
+                            </controls:EmptyState.Message>
                             <Button Command="{x:Bind ViewModel.ScanCommand}" Style="{StaticResource AccentButtonStyle}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Refresh}" Style="{StaticResource IconStyle}" />
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Refresh}"
+                                        Style="{StaticResource IconStyle}" />
                                     <TextBlock Text="Scan legacy/" />
                                 </StackPanel>
                             </Button>
@@ -450,7 +485,10 @@
                                 Visibility="{x:Bind ViewModel.IsLarge, Mode=OneWay}" />
                             <Border Style="{StaticResource FlushCardStyle}">
                                 <StackPanel>
-                                    <Grid x:Name="UnitsHeader" Style="{StaticResource TableHeaderStyle}">
+                                    <Grid
+                                        x:Name="UnitsHeader"
+                                        x:DefaultBindMode="OneWay"
+                                        Style="{StaticResource TableHeaderStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="88" />
@@ -465,126 +503,140 @@
                                         <Button
                                             Margin="-2,0,0,0"
                                             HorizontalAlignment="Left"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[0].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[0].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[0], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[0]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[0].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[0].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[0].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[0].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[0].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[0].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="1"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[1].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[1].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[1], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[1]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[1].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[1].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[1].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[1].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[1].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[1].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="2"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[2].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[2].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[2], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[2]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[2].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[2].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[2].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[2].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[2].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[2].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="3"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[3].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[3].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[3], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[3]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[3].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[3].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[3].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[3].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[3].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[3].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="4"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[4].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[4].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[4], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[4]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[4].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[4].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[4].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[4].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[4].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[4].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="5"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[5].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[5].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[5], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[5]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[5].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[5].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[5].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[5].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[5].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[5].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="6"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[6].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[6].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[6], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[6]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[6].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[6].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[6].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[6].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[6].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[6].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <TextBlock
@@ -594,6 +646,7 @@
                                     </Grid>
                                     <Grid
                                         x:Name="UnitsHeaderNarrow"
+                                        x:DefaultBindMode="OneWay"
                                         Style="{StaticResource TableHeaderStyle}"
                                         Visibility="Collapsed">
                                         <Grid.ColumnDefinitions>
@@ -606,72 +659,80 @@
                                         <Button
                                             Margin="-2,0,0,0"
                                             HorizontalAlignment="Left"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[0].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[0].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[0], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[0]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[0].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[0].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[0].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[0].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[0].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[0].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="1"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[1].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[1].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[1], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[1]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[1].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[1].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[1].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[1].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[1].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[1].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="2"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[4].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[4].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[4], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[4]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[4].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[4].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[4].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[4].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[4].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[4].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                         <Button
                                             Grid.Column="3"
                                             Margin="0,0,-2,0"
                                             HorizontalAlignment="Right"
-                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[5].AnnouncedName, Mode=OneWay}"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[5].AnnouncedName}"
                                             Click="OnSortClicked"
                                             Style="{StaticResource SortHeaderStyle}"
-                                            Tag="{x:Bind ViewModel.Headers[5], Mode=OneWay}">
+                                            Tag="{x:Bind ViewModel.Headers[5]}">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="{x:Bind ViewModel.Headers[5].Label, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[5].Label}" />
                                                 <FontIcon
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind ViewModel.Headers[5].Glyph, Mode=OneWay}"
+                                                    Glyph="{x:Bind ViewModel.Headers[5].Glyph}"
                                                     Style="{StaticResource IconStyle}"
-                                                    Visibility="{x:Bind ViewModel.Headers[5].IsSorted, Mode=OneWay}" />
+                                                    Visibility="{x:Bind ViewModel.Headers[5].IsSorted}" />
                                             </StackPanel>
                                         </Button>
                                     </Grid>
@@ -686,7 +747,9 @@
                                         SelectionMode="None" />
                                 </StackPanel>
                             </Border>
-                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.UnitsNote, Mode=OneWay}" />
+                            <TextBlock
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="{x:Bind ViewModel.UnitsNote, Mode=OneWay}" />
                         </StackPanel>
 
                         <!--  Screens and the controls on them.  -->
@@ -698,7 +761,9 @@
                                 Severity="Warning"
                                 Title="Some screens can’t be read.">
                                 <InfoBar.IconSource>
-                                    <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                                    <FontIconSource
+                                        FontFamily="{StaticResource StudioIconsFontFamily}"
+                                        Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                                 </InfoBar.IconSource>
                             </InfoBar>
                             <Border Style="{StaticResource FlushCardStyle}">
@@ -711,7 +776,9 @@
                                             <ColumnDefinition Width="72" />
                                             <ColumnDefinition Width="32" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Screen and its file" />
+                                        <TextBlock
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Screen and its file" />
                                         <TextBlock
                                             Grid.Column="1"
                                             Style="{StaticResource TableHeaderTextStyle}"
@@ -744,8 +811,12 @@
                                                         <ColumnDefinition Width="32" />
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel VerticalAlignment="Center">
-                                                        <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Root}" />
-                                                        <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
+                                                        <TextBlock
+                                                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                            Text="{x:Bind Root}" />
+                                                        <TextBlock
+                                                            Style="{StaticResource MonoTextStyle}"
+                                                            Text="{x:Bind Path}" />
                                                     </StackPanel>
                                                     <Border
                                                         Grid.Column="1"
@@ -771,7 +842,9 @@
                                                         Style="{StaticResource SubtleButtonStyle}"
                                                         Tag="{x:Bind Path}"
                                                         ToolTipService.ToolTip="Open in your editor">
-                                                        <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
+                                                        <FontIcon
+                                                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                                            Style="{StaticResource IconStyle}" />
                                                     </Button>
                                                 </Grid>
                                             </DataTemplate>
@@ -981,7 +1054,10 @@
                                                         </DataTemplate>
                                                     </ItemsRepeater.ItemTemplate>
                                                 </ItemsRepeater>
-                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Secrets found in legacy code always show as ***. The studio has no control to reveal them." />
+                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                                    Secrets found in legacy code always show as ***. The studio has
+                                                    no control to reveal them.
+                                                </TextBlock>
                                             </StackPanel>
                                         </Border>
                                     </DataTemplate>
@@ -1022,7 +1098,9 @@
                                             </DataTemplate>
                                         </ItemsRepeater.ItemTemplate>
                                     </ItemsRepeater>
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.ComNote, Mode=OneWay}" />
+                                    <TextBlock
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="{x:Bind ViewModel.ComNote, Mode=OneWay}" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -1155,8 +1233,12 @@
                         </StackPanel>
 
                         <!--  Circular dependencies.  -->
-                        <Border Style="{StaticResource FlushCardStyle}" Visibility="{x:Bind ViewModel.IsCycles, Mode=OneWay}">
-                            <ItemsRepeater AutomationProperties.Name="Cycles" ItemsSource="{x:Bind ViewModel.Cycles, Mode=OneWay}">
+                        <Border
+                            Style="{StaticResource FlushCardStyle}"
+                            Visibility="{x:Bind ViewModel.IsCycles, Mode=OneWay}">
+                            <ItemsRepeater
+                                AutomationProperties.Name="Cycles"
+                                ItemsSource="{x:Bind ViewModel.Cycles, Mode=OneWay}">
                                 <ItemsRepeater.ItemTemplate>
                                     <DataTemplate x:DataType="vm:CycleRow">
                                         <StackPanel
@@ -1169,7 +1251,9 @@
                                                 Foreground="{ThemeResource SystemFillColorCautionBrush}"
                                                 Glyph="{x:Bind icons:StudioIcons.Cycle}"
                                                 Style="{StaticResource IconStyle}" />
-                                            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{x:Bind Units}" />
+                                            <TextBlock
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                Text="{x:Bind Units}" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </ItemsRepeater.ItemTemplate>
@@ -1177,7 +1261,9 @@
                         </Border>
 
                         <!--  What the scanner could not read.  -->
-                        <Border Style="{StaticResource FlushCardStyle}" Visibility="{x:Bind ViewModel.IsDiagnostics, Mode=OneWay}">
+                        <Border
+                            Style="{StaticResource FlushCardStyle}"
+                            Visibility="{x:Bind ViewModel.IsDiagnostics, Mode=OneWay}">
                             <ListView
                                 x:Name="DiagnosticsList"
                                 AutomationProperties.Name="Diagnostics"

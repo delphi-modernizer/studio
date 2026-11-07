@@ -106,7 +106,11 @@
 
         <ScrollViewer>
             <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
-                <controls:PageHeader Purpose="Checks that every claim in the documents is backed by evidence and that every reference points to something real." Title="Traceability">
+                <controls:PageHeader Title="Traceability">
+                    <controls:PageHeader.Purpose>
+                        Checks that every claim in the documents is backed by evidence and that every reference points
+                        to something real.
+                    </controls:PageHeader.Purpose>
                     <controls:PageHeader.Actions>
                         <StackPanel
                             Orientation="Horizontal"
@@ -117,9 +121,13 @@
                                 IsOn="{x:Bind ViewModel.Strict, Mode=TwoWay}"
                                 OffContent="Count warnings as errors"
                                 OnContent="Count warnings as errors" />
-                            <Button Command="{x:Bind ViewModel.CheckCommand}" Style="{StaticResource AccentButtonStyle}">
+                            <Button
+                                Command="{x:Bind ViewModel.CheckCommand}"
+                                Style="{StaticResource AccentButtonStyle}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Refresh}" Style="{StaticResource IconStyle}" />
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Refresh}"
+                                        Style="{StaticResource IconStyle}" />
                                     <TextBlock Text="Check again" />
                                 </StackPanel>
                             </Button>
@@ -129,8 +137,12 @@
 
                 <controls:NoWorkspaceState
                     Glyph="{x:Bind icons:StudioIcons.Traceability}"
-                    Message="Traceability checks a workspace’s documents: every claim backed by evidence, every reference pointing to something real. Open or start a workspace to check it."
-                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        Traceability checks a workspace’s documents: every claim backed by evidence, every reference
+                        pointing to something real. Open or start a workspace to check it.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
 
                 <InfoBar
                     IsClosable="False"
@@ -139,7 +151,9 @@
                     Severity="Error"
                     Title="Couldn’t check the documents.">
                     <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                     </InfoBar.IconSource>
                 </InfoBar>
 
@@ -151,7 +165,9 @@
                         Severity="Informational"
                         Title="Warnings count as errors.">
                         <InfoBar.IconSource>
-                            <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
                         </InfoBar.IconSource>
                     </InfoBar>
 
@@ -195,13 +211,17 @@
                             <TextBlock
                                 MaxWidth="480"
                                 Style="{StaticResource BodyTextBlockStyle}"
-                                Text="Sign-offs that need clean documents can pass now. The final plan also counts warnings, such as open questions and requirements without a test."
                                 TextAlignment="Center"
-                                TextWrapping="Wrap" />
+                                TextWrapping="Wrap">
+                                Sign-offs that need clean documents can pass now. The final plan also counts
+                                warnings, such as open questions and requirements without a test.
+                            </TextBlock>
                         </StackPanel>
                     </Border>
 
-                    <Border Style="{StaticResource FlushCardStyle}" Visibility="{x:Bind ViewModel.HasProblems, Mode=OneWay}">
+                    <Border
+                        Style="{StaticResource FlushCardStyle}"
+                        Visibility="{x:Bind ViewModel.HasProblems, Mode=OneWay}">
                         <StackPanel>
                             <Grid Padding="16,6,8,0" ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
@@ -259,7 +279,9 @@
                                                     Style="{StaticResource BodyTextBlockStyle}"
                                                     Text="{x:Bind Description}"
                                                     TextWrapping="Wrap" />
-                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Rule}" />
+                                                <TextBlock
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="{x:Bind Rule}" />
                                             </StackPanel>
                                             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                                 <HyperlinkButton
@@ -272,7 +294,9 @@
                                                         Text="{x:Bind FileLink}"
                                                         TextTrimming="CharacterEllipsis" />
                                                 </HyperlinkButton>
-                                                <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Folder}" />
+                                                <TextBlock
+                                                    Style="{StaticResource MonoTextStyle}"
+                                                    Text="{x:Bind Folder}" />
                                             </StackPanel>
                                         </Grid>
                                     </DataTemplate>
@@ -281,7 +305,9 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Style="{StaticResource FlushCardStyle}" Visibility="{x:Bind ViewModel.IsMatrix, Mode=OneWay}">
+                    <Border
+                        Style="{StaticResource FlushCardStyle}"
+                        Visibility="{x:Bind ViewModel.IsMatrix, Mode=OneWay}">
                         <StackPanel>
                             <Grid Style="{StaticResource TableHeaderStyle}">
                                 <Grid.ColumnDefinitions>
@@ -398,7 +424,10 @@
                                 Padding="16,10"
                                 BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                                 BorderThickness="0,1,0,0">
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Rows appear as the functional requirements grow. A requirement with no test is a warning; one with no business rule and no evidence is an error." />
+                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                    Rows appear as the functional requirements grow. A requirement with no test is a
+                                    warning; one with no business rule and no evidence is an error.
+                                </TextBlock>
                             </Border>
                         </StackPanel>
                     </Border>

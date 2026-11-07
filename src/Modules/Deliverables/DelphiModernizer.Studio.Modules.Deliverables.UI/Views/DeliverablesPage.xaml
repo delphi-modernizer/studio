@@ -29,11 +29,17 @@
 
         <ScrollViewer>
             <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
-                <controls:PageHeader Purpose="The 20 documents of the modernization plan: which team drafts each one, which sign-off needs it, and where it stands." Title="Deliverables">
+                <controls:PageHeader Title="Deliverables">
+                    <controls:PageHeader.Purpose>
+                        The 20 documents of the modernization plan: which team drafts each one, which sign-off needs it,
+                        and where it stands.
+                    </controls:PageHeader.Purpose>
                     <controls:PageHeader.Actions>
                         <Button Click="OnOpenDocs" Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenFolder}" Style="{StaticResource IconStyle}" />
+                                <FontIcon
+                                    Glyph="{x:Bind icons:StudioIcons.OpenFolder}"
+                                    Style="{StaticResource IconStyle}" />
                                 <TextBlock Text="Open docs/" />
                             </StackPanel>
                         </Button>
@@ -42,8 +48,12 @@
 
                 <controls:NoWorkspaceState
                     Glyph="{x:Bind icons:StudioIcons.Deliverables}"
-                    Message="Deliverables lists a workspace’s 20 documents: which team drafts each one, which sign-off needs it, and where it stands. Open or start a workspace to see them."
-                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        Deliverables lists a workspace’s 20 documents: which team drafts each one, which sign-off
+                        needs it, and where it stands. Open or start a workspace to see them.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
 
                 <InfoBar
                     IsClosable="False"
@@ -52,7 +62,9 @@
                     Severity="Error"
                     Title="Couldn’t read the deliverables.">
                     <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                     </InfoBar.IconSource>
                 </InfoBar>
 
@@ -60,11 +72,15 @@
                     <InfoBar
                         IsClosable="False"
                         IsOpen="{x:Bind ViewModel.AllTemplates, Mode=OneWay}"
-                        Message="Write them yourself, or run a team’s agent task so an agent drafts them for you to review."
                         Severity="Informational"
                         Title="Every deliverable is still a template.">
+                        <InfoBar.Message>
+                            Write them yourself, or run a team’s agent task so an agent drafts them for you to review.
+                        </InfoBar.Message>
                         <InfoBar.IconSource>
-                            <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
                         </InfoBar.IconSource>
                         <InfoBar.ActionButton>
                             <Button Click="OnGoToWorkstreams" Content="Go to Workstreams" />
@@ -78,7 +94,9 @@
                         Severity="Error"
                         Title="{x:Bind ViewModel.MissingTitle, Mode=OneWay}">
                         <InfoBar.IconSource>
-                            <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                         </InfoBar.IconSource>
                         <InfoBar.ActionButton>
                             <Button Command="{x:Bind ViewModel.RestoreCommand}" Content="Restore from template" />
@@ -156,7 +174,9 @@
                                                         Text="{x:Bind Title}"
                                                         TextTrimming="CharacterEllipsis"
                                                         TextWrapping="NoWrap" />
-                                                    <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind PathText}" />
+                                                    <TextBlock
+                                                        Style="{StaticResource MonoTextStyle}"
+                                                        Text="{x:Bind PathText}" />
                                                 </StackPanel>
                                                 <TextBlock
                                                     Grid.Column="1"
@@ -178,7 +198,9 @@
                                                     Style="{StaticResource SubtleButtonStyle}"
                                                     Tag="{x:Bind}"
                                                     ToolTipService.ToolTip="Open in your editor">
-                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
+                                                    <FontIcon
+                                                        Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                                        Style="{StaticResource IconStyle}" />
                                                 </Button>
                                             </Grid>
                                         </Grid>
@@ -187,7 +209,10 @@
                             </ListView>
                         </StackPanel>
                     </Border>
-                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Approved shows only while the sign-off’s approval is current. Status is read from each file; agents can move a file to Draft, never to Approved." />
+                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                        Approved shows only while the sign-off’s approval is current. Status is read from each file;
+                        agents can move a file to Draft, never to Approved.
+                    </TextBlock>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
