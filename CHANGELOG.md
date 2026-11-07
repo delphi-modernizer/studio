@@ -20,3 +20,8 @@
 - Approve and revoke sign-offs from a dialog that shows your git identity, requires a note, never approves on Enter,
   and keeps the note when the engine refuses.
 - Sign-offs list the files each one covers, mark those changed since approval, and show every approval and revocation.
+- Workstreams lists the seven roles with their deliverables, agent tasks and run history; a task whose deliverable
+  another run writes shows Blocked with the reason and a link to that run.
+- Run an agent task asks for the task's scope, or the sign-off by name, and a budget, then runs it in the background.
+- The Run page follows a run live, with fact labels, collapsed tool calls and guard refusals, what it writes and
+  touches, Stop, and a new run when the budget is reached; the Workstreams item counts the runs in progress.
