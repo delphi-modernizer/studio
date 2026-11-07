@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
 using DelphiModernizer.Studio.UI.Common.Icons;
 using DelphiModernizer.Studio.UI.Contracts;
@@ -53,6 +54,18 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
         return isApproved ? StudioIcons.Approved : StudioIcons.Approve;
     }
 
+    /// <summary>A revocation shows the history glyph; an approval, the filled certificate.</summary>
+    public static string HistoryGlyph(bool isApproval)
+    {
+        return isApproval ? StudioIcons.Approved : StudioIcons.History;
+    }
+
+    /// <summary>A file changed since approval is drawn in the caution colour, with its "changed" mark.</summary>
+    public static Brush CoveredBrush(bool changed)
+    {
+        return Resource(changed ? "SystemFillColorCautionBrush" : "TextFillColorSecondaryBrush");
+    }
+
     private static Brush Resource(string key)
     {
         return (Brush)Microsoft.UI.Xaml.Application.Current.Resources[key];
@@ -61,6 +74,39 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.LoadCommand.ExecuteAsync(parameter: null);
+    }
+
+    private async void OnApprove(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: SignOffRow signOff })
+        {
+            await ShowDialogAsync(signOff, isRevoke: false);
+        }
+    }
+
+    private async void OnRevoke(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: SignOffRow signOff })
+        {
+            await ShowDialogAsync(signOff, isRevoke: true);
+        }
+    }
+
+    /// <summary>Only this dialog records an approval or a revocation; the list is read again after one.</summary>
+    private async Task ShowDialogAsync(SignOffRow signOff, bool isRevoke)
+    {
+        var dialogViewModel = await ViewModel.PrepareDialogAsync(signOff, isRevoke);
+        var dialog = new ApprovalDialog(dialogViewModel) { XamlRoot = XamlRoot };
+        var result = await dialog.ShowAsync();
+
+        if (dialogViewModel.ShowProblemsAfter)
+        {
+            ViewModel.ShowProblems();
+        }
+        else if (result == ContentDialogResult.Primary || dialogViewModel.IsRefused)
+        {
+            await ViewModel.LoadCommand.ExecuteAsync(parameter: null);
+        }
     }
 
     private void OnShowProblems(object sender, RoutedEventArgs e)
