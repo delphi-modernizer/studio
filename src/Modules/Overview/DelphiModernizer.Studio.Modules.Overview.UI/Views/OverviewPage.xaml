@@ -575,11 +575,13 @@
                                                     HorizontalAlignment="Left"
                                                     Style="{StaticResource NodeTileStyle}">
                                                     <FontIcon
+                                                        x:DefaultBindMode="OneTime"
                                                         FontSize="18"
                                                         Glyph="{x:Bind icons:StudioIcons.PrincipalArchitect}"
                                                         Style="{StaticResource IconStyle}" />
                                                 </Border>
                                                 <FontIcon
+                                                    x:DefaultBindMode="OneTime"
                                                     HorizontalAlignment="Right"
                                                     FontSize="12"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"

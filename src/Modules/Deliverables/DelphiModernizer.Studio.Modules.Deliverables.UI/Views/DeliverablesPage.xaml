@@ -9,23 +9,25 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <ResourceDictionary.ThemeDictionaries>
-            <!--  In high contrast a row under the pointer takes a button's colours, so secondary text stays.  -->
-            <ResourceDictionary x:Key="HighContrast">
-                <SolidColorBrush
-                    x:Key="ListViewItemBackgroundPointerOver"
-                    Color="{ThemeResource SystemColorHighlightTextColor}" />
-                <SolidColorBrush
-                    x:Key="ListViewItemBackgroundPressed"
-                    Color="{ThemeResource SystemColorHighlightTextColor}" />
-                <SolidColorBrush
-                    x:Key="ListViewItemForegroundPointerOver"
-                    Color="{ThemeResource SystemColorHighlightColor}" />
-                <SolidColorBrush
-                    x:Key="ListViewItemForegroundPressed"
-                    Color="{ThemeResource SystemColorHighlightColor}" />
-            </ResourceDictionary>
-        </ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <!--  In high contrast a row under the pointer takes a button's colours, so secondary text stays.  -->
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPressed"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPressed"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
     </Page.Resources>
 
     <Grid>
