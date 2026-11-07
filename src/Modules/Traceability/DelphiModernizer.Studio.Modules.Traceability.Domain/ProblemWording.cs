@@ -34,6 +34,23 @@ public static class ProblemWordings
 
     public static IReadOnlyCollection<string> Rules => _byRule.Keys;
 
+    /// <summary>What Narrator reads for a problem row, its severity first and its file and line last.</summary>
+    /// <param name="severity">The severity as its pill words it, "Error" or "Warning".</param>
+    /// <param name="subject">The record the problem is about, or null when there is none to name.</param>
+    public static string Announced(
+        string severity,
+        string description,
+        string label,
+        string? subject,
+        string file,
+        int line)
+    {
+        var about = subject is null ? label : $"{label}, {subject}";
+        var where = line > 0 ? $"{file}, line {line}" : file;
+
+        return $"{severity}: {description} {about}. {where}";
+    }
+
     /// <summary>The wording of a rule; a rule a newer kit adds reads as its own code until it gets words here.</summary>
     public static ProblemWording Of(string ruleId)
     {
