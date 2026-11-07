@@ -7,7 +7,7 @@ using DelphiModernizer.Studio.UI.Contracts;
 namespace DelphiModernizer.Studio.Modules.Traceability.UI;
 
 /// <summary>The Traceability item's badge: the problems the trace finds in the open workspace's documents.</summary>
-internal sealed class ProblemsBadge : IBadgeSource
+public sealed class ProblemsBadge : IBadgeSource
 {
     private readonly IWorkspaceSession _session;
     private readonly ISender _sender;
@@ -35,7 +35,13 @@ internal sealed class ProblemsBadge : IBadgeSource
     private async void OnSessionChanged(object? sender, EventArgs e)
     {
         var trace = _session.Current is null ? null : await _sender.Send(new RunTraceQuery(Strict: false));
-        Count = trace is { IsSuccess: true } ? trace.Value.Errors : 0;
+        Show(trace is { IsSuccess: true } ? trace.Value.Trace.Errors : 0);
+    }
+
+    /// <summary>Shows the errors of a check the Traceability page just ran, so the badge never lags the page.</summary>
+    public void Show(int errors)
+    {
+        Count = errors;
         Changed?.Invoke(this, EventArgs.Empty);
     }
 }

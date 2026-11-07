@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -80,27 +79,11 @@ internal sealed class GetOverviewQueryHandler(IWorkspaceSession session)
             runs);
     }
 
-    /// <remarks>The question is the register row's second cell; the row's line comes from the trace check.</remarks>
     private static List<OpenQuestion> Questions(Workspace workspace, TraceReport trace)
     {
-        var questions = new List<OpenQuestion>();
-        var files = new Dictionary<string, string[]>(StringComparer.Ordinal);
-
-        foreach (var issue in trace.Issues.Where(i => i.Rule == "open-question" && i.RecordId is not null))
-        {
-            if (!files.TryGetValue(issue.Path, out var lines))
-            {
-                var path = Path.Combine(workspace.Root, issue.Path);
-                lines = File.Exists(path) ? File.ReadAllLines(path) : [];
-                files[issue.Path] = lines;
-            }
-
-            var cells = issue.Line > 0 && issue.Line <= lines.Length ? lines[issue.Line - 1].Split('|') : [];
-            var text = cells.Length > 2 ? cells[2].Trim() : issue.Message;
-            questions.Add(new OpenQuestion(issue.RecordId!, text, issue.Path, issue.Line));
-        }
-
-        return questions;
+        return [.. trace.Issues
+            .Where(i => i.Rule == "open-question" && i.RecordId is not null)
+            .Select(i => new OpenQuestion(i.RecordId!, RegisterRows.Cell(workspace.Root, i.Path, i.Line, 0) ?? i.Message, i.Path, i.Line))];
     }
 
     private static WorkstreamProgress Progress(WorkstreamRole role, TraceReport trace)
