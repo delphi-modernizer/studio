@@ -24,8 +24,8 @@ in your user-level NuGet configuration.
 
 ## Icons
 
-`scripts/build-icon-font.py` and `scripts/build-app-icon.py` rebuild the committed font, glyph table, app icon and
-logos from `assets/`; see [icons.md](icons.md).
+`scripts/build_icon_font.py` and `scripts/build_app_icon.py` (`uv run python <script>`) rebuild the committed font,
+glyph table, app icon and logos from `assets/`; see [icons.md](icons.md).
 
 ## Screenshots
 

@@ -1,0 +1,117 @@
+[project]
+name = "delphi-modernizer-studio-scripts"
+version = "0.1.0"
+description = "The studio's build scripts: the Studio Icons font and the app icon."
+requires-python = ">=3.14"
+license = "MIT"
+dependencies = []
+
+[dependency-groups]
+# Pinned exactly: the committed font and icons are the bytes these versions
+# write, and CI rebuilds the font to compare.
+scripts = ["fonttools==4.60.2", "resvg-py==0.5.0", "pillow==13.0.0"]
+lint = ["pyink>=24.10", "isort>=6.0", "pylint>=3.3"]
+typecheck = ["mypy>=1.18", "pyright>=1.1.406"]
+
+[tool.uv]
+default-groups = ["scripts"]
+
+
+# https://google.github.io/styleguide/pyguide.html, as
+# delphi-modernizer/.github standards/python/PYTHON-STYLE.md sets it.
+
+[tool.pyink]
+line-length = 80
+target-version = ["py314"]
+pyink-indentation = 4
+# Splits long strings and hugs brackets, so that 80 columns stay readable.
+unstable = true
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "google"
+line_length = 80
+multi_line_output = 3
+include_trailing_comma = true
+use_parentheses = true
+src_paths = ["scripts"]
+skip_gitignore = true
+
+
+# Based on Google's pylintrc, with 4-space indentation.
+
+[tool.pylint.main]
+py-version = "3.14"
+jobs = 0
+source-roots = ["scripts"]
+load-plugins = ["pylint.extensions.docparams"]
+
+[tool.pylint.format]
+max-line-length = 80
+indent-string = "    "
+ignore-long-lines = '^\s*(# )?<?https?://\S+>?$|^\s*(from\s+\S+\s+)?import\s+.+$'
+
+[tool.pylint.basic]
+good-names = ["main", "_", "i", "j", "k", "fn"]
+typevar-rgx = "^([A-Z]|T[A-Za-z]+)$"
+no-docstring-rgx = "(__.*__|main|test.*|.*test|.*Test)$"
+docstring-min-length = 12
+
+[tool.pylint.parameter_documentation]
+default-docstring-type = "google"
+accept-no-param-doc = true
+accept-no-raise-doc = true
+accept-no-return-doc = true
+accept-no-yields-doc = true
+
+[tool.pylint.design]
+max-args = 10
+max-positional-arguments = 6
+max-attributes = 20
+max-locals = 20
+max-returns = 10
+max-branches = 12
+max-statements = 50
+
+[tool.pylint.similarities]
+min-similarity-lines = 8
+ignore-comments = true
+ignore-docstrings = true
+ignore-imports = true
+ignore-signatures = true
+
+[tool.pylint.messages_control]
+disable = [
+    "too-few-public-methods",
+    # mypy wants the `return None` of a function that may return something.
+    "useless-return",
+    "fixme",
+    # Type checkers (mypy, pyright) own these.
+    "import-error",
+    "no-member",
+    "no-name-in-module",
+    # isort owns import order.
+    "wrong-import-order",
+    "ungrouped-imports",
+]
+
+
+[tool.mypy]
+python_version = "3.14"
+files = ["scripts"]
+# `typings/` holds stubs for the untyped parts of fontTools.
+mypy_path = "scripts:typings"
+explicit_package_bases = true
+strict = true
+warn_unreachable = true
+show_error_codes = true
+show_column_numbers = true
+
+[tool.pyright]
+include = ["scripts"]
+stubPath = "typings"
+pythonVersion = "3.14"
+venvPath = "."
+venv = ".venv"
+typeCheckingMode = "standard"
+reportMissingTypeStubs = "error"

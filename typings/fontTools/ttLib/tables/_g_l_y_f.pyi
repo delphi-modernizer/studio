@@ -1,0 +1,2 @@
+class Glyph:
+    xMin: int
