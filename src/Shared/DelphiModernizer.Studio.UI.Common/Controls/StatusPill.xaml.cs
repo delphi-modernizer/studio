@@ -39,10 +39,9 @@ public sealed partial class StatusPill : UserControl
         set => SetValue(TextProperty, value);
     }
 
-    /// <remarks>A UserControl has no peer of its own, so without this one its Name never reaches Narrator.</remarks>
     protected override AutomationPeer OnCreateAutomationPeer()
     {
-        return new StatusPillAutomationPeer(this);
+        return new TextAutomationPeer(this, nameof(StatusPill));
     }
 
     private static void OnStateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
@@ -67,19 +66,6 @@ public sealed partial class StatusPill : UserControl
         if (changed && IsLoaded && AutomationProperties.GetLiveSetting(this) != AutomationLiveSetting.Off)
         {
             FrameworkElementAutomationPeer.FromElement(this)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
-        }
-    }
-
-    private sealed partial class StatusPillAutomationPeer(StatusPill owner) : FrameworkElementAutomationPeer(owner)
-    {
-        protected override string GetClassNameCore()
-        {
-            return nameof(StatusPill);
-        }
-
-        protected override AutomationControlType GetAutomationControlTypeCore()
-        {
-            return AutomationControlType.Text;
         }
     }
 }
