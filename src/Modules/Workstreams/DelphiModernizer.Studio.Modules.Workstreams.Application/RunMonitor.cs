@@ -91,6 +91,7 @@ public sealed class RunMonitor : IDisposable
             run.Add(new RunCompleted("failed", true, "The run ended without a result.", null, null, null, 0));
         }
 
+        run.Finish();
         Changed?.Invoke(this, EventArgs.Empty);
     }
 }

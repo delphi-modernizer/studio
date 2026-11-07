@@ -44,7 +44,7 @@ public sealed class LiveRun : IDisposable
 
     public bool IsEnded => Completed is not null;
 
-    /// <summary>Completes with the run's last event, however it ended.</summary>
+    /// <summary>Completes with the run's last event once the engine has closed the run: summary written, leases released.</summary>
     public Task<RunCompleted> Ended => _ended.Task;
 
     internal CancellationToken _stopToken => _stop.Token;
@@ -105,10 +105,14 @@ public sealed class LiveRun : IDisposable
         }
 
         received?.Invoke(this, item);
+    }
 
-        if (item is RunCompleted last)
+    /// <summary>Called by the monitor after the engine's stream is closed, which follows the last event.</summary>
+    internal void Finish()
+    {
+        if (Completed is { } completed)
         {
-            _ended.TrySetResult(last);
+            _ended.TrySetResult(completed);
         }
     }
 }
