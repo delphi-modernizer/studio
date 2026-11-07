@@ -26,6 +26,8 @@ change.
 | Blocked by a run the studio did not start, such as `dmz run` in a terminal: the engine's leases name no holder publicly | Run… is offered; the engine refuses the lease and the dialog shows its reason | `StartRunCommand` |
 | The Run an agent task dialog's description: the kit has none per recipe; the canvas draws one for Extract business rules | One sentence from what the recipe writes | `RunRecipeDialog` |
 | Short names for what a recipe writes ("Writes the functional requirements") | The kit's deliverable titles | `RunWords.Writes` |
+| Is an artboard's 1280 × 800 the window's visible frame, title bar included? | Yes: screenshots size the frame Windows draws, without the invisible resize borders | `Desktop.SetVisibleFrame` |
+| The brief's sample shows G0 and D01 approved; only a person approves, so the CI workspace has no approval | Screenshots show the freshly scanned workspace: no sign-off approved, every deliverable a template | `ci.yml`, `screenshots` job |
 | The other handoff questions (stale on answered questions, settings defaults, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |
 | The Delphi code node names the legacy system ("Acme ERP · Delphi 7"); the manifest holds only the workspace's name | The Delphi version alone | `OverviewWords.DelphiCode` |
 | A large codebase's "Group by folder" drop-down and its collapsible folders: the canvas draws neither the other choices nor how a folder opens | Folder headings above 50 code modules, every folder open, no drop-down | `InventoryViewModel.FilteredUnits` |

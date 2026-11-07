@@ -10,8 +10,12 @@ using Microsoft.UI.Xaml;
 
 namespace DelphiModernizer.Studio.App;
 
-/// <summary>The composition root: builds the services, opens the main window with the shell and logs what escapes.</summary>
-/// <remarks>The base type is spelled out because the <c>DelphiModernizer.Studio.Application</c> namespace shadows it.</remarks>
+/// <summary>
+/// The composition root: builds the services, opens the main window with the shell and logs what escapes.
+/// </summary>
+/// <remarks>
+/// The base type is spelled out because the <c>DelphiModernizer.Studio.Application</c> namespace shadows it.
+/// </remarks>
 public sealed partial class App : Microsoft.UI.Xaml.Application
 {
     private ServiceProvider? _services;

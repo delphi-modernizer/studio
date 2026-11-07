@@ -40,6 +40,9 @@ internal static class AppHost
             module.RegisterServices(services);
         }
 
-        return services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+        return services.BuildServiceProvider(new ServiceProviderOptions {
+            ValidateOnBuild = true,
+            ValidateScopes = true,
+        });
     }
 }

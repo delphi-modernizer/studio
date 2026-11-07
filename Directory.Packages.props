@@ -45,4 +45,8 @@
     <PackageVersion Include="coverlet.collector" Version="10.1.0" />
   </ItemGroup>
 
+  <ItemGroup Label="Screenshots (docs/design/ui-screenshots.md)">
+    <PackageVersion Include="FlaUI.UIA3" Version="5.0.0" />
+  </ItemGroup>
+
 </Project>
