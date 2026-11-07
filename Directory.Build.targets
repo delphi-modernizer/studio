@@ -1,0 +1,15 @@
+<Project>
+
+  <!--
+    A project names the engine assemblies it uses as EngineReference items; they become project references to the
+    engine checkout or package references, as EngineSource says.
+  -->
+  <ItemGroup Condition="'$(EngineSource)' == 'Source'">
+    <ProjectReference Include="@(EngineReference->'$(EngineRoot)src/%(Identity)/%(Identity).csproj')" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(EngineSource)' == 'Package'">
+    <PackageReference Include="@(EngineReference)" />
+  </ItemGroup>
+
+</Project>

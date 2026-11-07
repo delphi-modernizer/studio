@@ -1,0 +1,7 @@
+globs:
+  - "**/*.md"
+ignores:
+  - "CLAUDE.md"
+  - "**/bin/**"
+  - "**/obj/**"
+  - ".engine/**"
