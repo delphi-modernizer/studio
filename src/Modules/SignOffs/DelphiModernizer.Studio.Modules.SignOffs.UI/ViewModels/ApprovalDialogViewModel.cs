@@ -134,7 +134,7 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
 
         var signOffs = await _sender.Send(new GetSignOffsQuery(), cancellationToken);
         var now = signOffs.IsSuccess ? signOffs.Value.FirstOrDefault(s => s.Status.Gate == SignOff.Gate) : null;
-        var reason = now is null ? "a check no longer passes" : SignOffRefusal.Reason(now);
+        var reason = now is null ? "a check fails now" : SignOffRefusal.Reason(now);
         Refusal = $"{SignOff.Name} can’t be approved yet: {reason}. A check changed after this dialog opened. Your note is kept.";
         RefusalShowsProblems = now?.Checks.Any(c => c is { Passed: false, ShowsProblems: true }) == true;
         IsRefused = true;

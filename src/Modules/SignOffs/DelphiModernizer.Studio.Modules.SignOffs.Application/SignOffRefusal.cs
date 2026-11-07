@@ -4,7 +4,7 @@ using DelphiModernizer.Engine.Core;
 
 namespace DelphiModernizer.Studio.Modules.SignOffs.Application;
 
-/// <summary>The words for an approval the engine refused because a check no longer passes.</summary>
+/// <summary>The words for an approval the engine refused because a check fails when it evaluates them again.</summary>
 public static class SignOffRefusal
 {
     /// <summary>Whether the engine refused because a check failed when it evaluated them again.</summary>
@@ -25,7 +25,7 @@ public static class SignOffRefusal
             .Select(c => c.ShowsProblems ? $"{c.Detail.Split(';')[0]} in the documents" : $"{c.Name} ({Lowered(c.Detail)})")
             .ToList();
 
-        return failing.Count == 0 ? "a check no longer passes" : string.Join("; ", failing);
+        return failing.Count == 0 ? "a check fails now" : string.Join("; ", failing);
     }
 
     private static string Lowered(string text)

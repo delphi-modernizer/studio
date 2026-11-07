@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,8 @@ public sealed class ApprovalTests
     [Fact]
     public async Task The_approver_is_who_git_says_in_the_workspace()
     {
-        using var workspace = await TestWorkspace.CreateAsync();
+        using var repository = await GitWorkspace.CreateAsync();
+        var workspace = repository.Workspace;
         await GitAsync(workspace, "init");
         await GitAsync(workspace, "config", "user.name", "Dana Reviewer");
         await GitAsync(workspace, "config", "user.email", "dana@example.com");
@@ -32,7 +34,8 @@ public sealed class ApprovalTests
     [Fact]
     public async Task Without_a_git_name_there_is_no_approver()
     {
-        using var workspace = await TestWorkspace.CreateAsync();
+        using var repository = await GitWorkspace.CreateAsync();
+        var workspace = repository.Workspace;
         await GitAsync(workspace, "init");
         await GitAsync(workspace, "config", "user.name", string.Empty);
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
@@ -45,7 +48,8 @@ public sealed class ApprovalTests
     [Fact]
     public async Task Approving_records_the_git_identity_and_the_note_and_commits_it()
     {
-        using var workspace = await ApprovableAsync();
+        using var repository = await ApprovableAsync();
+        var workspace = repository.Workspace;
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
 
         var approved = await sender.Send(new ApproveGateCommand("G0", "Read the charter."), TestContext.Current.CancellationToken);
@@ -59,7 +63,8 @@ public sealed class ApprovalTests
     [Fact]
     public async Task A_refusal_names_what_fails_in_words()
     {
-        using var workspace = await ApprovableAsync();
+        using var repository = await ApprovableAsync();
+        var workspace = repository.Workspace;
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
 
         var approved = await sender.Send(new ApproveGateCommand("G1", "Looks fine."), TestContext.Current.CancellationToken);
@@ -72,7 +77,8 @@ public sealed class ApprovalTests
     [Fact]
     public async Task Revoking_keeps_later_approvals_and_blocks_approving_them_again()
     {
-        using var workspace = await ApprovableAsync();
+        using var repository = await ApprovableAsync();
+        var workspace = repository.Workspace;
         await MakeDiscoveryReadyAsync(workspace);
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
         var cancellationToken = TestContext.Current.CancellationToken;
@@ -92,14 +98,14 @@ public sealed class ApprovalTests
         Assert.True(SignOffRefusal.IsRefusal(again.Error));
     }
 
-    private static async Task<TestWorkspace> ApprovableAsync()
+    private static async Task<GitWorkspace> ApprovableAsync()
     {
-        var workspace = await TestWorkspace.CreateAsync();
-        await GitAsync(workspace, "init");
-        await GitAsync(workspace, "config", "user.name", "Dana Reviewer");
-        await GitAsync(workspace, "config", "user.email", "dana@example.com");
+        var repository = await GitWorkspace.CreateAsync();
+        await GitAsync(repository.Workspace, "init");
+        await GitAsync(repository.Workspace, "config", "user.name", "Dana Reviewer");
+        await GitAsync(repository.Workspace, "config", "user.email", "dana@example.com");
 
-        return workspace;
+        return repository;
     }
 
     /// <summary>Puts the system inventory in review and saves a scan, so Discovery waits only on Project setup.</summary>
@@ -129,5 +135,26 @@ public sealed class ApprovalTests
         await git.WaitForExitAsync(CancellationToken.None);
 
         return output;
+    }
+
+    /// <summary>A test workspace made a git repository; Windows refuses to delete the read-only objects git writes.</summary>
+    private sealed class GitWorkspace(TestWorkspace workspace) : IDisposable
+    {
+        public TestWorkspace Workspace { get; } = workspace;
+
+        public static async Task<GitWorkspace> CreateAsync()
+        {
+            return new GitWorkspace(await TestWorkspace.CreateAsync());
+        }
+
+        public void Dispose()
+        {
+            foreach (var file in Directory.EnumerateFiles(Workspace.Parent, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
+
+            Workspace.Dispose();
+        }
     }
 }
