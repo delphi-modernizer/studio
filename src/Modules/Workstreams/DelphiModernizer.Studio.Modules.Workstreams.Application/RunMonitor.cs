@@ -36,12 +36,12 @@ public sealed class RunMonitor : IDisposable
         return Runs.FirstOrDefault(r => r.RunId == runId);
     }
 
-    /// <summary>The run in progress that writes any of <paramref name="deliverables"/>, which holds their leases.</summary>
-    public LiveRun? Writing(IEnumerable<string> deliverables)
+    /// <summary>The run in progress in the workspace at <paramref name="workspaceRoot"/> that writes any of <paramref name="deliverables"/>.</summary>
+    public LiveRun? Writing(string workspaceRoot, IEnumerable<string> deliverables)
     {
         var wanted = deliverables.ToHashSet(StringComparer.Ordinal);
 
-        return Runs.FirstOrDefault(r => !r.IsEnded && r.Recipe.Writes.Any(wanted.Contains));
+        return Runs.FirstOrDefault(r => !r.IsEnded && r.WorkspaceRoot == workspaceRoot && r.Recipe.Writes.Any(wanted.Contains));
     }
 
     public void Dispose()
@@ -53,9 +53,9 @@ public sealed class RunMonitor : IDisposable
     }
 
     /// <param name="events">The engine's stream; it is enumerated to its end, or until the run is stopped.</param>
-    internal LiveRun Track(string runId, Recipe recipe, string? argument, decimal budgetUsd, DateTimeOffset startedAt, IAsyncEnumerable<AgentEvent> events)
+    internal LiveRun Track(string runId, string workspaceRoot, Recipe recipe, string? argument, decimal budgetUsd, DateTimeOffset startedAt, IAsyncEnumerable<AgentEvent> events)
     {
-        var run = new LiveRun(runId, recipe, argument, budgetUsd, startedAt);
+        var run = new LiveRun(runId, workspaceRoot, recipe, argument, budgetUsd, startedAt);
 
         lock (_gate)
         {

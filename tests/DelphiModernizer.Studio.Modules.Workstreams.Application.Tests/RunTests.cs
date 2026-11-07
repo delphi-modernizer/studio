@@ -70,7 +70,7 @@ public sealed class RunTests
 
         var first = await sender.Send(new StartRunCommand("ws01-business-rules", "legacy/Sales", 1m), TestContext.Current.CancellationToken);
         var second = await sender.Send(new StartRunCommand("ws02-frs", null, 1m), TestContext.Current.CancellationToken);
-        var writing = monitor.Writing(["D03"]);
+        var writing = monitor.Writing(workspace.Workspace.Root, ["D03"]);
         Assert.Equal(1, monitor.InProgress);
         first.Value.Stop();
         var stopped = await first.Value.Ended;
@@ -82,7 +82,7 @@ public sealed class RunTests
         Assert.Same(first.Value, writing);
         Assert.Equal(RunOutcome.Stopped, RunOutcomes.Of(stopped.Outcome));
         Assert.True(again.IsSuccess);
-        Assert.Null(monitor.Writing(["D03"]));
+        Assert.Null(monitor.Writing(workspace.Workspace.Root, ["D03"]));
     }
 
     [Fact]

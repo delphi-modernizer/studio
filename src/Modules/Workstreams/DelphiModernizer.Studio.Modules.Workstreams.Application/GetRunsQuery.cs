@@ -101,7 +101,7 @@ internal sealed class GetRunsQueryHandler(IWorkspaceSession session, RunMonitor 
             .Select(r => r.RunId)
             .ToHashSet(StringComparer.Ordinal);
         var live = monitor.Runs
-            .Where(r => !recorded.Contains(r.RunId))
+            .Where(r => r.WorkspaceRoot == workspace.Root && !recorded.Contains(r.RunId))
             .Select(RunRecord.Of);
         IReadOnlyList<RunRecord> runs = [.. live
             .Concat(stored)

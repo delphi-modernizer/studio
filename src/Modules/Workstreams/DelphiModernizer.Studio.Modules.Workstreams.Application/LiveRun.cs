@@ -16,9 +16,10 @@ public sealed class LiveRun : IDisposable
     private readonly TaskCompletionSource<RunCompleted> _ended = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private EventHandler<AgentEvent>? _received;
 
-    internal LiveRun(string runId, Recipe recipe, string? argument, decimal budgetUsd, DateTimeOffset startedAt)
+    internal LiveRun(string runId, string workspaceRoot, Recipe recipe, string? argument, decimal budgetUsd, DateTimeOffset startedAt)
     {
         RunId = runId;
+        WorkspaceRoot = workspaceRoot;
         Recipe = recipe;
         Argument = argument;
         BudgetUsd = budgetUsd;
@@ -26,6 +27,8 @@ public sealed class LiveRun : IDisposable
     }
 
     public string RunId { get; }
+
+    public string WorkspaceRoot { get; }
 
     public Recipe Recipe { get; }
 

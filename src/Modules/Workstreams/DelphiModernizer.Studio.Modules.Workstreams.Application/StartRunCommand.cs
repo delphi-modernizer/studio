@@ -92,7 +92,7 @@ internal sealed class StartRunCommandHandler(
             var events = Leased(new AgentRunner(executable.Value), run, workspace, recipe.Writes, CancellationToken.None);
             tracked = true;
 
-            return monitor.Track(run.RunId, recipe, argument, request.BudgetUsd, startedAt, events);
+            return monitor.Track(run.RunId, workspace.Root, recipe, argument, request.BudgetUsd, startedAt, events);
         }
         finally
         {
