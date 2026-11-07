@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DelphiModernizer.Engine.Kit;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 using DelphiModernizer.Studio.Modules.Traceability.Application;
@@ -219,11 +220,15 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
         };
     }
 
+    /// <remarks>A rule the kit makes a warning reports as an error only when warnings count, and says so.</remarks>
     private static ProblemRow Row(Problem problem)
     {
         var issue = problem.Issue;
         var pill = issue.Severity == "error" ? PillState.Error : PillState.Warning;
-        var rule = problem.Subject is null ? problem.Wording.Label : $"{problem.Wording.Label} · {problem.Subject}";
+        var subject = problem.Subject is null ? string.Empty : $" · {problem.Subject}";
+        var promoted = issue.Severity == "error"
+            && KitBundle.Embedded.Spec.TraceRules.Rules.Any(r => r.Id == issue.RuleId && r.Severity == "warning");
+        var rule = $"{problem.Wording.Label}{subject}{(promoted ? " · counts as an error now" : string.Empty)}";
         var folder = Path.GetDirectoryName(issue.Path)?.Replace('\\', '/') is { Length: > 0 } directory
             ? directory + "/"
             : string.Empty;
