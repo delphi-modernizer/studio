@@ -49,18 +49,21 @@ internal static class Program
 
             foreach (var error in data.Errors())
             {
-                failures.Add($"The app logged: {error}");
+                Fail(failures, $"The app logged: {error}");
             }
 
             data.CopyLogs(Path.Combine(output, "logs"));
         }
 
-        foreach (var failure in failures)
-        {
-            Console.Error.WriteLine($"FAILED {failure}");
-        }
+        Console.WriteLine(failures.Count == 0 ? "Every page captured." : $"{failures.Count} failures.");
 
         return failures.Count == 0 ? 0 : 1;
+    }
+
+    private static void Fail(List<string> failures, string failure)
+    {
+        failures.Add(failure);
+        Console.Error.WriteLine($"FAILED {failure}");
     }
 
     private static void AllPages(StudioDriver app, Action<string, Action> step)
@@ -160,7 +163,7 @@ internal static class Program
             pages(app, (page, capture) => {
                 if (app.HasExited)
                 {
-                    failures.Add($"{theme} {page}: the app is not running.");
+                    Fail(failures, $"{theme} {page}: the app is not running.");
 
                     return;
                 }
@@ -172,13 +175,13 @@ internal static class Program
                 catch (Exception exception) when (exception is InvalidOperationException or IOException
                     or COMException or TimeoutException)
                 {
-                    failures.Add($"{theme} {page}: {exception.Message}");
+                    Fail(failures, $"{theme} {page}: {exception.Message}");
                 }
             });
         }
         catch (Exception exception) when (exception is InvalidOperationException or Win32Exception)
         {
-            failures.Add($"{theme}: the app did not start: {exception.Message}");
+            Fail(failures, $"{theme}: the app did not start: {exception.Message}");
         }
     }
 }

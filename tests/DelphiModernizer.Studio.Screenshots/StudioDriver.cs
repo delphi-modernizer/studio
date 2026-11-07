@@ -102,7 +102,11 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Clicks the first row of a list; UI Automation cannot raise ItemClick.</summary>
     public void ClickFirstItem(string listName)
     {
-        var list = Find(cf => cf.ByName(listName), listName);
+        var list = Find(
+            cf => cf
+                .ByName(listName)
+                .And(cf.ByControlType(ControlType.List)),
+            listName);
         var row = Retry
             .WhileNull(() => list.FindFirstChild(cf => cf.ByControlType(ControlType.ListItem)), _findTimeout)
             .Result ?? throw new InvalidOperationException($"{listName} has no rows.");
@@ -181,7 +185,7 @@ internal sealed class StudioDriver : IDisposable
         if (!_app.HasExited)
         {
             _app.Close();
-            _app.WaitWhileMainHandleIsMissing(TimeSpan.FromSeconds(1));
+            Retry.WhileFalse(() => _app.HasExited, TimeSpan.FromSeconds(10), throwOnTimeout: false);
         }
 
         if (!_app.HasExited)
