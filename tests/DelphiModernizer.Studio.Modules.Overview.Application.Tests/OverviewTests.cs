@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
@@ -22,6 +23,22 @@ public sealed class OverviewTests
         Assert.Equal(["D01", "D16"], overview.Value.Workstreams[0].Deliverables);
         Assert.Null(overview.Value.Inventory);
         Assert.Equal("dotnet", overview.Value.TargetStack);
+    }
+
+    [Fact]
+    public async Task An_open_question_reads_as_the_question_its_register_asks()
+    {
+        using var workspace = await TestWorkspace.CreateAsync();
+        var register = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter", "open-questions.md");
+        var row = "| Q-001 | Which regulations apply to invoices? | Tax rules shape the invoice module. | Test Person | Open |  |\n";
+        await File.AppendAllTextAsync(register, row, TestContext.Current.CancellationToken);
+        var sender = Services.Sender(workspace.Session, services => services.AddOverviewApplication());
+
+        var overview = await sender.Send(new GetOverviewQuery(), TestContext.Current.CancellationToken);
+
+        var question = Assert.Single(overview.Value.Questions);
+        Assert.Equal("Q-001", question.Id);
+        Assert.Equal("Which regulations apply to invoices?", question.Text);
     }
 
     [Fact]

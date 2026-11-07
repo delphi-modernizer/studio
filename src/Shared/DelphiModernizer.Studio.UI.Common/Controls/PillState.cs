@@ -72,3 +72,29 @@ public sealed record PillLook(string Word, string Glyph, PillTone Tone)
         };
     }
 }
+
+/// <summary>The pill for each state word the engine writes.</summary>
+public static class PillStates
+{
+    /// <param name="state">A gate's state: <c>approved</c>, <c>stale</c>, <c>ready</c> or <c>blocked</c>.</param>
+    public static PillState OfGate(string state)
+    {
+        return state switch {
+            "approved" => PillState.Approved,
+            "stale" => PillState.Stale,
+            "ready" => PillState.Ready,
+            _ => PillState.Blocked,
+        };
+    }
+
+    /// <param name="status">A deliverable's front-matter status, or <c>missing</c> when its file is gone.</param>
+    public static PillState OfDeliverable(string status)
+    {
+        return status switch {
+            "draft" => PillState.Draft,
+            "in-review" => PillState.InReview,
+            "missing" => PillState.Missing,
+            _ => PillState.Template,
+        };
+    }
+}
