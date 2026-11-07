@@ -10,7 +10,9 @@ using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
-/// <summary>Every deliverable of the open workspace with the status its front matter records, and where each sign-off stands.</summary>
+/// <summary>
+/// Every deliverable of the open workspace with the status its front matter records, and where each sign-off stands.
+/// </summary>
 public sealed record GetDeliverableStatesQuery : IRequest<Result<DeliverableStates>>;
 
 /// <param name="Gates">The sign-offs in the kit's order, as the engine evaluates them.</param>
@@ -19,7 +21,9 @@ public sealed record DeliverableStates(IReadOnlyList<DeliverableState> Deliverab
 internal sealed class GetDeliverableStatesQueryHandler(IWorkspaceSession session)
     : IRequestHandler<GetDeliverableStatesQuery, Result<DeliverableStates>>
 {
-    public Task<Result<DeliverableStates>> Handle(GetDeliverableStatesQuery request, CancellationToken cancellationToken)
+    public Task<Result<DeliverableStates>> Handle(
+        GetDeliverableStatesQuery request,
+        CancellationToken cancellationToken)
     {
         if (session.Current is not { } workspace)
         {
@@ -29,8 +33,9 @@ internal sealed class GetDeliverableStatesQueryHandler(IWorkspaceSession session
         return Task.Run(
             () => {
                 var trace = new TraceChecker(KitBundle.Embedded.Spec).Check(workspace.Root, strict: false);
+                var gates = new GateEvaluator(workspace).Evaluate();
 
-                return Result.Success(new DeliverableStates(trace.Deliverables, new GateEvaluator(workspace).Evaluate()));
+                return Result.Success(new DeliverableStates(trace.Deliverables, gates));
             },
             cancellationToken);
     }

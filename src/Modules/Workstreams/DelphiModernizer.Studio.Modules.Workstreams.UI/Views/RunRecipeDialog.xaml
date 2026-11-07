@@ -46,15 +46,22 @@
                 Minimum="0.1"
                 SmallChange="0.5"
                 SpinButtonPlacementMode="Inline" />
-            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="The run stops when it reaches this. The default comes from Settings." />
+            <TextBlock
+                Style="{StaticResource SecondaryCaptionTextStyle}"
+                Text="The run stops when it reaches this. The default comes from Settings." />
         </StackPanel>
         <InfoBar
             IsClosable="False"
             IsOpen="True"
-            Message="The guard keeps the agent in docs/. It can’t change the Delphi code, approve a sign-off, choose the platform, or write new code before the final plan is approved."
             Severity="Informational">
+            <InfoBar.Message>
+                The guard keeps the agent in docs/. It can’t change the Delphi code, approve a sign-off, choose the
+                platform, or write new code before the final plan is approved.
+            </InfoBar.Message>
             <InfoBar.IconSource>
-                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.GuardRefused}" />
+                <FontIconSource
+                    FontFamily="{StaticResource StudioIconsFontFamily}"
+                    Glyph="{x:Bind icons:StudioIcons.GuardRefused}" />
             </InfoBar.IconSource>
         </InfoBar>
         <InfoBar
@@ -63,7 +70,9 @@
             Severity="Error"
             Title="The run didn’t start.">
             <InfoBar.IconSource>
-                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                <FontIconSource
+                    FontFamily="{StaticResource StudioIconsFontFamily}"
+                    Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
             </InfoBar.IconSource>
         </InfoBar>
     </StackPanel>

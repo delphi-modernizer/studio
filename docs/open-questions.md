@@ -38,3 +38,7 @@ change.
 | The Delphi code node names the legacy system ("Acme ERP · Delphi 7"); the manifest holds only the workspace's name | The Delphi version alone | `OverviewWords.DelphiCode` |
 | A large codebase's "Group by folder" drop-down and its collapsible folders: the canvas draws neither the other choices nor how a folder opens | Folder headings above 50 code modules, every folder open, no drop-down | `InventoryViewModel.FilteredUnits` |
 | Narrator names for rows the handoff does not name: screens, SQL statements, risk markers, diagnostics, matrix rows and sign-off headings | The row's visible columns in order, such as "TFrmMain, MainForm.dfm, Text, 3 controls, 1 events" | Each row's `AnnouncedName` |
+| Sign-offs' approval panel width: the handoff says 320, the canvas stylesheet draws 336 | 320, as the handoff says | `SignOffsPage` |
+| Run's keyboard order once a run has ended: the handoff lists Open the draft, then Back to Legacy discovery, but the header's Back comes first on the page | Reading order: the header's Back, Run again… on the failed InfoBar, then the end card's Open the draft and Back | `RunPage` |
+| Evidence links in a run's transcript: the canvas draws them under a claim; the engine streams plain agent text | The links the kit's evidence pattern finds in each line, under that line | `RunTranscript.Evidence` |
+| A tool call's summary: the canvas draws "31 lines" for Read and "2 matches" for Grep only | Matches for Grep, lines for every other tool, Done for an empty result | `RunNames.ToolSummary` |

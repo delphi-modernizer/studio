@@ -31,7 +31,9 @@ public sealed partial class RunRecipeDialog : ContentDialog
     private bool _touched;
 
     /// <param name="argument">The argument to start with, as Run again passes the earlier run's.</param>
-    /// <param name="nextGate">The sign-off a gate argument starts from when <paramref name="argument"/> is null.</param>
+    /// <param name="nextGate">
+    /// The sign-off a gate argument starts from when <paramref name="argument"/> is null.
+    /// </param>
     public RunRecipeDialog(Recipe recipe, string roleName, string? argument, decimal budgetUsd, string? nextGate)
     {
         ArgumentNullException.ThrowIfNull(recipe);
@@ -40,7 +42,8 @@ public sealed partial class RunRecipeDialog : ContentDialog
         _choosesGate = recipe.Argument.Name == _gateArgument;
         RoleText.Text = roleName;
         TitleText.Text = $"Run {recipe.Title}";
-        Lead.Text = $"The agent writes the {RunWords.Writes(recipe)} as a draft, each claim with a link to its evidence and a fact label. You review the draft afterwards.";
+        Lead.Text = $"The agent writes the {RunWords.Writes(recipe)} as a draft, "
+            + "each claim with a link to its evidence and a fact label. You review the draft afterwards.";
         var name = RunWords.Capitalized(recipe.Argument.Name);
         ArgumentBox.Header = $"{name} ({(recipe.Argument.Required ? "required" : "optional")})";
         ArgumentBox.PlaceholderText = recipe.Argument.Description;
@@ -123,6 +126,7 @@ public sealed partial class RunRecipeDialog : ContentDialog
         ArgumentError.Text = $"This task needs a {_recipe.Argument.Name}.";
         ArgumentError.Visibility = missing && _touched ? Visibility.Visible : Visibility.Collapsed;
         AutomationProperties.SetHelpText(ArgumentBox, missing && _touched ? ArgumentError.Text : string.Empty);
-        IsPrimaryButtonEnabled = !missing && BudgetUsd > 0 && (_choosesGate || !ArgumentBox.Text.Contains('\n', StringComparison.Ordinal));
+        var oneLine = _choosesGate || !ArgumentBox.Text.Contains('\n', StringComparison.Ordinal);
+        IsPrimaryButtonEnabled = !missing && BudgetUsd > 0 && oneLine;
     }
 }

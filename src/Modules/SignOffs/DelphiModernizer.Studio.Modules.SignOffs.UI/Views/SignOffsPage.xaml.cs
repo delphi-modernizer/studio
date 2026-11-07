@@ -1,11 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
-using DelphiModernizer.Studio.UI.Common.Icons;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 
 namespace DelphiModernizer.Studio.Modules.SignOffs.UI.Views;
 
@@ -23,56 +21,40 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
 
     DelphiModernizer.Studio.UI.Contracts.ViewModel IHasViewModel.ViewModel => ViewModel;
 
-    /// <summary>The next sign-off's number carries the accent ring; x:Bind calls these from the row template.</summary>
-    public static Brush NumberBrush(bool isNext)
+    /// <summary>Wide: the checks and the approval panel side by side, 24 apart; narrow: the panel 16 below.</summary>
+    public static double ColumnGap(bool isNarrow)
     {
-        return Resource(isNext ? "AccentFillColorDefaultBrush" : "ControlStrongStrokeColorDefaultBrush");
+        return isNarrow ? 0 : 24;
     }
 
-    public static Thickness NumberThickness(bool isNext)
+    public static double RowGap(bool isNarrow)
     {
-        return new Thickness(isNext ? 2 : 1);
+        return isNarrow ? 16 : 0;
     }
 
-    public static Brush CheckBrush(CheckTone tone)
+    public static GridLength PanelWidth(bool isNarrow)
     {
-        return Resource(tone switch {
-            CheckTone.Passed => "SystemFillColorSuccessBrush",
-            CheckTone.Failing => "SystemFillColorCriticalBrush",
-            _ => "TextFillColorSecondaryBrush",
-        });
+        return new GridLength(isNarrow ? 0 : 320);
     }
 
-    /// <summary>A current approval shows the filled certificate in the success colour; a stale one, the outline.</summary>
-    public static Brush ApprovalBrush(bool isApproved)
+    public static int PanelRow(bool isNarrow)
     {
-        return Resource(isApproved ? "SystemFillColorSuccessBrush" : "TextFillColorSecondaryBrush");
+        return isNarrow ? 1 : 0;
     }
 
-    public static string ApprovalGlyph(bool isApproved)
+    public static int PanelColumn(bool isNarrow)
     {
-        return isApproved ? StudioIcons.Approved : StudioIcons.Approve;
+        return isNarrow ? 0 : 1;
     }
 
-    /// <summary>A revocation shows the history glyph; an approval, the filled certificate.</summary>
-    public static string HistoryGlyph(bool isApproval)
+    private void OnLayoutChanged(object sender, VisualStateChangedEventArgs e)
     {
-        return isApproval ? StudioIcons.Approved : StudioIcons.History;
-    }
-
-    /// <summary>A file changed since approval is drawn in the caution colour, with its "changed" mark.</summary>
-    public static Brush CoveredBrush(bool changed)
-    {
-        return Resource(changed ? "SystemFillColorCautionBrush" : "TextFillColorSecondaryBrush");
-    }
-
-    private static Brush Resource(string key)
-    {
-        return (Brush)Microsoft.UI.Xaml.Application.Current.Resources[key];
+        ViewModel.IsNarrow = e.NewState?.Name == nameof(Narrow);
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        ViewModel.IsNarrow = Layout.CurrentState?.Name == nameof(Narrow);
         await ViewModel.LoadCommand.ExecuteAsync(parameter: null);
     }
 

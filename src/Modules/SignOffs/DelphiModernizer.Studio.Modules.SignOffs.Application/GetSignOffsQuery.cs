@@ -14,7 +14,9 @@ using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 
 namespace DelphiModernizer.Studio.Modules.SignOffs.Application;
 
-/// <summary>The five sign-offs in order, each with its checks in words; the current approval is on its status.</summary>
+/// <summary>
+/// The five sign-offs in order, each with its checks in words; the current approval is on its status.
+/// </summary>
 public sealed record GetSignOffsQuery : IRequest<Result<IReadOnlyList<SignOff>>>;
 
 /// <param name="History">Every approval and revocation of the sign-off, oldest first.</param>
@@ -28,15 +30,31 @@ public sealed record SignOff(
     IReadOnlyList<ApprovalEntry> History,
     IReadOnlyList<string> Changed);
 
-/// <param name="ShowsProblems">Whether the check fails on problems in the documents, so it offers Show the problems.</param>
-public sealed record SignOffCheck(string Name, string Detail, bool Passed, bool ShowsProblems);
-
-internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequestHandler<GetSignOffsQuery, Result<IReadOnlyList<SignOff>>>
+/// <param name="ShowsProblems">
+/// Whether the check fails on problems in the documents, so it offers Show the problems.
+/// </param>
+public sealed record SignOffCheck(string Name, string Detail, bool Passed, bool ShowsProblems)
 {
-    /// <summary>A gate that needs more deliverables than this shows them as one check, as the final plan does.</summary>
+    /// <summary>What Narrator reads for the check row, such as "Not met: Discovery approved. It is blocked."</summary>
+    /// <remarks>A failing check reads its count alone; what follows the count is on screen only.</remarks>
+    public string AnnouncedName => (Passed, ShowsProblems) switch {
+        (true, _) => $"Passed: {Name}.",
+        (false, true) => $"Failing: {Name}. {Detail.Split(';')[0]}.",
+        _ => $"Not met: {Name}. {Detail}.",
+    };
+}
+
+internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session)
+    : IRequestHandler<GetSignOffsQuery, Result<IReadOnlyList<SignOff>>>
+{
+    /// <summary>
+    /// A gate that needs more deliverables than this shows them as one check, as the final plan does.
+    /// </summary>
     private const int _listedDeliverables = 7;
 
-    public async Task<Result<IReadOnlyList<SignOff>>> Handle(GetSignOffsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<SignOff>>> Handle(
+        GetSignOffsQuery request,
+        CancellationToken cancellationToken)
     {
         if (session.Current is not { } workspace)
         {
@@ -48,7 +66,10 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
         return await Task.WhenAll(signOffs.Select(s => WithChangesAsync(workspace, s, cancellationToken)));
     }
 
-    private static async Task<SignOff> WithChangesAsync(Workspace workspace, SignOff signOff, CancellationToken cancellationToken)
+    private static async Task<SignOff> WithChangesAsync(
+        Workspace workspace,
+        SignOff signOff,
+        CancellationToken cancellationToken)
     {
         if (signOff.Status.State != "stale")
         {
@@ -75,7 +96,11 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
             index + 1,
             SignOffNames.Of(status.Gate),
             SignOffWordings.Approves(status.Gate, status.Approves),
-            Checks(status, index == 0 ? null : gates[index - 1], spec.Gates.Gates.First(g => g.Id == status.Gate), context),
+            Checks(
+                status,
+                index == 0 ? null : gates[index - 1],
+                spec.Gates.Gates.First(g => g.Id == status.Gate),
+                context),
             ApprovalService.History(workspace, status.Gate),
             []))];
     }
@@ -93,7 +118,11 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
         if (previous is not null)
         {
             var passed = engine[0].Passed;
-            checks.Add(new SignOffCheck($"{SignOffNames.Of(previous.Gate)} approved", passed ? "Approved" : $"It is {previous.State}", passed, false));
+            checks.Add(new SignOffCheck(
+                $"{SignOffNames.Of(previous.Gate)} approved",
+                passed ? "Approved" : $"It is {previous.State}",
+                passed,
+                false));
             offset = 1;
         }
 
@@ -104,21 +133,27 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
         {
             var met = deliverableChecks.Count(c => c.Passed);
             var word = StatusWord(required[0].MinStatus);
-            checks.Add(new SignOffCheck($"All {required.Length} deliverables {word}", $"{met} of {required.Length} {word}", met == required.Length, false));
+            checks.Add(new SignOffCheck(
+                $"All {required.Length} deliverables {word}",
+                $"{met} of {required.Length} {word}",
+                met == required.Length,
+                false));
         }
         else
         {
             checks.AddRange(required.Select((r, i) => Deliverable(r, deliverableChecks[i].Passed, context)));
         }
 
-        checks.AddRange(gate.Requires.Conditions.Select((condition, i) => Condition(condition, engine[offset + required.Length + i], context)));
+        checks.AddRange(gate.Requires.Conditions.Select(
+            (condition, i) => Condition(condition, engine[offset + required.Length + i], context)));
 
         return checks;
     }
 
     private static SignOffCheck Deliverable(DeliverableRequirement requirement, bool passed, Context context)
     {
-        var title = KitBundle.Embedded.Spec.Deliverables.Deliverables.FirstOrDefault(d => d.Id == requirement.Id)?.Title ?? requirement.Id;
+        var title = KitBundle.Embedded.Spec.Deliverables.Deliverables
+            .FirstOrDefault(d => d.Id == requirement.Id)?.Title ?? requirement.Id;
         var name = $"{SignOffWordings.Deliverable(requirement.Id, title)} {StatusWord(requirement.MinStatus)}";
         var actual = context.Statuses.GetValueOrDefault(requirement.Id, "missing");
         var detail = passed ? Capitalized(StatusWord(actual)) : actual switch {
@@ -137,17 +172,37 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
 
         return condition switch {
             "legacy-attached" => new(
-                "Delphi code added", check.Passed ? "legacy/ holds the Delphi sources" : "legacy/ holds no Delphi sources", check.Passed, false),
+                "Delphi code added",
+                check.Passed ? "legacy/ holds the Delphi sources" : "legacy/ holds no Delphi sources",
+                check.Passed,
+                false),
             "target-stack-recorded" => new(
-                "Target platform recorded", check.Passed ? $"{target}, in the decision log" : "Neither chosen nor left for later", check.Passed, false),
+                "Target platform recorded",
+                check.Passed ? $"{target}, in the decision log" : "Neither chosen nor left for later",
+                check.Passed,
+                false),
             "target-stack-decided" => new(
-                "Target platform decided", check.Passed ? $"{target}, in the decision log" : "Still to decide after discovery", check.Passed, false),
+                "Target platform decided",
+                check.Passed ? $"{target}, in the decision log" : "Still to decide after discovery",
+                check.Passed,
+                false),
             "scan-present" => new(
-                "Delphi code scanned", check.Passed ? "A scan of legacy/ is saved" : "Not scanned yet; scan it from Inventory", check.Passed, false),
+                "Delphi code scanned",
+                check.Passed ? "A scan of legacy/ is saved" : "Not scanned yet; scan it from Inventory",
+                check.Passed,
+                false),
             "trace-clean" => new(
-                "No problems in the documents", check.Passed ? "None found" : Problems(context.Errors), check.Passed, !check.Passed),
+                "No problems in the documents",
+                check.Passed ? "None found" : Problems(context.Errors),
+                check.Passed,
+                !check.Passed),
             "trace-strict-clean" => new(
-                "No problems, warnings included", check.Passed ? "None found" : $"{Problems(context.StrictErrors())}; for the final plan, warnings count too", check.Passed, !check.Passed),
+                "No problems, warnings included",
+                check.Passed
+                    ? "None found"
+                    : $"{Problems(context.StrictErrors())}; for the final plan, warnings count too",
+                check.Passed,
+                !check.Passed),
             _ => new(condition, check.Detail, check.Passed, false),
         };
     }
@@ -171,5 +226,9 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
         return count == 1 ? "1 problem" : $"{count} problems";
     }
 
-    private sealed record Context(Workspace Workspace, Dictionary<string, string> Statuses, int Errors, Func<int> StrictErrors);
+    private sealed record Context(
+        Workspace Workspace,
+        Dictionary<string, string> Statuses,
+        int Errors,
+        Func<int> StrictErrors);
 }

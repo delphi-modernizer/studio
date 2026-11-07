@@ -11,8 +11,16 @@ using DelphiModernizer.Studio.UI.Common.Icons;
 namespace DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
 
 /// <summary>One check of a sign-off: met, not yet met, or failing on problems in the documents.</summary>
-public sealed record CheckRow(string Name, string Detail, bool Passed, bool ShowsProblems)
+public sealed record CheckRow(SignOffCheck Check)
 {
+    public string Name => Check.Name;
+
+    public string Detail => Check.Detail;
+
+    public bool Passed => Check.Passed;
+
+    public bool ShowsProblems => Check.ShowsProblems;
+
     public CheckTone Tone => (Passed, ShowsProblems) switch {
         (true, _) => CheckTone.Passed,
         (false, true) => CheckTone.Failing,
@@ -25,11 +33,11 @@ public sealed record CheckRow(string Name, string Detail, bool Passed, bool Show
         _ => StudioIcons.NotYet,
     };
 
-    public string AnnouncedName => Tone switch {
-        CheckTone.Passed => $"Passed: {Name}.",
-        CheckTone.Failing => $"Failing: {Name}. {Detail}.",
-        _ => $"Not met: {Name}. {Detail}.",
-    };
+    public bool IsFailing => Tone == CheckTone.Failing;
+
+    public bool IsNotYet => Tone == CheckTone.NotYet;
+
+    public string AnnouncedName => Check.AnnouncedName;
 }
 
 public enum CheckTone
@@ -40,16 +48,13 @@ public enum CheckTone
 }
 
 /// <summary>One file a sign-off covers, marked when it changed since the approval.</summary>
-public sealed record CoveredFileRow(string Path, bool Changed)
-{
-    public string Text => Changed ? $"{Path}  · changed" : Path;
-
-    public string AnnouncedName => Changed ? $"{Path}, changed since approval" : Path;
-}
+public sealed record CoveredFileRow(string Path, bool Changed);
 
 /// <summary>One approval or revocation in a sign-off's history.</summary>
 public sealed record HistoryRow(string Text, string Detail, bool IsApproval)
 {
+    public bool IsRevocation => !IsApproval;
+
     public static HistoryRow Of(ApprovalEntry entry)
     {
         var when = entry.At.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
@@ -72,16 +77,15 @@ public sealed record HistoryRow(string Text, string Detail, bool IsApproval)
 /// <summary>One sign-off as an expander: its header, its checks and where its approval stands.</summary>
 public sealed partial class SignOffRow : ObservableObject
 {
-    public SignOffRow(SignOff signOff, int count, bool isNext)
+    public SignOffRow(SignOff signOff, int count)
     {
         Gate = signOff.Status.Gate;
         Number = signOff.Number.ToString(CultureInfo.CurrentCulture);
         Name = signOff.Name;
         Approves = signOff.Approves;
         Pill = PillStates.OfGate(signOff.Status.State);
-        IsNext = isNext;
         IsLast = signOff.Number == count;
-        Checks = [.. signOff.Checks.Select(c => new CheckRow(c.Name, c.Detail, c.Passed, c.ShowsProblems))];
+        Checks = [.. signOff.Checks.Select(c => new CheckRow(c))];
         var passed = Checks.Count(c => c.Passed);
         PassCount = $"{passed} of {Checks.Count} pass";
         var failing = Checks.Count - passed;
@@ -94,7 +98,8 @@ public sealed partial class SignOffRow : ObservableObject
         ChangedSummary = signOff.Changed.Count switch {
             0 => "A file it covers differs from the one approved.",
             1 => $"{FileName(signOff.Changed[0])} differs from {ApprovedCommit(signOff)}.",
-            _ => $"{FileName(signOff.Changed[0])} and {signOff.Changed.Count - 1} more differ from {ApprovedCommit(signOff)}.",
+            _ => $"{FileName(signOff.Changed[0])} and {signOff.Changed.Count - 1} more differ from "
+                + $"{ApprovedCommit(signOff)}.",
         };
 
         if (signOff.Status.Approval is { } approval)
@@ -110,9 +115,15 @@ public sealed partial class SignOffRow : ObservableObject
 
         (Summary, SummaryDetail) = signOff.Status.State switch {
             "approved" => (ApprovedBy, ApprovedWhen),
-            "stale" => ("Changed since approval", signOff.Changed.Count > 0 ? string.Join(", ", signOff.Changed.Select(FileName)) : "A file it covers was edited"),
+            "stale" => (
+                "Changed since approval",
+                signOff.Changed.Count > 0
+                    ? string.Join(", ", signOff.Changed.Select(FileName))
+                    : "A file it covers was edited"),
             "ready" => ($"{passed} of {Checks.Count} checks pass", "Waiting for a person"),
-            _ => ($"{passed} of {Checks.Count} checks pass", Checks.FirstOrDefault(c => !c.Passed)?.Name ?? string.Empty),
+            _ => (
+                $"{passed} of {Checks.Count} checks pass",
+                Checks.FirstOrDefault(c => !c.Passed)?.Name ?? string.Empty),
         };
         AnnouncedName = $"{Name}, sign-off {Number} of {count}, {PillLook.Of(Pill).Word}, {Summary}";
     }
@@ -127,7 +138,6 @@ public sealed partial class SignOffRow : ObservableObject
 
     public PillState Pill { get; }
 
-    public bool IsNext { get; }
 
     public bool IsLast { get; }
 
@@ -151,7 +161,9 @@ public sealed partial class SignOffRow : ObservableObject
 
     public bool HasHistory => History.Count > 0;
 
-    /// <summary>What the stale InfoBar says changed: the files git reports, or the fingerprint alone when it cannot tell.</summary>
+    /// <summary>
+    /// What the stale InfoBar says changed: the files git reports, or the fingerprint alone when it cannot tell.
+    /// </summary>
     public string ChangedSummary { get; }
 
     public string ApprovedBy { get; } = string.Empty;
@@ -180,6 +192,13 @@ public sealed partial class SignOffRow : ObservableObject
 
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
+
+    /// <summary>Under 1100 the body is one column and the header drops its summary's second line.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowsSummaryDetail))]
+    public partial bool IsNarrow { get; set; }
+
+    public bool ShowsSummaryDetail => !IsNarrow;
 
     private static string FileName(string path)
     {

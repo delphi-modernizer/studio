@@ -28,7 +28,8 @@ public sealed class WorkstreamsModule : IModule
     public IReadOnlyList<NavigationItem> GetNavigationItems()
     {
         return [
-            new NavigationItem("Workstreams", StudioIcons.Workstreams, StudioIcons.WorkstreamsFilled, typeof(WorkstreamsPage), 30) {
+            new NavigationItem(
+                "Workstreams", StudioIcons.Workstreams, StudioIcons.WorkstreamsFilled, typeof(WorkstreamsPage), 30) {
                 Badge = provider => provider.GetRequiredService<RunsBadge>(),
             },
         ];

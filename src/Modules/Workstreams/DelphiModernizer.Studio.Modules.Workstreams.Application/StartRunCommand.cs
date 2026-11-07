@@ -15,7 +15,9 @@ using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
-/// <summary>Starts a kit recipe in the open workspace with the person's Claude Code settings and this run's budget.</summary>
+/// <summary>
+/// Starts a kit recipe in the open workspace with the person's Claude Code settings and this run's budget.
+/// </summary>
 /// <remarks>
 /// The run holds a lease on each deliverable the recipe writes until it ends; <see cref="RunMonitor"/> reads it to the
 /// end, and <see cref="LiveRun.Stop"/> stops the agent and releases the leases.
@@ -89,7 +91,8 @@ internal sealed class StartRunCommandHandler(
             }
 
             var argument = string.IsNullOrWhiteSpace(request.Argument) ? null : request.Argument.Trim();
-            var events = Leased(new AgentRunner(executable.Value), run, workspace, recipe.Writes, CancellationToken.None);
+            var runner = new AgentRunner(executable.Value);
+            var events = Leased(runner, run, workspace, recipe.Writes, CancellationToken.None);
             tracked = true;
 
             return monitor.Track(run.RunId, workspace.Root, recipe, argument, request.BudgetUsd, startedAt, events);
