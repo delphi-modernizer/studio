@@ -232,6 +232,51 @@
                                             Text="{x:Bind Note}"
                                             TextWrapping="Wrap"
                                             Visibility="{x:Bind HasApproval}" />
+                                        <StackPanel Spacing="8" Visibility="{x:Bind IsBlocked}">
+                                            <Button
+                                                AutomationProperties.HelpText="Opens when every check passes."
+                                                AutomationProperties.Name="{x:Bind ApproveName}"
+                                                IsEnabled="False"
+                                                Style="{StaticResource AccentButtonStyle}">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Approve}" Style="{StaticResource IconStyle}" />
+                                                    <TextBlock Text="{x:Bind ApproveText}" />
+                                                </StackPanel>
+                                            </Button>
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Approve opens when every check passes." />
+                                        </StackPanel>
+                                        <StackPanel Spacing="8" Visibility="{x:Bind IsReady}">
+                                            <Button
+                                                AutomationProperties.HelpText="Opens a confirmation. Records your git identity and a note."
+                                                AutomationProperties.Name="{x:Bind ApproveName}"
+                                                Click="OnApprove"
+                                                Style="{StaticResource AccentButtonStyle}">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Approve}" Style="{StaticResource IconStyle}" />
+                                                    <TextBlock Text="{x:Bind ApproveText}" />
+                                                </StackPanel>
+                                            </Button>
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Records your git identity and a note. Agents are refused." />
+                                        </StackPanel>
+                                        <StackPanel Spacing="8" Visibility="{x:Bind IsApproved}">
+                                            <Button
+                                                HorizontalAlignment="Left"
+                                                Click="OnRevoke"
+                                                Content="Revoke approval…" />
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Revoking keeps this approval in the history." />
+                                        </StackPanel>
+                                        <StackPanel
+                                            Orientation="Horizontal"
+                                            Spacing="8"
+                                            Visibility="{x:Bind IsStale}">
+                                            <Button Click="OnApprove" Style="{StaticResource AccentButtonStyle}">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Approve}" Style="{StaticResource IconStyle}" />
+                                                    <TextBlock Text="Re-approve…" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Click="OnRevoke" Content="Revoke approval…" />
+                                        </StackPanel>
                                         <Rectangle
                                             Height="1"
                                             Margin="0,4"

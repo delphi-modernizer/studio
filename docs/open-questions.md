@@ -15,6 +15,7 @@ change.
 | Browse… for the workspace folder when the folder picked already holds files | A new folder named after the workspace inside it, shown in the box before Next | `NewWorkspaceViewModel.BrowseFolder` |
 | Short names for deliverables in sign-off checks: the canvas names D01 to D09 ("System inventory", "Technology evaluation"); D10 to D20 are new | "Data migration strategy", "Testing strategy" and the like, one place to change | `SignOffWordings` |
 | The files a sign-off covers ("Covers · 7 files") and which changed since approval: the engine hashes them but does not list them | The fingerprint only, with Copy; the list waits on an engine change in milestone 3 | `SignOffsPage` |
+| The refusal's words for a check other than problems in the documents: the canvas words only "1 problem in the documents" | The check's name with its detail, as "System inventory in review (it is a draft)", one place to change | `SignOffRefusal` |
 | The preview's "[n] of [total] files" while scanning: the engine's scanner reports no progress | "Scanning the folder…" with an indeterminate bar | `NewWorkspacePage` |
 | Problem wording: the canvas words three trace rules (broken evidence, missing evidence, open question); the other eleven are new | Labels and sentences in the same style, one place to change | `ProblemWordings` |
 | Default window height | 760, as the brief says | `MainWindow.xaml` |

@@ -67,6 +67,14 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
         _clipboard.SetText(text);
     }
 
+    /// <summary>The dialog for approving or revoking a sign-off, with who git says the person is.</summary>
+    public async Task<ApprovalDialogViewModel> PrepareDialogAsync(SignOffRow signOff, bool isRevoke)
+    {
+        var approver = await _sender.Send(new GetApproverQuery(), CancellationToken.None);
+
+        return new ApprovalDialogViewModel(_sender, signOff, isRevoke, approver);
+    }
+
     public void ShowProblems()
     {
         _navigation.NavigateTo("Traceability");

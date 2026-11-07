@@ -48,6 +48,7 @@ public sealed partial class SignOffRow : ObservableObject
         Approves = signOff.Approves;
         Pill = PillStates.OfGate(signOff.Status.State);
         IsNext = isNext;
+        IsLast = signOff.Number == count;
         Checks = [.. signOff.Checks.Select(c => new CheckRow(c.Name, c.Detail, c.Passed, c.ShowsProblems))];
         var passed = Checks.Count(c => c.Passed);
         PassCount = $"{passed} of {Checks.Count} pass";
@@ -86,6 +87,12 @@ public sealed partial class SignOffRow : ObservableObject
     public PillState Pill { get; }
 
     public bool IsNext { get; }
+
+    public bool IsLast { get; }
+
+    public string ApproveText => $"Approve {Name}…";
+
+    public string ApproveName => $"Approve {Name}";
 
     public IReadOnlyList<CheckRow> Checks { get; }
 
