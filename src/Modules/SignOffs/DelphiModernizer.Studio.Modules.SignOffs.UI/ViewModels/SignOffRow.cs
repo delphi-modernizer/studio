@@ -48,14 +48,7 @@ public enum CheckTone
 }
 
 /// <summary>One file a sign-off covers, marked when it changed since the approval.</summary>
-public sealed record CoveredFileRow(string Path, bool Changed)
-{
-    public string Text => Changed ? $"{Path}  · changed" : Path;
-
-    public bool IsUnchanged => !Changed;
-
-    public string AnnouncedName => Changed ? $"{Path}, changed since approval" : Path;
-}
+public sealed record CoveredFileRow(string Path, bool Changed);
 
 /// <summary>One approval or revocation in a sign-off's history.</summary>
 public sealed record HistoryRow(string Text, string Detail, bool IsApproval)

@@ -664,12 +664,10 @@
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Glyph="{x:Bind Glyph, Mode=OneWay}"
                                                     Style="{StaticResource IconStyle}" />
-                                                <TextBlock
+                                                <controls:PathText
                                                     Grid.Column="1"
                                                     VerticalAlignment="Center"
-                                                    Style="{StaticResource MonoTextStyle}"
-                                                    Text="{x:Bind Path}"
-                                                    TextWrapping="NoWrap" />
+                                                    Text="{x:Bind Path}" />
                                                 <Button
                                                     Grid.Column="2"
                                                     Padding="6"

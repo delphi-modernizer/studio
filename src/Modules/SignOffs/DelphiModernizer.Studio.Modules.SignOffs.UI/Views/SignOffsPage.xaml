@@ -96,22 +96,22 @@
         </DataTemplate>
 
         <DataTemplate x:Key="CoveredFileTemplate" x:DataType="vm:CoveredFileRow">
-            <!--  A changed file is drawn in the caution colour; MonoTextStyle gives the others the secondary one.  -->
-            <Grid>
+            <!--  The path keeps its file name when trimmed; a changed file adds its mark in the caution colour.  -->
+            <Grid
+                Padding="0,2"
+                ColumnSpacing="8"
+                ToolTipService.ToolTip="{x:Bind Path}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <controls:PathText Text="{x:Bind Path}" />
                 <TextBlock
-                    Padding="0,2"
-                    AutomationProperties.Name="{x:Bind AnnouncedName}"
-                    Style="{StaticResource MonoTextStyle}"
-                    Text="{x:Bind Text}"
-                    ToolTipService.ToolTip="{x:Bind Path}"
-                    Visibility="{x:Bind IsUnchanged}" />
-                <TextBlock
-                    Padding="0,2"
-                    AutomationProperties.Name="{x:Bind AnnouncedName}"
+                    Grid.Column="1"
+                    AutomationProperties.Name="changed since approval"
                     Foreground="{ThemeResource SystemFillColorCautionBrush}"
                     Style="{StaticResource MonoTextStyle}"
-                    Text="{x:Bind Text}"
-                    ToolTipService.ToolTip="{x:Bind Path}"
+                    Text="· changed"
                     Visibility="{x:Bind Changed}" />
             </Grid>
         </DataTemplate>
