@@ -39,8 +39,9 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial IReadOnlyList<FilterChoice> Filters { get; set; } = [];
 
+    /// <summary>Each sign-off's heading followed by the deliverables it needs that pass the filter.</summary>
     [ObservableProperty]
-    public partial IReadOnlyList<SignOffGroup> Groups { get; set; } = [];
+    public partial IReadOnlyList<DeliverableRow> Rows { get; set; } = [];
 
     [ObservableProperty]
     public partial DeliverableFilter Filter { get; set; }
@@ -131,7 +132,7 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
 
     partial void OnFilterChanged(DeliverableFilter value)
     {
-        Groups = Filtered();
+        Rows = Filtered();
     }
 
     private void Show(DeliverablesOverview overview)
@@ -150,22 +151,30 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
 
         Filters = [
             new(DeliverableFilter.All, "All", rows.Count),
-            new(DeliverableFilter.Approved, "Approved", rows.Count(r => r.Pill == PillState.Approved)),
-            new(DeliverableFilter.InReview, "In review", rows.Count(r => r.Pill == PillState.InReview)),
-            new(DeliverableFilter.Draft, "Draft", rows.Count(r => r.Pill == PillState.Draft)),
             new(DeliverableFilter.Template, "Template", rows.Count(r => r.Pill == PillState.Template)),
+            new(DeliverableFilter.Draft, "Draft", rows.Count(r => r.Pill == PillState.Draft)),
+            new(DeliverableFilter.InReview, "In review", rows.Count(r => r.Pill == PillState.InReview)),
+            new(DeliverableFilter.Approved, "Approved", rows.Count(r => r.Pill == PillState.Approved)),
             new(DeliverableFilter.Missing, "Missing", rows.Count(r => r.Pill == PillState.Missing)),
         ];
         AllTemplates = rows.TrueForAll(r => r.Pill == PillState.Template);
         Missing = rows.Find(r => r.Pill == PillState.Missing);
-        Groups = Filtered();
+        Rows = Filtered();
     }
 
-    private List<SignOffGroup> Filtered()
+    private List<DeliverableRow> Filtered()
     {
         return [.. _all
             .Select(g => g with { Rows = [.. g.Rows.Where(Matches)] })
-            .Where(g => g.Rows.Count > 0)];
+            .Where(g => g.Rows.Count > 0)
+            .SelectMany(g => g.Rows.Prepend(Heading(g)))];
+    }
+
+    private static DeliverableRow Heading(SignOffGroup group)
+    {
+        var name = $"{group.Name}, {group.Number}, {PillLook.Of(group.Pill).Word}";
+
+        return new DeliverableRow(string.Empty, group.Name, group.Number, string.Empty, group.Pill, name, IsGroup: true);
     }
 
     private bool Matches(DeliverableRow row)
