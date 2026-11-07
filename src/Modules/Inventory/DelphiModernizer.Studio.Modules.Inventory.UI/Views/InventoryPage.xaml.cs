@@ -19,10 +19,15 @@ public sealed partial class InventoryPage : Page, IHasViewModel
         InitializeComponent();
         ViewModel.PropertyChanged += OnViewModelChanged;
 
-        foreach (var table in new ListViewBase[] { UnitsList, ScreensList, SqlList, RisksList, DiagnosticsList })
+        ListViewBase[] tables = [UnitsList, ScreensList, SqlList, RisksList, DiagnosticsList];
+
+        foreach (var table in tables)
         {
             table.ContainerContentChanging += (_, args) => NameRow(args);
         }
+
+        // A table owns its scrolling, no taller than the page, so a large codebase's rows stay virtualised.
+        PageScroller.SizeChanged += (_, args) => Array.ForEach(tables, t => t.MaxHeight = args.NewSize.Height);
     }
 
     public InventoryViewModel ViewModel { get; }

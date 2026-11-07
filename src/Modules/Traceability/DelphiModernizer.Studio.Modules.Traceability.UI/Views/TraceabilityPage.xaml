@@ -124,7 +124,7 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
 
-        <ScrollViewer>
+        <ScrollViewer x:Name="PageScroller">
             <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                 <controls:PageHeader Title="Traceability">
                     <controls:PageHeader.Purpose>

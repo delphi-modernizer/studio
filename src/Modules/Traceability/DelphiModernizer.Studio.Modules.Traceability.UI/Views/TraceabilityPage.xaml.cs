@@ -22,6 +22,12 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
         ViewModel.PropertyChanged += OnViewModelChanged;
         ProblemsList.ContainerContentChanging += (_, args) => NameRow(args);
         MatrixList.ContainerContentChanging += (_, args) => NameRow(args);
+
+        // A list owns its scrolling, no taller than the page, so hundreds of rows stay virtualised.
+        PageScroller.SizeChanged += (_, args) => {
+            ProblemsList.MaxHeight = args.NewSize.Height;
+            MatrixList.MaxHeight = args.NewSize.Height;
+        };
     }
 
     public TraceabilityViewModel ViewModel { get; }
