@@ -11,6 +11,7 @@ change.
 | Do evidence links open in the person's editor or a read-only viewer? | The app Windows associates with the file, without the line; other file types are shown in Explorer, never run | `EditorLauncher` |
 | What do Workstreams, Deliverables, Traceability and Sign-offs say with no workspace open? The canvas draws only Overview and Inventory | A line saying what the page would show, in the style of the drawn two | Each page's `NoWorkspaceState` |
 | Clone from Git has an action card and a link but no drawn flow | Not offered yet | Start, Overview |
+| Problem wording: the canvas words three trace rules (broken evidence, missing evidence, open question); the other eleven are new | Labels and sentences in the same style, one place to change | `ProblemWordings` |
 | Default window height | 760, as the brief says | `MainWindow.xaml` |
 | When does the pane collapse on its own? | Never; only from the title-bar toggle | `ShellPage` |
 | The other handoff questions (stale on answered questions, changed-file lists, revoking earlier sign-offs, settings defaults, tool calls collapsed, Run again, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |

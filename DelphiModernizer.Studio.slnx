@@ -49,6 +49,7 @@
   </Folder>
   <Folder Name="/src/Modules/Traceability/">
     <Project Path="src/Modules/Traceability/DelphiModernizer.Studio.Modules.Traceability.Application/DelphiModernizer.Studio.Modules.Traceability.Application.csproj" />
+    <Project Path="src/Modules/Traceability/DelphiModernizer.Studio.Modules.Traceability.Domain/DelphiModernizer.Studio.Modules.Traceability.Domain.csproj" />
     <Project Path="src/Modules/Traceability/DelphiModernizer.Studio.Modules.Traceability.UI/DelphiModernizer.Studio.Modules.Traceability.UI.csproj">
       <Platform Solution="*|x64" Project="x64" />
     </Project>

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.Application.Abstractions\DelphiModernizer.Studio.Application.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.Mediator\DelphiModernizer.Studio.Mediator.csproj" />
+    <ProjectReference Include="..\DelphiModernizer.Studio.Modules.Traceability.Domain\DelphiModernizer.Studio.Modules.Traceability.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
