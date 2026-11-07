@@ -10,6 +10,19 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
+        <!--  The next sign-off's ring: AccentFillColorDefault's colours, and the highlight in high contrast.  -->
+        <ResourceDictionary.ThemeDictionaries>
+            <ResourceDictionary x:Key="Light">
+                <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemAccentColorDark1}" />
+            </ResourceDictionary>
+            <ResourceDictionary x:Key="Dark">
+                <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemAccentColorLight2}" />
+            </ResourceDictionary>
+            <ResourceDictionary x:Key="HighContrast">
+                <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            </ResourceDictionary>
+        </ResourceDictionary.ThemeDictionaries>
+
         <Style
             x:Key="SectionTitleStyle"
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
@@ -226,7 +239,7 @@
                                                     CornerRadius="12"
                                                     Visibility="{x:Bind IsNotNext}" />
                                                 <Border
-                                                    BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                                                    BorderBrush="{ThemeResource NextRingBrush}"
                                                     BorderThickness="2"
                                                     CornerRadius="12"
                                                     Visibility="{x:Bind IsNext}" />

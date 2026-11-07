@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using DelphiModernizer.Engine.Kit;
 using DelphiModernizer.Engine.Kit.Spec;
+using DelphiModernizer.Studio.Application.Abstractions.SignOffs;
 using DelphiModernizer.Studio.Application.Abstractions.Workstreams;
 using DelphiModernizer.Studio.Modules.Workstreams.Application;
 using DelphiModernizer.Studio.UI.Common;
@@ -86,6 +87,9 @@ public sealed record HistoryRow(RunRecord Run)
 /// <summary>The words the Workstreams and Run pages put around recipes, runs and money.</summary>
 public static class RunWords
 {
+    /// <summary>The kit's name for an argument that picks a sign-off, which people see by name, not code.</summary>
+    private const string _gateArgument = "gate";
+
     public static PillState PillOf(RunOutcome outcome)
     {
         return outcome switch {
@@ -102,7 +106,9 @@ public static class RunWords
     {
         var need = argument.Required ? "required" : "optional";
 
-        return $"{Capitalized(argument.Name)}, {need}: {Sentence(argument.Description)}";
+        return argument.Name == _gateArgument
+            ? $"Sign-off, {need}: the sign-off the Principal Architect prepares"
+            : $"{Capitalized(argument.Name)}, {need}: {Sentence(argument.Description)}";
     }
 
     /// <summary>"scope legacy/Sales", or "no focus" for an optional argument left empty.</summary>
@@ -111,6 +117,11 @@ public static class RunWords
         if (recipe is null)
         {
             return argument ?? string.Empty;
+        }
+
+        if (recipe.Argument.Name == _gateArgument)
+        {
+            return argument is null ? "no sign-off" : $"sign-off {SignOffNames.Of(argument)}";
         }
 
         return argument is null ? $"no {recipe.Argument.Name}" : $"{recipe.Argument.Name} {argument}";
