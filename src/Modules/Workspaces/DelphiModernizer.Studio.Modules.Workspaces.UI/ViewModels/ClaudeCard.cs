@@ -31,7 +31,10 @@ public sealed record ClaudeCard(
 
     public bool HasLink => Action != ClaudeCardAction.None;
 
-    public string AnnouncedName => $"Claude Code, {PillLook.Of(Pill).Word}. {Text}";
+    /// <summary>What Narrator reads for the card, such as "Claude Code, Not found. Agent runs need it; …".</summary>
+    public string AnnouncedName => Pill == PillState.NotFound
+        ? "Claude Code, Not found. Agent runs need it; everything else works without it."
+        : $"Claude Code, {PillLook.Of(Pill).Word}. {Text}";
 
     public static ClaudeCard Of(ClaudeStatus status)
     {

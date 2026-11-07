@@ -89,12 +89,14 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     ];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(NextLabel), nameof(CanGoBack), nameof(CanGoNext))]
+    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(StepHeading), nameof(NextLabel))]
+    [NotifyPropertyChangedFor(nameof(CanGoBack), nameof(CanGoNext))]
     [NotifyPropertyChangedFor(nameof(IsStep1), nameof(IsStep2), nameof(IsStep3), nameof(IsStep4), nameof(IsStep5))]
     public partial int Step { get; set; } = 1;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(CanGoBack), nameof(CanGoNext))]
+    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(StepHeading))]
+    [NotifyPropertyChangedFor(nameof(CanGoBack), nameof(CanGoNext))]
     [NotifyPropertyChangedFor(nameof(IsStep1), nameof(IsStep2), nameof(IsStep3), nameof(IsStep4), nameof(IsStep5))]
     [NotifyPropertyChangedFor(nameof(IsCreating), nameof(IsCreated), nameof(HasFooter), nameof(CanCancel))]
     public partial WizardPhase Phase { get; set; }
@@ -106,6 +108,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         WizardPhase.Created => "Created",
         _ => _titles[Step - 1],
     };
+
+    /// <summary>What Narrator reads for the step heading, such as "Step 2 of 5, Legacy source".</summary>
+    public string StepHeading => $"{StepOf}, {StepTitle}";
 
     public bool IsStep1 => IsEditing(1);
 

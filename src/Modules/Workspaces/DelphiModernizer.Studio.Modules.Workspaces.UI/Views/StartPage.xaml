@@ -17,7 +17,8 @@
                         <AdaptiveTrigger MinWindowWidth="1100" />
                     </VisualState.StateTriggers>
                 </VisualState>
-                <!--  Under 1100 (handoff part 2): one column of action cards, compact and without tiles, then the side cards below.  -->
+                <!--  Under 1100 (handoff part 2): one column of compact action cards without tiles, the side cards below,
+                      and Recent workspaces without Last opened.  -->
                 <VisualState x:Name="Narrow">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0" />
@@ -43,6 +44,7 @@
                         <Setter Target="SideColumn.Width" Value="0" />
                         <Setter Target="Side.(Grid.Row)" Value="1" />
                         <Setter Target="Side.(Grid.Column)" Value="0" />
+                        <Setter Target="LastOpenedHeader.Visibility" Value="Collapsed" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -155,6 +157,7 @@
                     </Grid>
 
                     <InfoBar
+                        AutomationProperties.LiveSetting="Polite"
                         IsClosable="True"
                         IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
                         Message="{x:Bind ViewModel.Problem, Mode=OneWay}"
@@ -190,7 +193,7 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="96" />
-                                            <ColumnDefinition Width="132" />
+                                            <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="32" />
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Name and folder" />
@@ -199,7 +202,9 @@
                                             Style="{StaticResource TableHeaderTextStyle}"
                                             Text="Target" />
                                         <TextBlock
+                                            x:Name="LastOpenedHeader"
                                             Grid.Column="2"
+                                            Width="132"
                                             Style="{StaticResource TableHeaderTextStyle}"
                                             Text="Last opened" />
                                     </Grid>
@@ -216,7 +221,7 @@
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="96" />
-                                                        <ColumnDefinition Width="132" />
+                                                        <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="32" />
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel VerticalAlignment="Center">
@@ -233,11 +238,14 @@
                                                             Text="{x:Bind Target}"
                                                             TextLineBounds="Tight" />
                                                     </Border>
+                                                    <!--  The header decides, so the column hides in every row under 1100.  -->
                                                     <TextBlock
                                                         Grid.Column="2"
+                                                        Width="132"
                                                         VerticalAlignment="Center"
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind OpenedAt}" />
+                                                        Text="{x:Bind OpenedAt}"
+                                                        Visibility="{Binding Visibility, ElementName=LastOpenedHeader}" />
                                                     <FontIcon
                                                         Grid.Column="3"
                                                         HorizontalAlignment="Right"
@@ -302,6 +310,7 @@
                                         Text="{x:Bind ViewModel.Claude.Note, Mode=OneWay}" />
                                     <HyperlinkButton
                                         Margin="-11,8,0,0"
+                                        AutomationProperties.HelpText="{x:Bind ViewModel.Claude.AnnouncedName, Mode=OneWay}"
                                         Click="OnClaudeLinkClicked"
                                         Content="{x:Bind ViewModel.Claude.Link, Mode=OneWay}"
                                         Visibility="{x:Bind ViewModel.Claude.HasLink, Mode=OneWay}" />

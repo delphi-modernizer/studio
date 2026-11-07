@@ -15,7 +15,7 @@ public sealed partial class CreationStepRow(InitStep step, string label) : Obser
     public partial InitStepState? State { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StatusText), nameof(AnnouncedName))]
+    [NotifyPropertyChangedFor(nameof(StatusText))]
     public partial string? Detail { get; set; }
 
     public bool IsWaiting => State is null or InitStepState.Skipped;
@@ -34,5 +34,12 @@ public sealed partial class CreationStepRow(InitStep step, string label) : Obser
         _ => "Waiting",
     };
 
-    public string AnnouncedName => $"{label}, {StatusText}";
+    /// <summary>What Narrator reads as the step changes, such as "Initialise git, working" and then "done".</summary>
+    public string AnnouncedName => State switch {
+        InitStepState.Working => $"{label}, working",
+        InitStepState.Done => $"{label}, done",
+        InitStepState.Skipped => $"{label}, skipped",
+        InitStepState.Failed => $"{label}, failed",
+        _ => $"{label}, waiting",
+    };
 }

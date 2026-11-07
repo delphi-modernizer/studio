@@ -159,12 +159,17 @@
                         Padding="24,20,24,24"
                         Style="{StaticResource CardStyle}">
                         <StackPanel MaxWidth="640" HorizontalAlignment="Left" Spacing="16">
+                            <!--  The heading reads with its step number and takes focus on Next and Back, so it is read first.  -->
                             <StackPanel>
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.StepOf, Mode=OneWay}" />
+                                <TextBlock
+                                    AutomationProperties.AccessibilityView="Raw"
+                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                    Text="{x:Bind ViewModel.StepOf, Mode=OneWay}" />
                                 <TextBlock
                                     x:Name="StepHeading"
                                     AutomationProperties.HeadingLevel="Level2"
-                                    AutomationProperties.LiveSetting="Polite"
+                                    AutomationProperties.Name="{x:Bind ViewModel.StepHeading, Mode=OneWay}"
+                                    IsTextSelectionEnabled="True"
                                     Style="{StaticResource SubtitleTextBlockStyle}"
                                     Text="{x:Bind ViewModel.StepTitle, Mode=OneWay}" />
                             </StackPanel>
@@ -183,6 +188,7 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <TextBox
+                                            x:Name="FolderBox"
                                             AutomationProperties.HelpText="{x:Bind ViewModel.FolderProblem, Mode=OneWay}"
                                             AutomationProperties.IsRequiredForForm="True"
                                             Header="Folder"
@@ -335,7 +341,7 @@
                                 </StackPanel>
 
                                 <InfoBar
-                                    AutomationProperties.LiveSetting="Assertive"
+                                    AutomationProperties.LiveSetting="Polite"
                                     IsClosable="False"
                                     IsOpen="{x:Bind ViewModel.IsPreviewFailed, Mode=OneWay}"
                                     Message="{x:Bind ViewModel.PreviewProblem, Mode=OneWay}"
@@ -514,7 +520,7 @@
                                     </InfoBar.IconSource>
                                 </InfoBar>
                                 <InfoBar
-                                    AutomationProperties.LiveSetting="Assertive"
+                                    AutomationProperties.LiveSetting="Polite"
                                     IsClosable="False"
                                     IsOpen="{x:Bind ViewModel.HasCreateProblem, Mode=OneWay}"
                                     Message="{x:Bind ViewModel.CreateProblem, Mode=OneWay}"
@@ -528,7 +534,7 @@
 
                             <!--  Creating: each step as the engine reports it.  -->
                             <ItemsRepeater
-                                AutomationProperties.LiveSetting="Polite"
+                                AutomationProperties.Name="Creating the workspace"
                                 ItemsSource="{x:Bind ViewModel.Creation}"
                                 Visibility="{x:Bind ViewModel.IsCreating, Mode=OneWay}">
                                 <ItemsRepeater.ItemTemplate>
@@ -628,12 +634,12 @@
                                 <!--  Tab order follows the markup: Back, Next or Create, then Cancel, which sits on the left.  -->
                                 <Button
                                     Grid.Column="2"
-                                    Click="OnBack"
+                                    Command="{x:Bind ViewModel.BackCommand}"
                                     Content="Back"
                                     IsEnabled="{x:Bind ViewModel.CanGoBack, Mode=OneWay}" />
                                 <Button
                                     Grid.Column="3"
-                                    Click="OnNext"
+                                    Command="{x:Bind ViewModel.NextCommand}"
                                     Content="{x:Bind ViewModel.NextLabel, Mode=OneWay}"
                                     IsEnabled="{x:Bind ViewModel.CanGoNext, Mode=OneWay}"
                                     Style="{StaticResource AccentButtonStyle}" />
