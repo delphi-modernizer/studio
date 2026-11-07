@@ -77,14 +77,13 @@ public sealed record HistoryRow(string Text, string Detail, bool IsApproval)
 /// <summary>One sign-off as an expander: its header, its checks and where its approval stands.</summary>
 public sealed partial class SignOffRow : ObservableObject
 {
-    public SignOffRow(SignOff signOff, int count, bool isNext)
+    public SignOffRow(SignOff signOff, int count)
     {
         Gate = signOff.Status.Gate;
         Number = signOff.Number.ToString(CultureInfo.CurrentCulture);
         Name = signOff.Name;
         Approves = signOff.Approves;
         Pill = PillStates.OfGate(signOff.Status.State);
-        IsNext = isNext;
         IsLast = signOff.Number == count;
         Checks = [.. signOff.Checks.Select(c => new CheckRow(c))];
         var passed = Checks.Count(c => c.Passed);
@@ -139,9 +138,6 @@ public sealed partial class SignOffRow : ObservableObject
 
     public PillState Pill { get; }
 
-    public bool IsNext { get; }
-
-    public bool IsNotNext => !IsNext;
 
     public bool IsLast { get; }
 

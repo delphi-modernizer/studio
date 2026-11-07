@@ -138,7 +138,7 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     {
         var next = signOffs.FirstOrDefault(s => s.Status.State != "approved");
         var rows = signOffs
-            .Select(s => new SignOffRow(s, signOffs.Count, s == next))
+            .Select(s => new SignOffRow(s, signOffs.Count))
             .ToList();
         var open = _requested ?? (expanded.Count > 0 ? null : next?.Status.Gate);
         _requested = null;
