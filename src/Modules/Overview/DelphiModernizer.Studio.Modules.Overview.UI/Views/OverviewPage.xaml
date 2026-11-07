@@ -10,140 +10,133 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <Style
-            x:Key="FlowNodeStyle"
-            BasedOn="{StaticResource DefaultButtonStyle}"
-            TargetType="Button">
-            <Setter Property="Padding" Value="12,10" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Top" />
-            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
-            <Setter Property="CornerRadius" Value="8" />
-        </Style>
-        <!--  The next sign-off carries the accent border (handoff colour roles).  -->
-        <Style
-            x:Key="NextFlowNodeStyle"
-            BasedOn="{StaticResource FlowNodeStyle}"
-            TargetType="Button">
-            <Setter Property="BorderBrush" Value="{ThemeResource AccentFillColorDefaultBrush}" />
-            <Setter Property="BorderThickness" Value="2" />
-        </Style>
-        <Style x:Key="FlowLineStyle" TargetType="Rectangle">
-            <Setter Property="Fill" Value="{ThemeResource ControlStrongStrokeColorDefaultBrush}" />
-        </Style>
-        <Style x:Key="FlowHeadStyle" TargetType="Polygon">
-            <Setter Property="Fill" Value="{ThemeResource ControlStrongStrokeColorDefaultBrush}" />
-        </Style>
-        <Style
-            x:Key="FlowLabelStyle"
-            BasedOn="{StaticResource CaptionTextBlockStyle}"
-            TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
-            <Setter Property="TextAlignment" Value="Center" />
-        </Style>
-        <Style x:Key="FlowGroupStyle" TargetType="Border">
-            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="8" />
-        </Style>
-        <Style x:Key="PhaseNumberStyle" TargetType="Border">
-            <Setter Property="Width" Value="20" />
-            <Setter Property="Height" Value="20" />
-            <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="10" />
-        </Style>
-        <Style
-            x:Key="PhaseTextStyle"
-            BasedOn="{StaticResource CaptionTextBlockStyle}"
-            TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        </Style>
-        <Style x:Key="NodeTileStyle" TargetType="Border">
-            <Setter Property="Width" Value="28" />
-            <Setter Property="Height" Value="28" />
-            <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <StaticResource x:Key="FlowNextStroke" ResourceKey="AccentFillColorDefaultBrush" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <StaticResource x:Key="FlowNextStroke" ResourceKey="AccentFillColorDefaultBrush" />
+                </ResourceDictionary>
+                <!--  The accent fill is the window colour in high contrast, so the next sign-off's border uses Highlight.  -->
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="FlowNextStroke" Color="{ThemeResource SystemColorHighlightColor}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
 
-        <DataTemplate x:Key="TeamNodeTemplate" x:DataType="vm:TeamNode">
-            <Grid ColumnSpacing="8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Border Style="{StaticResource NodeTileStyle}">
+            <Style
+                x:Key="FlowNodeStyle"
+                BasedOn="{StaticResource DefaultButtonStyle}"
+                TargetType="Button">
+                <Setter Property="Padding" Value="12,10" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Top" />
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="CornerRadius" Value="8" />
+            </Style>
+            <!--  The next sign-off carries the accent border (handoff colour roles).  -->
+            <Style
+                x:Key="NextFlowNodeStyle"
+                BasedOn="{StaticResource FlowNodeStyle}"
+                TargetType="Button">
+                <Setter Property="BorderBrush" Value="{ThemeResource FlowNextStroke}" />
+                <Setter Property="BorderThickness" Value="2" />
+            </Style>
+            <Style x:Key="FlowLineStyle" TargetType="Rectangle">
+                <Setter Property="Fill" Value="{ThemeResource ControlStrongStrokeColorDefaultBrush}" />
+            </Style>
+            <Style x:Key="FlowHeadStyle" TargetType="Polygon">
+                <Setter Property="Fill" Value="{ThemeResource ControlStrongStrokeColorDefaultBrush}" />
+            </Style>
+            <Style
+                x:Key="FlowLabelStyle"
+                BasedOn="{StaticResource CaptionTextBlockStyle}"
+                TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Setter Property="TextAlignment" Value="Center" />
+            </Style>
+            <Style x:Key="FlowGroupStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="8" />
+            </Style>
+            <Style x:Key="PhaseNumberStyle" TargetType="Border">
+                <Setter Property="Width" Value="20" />
+                <Setter Property="Height" Value="20" />
+                <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="10" />
+            </Style>
+            <Style
+                x:Key="PhaseTextStyle"
+                BasedOn="{StaticResource CaptionTextBlockStyle}"
+                TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            </Style>
+            <Style x:Key="NodeTileStyle" TargetType="Border">
+                <Setter Property="Width" Value="28" />
+                <Setter Property="Height" Value="28" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+            </Style>
+
+            <DataTemplate x:Key="TeamNodeTemplate" x:DataType="vm:TeamNode">
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource NodeTileStyle}">
+                        <FontIcon
+                            FontSize="18"
+                            Glyph="{x:Bind Glyph}"
+                            Style="{StaticResource IconStyle}" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                        <TextBlock
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Progress}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                    </StackPanel>
                     <FontIcon
-                        FontSize="18"
-                        Glyph="{x:Bind Glyph}"
+                        Grid.Column="2"
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
                         Style="{StaticResource IconStyle}" />
-                </Border>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <TextBlock
-                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind Name}"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="NoWrap" />
-                    <TextBlock
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind Progress}"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="NoWrap" />
-                </StackPanel>
-                <FontIcon
-                    Grid.Column="2"
-                    FontSize="12"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
-                    Style="{StaticResource IconStyle}" />
-            </Grid>
-        </DataTemplate>
+                </Grid>
+            </DataTemplate>
 
-        <!--  Under 1100 the teams sit two to a row and drop their tile.  -->
-        <DataTemplate x:Key="TeamNodeCompactTemplate" x:DataType="vm:TeamNode">
-            <Grid ColumnSpacing="8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock
-                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind Name}"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="NoWrap" />
-                    <TextBlock
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind Progress}"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="NoWrap" />
-                </StackPanel>
-                <FontIcon
-                    Grid.Column="1"
-                    FontSize="12"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
-                    Style="{StaticResource IconStyle}" />
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate x:Key="GateNodeTemplate" x:DataType="vm:GateNode">
-            <StackPanel Spacing="4">
+            <!--  Under 1100 the teams sit two to a row and drop their tile.  -->
+            <DataTemplate x:Key="TeamNodeCompactTemplate" x:DataType="vm:TeamNode">
                 <Grid ColumnSpacing="8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind Name}"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="NoWrap" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                        <TextBlock
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Progress}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                    </StackPanel>
                     <FontIcon
                         Grid.Column="1"
                         FontSize="12"
@@ -151,49 +144,71 @@
                         Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
                         Style="{StaticResource IconStyle}" />
                 </Grid>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <controls:StatusPill State="{x:Bind Pill}" />
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="Next"
-                        Visibility="{x:Bind IsNext}" />
-                </StackPanel>
-            </StackPanel>
-        </DataTemplate>
+            </DataTemplate>
 
-        <!--  Under 1100 each sign-off is one row: name, Next sign-off, pill, chevron.  -->
-        <DataTemplate x:Key="GateNodeOneLineTemplate" x:DataType="vm:GateNode">
-            <Grid VerticalAlignment="Center" ColumnSpacing="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock
-                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind Name}"
-                        TextTrimming="CharacterEllipsis"
-                        TextWrapping="NoWrap" />
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                        Style="{StaticResource CaptionTextBlockStyle}"
-                        Text="Next sign-off"
-                        Visibility="{x:Bind IsNext}" />
+            <DataTemplate x:Key="GateNodeTemplate" x:DataType="vm:GateNode">
+                <StackPanel Spacing="4">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                        <FontIcon
+                            Grid.Column="1"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
+                            Style="{StaticResource IconStyle}" />
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <controls:StatusPill State="{x:Bind Pill}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Next"
+                            Visibility="{x:Bind IsNext}" />
+                    </StackPanel>
                 </StackPanel>
-                <controls:StatusPill Grid.Column="1" State="{x:Bind Pill}" />
-                <FontIcon
-                    Grid.Column="2"
-                    FontSize="12"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
-                    Style="{StaticResource IconStyle}" />
-            </Grid>
-        </DataTemplate>
+            </DataTemplate>
 
+            <!--  Under 1100 each sign-off is one row: name, Next sign-off, pill, chevron.  -->
+            <DataTemplate x:Key="GateNodeOneLineTemplate" x:DataType="vm:GateNode">
+                <Grid VerticalAlignment="Center" ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="NoWrap" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="Next sign-off"
+                            Visibility="{x:Bind IsNext}" />
+                    </StackPanel>
+                    <controls:StatusPill Grid.Column="1" State="{x:Bind Pill}" />
+                    <FontIcon
+                        Grid.Column="2"
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
+                        Style="{StaticResource IconStyle}" />
+                </Grid>
+            </DataTemplate>
+
+        </ResourceDictionary>
     </Page.Resources>
 
     <Grid>
@@ -315,280 +330,281 @@
                             </StackPanel>
 
                             <!--  Positions come from OverviewPage.Flow.cs, which follows the design's measurements for both widths.  -->
-                            <Canvas
-                                x:Name="Flow"
-                                AutomationProperties.Name="From the Delphi code, through six teams and the Principal Architect, to five sign-offs and the build"
-                                SizeChanged="OnFlowSizeChanged"
-                                XYFocusKeyboardNavigation="Enabled">
-                                <Canvas x:Name="Decorations" />
-                                <Border x:Name="TeamsGroup" Style="{StaticResource FlowGroupStyle}" />
-                                <Border x:Name="GatesGroup" Style="{StaticResource FlowGroupStyle}" />
-                                <StackPanel
-                                    x:Name="Phase1"
-                                    Orientation="Horizontal"
-                                    Spacing="8">
-                                    <Border Style="{StaticResource PhaseNumberStyle}">
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="11"
-                                            FontWeight="SemiBold"
-                                            Text="1" />
-                                    </Border>
-                                    <TextBlock Style="{StaticResource PhaseTextStyle}" Text="Delphi code" />
-                                </StackPanel>
-                                <StackPanel
-                                    x:Name="Phase2"
-                                    Orientation="Horizontal"
-                                    Spacing="8">
-                                    <Border Style="{StaticResource PhaseNumberStyle}">
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="11"
-                                            FontWeight="SemiBold"
-                                            Text="2" />
-                                    </Border>
-                                    <TextBlock Style="{StaticResource PhaseTextStyle}" Text="Six teams draft, side by side" />
-                                </StackPanel>
-                                <StackPanel
-                                    x:Name="Phase3"
-                                    Orientation="Horizontal"
-                                    Spacing="8">
-                                    <Border Style="{StaticResource PhaseNumberStyle}">
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="11"
-                                            FontWeight="SemiBold"
-                                            Text="3" />
-                                    </Border>
-                                    <TextBlock x:Name="Phase3Text" Style="{StaticResource PhaseTextStyle}" />
-                                </StackPanel>
-                                <StackPanel
-                                    x:Name="Phase4"
-                                    Orientation="Horizontal"
-                                    Spacing="8">
-                                    <Border Style="{StaticResource PhaseNumberStyle}">
-                                        <TextBlock
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            FontSize="11"
-                                            FontWeight="SemiBold"
-                                            Text="4" />
-                                    </Border>
-                                    <TextBlock Style="{StaticResource PhaseTextStyle}" Text="People sign off, in order" />
-                                </StackPanel>
-
-                                <Button
-                                    x:Name="LegacyNodeButton"
-                                    Padding="14,12"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Legacy.AnnouncedName, Mode=OneWay}"
-                                    Click="OnLegacyClicked"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="Opens Inventory">
-                                    <StackPanel Spacing="8">
-                                        <Grid Margin="0,0,0,4">
-                                            <Border HorizontalAlignment="Left" Style="{StaticResource NodeTileStyle}">
-                                                <FontIcon
-                                                    FontSize="18"
-                                                    Glyph="{x:Bind icons:StudioIcons.DelphiCode}"
-                                                    Style="{StaticResource IconStyle}" />
-                                            </Border>
-                                            <FontIcon
-                                                HorizontalAlignment="Right"
-                                                FontSize="12"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
-                                                Style="{StaticResource IconStyle}" />
-                                        </Grid>
-                                        <StackPanel>
-                                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Delphi code" />
-                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.Legacy.Subtitle, Mode=OneWay}" />
-                                        </StackPanel>
-                                        <StackPanel>
-                                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind ViewModel.Legacy.First, Mode=OneWay}" />
-                                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind ViewModel.Legacy.Second, Mode=OneWay}" />
-                                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind ViewModel.Legacy.Third, Mode=OneWay}" />
-                                        </StackPanel>
+                            <local:AutomationGroup AutomationProperties.Name="From the Delphi code, through six teams and the Principal Architect, to five sign-offs and the build">
+                                <Canvas
+                                    x:Name="Flow"
+                                    SizeChanged="OnFlowSizeChanged"
+                                    XYFocusKeyboardNavigation="Enabled">
+                                    <Canvas x:Name="Decorations" />
+                                    <Border x:Name="TeamsGroup" Style="{StaticResource FlowGroupStyle}" />
+                                    <Border x:Name="GatesGroup" Style="{StaticResource FlowGroupStyle}" />
+                                    <StackPanel
+                                        x:Name="Phase1"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <Border Style="{StaticResource PhaseNumberStyle}">
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Text="1" />
+                                        </Border>
+                                        <TextBlock Style="{StaticResource PhaseTextStyle}" Text="Delphi code" />
                                     </StackPanel>
-                                </Button>
-
-                                <Button
-                                    x:Name="Team0"
-                                    Padding="10,9"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Teams[0].AnnouncedName, Mode=OneWay}"
-                                    Click="OnTeamClicked"
-                                    Content="{x:Bind ViewModel.Teams[0], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource TeamNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="{x:Bind ViewModel.Teams[0].ToolTip, Mode=OneWay}" />
-                                <Button
-                                    x:Name="Team1"
-                                    Padding="10,9"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Teams[1].AnnouncedName, Mode=OneWay}"
-                                    Click="OnTeamClicked"
-                                    Content="{x:Bind ViewModel.Teams[1], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource TeamNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="{x:Bind ViewModel.Teams[1].ToolTip, Mode=OneWay}" />
-                                <Button
-                                    x:Name="Team2"
-                                    Padding="10,9"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Teams[2].AnnouncedName, Mode=OneWay}"
-                                    Click="OnTeamClicked"
-                                    Content="{x:Bind ViewModel.Teams[2], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource TeamNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="{x:Bind ViewModel.Teams[2].ToolTip, Mode=OneWay}" />
-                                <Button
-                                    x:Name="Team3"
-                                    Padding="10,9"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Teams[3].AnnouncedName, Mode=OneWay}"
-                                    Click="OnTeamClicked"
-                                    Content="{x:Bind ViewModel.Teams[3], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource TeamNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="{x:Bind ViewModel.Teams[3].ToolTip, Mode=OneWay}" />
-                                <Button
-                                    x:Name="Team4"
-                                    Padding="10,9"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Teams[4].AnnouncedName, Mode=OneWay}"
-                                    Click="OnTeamClicked"
-                                    Content="{x:Bind ViewModel.Teams[4], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource TeamNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="{x:Bind ViewModel.Teams[4].ToolTip, Mode=OneWay}" />
-                                <Button
-                                    x:Name="Team5"
-                                    Padding="10,9"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Teams[5].AnnouncedName, Mode=OneWay}"
-                                    Click="OnTeamClicked"
-                                    Content="{x:Bind ViewModel.Teams[5], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource TeamNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="{x:Bind ViewModel.Teams[5].ToolTip, Mode=OneWay}" />
-
-                                <Button
-                                    x:Name="ArchitectNodeButton"
-                                    Padding="14,12"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Architect.AnnouncedName, Mode=OneWay}"
-                                    Click="OnArchitectClicked"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="{x:Bind ViewModel.Architect.ToolTip, Mode=OneWay}">
-                                    <StackPanel Spacing="8">
-                                        <Grid Margin="0,0,0,4">
-                                            <Border HorizontalAlignment="Left" Style="{StaticResource NodeTileStyle}">
-                                                <FontIcon
-                                                    FontSize="18"
-                                                    Glyph="{x:Bind icons:StudioIcons.PrincipalArchitect}"
-                                                    Style="{StaticResource IconStyle}" />
-                                            </Border>
-                                            <FontIcon
-                                                HorizontalAlignment="Right"
-                                                FontSize="12"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
-                                                Style="{StaticResource IconStyle}" />
-                                        </Grid>
-                                        <StackPanel>
+                                    <StackPanel
+                                        x:Name="Phase2"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <Border Style="{StaticResource PhaseNumberStyle}">
                                             <TextBlock
-                                                Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                Text="Principal Architect"
-                                                TextWrapping="Wrap" />
-                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.Architect.Progress, Mode=OneWay}" />
-                                        </StackPanel>
-                                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Combines the drafts and flags contradictions" />
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Text="2" />
+                                        </Border>
+                                        <TextBlock Style="{StaticResource PhaseTextStyle}" Text="Six teams draft, side by side" />
                                     </StackPanel>
-                                </Button>
-
-                                <Button
-                                    x:Name="Gate0"
-                                    Padding="12,7"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Gates[0].AnnouncedName, Mode=OneWay}"
-                                    Click="OnGateClicked"
-                                    Content="{x:Bind ViewModel.Gates[0], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource GateNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="Opens Sign-offs" />
-                                <Button
-                                    x:Name="Gate1"
-                                    Padding="12,7"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Gates[1].AnnouncedName, Mode=OneWay}"
-                                    Click="OnGateClicked"
-                                    Content="{x:Bind ViewModel.Gates[1], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource GateNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="Opens Sign-offs" />
-                                <Button
-                                    x:Name="Gate2"
-                                    Padding="12,7"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Gates[2].AnnouncedName, Mode=OneWay}"
-                                    Click="OnGateClicked"
-                                    Content="{x:Bind ViewModel.Gates[2], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource GateNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="Opens Sign-offs" />
-                                <Button
-                                    x:Name="Gate3"
-                                    Padding="12,7"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Gates[3].AnnouncedName, Mode=OneWay}"
-                                    Click="OnGateClicked"
-                                    Content="{x:Bind ViewModel.Gates[3], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource GateNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="Opens Sign-offs" />
-                                <Button
-                                    x:Name="Gate4"
-                                    Padding="12,7"
-                                    AutomationProperties.Name="{x:Bind ViewModel.Gates[4].AnnouncedName, Mode=OneWay}"
-                                    Click="OnGateClicked"
-                                    Content="{x:Bind ViewModel.Gates[4], Mode=OneWay}"
-                                    ContentTemplate="{StaticResource GateNodeTemplate}"
-                                    Style="{StaticResource FlowNodeStyle}"
-                                    ToolTipService.ToolTip="Opens Sign-offs" />
-
-                                <!--  The build is not a stop: it opens on its own once the final plan is approved.  -->
-                                <Grid x:Name="BuildBox" AutomationProperties.Name="{x:Bind ViewModel.Build.AnnouncedName, Mode=OneWay}">
-                                    <Rectangle
-                                        RadiusX="8"
-                                        RadiusY="8"
-                                        Stroke="{ThemeResource ControlStrongStrokeColorDefaultBrush}"
-                                        StrokeDashArray="4,3"
-                                        Visibility="{x:Bind ViewModel.Build.IsLocked, Mode=OneWay}" />
-                                    <Border
-                                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="8"
-                                        Visibility="{x:Bind ViewModel.Build.IsUnlocked, Mode=OneWay}" />
-                                    <Grid
-                                        Padding="12,8"
-                                        VerticalAlignment="Center"
-                                        ColumnSpacing="10">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <FontIcon Glyph="{x:Bind icons:StudioIcons.Build}" Style="{StaticResource IconStyle}" />
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <StackPanel
+                                        x:Name="Phase3"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <Border Style="{StaticResource PhaseNumberStyle}">
                                             <TextBlock
-                                                Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                Text="Build the new system"
-                                                TextTrimming="CharacterEllipsis"
-                                                TextWrapping="NoWrap" />
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Text="3" />
+                                        </Border>
+                                        <TextBlock x:Name="Phase3Text" Style="{StaticResource PhaseTextStyle}" />
+                                    </StackPanel>
+                                    <StackPanel
+                                        x:Name="Phase4"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <Border Style="{StaticResource PhaseNumberStyle}">
                                             <TextBlock
-                                                x:Name="BuildSubtitle"
-                                                Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                Text="{x:Bind ViewModel.Build.Subtitle, Mode=OneWay}" />
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Text="4" />
+                                        </Border>
+                                        <TextBlock Style="{StaticResource PhaseTextStyle}" Text="People sign off, in order" />
+                                    </StackPanel>
+
+                                    <Button
+                                        x:Name="LegacyNodeButton"
+                                        Padding="14,12"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Legacy.AnnouncedName, Mode=OneWay}"
+                                        Click="OnLegacyClicked"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="Opens Inventory">
+                                        <StackPanel Spacing="8">
+                                            <Grid Margin="0,0,0,4">
+                                                <Border HorizontalAlignment="Left" Style="{StaticResource NodeTileStyle}">
+                                                    <FontIcon
+                                                        FontSize="18"
+                                                        Glyph="{x:Bind icons:StudioIcons.DelphiCode}"
+                                                        Style="{StaticResource IconStyle}" />
+                                                </Border>
+                                                <FontIcon
+                                                    HorizontalAlignment="Right"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
+                                                    Style="{StaticResource IconStyle}" />
+                                            </Grid>
+                                            <StackPanel>
+                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Delphi code" />
+                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.Legacy.Subtitle, Mode=OneWay}" />
+                                            </StackPanel>
+                                            <StackPanel>
+                                                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind ViewModel.Legacy.First, Mode=OneWay}" />
+                                                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind ViewModel.Legacy.Second, Mode=OneWay}" />
+                                                <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="{x:Bind ViewModel.Legacy.Third, Mode=OneWay}" />
+                                            </StackPanel>
                                         </StackPanel>
-                                        <controls:StatusPill Grid.Column="2" State="{x:Bind ViewModel.Build.Pill, Mode=OneWay}" />
-                                    </Grid>
-                                </Grid>
+                                    </Button>
 
-                                <local:FlowLegend x:Name="LegendInside" />
-                            </Canvas>
+                                    <Button
+                                        x:Name="Team0"
+                                        Padding="10,9"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Teams[0].AnnouncedName, Mode=OneWay}"
+                                        Click="OnTeamClicked"
+                                        Content="{x:Bind ViewModel.Teams[0], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource TeamNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.Teams[0].ToolTip, Mode=OneWay}" />
+                                    <Button
+                                        x:Name="Team1"
+                                        Padding="10,9"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Teams[1].AnnouncedName, Mode=OneWay}"
+                                        Click="OnTeamClicked"
+                                        Content="{x:Bind ViewModel.Teams[1], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource TeamNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.Teams[1].ToolTip, Mode=OneWay}" />
+                                    <Button
+                                        x:Name="Team2"
+                                        Padding="10,9"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Teams[2].AnnouncedName, Mode=OneWay}"
+                                        Click="OnTeamClicked"
+                                        Content="{x:Bind ViewModel.Teams[2], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource TeamNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.Teams[2].ToolTip, Mode=OneWay}" />
+                                    <Button
+                                        x:Name="Team3"
+                                        Padding="10,9"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Teams[3].AnnouncedName, Mode=OneWay}"
+                                        Click="OnTeamClicked"
+                                        Content="{x:Bind ViewModel.Teams[3], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource TeamNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.Teams[3].ToolTip, Mode=OneWay}" />
+                                    <Button
+                                        x:Name="Team4"
+                                        Padding="10,9"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Teams[4].AnnouncedName, Mode=OneWay}"
+                                        Click="OnTeamClicked"
+                                        Content="{x:Bind ViewModel.Teams[4], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource TeamNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.Teams[4].ToolTip, Mode=OneWay}" />
+                                    <Button
+                                        x:Name="Team5"
+                                        Padding="10,9"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Teams[5].AnnouncedName, Mode=OneWay}"
+                                        Click="OnTeamClicked"
+                                        Content="{x:Bind ViewModel.Teams[5], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource TeamNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.Teams[5].ToolTip, Mode=OneWay}" />
+
+                                    <Button
+                                        x:Name="ArchitectNodeButton"
+                                        Padding="14,12"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Architect.AnnouncedName, Mode=OneWay}"
+                                        Click="OnArchitectClicked"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="{x:Bind ViewModel.Architect.ToolTip, Mode=OneWay}">
+                                        <StackPanel Spacing="8">
+                                            <Grid Margin="0,0,0,4">
+                                                <Border HorizontalAlignment="Left" Style="{StaticResource NodeTileStyle}">
+                                                    <FontIcon
+                                                        FontSize="18"
+                                                        Glyph="{x:Bind icons:StudioIcons.PrincipalArchitect}"
+                                                        Style="{StaticResource IconStyle}" />
+                                                </Border>
+                                                <FontIcon
+                                                    HorizontalAlignment="Right"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
+                                                    Style="{StaticResource IconStyle}" />
+                                            </Grid>
+                                            <StackPanel>
+                                                <TextBlock
+                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                    Text="Principal Architect"
+                                                    TextWrapping="Wrap" />
+                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.Architect.Progress, Mode=OneWay}" />
+                                            </StackPanel>
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Combines the drafts and flags contradictions" />
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button
+                                        x:Name="Gate0"
+                                        Padding="12,7"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Gates[0].AnnouncedName, Mode=OneWay}"
+                                        Click="OnGateClicked"
+                                        Content="{x:Bind ViewModel.Gates[0], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource GateNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="Opens Sign-offs" />
+                                    <Button
+                                        x:Name="Gate1"
+                                        Padding="12,7"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Gates[1].AnnouncedName, Mode=OneWay}"
+                                        Click="OnGateClicked"
+                                        Content="{x:Bind ViewModel.Gates[1], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource GateNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="Opens Sign-offs" />
+                                    <Button
+                                        x:Name="Gate2"
+                                        Padding="12,7"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Gates[2].AnnouncedName, Mode=OneWay}"
+                                        Click="OnGateClicked"
+                                        Content="{x:Bind ViewModel.Gates[2], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource GateNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="Opens Sign-offs" />
+                                    <Button
+                                        x:Name="Gate3"
+                                        Padding="12,7"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Gates[3].AnnouncedName, Mode=OneWay}"
+                                        Click="OnGateClicked"
+                                        Content="{x:Bind ViewModel.Gates[3], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource GateNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="Opens Sign-offs" />
+                                    <Button
+                                        x:Name="Gate4"
+                                        Padding="12,7"
+                                        AutomationProperties.Name="{x:Bind ViewModel.Gates[4].AnnouncedName, Mode=OneWay}"
+                                        Click="OnGateClicked"
+                                        Content="{x:Bind ViewModel.Gates[4], Mode=OneWay}"
+                                        ContentTemplate="{StaticResource GateNodeTemplate}"
+                                        Style="{StaticResource FlowNodeStyle}"
+                                        ToolTipService.ToolTip="Opens Sign-offs" />
+
+                                    <!--  The build is not a stop: it opens on its own once the final plan is approved.  -->
+                                    <local:AutomationGroup x:Name="BuildBox" AutomationProperties.Name="{x:Bind ViewModel.Build.AnnouncedName, Mode=OneWay}">
+                                        <Rectangle
+                                            RadiusX="8"
+                                            RadiusY="8"
+                                            Stroke="{ThemeResource ControlStrongStrokeColorDefaultBrush}"
+                                            StrokeDashArray="4,3"
+                                            Visibility="{x:Bind ViewModel.Build.IsLocked, Mode=OneWay}" />
+                                        <Border
+                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Visibility="{x:Bind ViewModel.Build.IsUnlocked, Mode=OneWay}" />
+                                        <Grid
+                                            Padding="12,8"
+                                            VerticalAlignment="Center"
+                                            ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <FontIcon Glyph="{x:Bind icons:StudioIcons.Build}" Style="{StaticResource IconStyle}" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock
+                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                    Text="Build the new system"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap" />
+                                                <TextBlock
+                                                    x:Name="BuildSubtitle"
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="{x:Bind ViewModel.Build.Subtitle, Mode=OneWay}" />
+                                            </StackPanel>
+                                            <controls:StatusPill Grid.Column="2" State="{x:Bind ViewModel.Build.Pill, Mode=OneWay}" />
+                                        </Grid>
+                                    </local:AutomationGroup>
+
+                                    <local:FlowLegend x:Name="LegendInside" />
+                                </Canvas>
+                            </local:AutomationGroup>
 
                             <Border
                                 x:Name="LegendBelow"

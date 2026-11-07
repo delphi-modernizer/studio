@@ -32,9 +32,6 @@ public sealed record NextStep(NextStepTone Tone, string Title, string Message, s
     };
 }
 
-/// <summary>The Delphi code node: what the latest scan found, or how to get a scan.</summary>
-public sealed record LegacyNode(string Subtitle, string First, string Second, string Third, string AnnouncedName);
-
 /// <summary>A team or the Principal Architect on the diagram.</summary>
 public sealed record TeamNode(string Code, string Name, string Glyph, string Progress, string AnnouncedName, string ToolTip);
 

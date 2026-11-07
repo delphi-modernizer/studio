@@ -38,8 +38,8 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         _editor = editor;
         Teams = [.. WorkstreamRole.All
             .Skip(1)
-            .Select(r => Team(r, null))];
-        Architect = Team(WorkstreamRole.All[0], null);
+            .Select(r => Team(r, null, approved: false))];
+        Architect = Team(WorkstreamRole.All[0], null, approved: false);
         Gates = [.. SignOffNames.Gates
             .Order(StringComparer.Ordinal)
             .Select(g => new GateNode(g, SignOffNames.Of(g), PillState.Blocked, false, SignOffNames.Of(g)))];
@@ -70,7 +70,7 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     public partial string Summary { get; set; } = string.Empty;
 
     [ObservableProperty]
-    public partial LegacyNode Legacy { get; set; } = new(string.Empty, string.Empty, string.Empty, string.Empty, "Delphi code");
+    public partial DelphiCodeWords Legacy { get; set; } = new(string.Empty, string.Empty, string.Empty, string.Empty, "Delphi code");
 
     /// <summary>The six teams in the kit's order; an <c>IList</c> because the diagram binds each one by index.</summary>
     [ObservableProperty]
@@ -183,15 +183,17 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
             .Select((gate, index) => (gate, index))
             .FirstOrDefault(g => g.gate.State != "approved");
         var nextIndex = next.gate is null ? -1 : next.index;
+        var approved = next.gate is null && overview.Gates.Count > 0;
+        var architect = overview.Workstreams.FirstOrDefault(w => w.Role.Code == WorkstreamRole.All[0].Code);
 
         Purpose = $"How {overview.Name} stands, from the Delphi code to an approved plan.";
         NextStep = NextStepFor(overview, next.gate);
-        Summary = SummaryOf(overview);
-        Legacy = LegacyOf(overview);
+        Summary = SummaryOf(overview, approved);
+        Legacy = OverviewWords.DelphiCode(overview.Inventory, overview.Cycles);
         Teams = [.. overview.Workstreams
             .Where(w => w.Role.Code != WorkstreamRole.All[0].Code)
-            .Select(w => Team(w.Role, w))];
-        Architect = Team(WorkstreamRole.All[0], overview.Workstreams.FirstOrDefault(w => w.Role.Code == WorkstreamRole.All[0].Code));
+            .Select(w => Team(w.Role, w, approved))];
+        Architect = Team(WorkstreamRole.All[0], architect, approved);
         Gates = [.. overview.Gates.Select((gate, index) => GateOf(gate, index, index == nextIndex, overview.Gates.Count))];
         Build = overview.Gates.Count > 0 && overview.Gates[^1].State == "approved" ? Unlocked() : Locked();
         Questions = [.. overview.Questions.Select(q => new QuestionRow(q.Id, q.Text, q.Path, q.Line))];
@@ -235,52 +237,32 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         return new NextStep(NextStepTone.Informational, $"{name} is the next sign-off.", $"{passed} of {next.Checks.Length} checks pass.", $"Review {name}", NextStepAction.SignOffs, next.Gate);
     }
 
-    private static string SummaryOf(WorkspaceOverview overview)
+    /// <param name="approved">Whether every sign-off is approved, so every deliverable counts as approved.</param>
+    private static string SummaryOf(WorkspaceOverview overview, bool approved)
     {
         var deliverables = overview.Workstreams.Sum(w => w.Deliverables.Count);
-        var started = overview.Workstreams.Sum(w => w.Started);
-        var approved = overview.Gates.Count(g => g.State == "approved");
+        var started = approved
+            ? $"{deliverables} of {deliverables} deliverables approved"
+            : $"{overview.Workstreams.Sum(w => w.Started)} of {deliverables} deliverables started";
+        var signedOff = overview.Gates.Count(g => g.State == "approved");
         var tail = overview switch {
             { Inventory: null } => "Delphi code not scanned yet",
             { Trace.Errors: 0 } => "nothing to fix",
             _ => $"{Count(overview.Trace.Errors, "problem")} to fix",
         };
 
-        return $"{started} of {deliverables} deliverables started · {approved} of {overview.Gates.Count} sign-offs approved · {tail}";
+        return $"{started} · {signedOff} of {overview.Gates.Count} sign-offs approved · {tail}";
     }
 
-    private static LegacyNode LegacyOf(WorkspaceOverview overview)
+    private static TeamNode Team(WorkstreamRole role, WorkstreamProgress? progress, bool approved)
     {
-        if (overview.Inventory is not { } inventory)
-        {
-            return new LegacyNode("Not scanned yet", "Not scanned yet", "Scan it from Inventory", string.Empty, "Delphi code, not scanned yet. Opens Inventory.");
-        }
-
-        var version = inventory.DelphiVersions.FirstOrDefault() ?? "Delphi version unknown";
-        var screens = inventory.Forms - inventory.DataModules;
-        var first = Count(inventory.Units, "code module");
-        var second = $"{Count(screens, "screen")}, {Count(inventory.DataModules, "data module")}";
-        var third = overview.Cycles == 0 ? "No circular dependencies" : Count(overview.Cycles, "circular dependency", "circular dependencies");
-        var announced = $"Delphi code, {version}: {Count(inventory.Files, "file")}, {first}, {second}, {third}. Opens Inventory.";
-
-        return new LegacyNode(version, first, second, third, announced);
-    }
-
-    private static TeamNode Team(WorkstreamRole role, WorkstreamProgress? progress)
-    {
-        var total = progress?.Deliverables.Count ?? 0;
-        var started = progress?.Started ?? 0;
-        var line = $"{started} of {total} started";
-        var architect = role.Code == WorkstreamRole.All[0].Code;
-        var name = architect ? role.Name : $"{role.Name} team";
-
         return new TeamNode(
             role.Code,
             role.Name,
             RoleGlyphs.Of(role.Code),
-            line,
-            $"{name}, {started} of {total} deliverables started. {role.Purpose} Opens Workstreams.",
-            $"Opens {role.Name} in Workstreams. {role.Purpose}");
+            OverviewWords.Progress(progress, approved),
+            OverviewWords.TeamName(role, progress, approved),
+            OverviewWords.TeamToolTip(role));
     }
 
     private static GateNode GateOf(GateStatus gate, int index, bool isNext, int count)
@@ -316,10 +298,10 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         return new RunRow(role?.Name ?? run.Agent, $"{run.StartedAt.LocalDateTime.ToString("g", CultureInfo.CurrentCulture)}{cost}", pill);
     }
 
-    private static string Count(int value, string singular, string? plural = null)
+    private static string Count(int value, string singular)
     {
         var number = value.ToString("N0", CultureInfo.CurrentCulture);
 
-        return value == 1 ? $"{number} {singular}" : $"{number} {plural ?? singular + "s"}";
+        return value == 1 ? $"{number} {singular}" : $"{number} {singular}s";
     }
 }
