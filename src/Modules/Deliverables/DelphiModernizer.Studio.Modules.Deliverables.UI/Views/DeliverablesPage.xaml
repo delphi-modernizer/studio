@@ -194,9 +194,7 @@
                                                         Text="{x:Bind Title}"
                                                         TextTrimming="CharacterEllipsis"
                                                         TextWrapping="NoWrap" />
-                                                    <TextBlock
-                                                        Style="{StaticResource MonoTextStyle}"
-                                                        Text="{x:Bind PathText}" />
+                                                    <controls:PathText Text="{x:Bind PathText}" />
                                                 </StackPanel>
                                                 <TextBlock
                                                     Grid.Column="1"

@@ -314,9 +314,7 @@
                                                         Text="{x:Bind FileLink}"
                                                         TextTrimming="CharacterEllipsis" />
                                                 </HyperlinkButton>
-                                                <TextBlock
-                                                    Style="{StaticResource MonoTextStyle}"
-                                                    Text="{x:Bind Folder}" />
+                                                <controls:PathText Text="{x:Bind Folder}" />
                                             </StackPanel>
                                         </Grid>
                                     </DataTemplate>

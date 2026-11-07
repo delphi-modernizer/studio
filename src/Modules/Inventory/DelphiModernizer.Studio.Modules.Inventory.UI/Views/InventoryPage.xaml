@@ -115,7 +115,7 @@
                                         TextLineBounds="Tight" />
                                 </Border>
                             </StackPanel>
-                            <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
+                            <controls:PathText Text="{x:Bind Path}" />
                         </StackPanel>
                         <TextBlock
                             Grid.Column="1"
@@ -208,7 +208,7 @@
                                         TextLineBounds="Tight" />
                                 </Border>
                             </StackPanel>
-                            <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
+                            <controls:PathText Text="{x:Bind Path}" />
                         </StackPanel>
                         <TextBlock
                             Grid.Column="1"
@@ -840,9 +840,7 @@
                                                         <TextBlock
                                                             Style="{StaticResource BodyStrongTextBlockStyle}"
                                                             Text="{x:Bind Root}" />
-                                                        <TextBlock
-                                                            Style="{StaticResource MonoTextStyle}"
-                                                            Text="{x:Bind Path}" />
+                                                        <controls:PathText Text="{x:Bind Path}" />
                                                     </StackPanel>
                                                     <Border
                                                         Grid.Column="1"
