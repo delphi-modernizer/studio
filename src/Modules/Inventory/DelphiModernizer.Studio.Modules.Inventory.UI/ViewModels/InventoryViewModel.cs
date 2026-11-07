@@ -473,7 +473,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         var settings = connection.Details
             .Split("; ", StringSplitOptions.RemoveEmptyEntries)
             .Select(pair => pair.Split('=', 2))
-            .Select(kv => new Setting(kv[0], kv.Length > 1 ? kv[1] : string.Empty))
+            .SelectMany(kv => kv.Length > 1 ? Settings(kv[0], kv[1]) : [new Setting(kv[0], string.Empty)])
             .ToList();
         var meta = connection.Technology is null
             ? connection.ClassName
@@ -485,6 +485,22 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
             Link(connection.Path, connection.Line),
             connection.HasEmbeddedPassword,
             settings);
+    }
+
+    /// <summary>A setting, or the settings a list such as Params.Strings holds, one per name.</summary>
+    /// <remarks>A list's secret then reads alone, as "PASSWORD, redacted", never inside the list's text.</remarks>
+    private static IEnumerable<Setting> Settings(string key, string value)
+    {
+        var parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length == 0 || !parts.All(p => p.Contains('=', StringComparison.Ordinal)))
+        {
+            return [new Setting(key, value)];
+        }
+
+        return parts
+            .Select(p => p.Split('=', 2))
+            .Select(kv => new Setting(kv[0].Trim(), kv[1].Trim()));
     }
 
     private static string Link(string path, int line)
