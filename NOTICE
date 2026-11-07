@@ -1,0 +1,8 @@
+Delphi Modernizer Studio
+Copyright (c) 2026 Delphi Modernizer contributors, MIT licence.
+
+The Studio Icons font and the SVGs in assets/icons are from Fluent UI System Icons
+(https://github.com/microsoft/fluentui-system-icons), Copyright (c) 2020 Microsoft Corporation, MIT licence;
+see assets/icons/LICENSE.
+
+The application structure follows the kakehashi and Contr for Windows conventions of the same team.
