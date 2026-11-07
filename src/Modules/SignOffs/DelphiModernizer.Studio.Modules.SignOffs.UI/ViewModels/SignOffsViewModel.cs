@@ -56,6 +56,10 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial string NextName { get; set; } = string.Empty;
 
+    /// <summary>Under 1100 each sign-off's body is one column; the page sets this from its window width.</summary>
+    [ObservableProperty]
+    public partial bool IsNarrow { get; set; }
+
     /// <param name="parameter">The gate to open, as Overview passes it; null opens the next one.</param>
     public override void OnNavigatedTo(object? parameter)
     {
@@ -83,6 +87,14 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     public void Prepare()
     {
         _navigation.NavigateTo("Workstreams", "PA");
+    }
+
+    partial void OnIsNarrowChanged(bool value)
+    {
+        foreach (var row in SignOffs)
+        {
+            row.IsNarrow = value;
+        }
     }
 
     protected override void OnWorkspaceChanged()
@@ -130,6 +142,7 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
         foreach (var row in rows)
         {
             row.IsExpanded = row.Gate == open || expanded.Contains(row.Gate);
+            row.IsNarrow = IsNarrow;
         }
 
         SignOffs = rows;

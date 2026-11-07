@@ -31,6 +31,7 @@
         </InfoBar>
 
         <InfoBar
+            x:Name="RefusalBar"
             AutomationProperties.LiveSetting="Assertive"
             IsClosable="False"
             IsOpen="{x:Bind ViewModel.IsRefused, Mode=OneWay}"
@@ -101,9 +102,12 @@
                     <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                 </InfoBar.IconSource>
             </InfoBar>
+            <!--  The stroke keeps the box visible in high contrast, where the subtle fill is transparent.  -->
             <Border
-                Padding="12,8"
+                Padding="10,8"
                 Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                BorderThickness="1"
                 CornerRadius="4">
                 <TextBlock
                     IsTextSelectionEnabled="True"

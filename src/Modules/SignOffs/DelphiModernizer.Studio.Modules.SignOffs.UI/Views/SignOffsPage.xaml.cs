@@ -66,13 +66,45 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
         return Resource(changed ? "SystemFillColorCautionBrush" : "TextFillColorSecondaryBrush");
     }
 
+    /// <summary>Wide: the checks and the approval panel side by side, 24 apart; narrow: the panel 16 below.</summary>
+    public static double ColumnGap(bool isNarrow)
+    {
+        return isNarrow ? 0 : 24;
+    }
+
+    public static double RowGap(bool isNarrow)
+    {
+        return isNarrow ? 16 : 0;
+    }
+
+    public static GridLength PanelWidth(bool isNarrow)
+    {
+        return new GridLength(isNarrow ? 0 : 320);
+    }
+
+    public static int PanelRow(bool isNarrow)
+    {
+        return isNarrow ? 1 : 0;
+    }
+
+    public static int PanelColumn(bool isNarrow)
+    {
+        return isNarrow ? 0 : 1;
+    }
+
     private static Brush Resource(string key)
     {
         return (Brush)Microsoft.UI.Xaml.Application.Current.Resources[key];
     }
 
+    private void OnLayoutChanged(object sender, VisualStateChangedEventArgs e)
+    {
+        ViewModel.IsNarrow = e.NewState?.Name == nameof(Narrow);
+    }
+
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        ViewModel.IsNarrow = Layout.CurrentState?.Name == nameof(Narrow);
         await ViewModel.LoadCommand.ExecuteAsync(parameter: null);
     }
 

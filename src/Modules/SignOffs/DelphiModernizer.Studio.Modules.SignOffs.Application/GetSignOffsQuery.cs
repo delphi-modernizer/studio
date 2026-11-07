@@ -29,7 +29,16 @@ public sealed record SignOff(
     IReadOnlyList<string> Changed);
 
 /// <param name="ShowsProblems">Whether the check fails on problems in the documents, so it offers Show the problems.</param>
-public sealed record SignOffCheck(string Name, string Detail, bool Passed, bool ShowsProblems);
+public sealed record SignOffCheck(string Name, string Detail, bool Passed, bool ShowsProblems)
+{
+    /// <summary>What Narrator reads for the check row, such as "Not met: Discovery approved. It is blocked."</summary>
+    /// <remarks>A failing check reads its count alone; what follows the count is on screen only.</remarks>
+    public string AnnouncedName => (Passed, ShowsProblems) switch {
+        (true, _) => $"Passed: {Name}.",
+        (false, true) => $"Failing: {Name}. {Detail.Split(';')[0]}.",
+        _ => $"Not met: {Name}. {Detail}.",
+    };
+}
 
 internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequestHandler<GetSignOffsQuery, Result<IReadOnlyList<SignOff>>>
 {

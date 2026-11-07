@@ -11,8 +11,16 @@ using DelphiModernizer.Studio.UI.Common.Icons;
 namespace DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
 
 /// <summary>One check of a sign-off: met, not yet met, or failing on problems in the documents.</summary>
-public sealed record CheckRow(string Name, string Detail, bool Passed, bool ShowsProblems)
+public sealed record CheckRow(SignOffCheck Check)
 {
+    public string Name => Check.Name;
+
+    public string Detail => Check.Detail;
+
+    public bool Passed => Check.Passed;
+
+    public bool ShowsProblems => Check.ShowsProblems;
+
     public CheckTone Tone => (Passed, ShowsProblems) switch {
         (true, _) => CheckTone.Passed,
         (false, true) => CheckTone.Failing,
@@ -25,11 +33,7 @@ public sealed record CheckRow(string Name, string Detail, bool Passed, bool Show
         _ => StudioIcons.NotYet,
     };
 
-    public string AnnouncedName => Tone switch {
-        CheckTone.Passed => $"Passed: {Name}.",
-        CheckTone.Failing => $"Failing: {Name}. {Detail}.",
-        _ => $"Not met: {Name}. {Detail}.",
-    };
+    public string AnnouncedName => Check.AnnouncedName;
 }
 
 public enum CheckTone
@@ -81,7 +85,7 @@ public sealed partial class SignOffRow : ObservableObject
         Pill = PillStates.OfGate(signOff.Status.State);
         IsNext = isNext;
         IsLast = signOff.Number == count;
-        Checks = [.. signOff.Checks.Select(c => new CheckRow(c.Name, c.Detail, c.Passed, c.ShowsProblems))];
+        Checks = [.. signOff.Checks.Select(c => new CheckRow(c))];
         var passed = Checks.Count(c => c.Passed);
         PassCount = $"{passed} of {Checks.Count} pass";
         var failing = Checks.Count - passed;
@@ -180,6 +184,13 @@ public sealed partial class SignOffRow : ObservableObject
 
     [ObservableProperty]
     public partial bool IsExpanded { get; set; }
+
+    /// <summary>Under 1100 the body is one column and the header drops its summary's second line.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowsSummaryDetail))]
+    public partial bool IsNarrow { get; set; }
+
+    public bool ShowsSummaryDetail => !IsNarrow;
 
     private static string FileName(string path)
     {

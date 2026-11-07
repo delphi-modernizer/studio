@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.Modules.SignOffs.UI.Views;
@@ -23,6 +25,7 @@ public sealed partial class ApprovalDialog : ContentDialog
         Opened += OnOpened;
         PrimaryButtonClick += OnPrimaryButtonClick;
         ShowProblemsButton.Click += OnShowProblems;
+        ViewModel.PropertyChanged += OnViewModelChanged;
     }
 
     public ApprovalDialogViewModel ViewModel { get; }
@@ -45,6 +48,21 @@ public sealed partial class ApprovalDialog : ContentDialog
         {
             deferral.Complete();
         }
+    }
+
+    /// <summary>The refusal InfoBar is assertive; opening it is the change Narrator reads at once.</summary>
+    private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ApprovalDialogViewModel.IsRefused) || !ViewModel.IsRefused)
+        {
+            return;
+        }
+
+        // The InfoBar opens through its binding first, so the announcement waits a turn.
+        DispatcherQueue.TryEnqueue(() => {
+            var peer = FrameworkElementAutomationPeer.FromElement(RefusalBar);
+            peer?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+        });
     }
 
     private void OnShowProblems(object sender, RoutedEventArgs e)
