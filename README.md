@@ -16,7 +16,7 @@ Built milestone by milestone against the approved design (see [docs/ARCHITECTURE
 | --- | --- | --- |
 | 1 Shell | Solution, engine wiring, Mica, themes, title bar, navigation pane with badges, page frame, Studio Icons, app icon, shared controls | Done |
 | 2 Without AI | Start, New workspace, Overview, Inventory, Deliverables, Traceability, Sign-offs (read), Settings | Done |
-| 3 Sign-offs | Approve and revoke dialogs, git identity, refusal, stale approvals, history | In progress |
+| 3 Sign-offs | Approve and revoke dialogs, git identity, refusal, stale approvals, history | Done |
 | 4 Agent runs | Workstreams, the Run an agent task dialog, the live Run page, budget and Claude Code dialogs | In progress |
 | 5 Finish | Narrow layouts, high contrast, keyboard order and Narrator names, a full pass against every artboard | Next |
 

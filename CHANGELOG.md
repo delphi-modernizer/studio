@@ -17,3 +17,6 @@
   step, open questions and recent agent runs.
 - Inventory by tab, Deliverables by sign-off, Traceability with its problems and matrix, the sign-offs' checks and
   approvals, and Settings.
+- Approve and revoke sign-offs from a dialog that shows your git identity, requires a note, never approves on Enter,
+  and keeps the note when the engine refuses.
+- Sign-offs list the files each one covers, mark those changed since approval, and show every approval and revocation.
