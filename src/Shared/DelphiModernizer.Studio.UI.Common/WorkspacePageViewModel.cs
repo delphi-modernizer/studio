@@ -15,10 +15,10 @@ public abstract partial class WorkspacePageViewModel : ViewModel
     protected WorkspacePageViewModel(IWorkspaceSession session)
     {
         ArgumentNullException.ThrowIfNull(session);
-        Session = session;
+        _session = session;
         _dispatcher = DispatcherQueue.GetForCurrentThread();
         HasWorkspace = session.Current is not null;
-        Session.Changed += OnSessionChanged;
+        _session.Changed += OnSessionChanged;
     }
 
     [ObservableProperty]
@@ -27,7 +27,7 @@ public abstract partial class WorkspacePageViewModel : ViewModel
 
     public bool HasNoWorkspace => !HasWorkspace;
 
-    protected IWorkspaceSession Session { get; }
+    protected IWorkspaceSession _session { get; }
 
     /// <summary>Called on the UI thread after another workspace opened or the open one closed.</summary>
     protected virtual void OnWorkspaceChanged()
@@ -38,7 +38,7 @@ public abstract partial class WorkspacePageViewModel : ViewModel
     {
         if (disposing)
         {
-            Session.Changed -= OnSessionChanged;
+            _session.Changed -= OnSessionChanged;
         }
 
         base.Dispose(disposing);
@@ -47,7 +47,7 @@ public abstract partial class WorkspacePageViewModel : ViewModel
     private void OnSessionChanged(object? sender, EventArgs e)
     {
         _dispatcher.TryEnqueue(() => {
-            HasWorkspace = Session.Current is not null;
+            HasWorkspace = _session.Current is not null;
             OnWorkspaceChanged();
         });
     }

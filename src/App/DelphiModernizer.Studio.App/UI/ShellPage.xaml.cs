@@ -51,6 +51,8 @@ public sealed partial class ShellPage : Page
             .OrderBy(i => i.Placement)
             .ThenBy(i => i.Order)];
         InitializeComponent();
+        AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
+        AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
     }
 
     public ShellViewModel ViewModel { get; }
@@ -203,11 +205,6 @@ public sealed partial class ShellPage : Page
         return owner is null ? null : _containers[_navigation.GetPageKey(owner.PageType)];
     }
 
-    private void OnBackRequested(TitleBar sender, object args)
-    {
-        _navigation.GoBack();
-    }
-
     private void OnBackInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         _navigation.GoBack();
@@ -221,11 +218,6 @@ public sealed partial class ShellPage : Page
             _navigation.GoBack();
             e.Handled = true;
         }
-    }
-
-    private void OnPaneToggleRequested(TitleBar sender, object args)
-    {
-        NavView.IsPaneOpen = !NavView.IsPaneOpen;
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)

@@ -15,8 +15,11 @@ public sealed partial class NoWorkspaceState : UserControl
     public static readonly DependencyProperty MessageProperty = DependencyProperty.Register(
         nameof(Message), typeof(string), typeof(NoWorkspaceState), new PropertyMetadata(string.Empty));
 
+    private readonly IWorkspaceActions _actions;
+
     public NoWorkspaceState()
     {
+        _actions = ContractServices.Provider.GetRequiredService<IWorkspaceActions>();
         InitializeComponent();
     }
 
@@ -33,16 +36,14 @@ public sealed partial class NoWorkspaceState : UserControl
         set => SetValue(MessageProperty, value);
     }
 
-    private static IWorkspaceActions Actions => ContractServices.Provider.GetRequiredService<IWorkspaceActions>();
-
     private void OnNewWorkspace(object sender, RoutedEventArgs e)
     {
-        Actions.StartNewWorkspace();
+        _actions.StartNewWorkspace();
     }
 
     private async void OnOpenFolder(object sender, RoutedEventArgs e)
     {
-        var problem = await Actions.OpenFolderAsync();
+        var problem = await _actions.OpenFolderAsync();
         Problem.Message = problem ?? string.Empty;
         Problem.IsOpen = problem is not null;
     }

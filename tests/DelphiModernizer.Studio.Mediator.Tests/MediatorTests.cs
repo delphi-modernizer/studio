@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 using DelphiModernizer.Studio.Tests;

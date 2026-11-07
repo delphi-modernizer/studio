@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DelphiModernizer.Studio.UI.Contracts;
 using DelphiModernizer.Studio.UI.Contracts.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,17 +30,14 @@ public sealed class NavigationService : INavigationService
         ArgumentNullException.ThrowIfNull(modules);
         _scopes = scopes;
 
-        foreach (var module in modules)
-        {
-            foreach (var item in module.GetNavigationItems())
-            {
-                _pages[GetPageKey(item.PageType)] = item.PageType;
-            }
+        var pages = modules.SelectMany(module => module
+            .GetNavigationItems()
+            .Select(item => item.PageType)
+            .Concat(module.GetPages()));
 
-            foreach (var page in module.GetPages())
-            {
-                _pages[GetPageKey(page)] = page;
-            }
+        foreach (var page in pages)
+        {
+            _pages[GetPageKey(page)] = page;
         }
     }
 

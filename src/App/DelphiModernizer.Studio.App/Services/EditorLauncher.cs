@@ -23,6 +23,9 @@ public sealed class EditorLauncher : IEditorLauncher
         ".pas", ".dpr", ".dpk", ".inc", ".dfm", ".fmx", ".dproj", ".dof", ".cfg", ".bdsproj", ".groupproj",
         ".md", ".json", ".txt", ".sql", ".xml", ".ini", ".csv");
 
+    private static readonly string _explorer = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+
     private readonly IWorkspaceSession _session;
 
     public EditorLauncher(IWorkspaceSession session)
@@ -42,7 +45,7 @@ public sealed class EditorLauncher : IEditorLauncher
 
         var start = _openable.Contains(Path.GetExtension(path))
             ? new ProcessStartInfo(path) { UseShellExecute = true }
-            : new ProcessStartInfo("explorer.exe") { ArgumentList = { $"/select,{path}" } };
+            : new ProcessStartInfo(_explorer) { ArgumentList = { $"/select,{path}" } };
 
         try
         {

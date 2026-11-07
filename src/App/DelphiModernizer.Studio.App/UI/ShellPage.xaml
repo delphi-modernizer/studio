@@ -31,11 +31,9 @@
             x:Name="AppTitleBar"
             Title="Delphi Modernizer Studio"
             Height="48"
-            BackRequested="OnBackRequested"
             IsBackButtonEnabled="{x:Bind ViewModel.CanGoBack, Mode=OneWay}"
             IsBackButtonVisible="True"
             IsPaneToggleButtonVisible="True"
-            PaneToggleRequested="OnPaneToggleRequested"
             Subtitle="{x:Bind ViewModel.Subtitle, Mode=OneWay}">
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="ms-appx:///Assets/Square44x44Logo.targetsize-16_altform-unplated.png" />
