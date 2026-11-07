@@ -26,3 +26,22 @@ in your user-level NuGet configuration.
 
 `scripts/build_icon_font.py` and `scripts/build_app_icon.py` (`uv run python <script>`) rebuild the committed font,
 glyph table, app icon and logos from `assets/`; see [icons.md](icons.md).
+
+## Screenshots
+
+`tests/DelphiModernizer.Studio.Screenshots` captures every page of the built app; the `screenshots` CI job runs it and
+uploads the artifact `screenshots` ([ui-screenshots.md](design/ui-screenshots.md)). It is a console tool, not a test
+project, so `dotnet test` skips it everywhere. It targets `net10.0-windows` with `EnableWindowsTargeting`, so
+`dotnet build` compiles it on Linux too; it runs only on Windows.
+
+To run it on a Windows PC, publish the app and `dmz` as the `screenshots` job does, create a workspace with `dmz init`
+and `dmz scan`, then:
+
+```bash
+dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release -- \
+  --app out/studio/DelphiModernizer.Studio.exe --workspace <workspace> --out out/screenshots
+```
+
+It moves your studio data folder (`%LOCALAPPDATA%\DelphiModernizer\Studio`) aside while it runs and puts it back, may
+switch the display to 1920 × 1080 and briefly turns on high contrast. The app takes no launch argument for it: the tool
+writes the recent workspace and the Theme setting the app already reads.

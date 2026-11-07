@@ -26,6 +26,8 @@ change.
 | Blocked by a run the studio did not start, such as `dmz run` in a terminal: the engine's leases name no holder publicly | Run… is offered; the engine refuses the lease and the dialog shows its reason | `StartRunCommand` |
 | The Run an agent task dialog's description: the kit has none per recipe; the canvas draws one for Extract business rules | One sentence from what the recipe writes | `RunRecipeDialog` |
 | Short names for what a recipe writes ("Writes the functional requirements") | The kit's deliverable titles | `RunWords.Writes` |
+| Is an artboard's 1280 × 800 the window's visible frame, title bar included? | Yes: screenshots size the frame Windows draws, without the invisible resize borders | `Desktop.SetVisibleFrame` |
+| The brief's sample shows G0 and D01 approved; only a person approves, so the CI workspace has no approval | Screenshots show the freshly scanned workspace: no sign-off approved, every deliverable a template | `ci.yml`, `screenshots` job |
 | The other handoff questions (stale on answered questions, settings defaults, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |
 | Sign-offs' approval panel width: the handoff says 320, the canvas stylesheet draws 336 | 320, as the handoff says | `SignOffsPage` |
 | Run's keyboard order once a run has ended: the handoff lists Open the draft, then Back to Legacy discovery, but the header's Back comes first on the page | Reading order: the header's Back, Run again… on the failed InfoBar, then the end card's Open the draft and Back | `RunPage` |
