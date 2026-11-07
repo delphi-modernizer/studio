@@ -148,6 +148,7 @@
                             Text="{x:Bind Types}" />
                         <Button
                             Grid.Column="8"
+                            Padding="8"
                             VerticalAlignment="Center"
                             AutomationProperties.Name="{x:Bind OpenName}"
                             Click="OnLinkClicked"
@@ -224,6 +225,7 @@
                             Text="{x:Bind FanOut.ToString()}" />
                         <Button
                             Grid.Column="4"
+                            Padding="8"
                             VerticalAlignment="Center"
                             AutomationProperties.Name="{x:Bind OpenName}"
                             Click="OnLinkClicked"
@@ -862,6 +864,7 @@
                                                         Text="{x:Bind Events.ToString()}" />
                                                     <Button
                                                         Grid.Column="4"
+                                                        Padding="8"
                                                         VerticalAlignment="Center"
                                                         AutomationProperties.Name="{x:Bind OpenName}"
                                                         Click="OnLinkClicked"

@@ -211,6 +211,7 @@
                                                     State="{x:Bind Pill}" />
                                                 <Button
                                                     Grid.Column="3"
+                                                    Padding="8"
                                                     VerticalAlignment="Center"
                                                     AutomationProperties.Name="{x:Bind OpenName}"
                                                     Click="OnOpenDeliverable"
