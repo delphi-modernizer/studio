@@ -11,12 +11,16 @@ namespace DelphiModernizer.Studio.Application.Abstractions.Tests;
 public sealed class NameMappingTests
 {
     [Fact]
-    public void Every_gate_in_the_kit_has_a_name_without_its_code()
+    public void Every_gate_in_the_kit_has_the_kit_s_name_without_its_code()
     {
-        var gates = KitBundle.Embedded.Spec.Gates.Gates.Select(g => g.Id);
+        var gates = KitBundle.Embedded.Spec.Gates.Gates;
+        var ids = gates
+            .Select(g => g.Id)
+            .Order();
 
-        Assert.Equal(gates.Order(), SignOffNames.Gates.Order());
-        Assert.All(gates, gate => Assert.DoesNotContain(gate, SignOffNames.Of(gate), StringComparison.Ordinal));
+        Assert.Equal(ids, SignOffNames.Gates.Order());
+        Assert.All(gates, gate => Assert.Equal(gate.Name, SignOffNames.Of(gate.Id)));
+        Assert.All(gates, gate => Assert.DoesNotContain(gate.Id, SignOffNames.Of(gate.Id), StringComparison.Ordinal));
     }
 
     [Fact]

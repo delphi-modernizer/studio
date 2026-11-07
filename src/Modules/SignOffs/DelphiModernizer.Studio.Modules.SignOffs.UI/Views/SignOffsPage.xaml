@@ -179,6 +179,34 @@
                                                 </DataTemplate>
                                             </ItemsRepeater.ItemTemplate>
                                         </ItemsRepeater>
+                                        <StackPanel Margin="0,16,0,0" Visibility="{x:Bind HasHistory}">
+                                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="History" />
+                                            <ItemsRepeater ItemsSource="{x:Bind History}">
+                                                <ItemsRepeater.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:HistoryRow">
+                                                        <Grid Padding="0,8" ColumnSpacing="12">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="*" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <FontIcon
+                                                                Margin="0,2,0,0"
+                                                                VerticalAlignment="Top"
+                                                                Foreground="{x:Bind local:SignOffsPage.ApprovalBrush(IsApproval)}"
+                                                                Glyph="{x:Bind local:SignOffsPage.HistoryGlyph(IsApproval)}"
+                                                                Style="{StaticResource IconStyle}" />
+                                                            <StackPanel Grid.Column="1">
+                                                                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{x:Bind Text}" />
+                                                                <TextBlock
+                                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                                    Text="{x:Bind Detail}"
+                                                                    TextWrapping="Wrap" />
+                                                            </StackPanel>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsRepeater.ItemTemplate>
+                                            </ItemsRepeater>
+                                        </StackPanel>
                                     </StackPanel>
 
                                     <StackPanel
@@ -203,7 +231,7 @@
                                         <InfoBar
                                             IsClosable="False"
                                             IsOpen="{x:Bind IsStale}"
-                                            Message="A file it covers differs from the one approved."
+                                            Message="{x:Bind ChangedSummary}"
                                             Severity="Warning"
                                             Title="Changed after approval.">
                                             <InfoBar.IconSource>
@@ -281,6 +309,26 @@
                                             Height="1"
                                             Margin="0,4"
                                             Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Covers" />
+                                            <TextBlock
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                Text="{x:Bind CoversCount}" />
+                                        </StackPanel>
+                                        <ItemsRepeater ItemsSource="{x:Bind Covers}">
+                                            <ItemsRepeater.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:CoveredFileRow">
+                                                    <TextBlock
+                                                        Padding="0,2"
+                                                        AutomationProperties.Name="{x:Bind AnnouncedName}"
+                                                        Foreground="{x:Bind local:SignOffsPage.CoveredBrush(Changed)}"
+                                                        Style="{StaticResource MonoTextStyle}"
+                                                        Text="{x:Bind Text}"
+                                                        ToolTipService.ToolTip="{x:Bind Path}" />
+                                                </DataTemplate>
+                                            </ItemsRepeater.ItemTemplate>
+                                        </ItemsRepeater>
                                         <Grid ColumnSpacing="8">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />

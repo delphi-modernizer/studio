@@ -57,7 +57,7 @@ public sealed class ApprovalTests
 
         Assert.Equal("Dana Reviewer <dana@example.com>", approved.Value.By);
         Assert.Equal("Read the charter.", approved.Value.Note);
-        Assert.NotEmpty(log);
+        Assert.Equal("chore: approve the Project setup sign-off", log.Trim());
     }
 
     [Fact]
@@ -96,6 +96,42 @@ public sealed class ApprovalTests
 
         Assert.Equal(["ready", "approved"], states);
         Assert.True(SignOffRefusal.IsRefusal(again.Error));
+    }
+
+    [Fact]
+    public async Task A_stale_sign_off_names_the_files_changed_since_its_approval()
+    {
+        using var repository = await ApprovableAsync();
+        var workspace = repository.Workspace;
+        await GitAsync(workspace, "add", "-A");
+        await GitAsync(workspace, "commit", "-m", "chore: start");
+        var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await sender.Send(new ApproveGateCommand("G0", "Read the charter."), cancellationToken);
+        var questions = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter", "open-questions.md");
+        await File.AppendAllTextAsync(questions, "\nOne more question.\n", cancellationToken);
+
+        var setup = (await sender.Send(new GetSignOffsQuery(), cancellationToken)).Value[0];
+
+        Assert.Equal("stale", setup.Status.State);
+        Assert.Equal(["docs/00-project-charter/open-questions.md"], setup.Changed);
+        Assert.Contains("docs/00-project-charter/open-questions.md", setup.Status.CoveredFiles);
+    }
+
+    [Fact]
+    public async Task The_history_keeps_the_approval_and_its_revocation_oldest_first()
+    {
+        using var repository = await ApprovableAsync();
+        var workspace = repository.Workspace;
+        var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await sender.Send(new ApproveGateCommand("G0", "Read the charter."), cancellationToken);
+        await sender.Send(new RevokeGateCommand("G0", "The scope changed."), cancellationToken);
+
+        var setup = (await sender.Send(new GetSignOffsQuery(), cancellationToken)).Value[0];
+
+        Assert.Equal(["approve", "revoke"], setup.History.Select(e => e.Action));
+        Assert.Equal("ready", setup.Status.State);
     }
 
     private static async Task<GitWorkspace> ApprovableAsync()

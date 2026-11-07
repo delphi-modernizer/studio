@@ -54,6 +54,18 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
         return isApproved ? StudioIcons.Approved : StudioIcons.Approve;
     }
 
+    /// <summary>A revocation shows the history glyph; an approval, the filled certificate.</summary>
+    public static string HistoryGlyph(bool isApproval)
+    {
+        return isApproval ? StudioIcons.Approved : StudioIcons.History;
+    }
+
+    /// <summary>A file changed since approval is drawn in the caution colour, with its "changed" mark.</summary>
+    public static Brush CoveredBrush(bool changed)
+    {
+        return Resource(changed ? "SystemFillColorCautionBrush" : "TextFillColorSecondaryBrush");
+    }
+
     private static Brush Resource(string key)
     {
         return (Brush)Microsoft.UI.Xaml.Application.Current.Resources[key];
