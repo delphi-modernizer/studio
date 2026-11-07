@@ -53,6 +53,7 @@ public sealed partial class ShellPage : Page
         InitializeComponent();
         AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
         AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
+        NavView.Loaded += (_, _) => MakePaneOneTabStop();
     }
 
     public ShellViewModel ViewModel { get; }
@@ -248,6 +249,37 @@ public sealed partial class ShellPage : Page
             NavigationView => PaneItemToFocus().Focus(FocusState.Keyboard),
             _ => FocusManager.FindFirstFocusableElement(NavFrame) is UIElement first && first.Focus(FocusState.Keyboard),
         };
+    }
+
+    /// <summary>The pane, Settings in its footer included, is one tab stop with arrow keys inside.</summary>
+    /// <remarks>NavigationView makes its menu and footer two stops; the grid holding both is a template part.</remarks>
+    private void MakePaneOneTabStop()
+    {
+        if (Descendant(NavView, "PaneContentGrid") is { } pane)
+        {
+            pane.TabFocusNavigation = KeyboardNavigationMode.Once;
+            pane.XYFocusKeyboardNavigation = XYFocusKeyboardNavigationMode.Enabled;
+        }
+    }
+
+    private static FrameworkElement? Descendant(DependencyObject root, string name)
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+
+            if (child is FrameworkElement element && element.Name == name)
+            {
+                return element;
+            }
+
+            if (Descendant(child, name) is { } found)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>The pane is one tab stop, entered at the selected item.</summary>

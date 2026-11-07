@@ -68,7 +68,9 @@
             SelectionChanged="OnSelectionChanged">
             <NavigationView.Resources>
                 <!--  Selection shows as the backplate and the filled glyph; the pill would be a side stripe.  -->
-                <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="Transparent" />
+                <StaticResource
+                    x:Key="NavigationViewSelectionIndicatorForeground"
+                    ResourceKey="SubtleFillColorTransparentBrush" />
             </NavigationView.Resources>
 
             <Frame x:Name="NavFrame" IsNavigationStackEnabled="False" />
