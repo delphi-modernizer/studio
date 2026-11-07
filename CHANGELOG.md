@@ -45,4 +45,5 @@
   sign-off's border and hovered rows stay readable.
 - Paths trim at the start in narrow columns, so the file name stays visible, and Narrator reads the whole path.
 - A `screenshots` CI job starts the app on the brief's sample workspace and captures every page at 1280 × 800 and
-  960 × 576 in light, dark and high contrast; it fails when the app does not start or a page cannot be reached.
+  960 × 576 in light and dark, and Overview and Sign-offs in high contrast; it fails when the app does not start or a
+  page cannot be reached.
