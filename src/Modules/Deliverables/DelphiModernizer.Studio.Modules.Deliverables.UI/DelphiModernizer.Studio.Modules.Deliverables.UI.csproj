@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.UI.Common\DelphiModernizer.Studio.UI.Common.csproj" />
+    <ProjectReference Include="..\DelphiModernizer.Studio.Modules.Deliverables.Application\DelphiModernizer.Studio.Modules.Deliverables.Application.csproj" />
     <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.UI.Contracts\DelphiModernizer.Studio.UI.Contracts.csproj" />
   </ItemGroup>
 

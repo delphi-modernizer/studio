@@ -20,6 +20,7 @@
     </Project>
   </Folder>
   <Folder Name="/src/Modules/Deliverables/">
+    <Project Path="src/Modules/Deliverables/DelphiModernizer.Studio.Modules.Deliverables.Application/DelphiModernizer.Studio.Modules.Deliverables.Application.csproj" />
     <Project Path="src/Modules/Deliverables/DelphiModernizer.Studio.Modules.Deliverables.UI/DelphiModernizer.Studio.Modules.Deliverables.UI.csproj">
       <Platform Solution="*|x64" Project="x64" />
     </Project>
@@ -80,6 +81,7 @@
     <Project Path="tests/DelphiModernizer.Studio.Application.Abstractions.Tests/DelphiModernizer.Studio.Application.Abstractions.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.ArchitectureTests/DelphiModernizer.Studio.ArchitectureTests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Mediator.Tests/DelphiModernizer.Studio.Mediator.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.Deliverables.Application.Tests/DelphiModernizer.Studio.Modules.Deliverables.Application.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Modules.Inventory.Application.Tests/DelphiModernizer.Studio.Modules.Inventory.Application.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Modules.Overview.Application.Tests/DelphiModernizer.Studio.Modules.Overview.Application.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Modules.SignOffs.Application.Tests/DelphiModernizer.Studio.Modules.SignOffs.Application.Tests.csproj" />

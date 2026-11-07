@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DelphiModernizer.Studio.Modules.Deliverables.Application;
 using DelphiModernizer.Studio.Modules.Deliverables.UI.ViewModels;
 using DelphiModernizer.Studio.Modules.Deliverables.UI.Views;
 using DelphiModernizer.Studio.UI.Common.Icons;
@@ -16,6 +17,7 @@ public sealed class DeliverablesModule : IModule
     public void RegisterServices(IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        services.AddDeliverablesApplication();
         services.AddTransient<DeliverablesViewModel>();
         services.AddTransient<DeliverablesPage>();
     }

@@ -38,18 +38,14 @@ public sealed class EditorLauncher : IEditorLauncher
     {
         if (_session.Current is not { } workspace
             || !WorkspacePaths.TryResolveInside(workspace.Root, workspace.Root, relativePath, out var path)
-            || !File.Exists(path))
+            || !(File.Exists(path) || Directory.Exists(path)))
         {
             return Task.FromResult(false);
         }
 
-        var start = _openable.Contains(Path.GetExtension(path))
-            ? new ProcessStartInfo(path) { UseShellExecute = true }
-            : new ProcessStartInfo(_explorer) { ArgumentList = { $"/select,{path}" } };
-
         try
         {
-            using var process = Process.Start(start);
+            using var process = Process.Start(StartInfoFor(path));
 
             return Task.FromResult(true);
         }
@@ -57,5 +53,18 @@ public sealed class EditorLauncher : IEditorLauncher
         {
             return Task.FromResult(false);
         }
+    }
+
+    /// <summary>A folder opens in Explorer, a source or document file in its app, and anything else is only shown.</summary>
+    private static ProcessStartInfo StartInfoFor(string path)
+    {
+        if (Directory.Exists(path))
+        {
+            return new ProcessStartInfo(_explorer) { ArgumentList = { path } };
+        }
+
+        return _openable.Contains(Path.GetExtension(path))
+            ? new ProcessStartInfo(path) { UseShellExecute = true }
+            : new ProcessStartInfo(_explorer) { ArgumentList = { $"/select,{path}" } };
     }
 }
