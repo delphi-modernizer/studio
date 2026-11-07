@@ -230,7 +230,9 @@
                                                     Text="{x:Bind Number}" />
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                                <TextBlock
+                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                    Text="{x:Bind Name}" />
                                                 <TextBlock
                                                     Style="{StaticResource SecondaryCaptionTextStyle}"
                                                     Text="{x:Bind Approves}"
