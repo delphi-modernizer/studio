@@ -320,6 +320,124 @@
                     </StackPanel>
                 </Grid>
             </DataTemplate>
+
+            <DataTemplate x:Key="TechnologyCardTemplate" x:DataType="vm:TechnologyCard">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="{x:Bind icons:StudioIcons.Components}"
+                                Style="{StaticResource IconStyle}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                AutomationProperties.HeadingLevel="Level2"
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind Name}" />
+                            <Border Grid.Column="2" Style="{StaticResource TagStyle}">
+                                <TextBlock
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="{x:Bind Category}"
+                                    TextLineBounds="Tight" />
+                            </Border>
+                            <TextBlock
+                                Grid.Column="3"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="{x:Bind Places}" />
+                        </Grid>
+                        <ItemsRepeater ItemsSource="{x:Bind Evidence}">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="vm:Place">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <HyperlinkButton
+                                            AutomationProperties.Name="{x:Bind LinkName}"
+                                            Click="OnLinkClicked"
+                                            Content="{x:Bind Link}"
+                                            Style="{StaticResource LinkStyle}"
+                                            Tag="{x:Bind Link}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="{x:Bind Detail}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
+            <DataTemplate x:Key="ConnectionCardTemplate" x:DataType="vm:ConnectionCard">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="8">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="{x:Bind icons:StudioIcons.Connection}"
+                                Style="{StaticResource IconStyle}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                AutomationProperties.HeadingLevel="Level2"
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind Name}" />
+                            <controls:StatusPill
+                                Grid.Column="2"
+                                State="Error"
+                                Text="Embedded password"
+                                Visibility="{x:Bind HasEmbeddedPassword}" />
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="{x:Bind Meta}" />
+                            <HyperlinkButton
+                                AutomationProperties.Name="{x:Bind LinkName}"
+                                Click="OnLinkClicked"
+                                Content="{x:Bind Link}"
+                                Style="{StaticResource LinkStyle}"
+                                Tag="{x:Bind Link}" />
+                        </StackPanel>
+                        <ItemsRepeater ItemsSource="{x:Bind Settings}">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="vm:Setting">
+                                    <Grid ColumnSpacing="16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="128" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            AutomationProperties.AccessibilityView="Raw"
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="{x:Bind Key}" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            AutomationProperties.Name="{x:Bind AnnouncedName}"
+                                            Style="{StaticResource ValueTextStyle}"
+                                            Text="{x:Bind Value}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                            Secrets found in legacy code always show as ***. The studio has
+                            no control to reveal them.
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
 
@@ -948,146 +1066,57 @@
 
                         <!--  Data access, connections, libraries and external routines.  -->
                         <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsData, Mode=OneWay}">
-                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Technologies, Mode=OneWay}">
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.TechnologyRows, Mode=OneWay}">
                                 <ItemsRepeater.Layout>
-                                    <UniformGridLayout
-                                        ItemsStretch="Fill"
-                                        MaximumRowsOrColumns="2"
-                                        MinColumnSpacing="16"
-                                        MinItemWidth="280"
-                                        MinRowSpacing="16"
-                                        Orientation="Horizontal" />
+                                    <StackLayout Spacing="16" />
                                 </ItemsRepeater.Layout>
                                 <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:TechnologyCard">
-                                        <Border Style="{StaticResource CardStyle}">
-                                            <StackPanel Spacing="10">
-                                                <Grid ColumnSpacing="8">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <FontIcon
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        Glyph="{x:Bind icons:StudioIcons.Components}"
-                                                        Style="{StaticResource IconStyle}" />
-                                                    <TextBlock
-                                                        Grid.Column="1"
-                                                        AutomationProperties.HeadingLevel="Level2"
-                                                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                        Text="{x:Bind Name}" />
-                                                    <Border Grid.Column="2" Style="{StaticResource TagStyle}">
-                                                        <TextBlock
-                                                            Style="{StaticResource CaptionTextBlockStyle}"
-                                                            Text="{x:Bind Category}"
-                                                            TextLineBounds="Tight" />
-                                                    </Border>
-                                                    <TextBlock
-                                                        Grid.Column="3"
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind Places}" />
-                                                </Grid>
-                                                <ItemsRepeater ItemsSource="{x:Bind Evidence}">
-                                                    <ItemsRepeater.ItemTemplate>
-                                                        <DataTemplate x:DataType="vm:Place">
-                                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                                <HyperlinkButton
-                                                                    AutomationProperties.Name="{x:Bind LinkName}"
-                                                                    Click="OnLinkClicked"
-                                                                    Content="{x:Bind Link}"
-                                                                    Style="{StaticResource LinkStyle}"
-                                                                    Tag="{x:Bind Link}" />
-                                                                <TextBlock
-                                                                    VerticalAlignment="Center"
-                                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                                    Text="{x:Bind Detail}"
-                                                                    TextTrimming="CharacterEllipsis" />
-                                                            </StackPanel>
-                                                        </DataTemplate>
-                                                    </ItemsRepeater.ItemTemplate>
-                                                </ItemsRepeater>
-                                            </StackPanel>
-                                        </Border>
+                                    <DataTemplate x:DataType="vm:TechnologyPair">
+                                        <Grid ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Left}"
+                                                ContentTemplate="{StaticResource TechnologyCardTemplate}" />
+                                            <ContentPresenter
+                                                Grid.Column="1"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Right}"
+                                                ContentTemplate="{StaticResource TechnologyCardTemplate}"
+                                                Visibility="{x:Bind HasRight}" />
+                                        </Grid>
                                     </DataTemplate>
                                 </ItemsRepeater.ItemTemplate>
                             </ItemsRepeater>
-                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.Connections, Mode=OneWay}">
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.ConnectionRows, Mode=OneWay}">
                                 <ItemsRepeater.Layout>
-                                    <UniformGridLayout
-                                        ItemsStretch="Fill"
-                                        MaximumRowsOrColumns="2"
-                                        MinColumnSpacing="16"
-                                        MinItemWidth="280"
-                                        MinRowSpacing="16"
-                                        Orientation="Horizontal" />
+                                    <StackLayout Spacing="16" />
                                 </ItemsRepeater.Layout>
                                 <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:ConnectionCard">
-                                        <Border Style="{StaticResource CardStyle}">
-                                            <StackPanel Spacing="8">
-                                                <Grid ColumnSpacing="8">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <FontIcon
-                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                        Glyph="{x:Bind icons:StudioIcons.Connection}"
-                                                        Style="{StaticResource IconStyle}" />
-                                                    <TextBlock
-                                                        Grid.Column="1"
-                                                        AutomationProperties.HeadingLevel="Level2"
-                                                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                        Text="{x:Bind Name}" />
-                                                    <controls:StatusPill
-                                                        Grid.Column="2"
-                                                        State="Error"
-                                                        Text="Embedded password"
-                                                        Visibility="{x:Bind HasEmbeddedPassword}" />
-                                                </Grid>
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <TextBlock
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind Meta}" />
-                                                    <HyperlinkButton
-                                                        AutomationProperties.Name="{x:Bind LinkName}"
-                                                        Click="OnLinkClicked"
-                                                        Content="{x:Bind Link}"
-                                                        Style="{StaticResource LinkStyle}"
-                                                        Tag="{x:Bind Link}" />
-                                                </StackPanel>
-                                                <ItemsRepeater ItemsSource="{x:Bind Settings}">
-                                                    <ItemsRepeater.ItemTemplate>
-                                                        <DataTemplate x:DataType="vm:Setting">
-                                                            <Grid ColumnSpacing="16">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="128" />
-                                                                    <ColumnDefinition Width="*" />
-                                                                </Grid.ColumnDefinitions>
-                                                                <TextBlock
-                                                                    AutomationProperties.AccessibilityView="Raw"
-                                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                                    Text="{x:Bind Key}" />
-                                                                <TextBlock
-                                                                    Grid.Column="1"
-                                                                    AutomationProperties.Name="{x:Bind AnnouncedName}"
-                                                                    Style="{StaticResource ValueTextStyle}"
-                                                                    Text="{x:Bind Value}" />
-                                                            </Grid>
-                                                        </DataTemplate>
-                                                    </ItemsRepeater.ItemTemplate>
-                                                </ItemsRepeater>
-                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
-                                                    Secrets found in legacy code always show as ***. The studio has
-                                                    no control to reveal them.
-                                                </TextBlock>
-                                            </StackPanel>
-                                        </Border>
+                                    <DataTemplate x:DataType="vm:ConnectionPair">
+                                        <Grid ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Left}"
+                                                ContentTemplate="{StaticResource ConnectionCardTemplate}" />
+                                            <ContentPresenter
+                                                Grid.Column="1"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Right}"
+                                                ContentTemplate="{StaticResource ConnectionCardTemplate}"
+                                                Visibility="{x:Bind HasRight}" />
+                                        </Grid>
                                     </DataTemplate>
                                 </ItemsRepeater.ItemTemplate>
                             </ItemsRepeater>

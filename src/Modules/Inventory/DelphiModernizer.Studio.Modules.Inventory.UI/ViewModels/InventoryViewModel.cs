@@ -132,10 +132,20 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     public partial IReadOnlyList<ControlRow> Controls { get; set; } = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TechnologyRows))]
     public partial IReadOnlyList<TechnologyCard> Technologies { get; set; } = [];
 
+    public IReadOnlyList<TechnologyPair> TechnologyRows => [.. Technologies
+        .Chunk(2)
+        .Select(p => new TechnologyPair(p[0], p.Length > 1 ? p[1] : null))];
+
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ConnectionRows))]
     public partial IReadOnlyList<ConnectionCard> Connections { get; set; } = [];
+
+    public IReadOnlyList<ConnectionPair> ConnectionRows => [.. Connections
+        .Chunk(2)
+        .Select(p => new ConnectionPair(p[0], p.Length > 1 ? p[1] : null))];
 
     [ObservableProperty]
     public partial IReadOnlyList<ExternalRow> Externals { get; set; } = [];

@@ -110,6 +110,18 @@ public sealed record ConnectionCard(
     public string LinkName => InventoryWords.Evidence(Link);
 }
 
+/// <summary>Two technology cards side by side; a row is as tall as its taller card.</summary>
+public sealed record TechnologyPair(TechnologyCard Left, TechnologyCard? Right)
+{
+    public bool HasRight => Right is not null;
+}
+
+/// <summary>Two connection cards side by side; a row is as tall as its taller card.</summary>
+public sealed record ConnectionPair(ConnectionCard Left, ConnectionCard? Right)
+{
+    public bool HasRight => Right is not null;
+}
+
 /// <summary>A setting of a connection; a redacted value reads as "PASSWORD, redacted".</summary>
 public sealed record Setting(string Key, string Value)
 {
