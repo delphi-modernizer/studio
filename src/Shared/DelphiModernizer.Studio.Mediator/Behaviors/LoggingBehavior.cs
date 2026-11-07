@@ -18,7 +18,10 @@ public sealed partial class LoggingBehavior<TRequest, TResponse> : IPipelineBeha
         _logger = logger;
     }
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(next);
         var name = typeof(TRequest).Name;

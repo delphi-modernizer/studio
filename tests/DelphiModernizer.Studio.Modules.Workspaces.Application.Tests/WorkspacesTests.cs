@@ -19,7 +19,9 @@ public sealed class WorkspacesTests : IDisposable
 
     public WorkspacesTests()
     {
-        _sender = Services.Sender(_session, services => services.AddWorkspacesApplication(Path.Combine(_folder, "profile")));
+        _sender = Services.Sender(
+            _session,
+            services => services.AddWorkspacesApplication(Path.Combine(_folder, "profile")));
     }
 
     [Fact]
@@ -35,7 +37,9 @@ public sealed class WorkspacesTests : IDisposable
             null,
             InitializeGit: false);
 
-        var created = await _sender.Send(new CreateWorkspaceCommand(request, null), TestContext.Current.CancellationToken);
+        var created = await _sender.Send(
+            new CreateWorkspaceCommand(request, null),
+            TestContext.Current.CancellationToken);
         var recent = await _sender.Send(new GetRecentWorkspacesQuery(), TestContext.Current.CancellationToken);
 
         Assert.True(created.IsSuccess, created.Error.Message);
@@ -48,7 +52,9 @@ public sealed class WorkspacesTests : IDisposable
     {
         using var existing = await TestWorkspace.CreateAsync();
 
-        var opened = await _sender.Send(new OpenWorkspaceCommand(Path.Combine(existing.Workspace.Root, "docs")), TestContext.Current.CancellationToken);
+        var opened = await _sender.Send(
+            new OpenWorkspaceCommand(Path.Combine(existing.Workspace.Root, "docs")),
+            TestContext.Current.CancellationToken);
 
         Assert.True(opened.IsSuccess, opened.Error.Message);
         Assert.Equal(existing.Workspace.Root, _session.Current?.Root);
@@ -66,7 +72,9 @@ public sealed class WorkspacesTests : IDisposable
     [Fact]
     public async Task The_preview_counts_what_the_scanner_finds()
     {
-        var preview = await _sender.Send(new PreviewLegacyQuery(TestWorkspace.CreateLegacyTree(_folder), 1252), TestContext.Current.CancellationToken);
+        var preview = await _sender.Send(
+            new PreviewLegacyQuery(TestWorkspace.CreateLegacyTree(_folder), 1252),
+            TestContext.Current.CancellationToken);
 
         Assert.True(preview.IsSuccess, preview.Error.Message);
         Assert.Equal(2, preview.Value.Summary.Units);
@@ -90,7 +98,9 @@ public sealed class WorkspacesTests : IDisposable
         var used = Directory.CreateDirectory(Path.Combine(_folder, "used")).FullName;
         await File.WriteAllTextAsync(Path.Combine(used, "notes.txt"), "kept", TestContext.Current.CancellationToken);
 
-        var fresh = await _sender.Send(new CheckWorkspaceFolderQuery(Path.Combine(_folder, "fresh")), TestContext.Current.CancellationToken);
+        var fresh = await _sender.Send(
+            new CheckWorkspaceFolderQuery(Path.Combine(_folder, "fresh")),
+            TestContext.Current.CancellationToken);
         var taken = await _sender.Send(new CheckWorkspaceFolderQuery(used), TestContext.Current.CancellationToken);
 
         Assert.True(fresh.IsSuccess);
@@ -100,7 +110,9 @@ public sealed class WorkspacesTests : IDisposable
     [Fact]
     public async Task The_preview_of_a_missing_folder_says_so()
     {
-        var preview = await _sender.Send(new PreviewLegacyQuery(Path.Combine(_folder, "nowhere"), 1252), TestContext.Current.CancellationToken);
+        var preview = await _sender.Send(
+            new PreviewLegacyQuery(Path.Combine(_folder, "nowhere"), 1252),
+            TestContext.Current.CancellationToken);
 
         Assert.Equal("Workspaces.FolderMissing", preview.Error.Code);
     }

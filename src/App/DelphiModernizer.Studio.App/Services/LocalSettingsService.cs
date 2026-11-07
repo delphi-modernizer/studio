@@ -8,7 +8,9 @@ using DelphiModernizer.Studio.UI.Contracts.Services;
 namespace DelphiModernizer.Studio.App.Services;
 
 /// <summary>Keeps small settings as one JSON file under <see cref="StudioPaths.DataDirectory"/>.</summary>
-/// <remarks>An unreadable file starts fresh and an unwritable one is skipped: settings must never stop the app.</remarks>
+/// <remarks>
+/// An unreadable file starts fresh and an unwritable one is skipped: settings must never stop the app.
+/// </remarks>
 public sealed class LocalSettingsService : ILocalSettingsService
 {
     private readonly string _path = Path.Combine(StudioPaths.DataDirectory, "settings.json");

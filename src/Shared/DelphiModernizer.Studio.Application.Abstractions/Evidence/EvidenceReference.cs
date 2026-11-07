@@ -5,7 +5,9 @@ using DelphiModernizer.Engine.Kit;
 
 namespace DelphiModernizer.Studio.Application.Abstractions.Evidence;
 
-/// <summary>A link from a claim to the legacy code it comes from, such as <c>legacy/Sales/Pricing.pas#L18-L29</c>.</summary>
+/// <summary>
+/// A link from a claim to the legacy code it comes from, such as <c>legacy/Sales/Pricing.pas#L18-L29</c>.
+/// </summary>
 /// <param name="Path">The workspace-relative file, starting with the kit's evidence root (<c>legacy/</c>).</param>
 /// <param name="EndLine">The last cited line, or null when the link cites one line.</param>
 public sealed record EvidenceReference(string Path, int StartLine, int? EndLine)

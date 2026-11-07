@@ -4,7 +4,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
 
-/// <summary>How sure an agent is of a claim; it sits right after the claim and travels with it into every summary.</summary>
+/// <summary>
+/// How sure an agent is of a claim; it sits right after the claim and travels with it into every summary.
+/// </summary>
 public enum FactKind
 {
     Confirmed,

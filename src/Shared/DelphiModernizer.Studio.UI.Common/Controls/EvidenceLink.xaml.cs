@@ -8,11 +8,16 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
 
-/// <summary>A link to the legacy code a claim comes from; it opens the file in the person's editor at the cited lines.</summary>
+/// <summary>
+/// A link to the legacy code a claim comes from; it opens the file in the person's editor at the cited lines.
+/// </summary>
 public sealed partial class EvidenceLink : UserControl
 {
     public static readonly DependencyProperty ReferenceProperty = DependencyProperty.Register(
-        nameof(Reference), typeof(string), typeof(EvidenceLink), new PropertyMetadata(string.Empty, OnReferenceChanged));
+        nameof(Reference),
+        typeof(string),
+        typeof(EvidenceLink),
+        new PropertyMetadata(string.Empty, OnReferenceChanged));
 
     private EvidenceReference? _parsed;
 

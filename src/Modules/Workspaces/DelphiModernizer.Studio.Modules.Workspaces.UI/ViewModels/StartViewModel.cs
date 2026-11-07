@@ -13,7 +13,9 @@ using DelphiModernizer.Studio.UI.Contracts.Services;
 
 namespace DelphiModernizer.Studio.Modules.Workspaces.UI.ViewModels;
 
-/// <summary>The Start page: ways to begin, the workspaces opened before, and whether agent runs can work here.</summary>
+/// <summary>
+/// The Start page: ways to begin, the workspaces opened before, and whether agent runs can work here.
+/// </summary>
 public sealed partial class StartViewModel : ViewModel
 {
     private readonly ISender _sender;

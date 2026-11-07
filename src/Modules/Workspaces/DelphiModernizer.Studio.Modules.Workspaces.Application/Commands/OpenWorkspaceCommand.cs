@@ -27,9 +27,17 @@ internal sealed class OpenWorkspaceCommandHandler(IWorkspaceSession session, Rec
         return Task.FromResult(found);
     }
 
-    internal static void Activate(IWorkspaceSession session, RecentWorkspaceStore recent, IClock clock, Workspace workspace)
+    internal static void Activate(
+        IWorkspaceSession session,
+        RecentWorkspaceStore recent,
+        IClock clock,
+        Workspace workspace)
     {
         session.Open(workspace);
-        recent.Remember(new RecentWorkspace(workspace.Manifest.Name, workspace.Root, workspace.Manifest.TargetStack, clock.UtcNow));
+        recent.Remember(new RecentWorkspace(
+            workspace.Manifest.Name,
+            workspace.Root,
+            workspace.Manifest.TargetStack,
+            clock.UtcNow));
     }
 }

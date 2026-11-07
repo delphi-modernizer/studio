@@ -2,7 +2,9 @@ using Microsoft.UI.Xaml;
 
 namespace DelphiModernizer.Studio.UI.Contracts.Services;
 
-/// <summary>Applies the person's theme to the main window and remembers it; Windows' contrast themes override it.</summary>
+/// <summary>
+/// Applies the person's theme to the main window and remembers it; Windows' contrast themes override it.
+/// </summary>
 public interface IThemeService
 {
     ElementTheme Theme { get; }
