@@ -6,12 +6,12 @@ using WinRT.Interop;
 
 namespace DelphiModernizer.Studio.App.Services;
 
-/// <summary>The system folder picker, owned by the main window as an unpackaged app must set it.</summary>
-public sealed class FolderPickerService : IFolderPickerService
+/// <summary>The system pickers, owned by the main window as an unpackaged app must set them.</summary>
+public sealed class PickerService : IPickerService
 {
     private readonly MainWindow _window;
 
-    public FolderPickerService(MainWindow window)
+    public PickerService(MainWindow window)
     {
         ArgumentNullException.ThrowIfNull(window);
         _window = window;
@@ -25,5 +25,15 @@ public sealed class FolderPickerService : IFolderPickerService
         var folder = await picker.PickSingleFolderAsync();
 
         return folder?.Path;
+    }
+
+    public async Task<string?> PickFileAsync(string extension)
+    {
+        var picker = new FileOpenPicker { SuggestedStartLocation = PickerLocationId.ComputerFolder };
+        picker.FileTypeFilter.Add(extension);
+        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(_window));
+        var file = await picker.PickSingleFileAsync();
+
+        return file?.Path;
     }
 }

@@ -50,6 +50,7 @@ public sealed class WorkstreamsTests
 
         Assert.True(started.IsFailure);
         Assert.False(status.IsReady);
+        Assert.Equal(ClaudeState.NotFound, status.State);
         Assert.NotNull(status.Problem);
     }
 

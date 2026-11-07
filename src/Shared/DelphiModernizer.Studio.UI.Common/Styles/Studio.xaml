@@ -89,4 +89,86 @@
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
 
+    <!--  An outlined tag, such as a workspace's target platform: an outline and no colour, so it never reads as a state.  -->
+    <Style x:Key="TagStyle" TargetType="Border">
+        <Setter Property="MinHeight" Value="18" />
+        <Setter Property="Padding" Value="6,0,6,1" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="BorderBrush" Value="{ThemeResource ControlStrongStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <!--  A card whose rows reach its edges: the header and the rows carry their own padding.  -->
+    <Style
+        x:Key="FlushCardStyle"
+        BasedOn="{StaticResource CardStyle}"
+        TargetType="Border">
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style x:Key="CardHeaderStyle" TargetType="Grid">
+        <Setter Property="MinHeight" Value="48" />
+        <Setter Property="Padding" Value="16,8,8,8" />
+        <Setter Property="ColumnSpacing" Value="8" />
+        <Setter Property="BorderBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+    </Style>
+
+    <!--  Tables (handoff part 2): a 36 tall header row of captions, rows at least 44 tall, 12 between columns.  -->
+    <Style x:Key="TableHeaderStyle" TargetType="Grid">
+        <Setter Property="MinHeight" Value="36" />
+        <Setter Property="Padding" Value="16,6" />
+        <Setter Property="ColumnSpacing" Value="12" />
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
+    </Style>
+
+    <Style
+        x:Key="TableHeaderTextStyle"
+        BasedOn="{StaticResource CaptionTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style
+        x:Key="TableRowStyle"
+        BasedOn="{StaticResource DefaultListViewItemStyle}"
+        TargetType="ListViewItem">
+        <Setter Property="MinHeight" Value="44" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="16,6" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="BorderBrush" Value="{ThemeResource DividerStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="CornerRadius" Value="0" />
+    </Style>
+
+    <!--  The tile in an action card or a role: 40 square, the accent fill for the one primary action.  -->
+    <Style x:Key="TileStyle" TargetType="Border">
+        <Setter Property="Width" Value="40" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+    </Style>
+
+    <Style
+        x:Key="AccentTileStyle"
+        BasedOn="{StaticResource TileStyle}"
+        TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" />
+    </Style>
+
+    <Style
+        x:Key="ActionCardStyle"
+        BasedOn="{StaticResource DefaultButtonStyle}"
+        TargetType="Button">
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
 </ResourceDictionary>
