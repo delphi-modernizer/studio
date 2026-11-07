@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DelphiModernizer.Studio.Modules.Deliverables.UI.Views.DeliverablesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons">
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource PageContentStyle}">
+            <controls:PageHeader Purpose="The 20 documents of the modernization plan: which team drafts each one, which sign-off needs it, and where it stands." Title="Deliverables" />
+            <controls:NoWorkspaceState
+                Glyph="{x:Bind icons:StudioIcons.Deliverables}"
+                Message="Deliverables lists a workspace’s 20 documents: which team drafts each one, which sign-off needs it, and where it stands. Open or start a workspace to see them."
+                Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

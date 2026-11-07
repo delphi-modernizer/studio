@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DelphiModernizer.Studio.Modules.Traceability.UI.Views.TraceabilityPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons">
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource PageContentStyle}">
+            <controls:PageHeader Purpose="Checks that every claim in the documents is backed by evidence and that every reference points to something real." Title="Traceability" />
+            <controls:NoWorkspaceState
+                Glyph="{x:Bind icons:StudioIcons.Traceability}"
+                Message="Traceability checks a workspace’s documents: every claim backed by evidence, every reference pointing to something real. Open or start a workspace to check it."
+                Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

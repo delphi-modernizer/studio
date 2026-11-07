@@ -1,0 +1,17 @@
+<UserControl
+    x:Class="DelphiModernizer.Studio.UI.Common.Controls.EvidenceLink"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <HyperlinkButton
+        x:Name="Link"
+        Padding="0"
+        Click="OnClick">
+        <TextBlock
+            x:Name="Words"
+            FontFamily="Cascadia Mono,Consolas"
+            FontSize="12"
+            LineHeight="16"
+            TextTrimming="CharacterEllipsis" />
+    </HyperlinkButton>
+</UserControl>

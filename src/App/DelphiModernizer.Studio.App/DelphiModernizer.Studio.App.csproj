@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>DelphiModernizer.Studio.App</RootNamespace>
+    <AssemblyName>DelphiModernizer.Studio</AssemblyName>
+    <UseWinUI>true</UseWinUI>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <!-- Platform checks are the Windows App SDK's own; the XAML type generator references a deprecated property;
+         the TitleBar control is marked experimental in this SDK line. -->
+    <NoWarn>$(NoWarn);CA1416;CS0612;CS0618;CS8305</NoWarn>
+
+    <WindowsPackageType>None</WindowsPackageType>
+    <EnableMsixTooling>false</EnableMsixTooling>
+    <!-- A self-contained build carries the Windows App SDK runtime, so the CI build runs without installing it. -->
+    <WindowsAppSDKSelfContained Condition="'$(SelfContained)' == 'true'">true</WindowsAppSDKSelfContained>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+    <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="WinUIEx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\DelphiModernizer.Studio.Application.Abstractions\DelphiModernizer.Studio.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Shared\DelphiModernizer.Studio.UI.Common\DelphiModernizer.Studio.UI.Common.csproj" />
+    <ProjectReference Include="..\..\Shared\DelphiModernizer.Studio.UI.Contracts\DelphiModernizer.Studio.UI.Contracts.csproj" />
+    <ProjectReference Include="..\..\Modules\Workspaces\DelphiModernizer.Studio.Modules.Workspaces.UI\DelphiModernizer.Studio.Modules.Workspaces.UI.csproj" />
+    <ProjectReference Include="..\..\Modules\Overview\DelphiModernizer.Studio.Modules.Overview.UI\DelphiModernizer.Studio.Modules.Overview.UI.csproj" />
+    <ProjectReference Include="..\..\Modules\Inventory\DelphiModernizer.Studio.Modules.Inventory.UI\DelphiModernizer.Studio.Modules.Inventory.UI.csproj" />
+    <ProjectReference Include="..\..\Modules\Workstreams\DelphiModernizer.Studio.Modules.Workstreams.UI\DelphiModernizer.Studio.Modules.Workstreams.UI.csproj" />
+    <ProjectReference Include="..\..\Modules\Deliverables\DelphiModernizer.Studio.Modules.Deliverables.UI\DelphiModernizer.Studio.Modules.Deliverables.UI.csproj" />
+    <ProjectReference Include="..\..\Modules\Traceability\DelphiModernizer.Studio.Modules.Traceability.UI\DelphiModernizer.Studio.Modules.Traceability.UI.csproj" />
+    <ProjectReference Include="..\..\Modules\SignOffs\DelphiModernizer.Studio.Modules.SignOffs.UI\DelphiModernizer.Studio.Modules.SignOffs.UI.csproj" />
+    <ProjectReference Include="..\..\Modules\Settings\DelphiModernizer.Studio.Modules.Settings.UI\DelphiModernizer.Studio.Modules.Settings.UI.csproj" />
+  </ItemGroup>
+
+  <!-- dotnet publish of a WinUI 3 app leaves out the XBF and PRI files. -->
+  <Target Name="CopyWinUIResourcesOnPublish" AfterTargets="Publish" Condition="'$(PublishDir)' != ''">
+    <ItemGroup>
+      <_WinUIXbfFiles Include="$(OutputPath)**\*.xbf" />
+      <_WinUIPriFiles Include="$(OutputPath)*.pri" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_WinUIXbfFiles)" DestinationFiles="@(_WinUIXbfFiles->'$(PublishDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_WinUIPriFiles)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

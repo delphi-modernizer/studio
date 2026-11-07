@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DelphiModernizer.Studio.Modules.Settings.UI.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons">
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource PageContentStyle}">
+            <controls:PageHeader Purpose="How agent runs use Claude Code, and the studio’s defaults. Settings apply to this PC, not to a workspace." Title="Settings" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,41 @@
+<UserControl
+    x:Class="DelphiModernizer.Studio.UI.Common.Controls.NoWorkspaceState"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons">
+
+    <controls:EmptyState
+        Margin="0,48,0,0"
+        Glyph="{x:Bind Glyph, Mode=OneWay}"
+        IsPageLevel="True"
+        Message="{x:Bind Message, Mode=OneWay}"
+        Title="No workspace open">
+        <StackPanel HorizontalAlignment="Center" Spacing="8">
+            <StackPanel
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="8">
+                <Button Click="OnNewWorkspace" Style="{StaticResource AccentButtonStyle}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="{x:Bind icons:StudioIcons.Add}" Style="{StaticResource IconStyle}" />
+                        <TextBlock Text="New workspace" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnOpenFolder">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenFolder}" Style="{StaticResource IconStyle}" />
+                        <TextBlock Text="Open folder…" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <InfoBar
+                x:Name="Problem"
+                MaxWidth="480"
+                IsClosable="True"
+                IsOpen="False"
+                Severity="Error"
+                Title="That folder didn’t open." />
+        </StackPanel>
+    </controls:EmptyState>
+</UserControl>

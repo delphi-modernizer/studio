@@ -1,0 +1,309 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
+using DelphiModernizer.Studio.UI.Contracts;
+using DelphiModernizer.Studio.UI.Contracts.Services;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+
+namespace DelphiModernizer.Studio.App.UI;
+
+/// <summary>The title bar and the navigation pane around the page frame; the pane is built from the modules' items.</summary>
+/// <remarks>
+/// The pane stays open down to the 960 px minimum and collapses only from the title-bar toggle (design assumption,
+/// open question 3). Every page stays selectable without a workspace; badges hide until one is open.
+/// </remarks>
+public sealed partial class ShellPage : Page
+{
+    private const double _narrowWidth = 1100;
+
+    private readonly INavigationService _navigation;
+    private readonly IWorkspaceSession _session;
+    private readonly IServiceProvider _services;
+    private readonly List<NavigationItem> _items;
+    private readonly Dictionary<string, NavigationViewItem> _containers = new(StringComparer.Ordinal);
+    private readonly List<(NavigationViewItem Container, NavigationItem Item, IBadgeSource Source)> _badges = [];
+    private bool _isLoaded;
+    private bool _isSyncingSelection;
+
+    public ShellPage(
+        ShellViewModel viewModel,
+        INavigationService navigation,
+        IWorkspaceSession session,
+        IEnumerable<IModule> modules,
+        IServiceProvider services)
+    {
+        ArgumentNullException.ThrowIfNull(viewModel);
+        ArgumentNullException.ThrowIfNull(navigation);
+        ArgumentNullException.ThrowIfNull(session);
+        ArgumentNullException.ThrowIfNull(modules);
+        ArgumentNullException.ThrowIfNull(services);
+        ViewModel = viewModel;
+        _navigation = navigation;
+        _session = session;
+        _services = services;
+        _items = [.. modules
+            .SelectMany(m => m.GetNavigationItems())
+            .OrderBy(i => i.Placement)
+            .ThenBy(i => i.Order)];
+        InitializeComponent();
+    }
+
+    public ShellViewModel ViewModel { get; }
+
+    /// <summary>The drag region the window hands to <c>SetTitleBar</c>.</summary>
+    public UIElement TitleBar => AppTitleBar;
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (_isLoaded)
+        {
+            return;
+        }
+
+        _isLoaded = true;
+        _navigation.Initialize(NavFrame);
+        _navigation.Navigated += OnNavigated;
+        _session.Changed += (_, _) => DispatcherQueue.TryEnqueue(RefreshBadges);
+
+        foreach (var item in _items)
+        {
+            AddItem(item);
+        }
+
+        _navigation.NavigateTo("Start");
+    }
+
+    private void AddItem(NavigationItem item)
+    {
+        var key = _navigation.GetPageKey(item.PageType);
+        var container = new NavigationViewItem {
+            Tag = key,
+            Content = item.Title,
+            Icon = Glyph(item.Glyph),
+        };
+        AutomationProperties.SetName(container, item.Title);
+        AutomationProperties.SetAutomationId(container, key);
+        _containers[key] = container;
+
+        if (item.Badge is { } badge)
+        {
+            var source = badge(_services);
+            _badges.Add((container, item, source));
+            source.Changed += (_, _) => DispatcherQueue.TryEnqueue(() => ShowBadge(container, item, source));
+            ShowBadge(container, item, source);
+        }
+
+        if (item.Placement == NavigationPlacement.Footer)
+        {
+            NavView.FooterMenuItems.Add(container);
+        }
+        else
+        {
+            NavView.MenuItems.Add(container);
+        }
+    }
+
+    private static FontIcon Glyph(string glyph)
+    {
+        return new FontIcon {
+            Glyph = glyph,
+            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["IconStyle"],
+        };
+    }
+
+    private void ShowBadge(NavigationViewItem container, NavigationItem item, IBadgeSource source)
+    {
+        var count = _session.Current is null ? 0 : source.Count;
+
+        if (count == 0)
+        {
+            container.InfoBadge = null;
+            AutomationProperties.SetName(container, item.Title);
+
+            return;
+        }
+
+        var style = source.Tone == BadgeTone.Critical ? "CriticalValueInfoBadgeStyle" : "AttentionValueInfoBadgeStyle";
+        container.InfoBadge = new InfoBadge {
+            Value = count,
+            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],
+        };
+        AutomationProperties.SetName(container, $"{item.Title}, {source.Describe(count)}");
+    }
+
+    private void RefreshBadges()
+    {
+        foreach (var (container, item, source) in _badges)
+        {
+            ShowBadge(container, item, source);
+        }
+    }
+
+    /// <summary>Gives the selected item its filled glyph and every other item its regular one.</summary>
+    private void ShowSelectedGlyphs(string? selectedKey)
+    {
+        foreach (var item in _items)
+        {
+            var key = _navigation.GetPageKey(item.PageType);
+
+            if (_containers[key].Icon is FontIcon icon)
+            {
+                icon.Glyph = key == selectedKey ? item.SelectedGlyph : item.Glyph;
+            }
+        }
+    }
+
+    private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        if (!_isSyncingSelection && args.SelectedItemContainer is NavigationViewItem { Tag: string key })
+        {
+            _navigation.NavigateTo(key);
+        }
+    }
+
+    /// <summary>Clicking the selected item again returns to its page, as from a page reached inside it such as Run.</summary>
+    private void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    {
+        if (args.InvokedItemContainer is NavigationViewItem { Tag: string key } container
+            && ReferenceEquals(container, NavView.SelectedItem)
+            && NavFrame.Content?.GetType().Name != key + "Page")
+        {
+            _navigation.NavigateTo(key);
+        }
+    }
+
+    /// <summary>Follows Back and navigation from inside pages without navigating again.</summary>
+    private void OnNavigated(object? sender, NavigationEvent e)
+    {
+        var owner = _containers.GetValueOrDefault(e.PageKey) ?? OwnerOf(e.PageType);
+        _isSyncingSelection = true;
+
+        try
+        {
+            NavView.SelectedItem = owner;
+        }
+        finally
+        {
+            _isSyncingSelection = false;
+        }
+
+        ShowSelectedGlyphs(owner?.Tag as string);
+    }
+
+    /// <summary>The pane item of the module a page belongs to, such as Workstreams for Run.</summary>
+    private NavigationViewItem? OwnerOf(Type pageType)
+    {
+        var owner = _items.FirstOrDefault(i => i.PageType.Assembly == pageType.Assembly);
+
+        return owner is null ? null : _containers[_navigation.GetPageKey(owner.PageType)];
+    }
+
+    private void OnBackRequested(TitleBar sender, object args)
+    {
+        _navigation.GoBack();
+    }
+
+    private void OnBackInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        _navigation.GoBack();
+        args.Handled = true;
+    }
+
+    private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsXButton1Pressed)
+        {
+            _navigation.GoBack();
+            e.Handled = true;
+        }
+    }
+
+    private void OnPaneToggleRequested(TitleBar sender, object args)
+    {
+        NavView.IsPaneOpen = !NavView.IsPaneOpen;
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        SearchBox.MaxWidth = e.NewSize.Width < _narrowWidth ? 240 : 360;
+    }
+
+    private void OnNextRegionInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = MoveRegion(1);
+    }
+
+    private void OnPreviousRegionInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = MoveRegion(-1);
+    }
+
+    /// <summary>Moves focus to the next or previous of the three regions: title bar, pane, page.</summary>
+    private bool MoveRegion(int step)
+    {
+        UIElement?[] regions = [SearchBox, NavView, NavFrame];
+        var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
+        var current = Array.FindIndex(regions, region => region is not null && Contains(region, focused));
+        var next = regions[(Math.Max(current, 0) + step + regions.Length) % regions.Length];
+
+        return next switch {
+            AutoSuggestBox search => search.Focus(FocusState.Keyboard),
+            NavigationView => (NavView.SelectedItem as Control ?? NavView.MenuItems.OfType<Control>().First()).Focus(FocusState.Keyboard),
+            _ => FocusManager.FindFirstFocusableElement(NavFrame) is UIElement first && first.Focus(FocusState.Keyboard),
+        };
+    }
+
+    private static bool Contains(DependencyObject region, DependencyObject? element)
+    {
+        for (var node = element; node is not null; node = VisualTreeHelper.GetParent(node))
+        {
+            if (ReferenceEquals(node, region))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Suggests the studio's pages by name.</summary>
+    /// <remarks>What search covers is an open question (handoff, question 7); pages are the one answer that needs no data.</remarks>
+    private void OnSearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput)
+        {
+            return;
+        }
+
+        sender.ItemsSource = string.IsNullOrWhiteSpace(sender.Text)
+            ? null
+            : _items
+                .Where(i => i.Title.Contains(sender.Text.Trim(), StringComparison.OrdinalIgnoreCase))
+                .Select(i => i.Title)
+                .ToList();
+    }
+
+    private void OnSearchSuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+    {
+        Go(args.SelectedItem as string);
+    }
+
+    private void OnSearchSubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        Go(args.ChosenSuggestion as string ?? (sender.ItemsSource as IList<string>)?.FirstOrDefault());
+    }
+
+    private void Go(string? title)
+    {
+        if (_items.FirstOrDefault(i => i.Title == title) is { } item)
+        {
+            _navigation.NavigateTo(_navigation.GetPageKey(item.PageType));
+            SearchBox.Text = string.Empty;
+        }
+    }
+}

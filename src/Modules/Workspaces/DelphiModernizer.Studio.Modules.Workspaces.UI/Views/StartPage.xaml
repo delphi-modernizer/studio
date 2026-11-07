@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DelphiModernizer.Studio.Modules.Workspaces.UI.Views.StartPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons">
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource PageContentStyle}">
+            <controls:PageHeader Purpose="Reopen a workspace, or start one from a Delphi source tree." Title="Start" />
+        </StackPanel>
+    </ScrollViewer>
+</Page>

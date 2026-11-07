@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DelphiModernizer.Studio.App.UI.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons"
+    Loaded="OnLoaded"
+    PointerPressed="OnPointerPressed"
+    SizeChanged="OnSizeChanged">
+
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator
+            Invoked="OnBackInvoked"
+            Key="Left"
+            Modifiers="Menu" />
+        <!--  F6 moves between the title bar, the pane and the page (handoff notes, keyboard order).  -->
+        <KeyboardAccelerator Invoked="OnNextRegionInvoked" Key="F6" />
+        <KeyboardAccelerator
+            Invoked="OnPreviousRegionInvoked"
+            Key="F6"
+            Modifiers="Shift" />
+    </Page.KeyboardAccelerators>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TitleBar
+            x:Name="AppTitleBar"
+            Title="Delphi Modernizer Studio"
+            Height="48"
+            BackRequested="OnBackRequested"
+            IsBackButtonEnabled="{x:Bind ViewModel.CanGoBack, Mode=OneWay}"
+            IsBackButtonVisible="True"
+            IsPaneToggleButtonVisible="True"
+            PaneToggleRequested="OnPaneToggleRequested"
+            Subtitle="{x:Bind ViewModel.Subtitle, Mode=OneWay}">
+            <TitleBar.IconSource>
+                <ImageIconSource ImageSource="ms-appx:///Assets/Square44x44Logo.targetsize-16_altform-unplated.png" />
+            </TitleBar.IconSource>
+            <AutoSuggestBox
+                x:Name="SearchBox"
+                MaxWidth="360"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                AutomationProperties.Name="Search"
+                PlaceholderText="Search"
+                QuerySubmitted="OnSearchSubmitted"
+                SuggestionChosen="OnSearchSuggestionChosen"
+                TextChanged="OnSearchTextChanged">
+                <AutoSuggestBox.QueryIcon>
+                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Search}" Style="{StaticResource IconStyle}" />
+                </AutoSuggestBox.QueryIcon>
+            </AutoSuggestBox>
+        </TitleBar>
+
+        <NavigationView
+            x:Name="NavView"
+            Grid.Row="1"
+            AlwaysShowHeader="False"
+            IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
+            IsSettingsVisible="False"
+            IsTabStop="False"
+            ItemInvoked="OnItemInvoked"
+            OpenPaneLength="240"
+            PaneDisplayMode="Left"
+            SelectionChanged="OnSelectionChanged">
+            <NavigationView.Resources>
+                <!--  Selection shows as the backplate and the filled glyph; the pill would be a side stripe.  -->
+                <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="Transparent" />
+            </NavigationView.Resources>
+
+            <Frame x:Name="NavFrame" IsNavigationStackEnabled="False" />
+        </NavigationView>
+    </Grid>
+</Page>
