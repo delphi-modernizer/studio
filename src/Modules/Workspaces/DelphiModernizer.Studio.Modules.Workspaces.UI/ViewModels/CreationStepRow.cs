@@ -11,7 +11,8 @@ public sealed partial class CreationStepRow(InitStep step, string label) : Obser
     public string Label => label;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsWaiting), nameof(IsWorking), nameof(IsDone), nameof(IsFailed), nameof(StatusText), nameof(AnnouncedName))]
+    [NotifyPropertyChangedFor(nameof(IsWaiting), nameof(IsWorking), nameof(IsDone), nameof(IsFailed))]
+    [NotifyPropertyChangedFor(nameof(StatusText), nameof(AnnouncedName))]
     public partial InitStepState? State { get; set; }
 
     [ObservableProperty]

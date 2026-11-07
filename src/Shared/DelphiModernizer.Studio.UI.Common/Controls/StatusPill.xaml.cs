@@ -30,7 +30,9 @@ public sealed partial class StatusPill : UserControl
         set => SetValue(StateProperty, value);
     }
 
-    /// <summary>Words that replace the state's own, such as the version Claude Code reports; null keeps the state's.</summary>
+    /// <summary>
+    /// Words that replace the state's own, such as the version Claude Code reports; null keeps the state's.
+    /// </summary>
     public string? Text
     {
         get => (string?)GetValue(TextProperty);

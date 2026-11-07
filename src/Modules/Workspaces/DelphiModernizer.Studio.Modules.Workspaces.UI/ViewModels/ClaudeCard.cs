@@ -53,7 +53,8 @@ public sealed record ClaudeCard(
                     ? "The Claude Code CLI is not on PATH. Everything works without it except agent runs."
                     : status.Problem ?? string.Empty,
                 null,
-                "With it, workstream agents draft deliverables with evidence links and fact labels for people to review.",
+                "With it, workstream agents draft deliverables with evidence links and fact labels "
+                    + "for people to review.",
                 "Set up Claude Code",
                 ClaudeCardAction.SetUp,
                 status),

@@ -2,7 +2,9 @@ using System;
 
 namespace DelphiModernizer.Studio.UI.Contracts;
 
-/// <summary>The service provider for controls XAML creates with <c>new()</c>, which cannot take constructor injection.</summary>
+/// <summary>
+/// The service provider for controls XAML creates with <c>new()</c>, which cannot take constructor injection.
+/// </summary>
 /// <remarks>Everything else uses constructor injection. The App configures this once, at startup.</remarks>
 public static class ContractServices
 {

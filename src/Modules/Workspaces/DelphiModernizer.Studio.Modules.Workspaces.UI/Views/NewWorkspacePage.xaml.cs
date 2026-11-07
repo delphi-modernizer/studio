@@ -80,7 +80,9 @@ public sealed partial class NewWorkspacePage : Page, IHasViewModel
         }
     }
 
-    /// <summary>A path typed by hand is previewed once the person leaves the box, as a browsed one is at once.</summary>
+    /// <summary>
+    /// A path typed by hand is previewed once the person leaves the box, as a browsed one is at once.
+    /// </summary>
     private async void OnLegacySourceLostFocus(object sender, RoutedEventArgs e)
     {
         if (ViewModel.Preview == PreviewState.None)

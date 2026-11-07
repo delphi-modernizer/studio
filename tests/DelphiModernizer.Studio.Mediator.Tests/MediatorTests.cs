@@ -67,7 +67,10 @@ public sealed class MediatorTests
 
     public sealed class Outer(Journal journal) : IPipelineBehavior<Echo, string>
     {
-        public Task<string> Handle(Echo request, RequestHandlerDelegate<string> next, CancellationToken cancellationToken)
+        public Task<string> Handle(
+            Echo request,
+            RequestHandlerDelegate<string> next,
+            CancellationToken cancellationToken)
         {
             journal.Entries.Add("outer");
 
@@ -77,7 +80,10 @@ public sealed class MediatorTests
 
     public sealed class Inner(Journal journal) : IPipelineBehavior<Echo, string>
     {
-        public Task<string> Handle(Echo request, RequestHandlerDelegate<string> next, CancellationToken cancellationToken)
+        public Task<string> Handle(
+            Echo request,
+            RequestHandlerDelegate<string> next,
+            CancellationToken cancellationToken)
         {
             journal.Entries.Add("inner");
 

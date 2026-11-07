@@ -52,7 +52,8 @@ public sealed partial class SettingsViewModel : ViewModel
         Model = agents.Model ?? string.Empty;
         EffortIndex = Math.Max(0, Array.IndexOf(Efforts, agents.Effort ?? Efforts[0]));
         Budget = (double)agents.BudgetUsd;
-        SelectedCodePage = CodePages.Common.FirstOrDefault(c => c.Number == settings.DefaultCodePage) ?? CodePages.Common[0];
+        SelectedCodePage = CodePages.Common.FirstOrDefault(c => c.Number == settings.DefaultCodePage)
+            ?? CodePages.Common[0];
         ThemeIndex = Math.Max(0, Array.IndexOf(_themes, theme.Theme));
         _loaded = true;
     }
@@ -79,12 +80,16 @@ public sealed partial class SettingsViewModel : ViewModel
         _ => PillState.NotFound,
     };
 
-    public string? PillText => Claude is { State: ClaudeState.Ready, Version: { } version } ? $"Claude Code {version}" : null;
+    public string? PillText => Claude is { State: ClaudeState.Ready, Version: { } version }
+        ? $"Claude Code {version}"
+        : null;
 
     public string Help => Claude switch {
         null => "Testing Claude Code…",
-        { State: ClaudeState.Ready } ready => $"Tested {_testedTime}: version {ready.Version} meets the {ready.Minimum} minimum.",
-        { State: ClaudeState.NotFound } missing => $"Agent runs need Claude Code {missing.Minimum} or later on this PC.",
+        { State: ClaudeState.Ready } ready =>
+            $"Tested {_testedTime}: version {ready.Version} meets the {ready.Minimum} minimum.",
+        { State: ClaudeState.NotFound } missing =>
+            $"Agent runs need Claude Code {missing.Minimum} or later on this PC.",
         _ => $"Agent runs need the native claude.exe, version {Claude.Minimum} or later.",
     };
 
@@ -93,7 +98,9 @@ public sealed partial class SettingsViewModel : ViewModel
 
     public bool HasProblem => Problem is not null;
 
-    /// <summary>What Narrator adds to the path box: the problem with the file chosen, else the card's description.</summary>
+    /// <summary>
+    /// What Narrator adds to the path box: the problem with the file chosen, else the card's description.
+    /// </summary>
     public string PathHelp => Problem ?? Help;
 
     public bool IsMissing => Claude is { State: ClaudeState.NotFound };
@@ -114,7 +121,8 @@ public sealed partial class SettingsViewModel : ViewModel
     [ObservableProperty]
     public partial int ThemeIndex { get; set; }
 
-    private string _testedTime => (_testedAt ?? DateTimeOffset.Now).LocalDateTime.ToString("t", CultureInfo.CurrentCulture);
+    private string _testedTime =>
+        (_testedAt ?? DateTimeOffset.Now).LocalDateTime.ToString("t", CultureInfo.CurrentCulture);
 
     [RelayCommand]
     private async Task TestAsync(CancellationToken cancellationToken)

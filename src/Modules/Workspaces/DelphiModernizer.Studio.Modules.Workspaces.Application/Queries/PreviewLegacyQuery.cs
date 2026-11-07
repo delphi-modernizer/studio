@@ -16,7 +16,9 @@ namespace DelphiModernizer.Studio.Modules.Workspaces.Application.Queries;
 public sealed record PreviewLegacyQuery(string Folder, int CodePage) : IRequest<Result<LegacyPreview>>;
 
 /// <param name="ProjectNames">The names the project files give, each once.</param>
-/// <param name="DelphiVersion">The first version a project file suggests, with that file's name; null when none does.</param>
+/// <param name="DelphiVersion">
+/// The first version a project file suggests, with that file's name; null when none does.
+/// </param>
 /// <param name="Cycles">The circular dependencies, each as the units in it.</param>
 /// <param name="Credentials">Connections with a password written into them; the studio shows them only as ***.</param>
 public sealed record LegacyPreview(
@@ -46,7 +48,9 @@ internal sealed class PreviewLegacyQueryHandler : IRequestHandler<PreviewLegacyQ
         }
 
         var options = new ScanOptions(request.CodePage);
-        var inventory = await Task.Run(() => LegacyScanner.Scan(request.Folder, options, cancellationToken), cancellationToken);
+        var inventory = await Task.Run(
+            () => LegacyScanner.Scan(request.Folder, options, cancellationToken),
+            cancellationToken);
         var versioned = inventory.Projects.FirstOrDefault(p => p.DelphiVersion is not null);
 
         return new LegacyPreview(
@@ -55,7 +59,9 @@ internal sealed class PreviewLegacyQueryHandler : IRequestHandler<PreviewLegacyQ
                 .Select(p => p.Name)
                 .OfType<string>()
                 .Distinct()],
-            versioned is null ? null : new DelphiVersionSource(versioned.DelphiVersion!, Path.GetFileName(versioned.Path)),
+            versioned is null
+                ? null
+                : new DelphiVersionSource(versioned.DelphiVersion!, Path.GetFileName(versioned.Path)),
             [.. inventory.DatabaseAccess.Select(t => new NamedCount(t.Name, t.Occurrences))],
             [.. inventory.ThirdParty.Select(t => new NamedCount(t.Name, t.Occurrences))],
             [.. inventory.Dependencies.Cycles.Select(c => (IReadOnlyList<string>)[.. c])],

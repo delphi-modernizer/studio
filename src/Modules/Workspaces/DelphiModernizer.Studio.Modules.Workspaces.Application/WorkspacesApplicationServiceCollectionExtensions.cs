@@ -9,7 +9,9 @@ namespace DelphiModernizer.Studio.Modules.Workspaces.Application;
 
 public static class WorkspacesApplicationServiceCollectionExtensions
 {
-    /// <summary>Adds the module's handlers and the recent-workspaces list under <paramref name="dataDirectory"/>.</summary>
+    /// <summary>
+    /// Adds the module's handlers and the recent-workspaces list under <paramref name="dataDirectory"/>.
+    /// </summary>
     public static IServiceCollection AddWorkspacesApplication(this IServiceCollection services, string dataDirectory)
     {
         ArgumentNullException.ThrowIfNull(services);

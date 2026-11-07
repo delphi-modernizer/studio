@@ -17,8 +17,8 @@
                         <AdaptiveTrigger MinWindowWidth="1100" />
                     </VisualState.StateTriggers>
                 </VisualState>
-                <!--  Under 1100 (handoff part 2): one column of compact action cards without tiles, the side cards below,
-                      and Recent workspaces without Last opened.  -->
+                <!--  Under 1100 (handoff part 2): one column of compact action cards without tiles,
+                      the side cards below, and Recent workspaces without Last opened.  -->
                 <VisualState x:Name="Narrow">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0" />
@@ -44,7 +44,7 @@
                         <Setter Target="SideColumn.Width" Value="0" />
                         <Setter Target="Side.(Grid.Row)" Value="1" />
                         <Setter Target="Side.(Grid.Column)" Value="0" />
-                        <Setter Target="LastOpenedHeader.Visibility" Value="Collapsed" />
+                        <Setter Target="LastOpened.Visibility" Value="Collapsed" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -52,7 +52,9 @@
 
         <ScrollViewer>
             <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
-                <controls:PageHeader Purpose="Reopen a workspace, or start one from a Delphi source tree." Title="Start" />
+                <controls:PageHeader
+                    Purpose="Reopen a workspace, or start one from a Delphi source tree."
+                    Title="Start" />
 
                 <StackPanel Spacing="16">
                     <Grid
@@ -72,10 +74,12 @@
 
                         <Button
                             x:Name="NewCard"
-                            AutomationProperties.HelpText="Copy a Delphi source tree into a new private repository and plan its modernization."
                             AutomationProperties.Name="New workspace"
                             Command="{x:Bind ViewModel.NewWorkspaceCommand}"
                             Style="{StaticResource ActionCardStyle}">
+                            <AutomationProperties.HelpText>
+                                Copy a Delphi source tree into a new private repository and plan its modernization.
+                            </AutomationProperties.HelpText>
                             <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -93,7 +97,10 @@
                                     VerticalAlignment="Center"
                                     Spacing="2">
                                     <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="New workspace" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Copy a Delphi source tree into a new private repository and plan its modernization." />
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                        Copy a Delphi source tree into a new private repository and plan its
+                                        modernization.
+                                    </TextBlock>
                                 </StackPanel>
                             </Grid>
                         </Button>
@@ -120,13 +127,17 @@
                                     Grid.Column="1"
                                     VerticalAlignment="Center"
                                     Spacing="2">
-                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Open folder…" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Open a workspace folder that already holds modernizer.json." />
+                                    <TextBlock
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        Text="Open folder…" />
+                                    <TextBlock
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="Open a workspace folder that already holds modernizer.json." />
                                 </StackPanel>
                             </Grid>
                         </Button>
 
-                        <!--  Clone from Git has no designed flow yet (docs/open-questions.md), so its card is shown but off.  -->
+                        <!--  Clone from Git has no designed flow (docs/open-questions.md): its card is shown, off.  -->
                         <Button
                             x:Name="CloneCard"
                             Grid.Column="2"
@@ -149,8 +160,12 @@
                                     Grid.Column="1"
                                     VerticalAlignment="Center"
                                     Spacing="2">
-                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Clone from Git…" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Clone a workspace repository your team already started." />
+                                    <TextBlock
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        Text="Clone from Git…" />
+                                    <TextBlock
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="Clone a workspace repository your team already started." />
                                 </StackPanel>
                             </Grid>
                         </Button>
@@ -164,7 +179,9 @@
                         Severity="Error"
                         Title="That workspace didn’t open.">
                         <InfoBar.IconSource>
-                            <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                         </InfoBar.IconSource>
                     </InfoBar>
 
@@ -196,13 +213,15 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="32" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Name and folder" />
+                                        <TextBlock
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Name and folder" />
                                         <TextBlock
                                             Grid.Column="1"
                                             Style="{StaticResource TableHeaderTextStyle}"
                                             Text="Target" />
                                         <TextBlock
-                                            x:Name="LastOpenedHeader"
+                                            x:Name="LastOpened"
                                             Grid.Column="2"
                                             Width="132"
                                             Style="{StaticResource TableHeaderTextStyle}"
@@ -217,7 +236,9 @@
                                         SelectionMode="None">
                                         <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="vm:RecentWorkspaceRow">
-                                                <Grid AutomationProperties.Name="{x:Bind AnnouncedName}" ColumnSpacing="12">
+                                                <Grid
+                                                    AutomationProperties.Name="{x:Bind AnnouncedName}"
+                                                    ColumnSpacing="12">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
                                                         <ColumnDefinition Width="96" />
@@ -230,7 +251,9 @@
                                                             Text="{x:Bind Name}"
                                                             TextTrimming="CharacterEllipsis"
                                                             TextWrapping="NoWrap" />
-                                                        <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Root}" />
+                                                        <TextBlock
+                                                            Style="{StaticResource MonoTextStyle}"
+                                                            Text="{x:Bind Root}" />
                                                     </StackPanel>
                                                     <Border Grid.Column="1" Style="{StaticResource TagStyle}">
                                                         <TextBlock
@@ -238,14 +261,14 @@
                                                             Text="{x:Bind Target}"
                                                             TextLineBounds="Tight" />
                                                     </Border>
-                                                    <!--  The header decides, so the column hides in every row under 1100.  -->
+                                                    <!--  The header decides, so it hides in every row under 1100.  -->
                                                     <TextBlock
                                                         Grid.Column="2"
                                                         Width="132"
                                                         VerticalAlignment="Center"
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
                                                         Text="{x:Bind OpenedAt}"
-                                                        Visibility="{Binding Visibility, ElementName=LastOpenedHeader}" />
+                                                        Visibility="{Binding Visibility, ElementName=LastOpened}" />
                                                     <FontIcon
                                                         Grid.Column="3"
                                                         HorizontalAlignment="Right"
@@ -260,9 +283,14 @@
 
                                 <controls:EmptyState
                                     Glyph="{x:Bind icons:StudioIcons.Folder}"
-                                    Message="Start one from a Delphi source tree, or open a workspace your team shared. Each workspace is a private git repository; nothing leaves your machine unless you push it."
                                     Title="No recent workspaces"
-                                    Visibility="{x:Bind ViewModel.HasNoRecent, Mode=OneWay}" />
+                                    Visibility="{x:Bind ViewModel.HasNoRecent, Mode=OneWay}">
+                                    <controls:EmptyState.Message>
+                                        Start one from a Delphi source tree, or open a workspace your team shared. Each
+                                        workspace is a private git repository; nothing leaves your machine unless you
+                                        push it.
+                                    </controls:EmptyState.Message>
+                                </controls:EmptyState>
                             </StackPanel>
                         </Border>
 
@@ -271,7 +299,8 @@
                             Grid.Column="1"
                             Spacing="16">
                             <Border Style="{StaticResource CardStyle}">
-                                <StackPanel AutomationProperties.Name="{x:Bind ViewModel.Claude.AnnouncedName, Mode=OneWay}">
+                                <StackPanel
+                                    AutomationProperties.Name="{x:Bind ViewModel.Claude.AnnouncedName, Mode=OneWay}">
                                     <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
@@ -310,7 +339,8 @@
                                         Text="{x:Bind ViewModel.Claude.Note, Mode=OneWay}" />
                                     <HyperlinkButton
                                         Margin="-11,8,0,0"
-                                        AutomationProperties.HelpText="{x:Bind ViewModel.Claude.AnnouncedName, Mode=OneWay}"
+                                        AutomationProperties.HelpText="{x:Bind ViewModel.Claude.AnnouncedName,
+                                            Mode=OneWay}"
                                         Click="OnClaudeLinkClicked"
                                         Content="{x:Bind ViewModel.Claude.Link, Mode=OneWay}"
                                         Visibility="{x:Bind ViewModel.Claude.HasLink, Mode=OneWay}" />

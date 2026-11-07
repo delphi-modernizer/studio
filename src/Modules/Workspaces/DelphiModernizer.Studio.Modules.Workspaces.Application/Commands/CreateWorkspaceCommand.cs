@@ -16,7 +16,10 @@ namespace DelphiModernizer.Studio.Modules.Workspaces.Application.Commands;
 public sealed record CreateWorkspaceCommand(InitRequest Request, IProgress<InitProgress>? Progress)
     : IRequest<Result<Workspace>>;
 
-internal sealed class CreateWorkspaceCommandHandler(IWorkspaceSession session, RecentWorkspaceStore recent, IClock clock)
+internal sealed class CreateWorkspaceCommandHandler(
+    IWorkspaceSession session,
+    RecentWorkspaceStore recent,
+    IClock clock)
     : IRequestHandler<CreateWorkspaceCommand, Result<Workspace>>
 {
     public async Task<Result<Workspace>> Handle(CreateWorkspaceCommand request, CancellationToken cancellationToken)

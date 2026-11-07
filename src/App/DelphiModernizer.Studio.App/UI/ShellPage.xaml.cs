@@ -12,7 +12,9 @@ using Microsoft.UI.Xaml.Media;
 
 namespace DelphiModernizer.Studio.App.UI;
 
-/// <summary>The title bar and the navigation pane around the page frame; the pane is built from the modules' items.</summary>
+/// <summary>
+/// The title bar and the navigation pane around the page frame; the pane is built from the modules' items.
+/// </summary>
 /// <remarks>
 /// The pane stays open down to the 960 px minimum and collapses only from the title-bar toggle (design assumption,
 /// open question 3). Every page stays selectable without a workspace; badges hide until one is open.
@@ -169,7 +171,9 @@ public sealed partial class ShellPage : Page
         }
     }
 
-    /// <summary>Clicking the selected item again returns to its page, as from a page reached inside it such as Run.</summary>
+    /// <summary>
+    /// Clicking the selected item again returns to its page, as from a page reached inside it such as Run.
+    /// </summary>
     private void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args.InvokedItemContainer is NavigationViewItem { Tag: string key } container
@@ -247,7 +251,8 @@ public sealed partial class ShellPage : Page
         return next switch {
             AutoSuggestBox search => search.Focus(FocusState.Keyboard),
             NavigationView => PaneItemToFocus().Focus(FocusState.Keyboard),
-            _ => FocusManager.FindFirstFocusableElement(NavFrame) is UIElement first && first.Focus(FocusState.Keyboard),
+            _ => FocusManager.FindFirstFocusableElement(NavFrame) is UIElement first
+                && first.Focus(FocusState.Keyboard),
         };
     }
 
@@ -304,7 +309,9 @@ public sealed partial class ShellPage : Page
     }
 
     /// <summary>Suggests the studio's pages by name.</summary>
-    /// <remarks>What search covers is an open question (handoff, question 7); pages are the one answer that needs no data.</remarks>
+    /// <remarks>
+    /// What search covers is an open question (handoff, question 7); pages are the one answer that needs no data.
+    /// </remarks>
     private void OnSearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput)

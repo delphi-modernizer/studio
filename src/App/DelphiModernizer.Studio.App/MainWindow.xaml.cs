@@ -7,7 +7,9 @@ using WinUIEx;
 namespace DelphiModernizer.Studio.App;
 
 /// <summary>The one window: Mica, the content drawn into the title bar, and the shell inside it.</summary>
-/// <remarks>1280 × 760 by default, as the brief says, and never smaller than the design's 960 × 576 minimum.</remarks>
+/// <remarks>
+/// 1280 × 760 by default, as the brief says, and never smaller than the design's 960 × 576 minimum.
+/// </remarks>
 public sealed partial class MainWindow : WindowEx
 {
     public MainWindow()

@@ -55,7 +55,9 @@ public sealed class EditorLauncher : IEditorLauncher
         }
     }
 
-    /// <summary>A folder opens in Explorer, a source or document file in its app, and anything else is only shown.</summary>
+    /// <summary>
+    /// A folder opens in Explorer, a source or document file in its app, and anything else is only shown.
+    /// </summary>
     private static ProcessStartInfo StartInfoFor(string path)
     {
         if (Directory.Exists(path))

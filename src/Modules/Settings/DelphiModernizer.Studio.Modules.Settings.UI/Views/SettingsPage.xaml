@@ -11,7 +11,7 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <!--  Settings cards (handoff part 2): at least 68 tall, glyph 20 with 16 to the text, the control on the right.  -->
+        <!--  Settings cards (handoff part 2): 68 tall at least, glyph 20 with 16 to the text, control right.  -->
         <Style
             x:Key="SettingCardStyle"
             BasedOn="{StaticResource CardStyle}"
@@ -57,7 +57,12 @@
                 HorizontalAlignment="Left"
                 Padding="{StaticResource PagePadding}"
                 Spacing="{StaticResource PageHeaderSpacing}">
-                <controls:PageHeader Purpose="How agent runs use Claude Code, and the studio’s defaults. Settings apply to this PC, not to a workspace." Title="Settings" />
+                <controls:PageHeader Title="Settings">
+                    <controls:PageHeader.Purpose>
+                        How agent runs use Claude Code, and the studio’s defaults. Settings apply to this PC, not to a
+                        workspace.
+                    </controls:PageHeader.Purpose>
+                </controls:PageHeader>
 
                 <StackPanel>
                     <TextBlock
@@ -85,14 +90,18 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Claude Code executable" />
+                                    <TextBlock
+                                        Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="Claude Code executable" />
                                     <controls:StatusPill
                                         Grid.Column="1"
                                         State="{x:Bind ViewModel.Pill, Mode=OneWay}"
                                         Text="{x:Bind ViewModel.PillText, Mode=OneWay}"
                                         Visibility="{x:Bind ViewModel.HasStatus, Mode=OneWay}" />
                                 </Grid>
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.Help, Mode=OneWay}" />
+                                <TextBlock
+                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                    Text="{x:Bind ViewModel.Help, Mode=OneWay}" />
                                 <Grid Margin="0,10,0,0" ColumnSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -103,10 +112,13 @@
                                         AutomationProperties.HelpText="{x:Bind ViewModel.PathHelp, Mode=OneWay}"
                                         AutomationProperties.Name="Claude Code executable"
                                         PlaceholderText="Not found on PATH"
-                                        Text="{x:Bind ViewModel.ClaudePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Text="{x:Bind ViewModel.ClaudePath, Mode=TwoWay,
+                                            UpdateSourceTrigger=PropertyChanged}" />
                                     <Button Grid.Column="1" Command="{x:Bind ViewModel.BrowseCommand}">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenFolder}" Style="{StaticResource IconStyle}" />
+                                            <FontIcon
+                                                Glyph="{x:Bind icons:StudioIcons.OpenFolder}"
+                                                Style="{StaticResource IconStyle}" />
                                             <TextBlock Text="Browse…" />
                                         </StackPanel>
                                     </Button>
@@ -137,10 +149,16 @@
                                     AutomationProperties.LiveSetting="Polite"
                                     IsClosable="False"
                                     IsOpen="{x:Bind ViewModel.IsMissing, Mode=OneWay}"
-                                    Message="The Claude Code CLI is not on PATH. Install it from https://claude.com/claude-code, or browse to claude.exe. Everything except agent runs works without it."
                                     Severity="Warning">
+                                    <InfoBar.Message>
+                                        The Claude Code CLI is not on PATH. Install it from
+                                        https://claude.com/claude-code, or browse to claude.exe. Everything except agent
+                                        runs works without it.
+                                    </InfoBar.Message>
                                     <InfoBar.IconSource>
-                                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                                        <FontIconSource
+                                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                                            Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                                     </InfoBar.IconSource>
                                 </InfoBar>
                             </StackPanel>
@@ -155,9 +173,11 @@
                         Text="Agent runs" />
                     <StackPanel Spacing="8">
                         <Border
-                            AutomationProperties.HelpText="An alias Claude Code accepts. Leave it empty to use Claude Code’s own default."
                             AutomationProperties.Name="Model"
                             Style="{StaticResource SettingCardStyle}">
+                            <AutomationProperties.HelpText>
+                                An alias Claude Code accepts. Leave it empty to use Claude Code’s own default.
+                            </AutomationProperties.HelpText>
                             <Grid Style="{StaticResource SettingGridStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20" />
@@ -170,24 +190,31 @@
                                     Style="{StaticResource IconStyle}" />
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Model" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="An alias Claude Code accepts. Leave it empty to use Claude Code’s own default." />
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                        An alias Claude Code accepts. Leave it empty to use Claude Code’s own default.
+                                    </TextBlock>
                                 </StackPanel>
                                 <ComboBox
                                     Grid.Column="2"
                                     Width="200"
                                     VerticalAlignment="Center"
-                                    AutomationProperties.HelpText="An alias Claude Code accepts. Leave it empty to use Claude Code’s own default."
                                     AutomationProperties.Name="Model"
                                     IsEditable="True"
                                     ItemsSource="{x:Bind vm:SettingsViewModel.Models}"
                                     PlaceholderText="Claude Code’s default"
-                                    Text="{x:Bind ViewModel.Model, Mode=TwoWay}" />
+                                    Text="{x:Bind ViewModel.Model, Mode=TwoWay}">
+                                    <AutomationProperties.HelpText>
+                                        An alias Claude Code accepts. Leave it empty to use Claude Code’s own default.
+                                    </AutomationProperties.HelpText>
+                                </ComboBox>
                             </Grid>
                         </Border>
                         <Border
-                            AutomationProperties.HelpText="low, medium, high, xhigh or max. Higher effort takes longer and costs more."
                             AutomationProperties.Name="Effort"
                             Style="{StaticResource SettingCardStyle}">
+                            <AutomationProperties.HelpText>
+                                low, medium, high, xhigh or max. Higher effort takes longer and costs more.
+                            </AutomationProperties.HelpText>
                             <Grid Style="{StaticResource SettingGridStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20" />
@@ -200,22 +227,29 @@
                                     Style="{StaticResource IconStyle}" />
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Effort" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="low, medium, high, xhigh or max. Higher effort takes longer and costs more." />
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                        low, medium, high, xhigh or max. Higher effort takes longer and costs more.
+                                    </TextBlock>
                                 </StackPanel>
                                 <ComboBox
                                     Grid.Column="2"
                                     Width="200"
                                     VerticalAlignment="Center"
-                                    AutomationProperties.HelpText="low, medium, high, xhigh or max. Higher effort takes longer and costs more."
                                     AutomationProperties.Name="Effort"
                                     ItemsSource="{x:Bind vm:SettingsViewModel.Efforts}"
-                                    SelectedIndex="{x:Bind ViewModel.EffortIndex, Mode=TwoWay}" />
+                                    SelectedIndex="{x:Bind ViewModel.EffortIndex, Mode=TwoWay}">
+                                    <AutomationProperties.HelpText>
+                                        low, medium, high, xhigh or max. Higher effort takes longer and costs more.
+                                    </AutomationProperties.HelpText>
+                                </ComboBox>
                             </Grid>
                         </Border>
                         <Border
-                            AutomationProperties.HelpText="Every run stops when it reaches this. You can change it when you start a run."
                             AutomationProperties.Name="Budget per run"
                             Style="{StaticResource SettingCardStyle}">
+                            <AutomationProperties.HelpText>
+                                Every run stops when it reaches this. You can change it when you start a run.
+                            </AutomationProperties.HelpText>
                             <Grid Style="{StaticResource SettingGridStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20" />
@@ -228,7 +262,9 @@
                                     Style="{StaticResource IconStyle}" />
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Budget per run" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Every run stops when it reaches this. You can change it when you start a run." />
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                        Every run stops when it reaches this. You can change it when you start a run.
+                                    </TextBlock>
                                 </StackPanel>
                                 <StackPanel
                                     Grid.Column="2"
@@ -241,13 +277,17 @@
                                         Text="$" />
                                     <NumberBox
                                         Width="188"
-                                        AutomationProperties.HelpText="Every run stops when it reaches this. You can change it when you start a run."
                                         AutomationProperties.Name="Budget per run"
                                         LargeChange="1"
                                         Minimum="0.1"
                                         SmallChange="0.5"
                                         SpinButtonPlacementMode="Inline"
-                                        Value="{x:Bind ViewModel.Budget, Mode=TwoWay}" />
+                                        Value="{x:Bind ViewModel.Budget, Mode=TwoWay}">
+                                        <AutomationProperties.HelpText>
+                                            Every run stops when it reaches this. You can change it when you start a
+                                            run.
+                                        </AutomationProperties.HelpText>
+                                    </NumberBox>
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -261,9 +301,12 @@
                         Text="Legacy source and appearance" />
                     <StackPanel Spacing="8">
                         <Border
-                            AutomationProperties.HelpText="For files without a byte-order mark. New workspaces start with it; each workspace keeps its own."
                             AutomationProperties.Name="Default code page"
                             Style="{StaticResource SettingCardStyle}">
+                            <AutomationProperties.HelpText>
+                                For files without a byte-order mark. New workspaces start with it; each workspace keeps
+                                its own.
+                            </AutomationProperties.HelpText>
                             <Grid Style="{StaticResource SettingGridStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20" />
@@ -276,23 +319,32 @@
                                     Style="{StaticResource IconStyle}" />
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Default code page" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="For files without a byte-order mark. New workspaces start with it; each workspace keeps its own." />
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                        For files without a byte-order mark. New workspaces start with it; each
+                                        workspace keeps its own.
+                                    </TextBlock>
                                 </StackPanel>
                                 <ComboBox
                                     Grid.Column="2"
                                     Width="200"
                                     VerticalAlignment="Center"
-                                    AutomationProperties.HelpText="For files without a byte-order mark. New workspaces start with it; each workspace keeps its own."
                                     AutomationProperties.Name="Default code page"
                                     DisplayMemberPath="Label"
                                     ItemsSource="{x:Bind settings:CodePages.Common}"
-                                    SelectedItem="{x:Bind ViewModel.SelectedCodePage, Mode=TwoWay}" />
+                                    SelectedItem="{x:Bind ViewModel.SelectedCodePage, Mode=TwoWay}">
+                                    <AutomationProperties.HelpText>
+                                        For files without a byte-order mark. New workspaces start with it; each
+                                        workspace keeps its own.
+                                    </AutomationProperties.HelpText>
+                                </ComboBox>
                             </Grid>
                         </Border>
                         <Border
-                            AutomationProperties.HelpText="Light, dark, or follow Windows. High contrast always follows Windows."
                             AutomationProperties.Name="Theme"
                             Style="{StaticResource SettingCardStyle}">
+                            <AutomationProperties.HelpText>
+                                Light, dark, or follow Windows. High contrast always follows Windows.
+                            </AutomationProperties.HelpText>
                             <Grid Style="{StaticResource SettingGridStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="20" />
@@ -305,15 +357,19 @@
                                     Style="{StaticResource IconStyle}" />
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Theme" />
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Light, dark, or follow Windows. High contrast always follows Windows." />
+                                    <TextBlock
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="Light, dark, or follow Windows. High contrast always follows Windows." />
                                 </StackPanel>
                                 <ComboBox
                                     Grid.Column="2"
                                     Width="200"
                                     VerticalAlignment="Center"
-                                    AutomationProperties.HelpText="Light, dark, or follow Windows. High contrast always follows Windows."
                                     AutomationProperties.Name="Theme"
                                     SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}">
+                                    <AutomationProperties.HelpText>
+                                        Light, dark, or follow Windows. High contrast always follows Windows.
+                                    </AutomationProperties.HelpText>
                                     <x:String>Use system setting</x:String>
                                     <x:String>Light</x:String>
                                     <x:String>Dark</x:String>
@@ -340,7 +396,9 @@
                                 Glyph="{x:Bind icons:StudioIcons.Versions}"
                                 Style="{StaticResource IconStyle}" />
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Delphi Modernizer Studio" />
+                                <TextBlock
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Text="Delphi Modernizer Studio" />
                                 <TextBlock
                                     IsTextSelectionEnabled="True"
                                     Style="{StaticResource SecondaryCaptionTextStyle}"
@@ -351,7 +409,9 @@
                                 VerticalAlignment="Center"
                                 Command="{x:Bind ViewModel.CopyVersionsCommand}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Copy}" Style="{StaticResource IconStyle}" />
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Copy}"
+                                        Style="{StaticResource IconStyle}" />
                                     <TextBlock Text="Copy versions" />
                                 </StackPanel>
                             </Button>
