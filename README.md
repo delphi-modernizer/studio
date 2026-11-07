@@ -18,7 +18,7 @@ Built milestone by milestone against the approved design (see [docs/ARCHITECTURE
 | 2 Without AI | Start, New workspace, Overview, Inventory, Deliverables, Traceability, Sign-offs (read), Settings | Done |
 | 3 Sign-offs | Approve and revoke dialogs, git identity, refusal, stale approvals, history | Done |
 | 4 Agent runs | Workstreams, the Run an agent task dialog, the live Run page, budget and Claude Code dialogs | Done |
-| 5 Finish | Narrow layouts, high contrast, keyboard order and Narrator names, a full pass against every artboard | Next |
+| 5 Finish | Narrow layouts, high contrast, keyboard order and Narrator names, a full pass against every artboard | Done |
 
 ## Build
 

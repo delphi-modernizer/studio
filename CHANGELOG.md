@@ -25,3 +25,24 @@
 - Run an agent task asks for the task's scope, or the sign-off by name, and a budget, then runs it in the background.
 - The Run page follows a run live, with fact labels, collapsed tool calls and guard refusals, what it writes and
   touches, Stop, and a new run when the budget is reached; the Workstreams item counts the runs in progress.
+- The navigation pane, Settings included, is one tab stop with arrow keys inside and a rule above Settings; title-bar
+  search takes its 360 px at full width.
+- Status pills read their word alone and announce a change where the page asks for it; live changes are read politely,
+  and only a refused approval is read at once.
+- New workspace reads its step heading ("Step 2 of 5, Legacy source") on Next and Back, and each creation step as it
+  starts and ends; Settings cards read their header and description, and a Claude Code test reads its result.
+- Start hides Last opened under 1100 and reads the Claude Code card and recent workspaces as the handoff words them.
+- Overview, Inventory, Deliverables and Traceability lay out at 960 × 576; Inventory drops its secondary columns under
+  1100, and large tables scroll virtualised.
+- Each table is one keyboard stop and Inventory's headers sort; Narrator reads the diagram as a group with its nodes,
+  SelectorBar items, sorted headers, rows, evidence links and redacted values, and Overview names the teams whose
+  agents are running.
+- Sign-offs, Workstreams and Run lay out at 960 × 576 and follow the handoff's keyboard order and Narrator names; each
+  sign-off's number sits on the board's tile.
+- Run's transcript is one list: arrows move by item, Enter or Space expands a tool call, and Tab reaches the item's
+  evidence links.
+- Every brush in the shared styles and on Sign-offs is a theme resource that resolves in high contrast, where the next
+  sign-off's border and hovered rows stay readable.
+- Paths trim at the start in narrow columns, so the file name stays visible, and Narrator reads the whole path.
+- A `screenshots` CI job starts the app on the brief's sample workspace and captures every page at 1280 × 800 and
+  960 × 576 in light, dark and high contrast; it fails when the app does not start or a page cannot be reached.
