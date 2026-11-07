@@ -13,6 +13,8 @@ change.
 | Clone from Git has an action card and a link but no drawn flow | The card is shown, turned off | Start, Overview |
 | The target tag for a workspace that decided to choose after discovery | "Undecided" | `TargetStackNames` |
 | Browse… for the workspace folder when the folder picked already holds files | A new folder named after the workspace inside it, shown in the box before Next | `NewWorkspaceViewModel.BrowseFolder` |
+| Short names for deliverables in sign-off checks: the canvas names D01 to D09 ("System inventory", "Technology evaluation"); D10 to D20 are new | "Data migration strategy", "Testing strategy" and the like, one place to change | `SignOffWordings` |
+| The files a sign-off covers ("Covers · 7 files") and which changed since approval: the engine hashes them but does not list them | The fingerprint only, with Copy; the list waits on an engine change in milestone 3 | `SignOffsPage` |
 | The preview's "[n] of [total] files" while scanning: the engine's scanner reports no progress | "Scanning the folder…" with an indeterminate bar | `NewWorkspacePage` |
 | Problem wording: the canvas words three trace rules (broken evidence, missing evidence, open question); the other eleven are new | Labels and sentences in the same style, one place to change | `ProblemWordings` |
 | Default window height | 760, as the brief says | `MainWindow.xaml` |
