@@ -138,9 +138,9 @@ public sealed partial class RunPage : Page, IHasViewModel
         ViewModel.ExpandAll();
     }
 
-    private void OnToolClicked(object sender, RoutedEventArgs e)
+    private void OnTranscriptItemClick(object sender, ItemClickEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: ToolRow row })
+        if (e.ClickedItem is ToolRow row)
         {
             ViewModel.Toggle(row);
         }

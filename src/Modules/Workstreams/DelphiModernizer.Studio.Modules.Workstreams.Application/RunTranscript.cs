@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using DelphiModernizer.Engine.Agents;
+using DelphiModernizer.Engine.Kit;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
@@ -22,6 +23,12 @@ public static partial class RunTranscript
 
     private static readonly FrozenSet<string> _editingTools = new[] { "Edit", "Write", "MultiEdit", "NotebookEdit" }.ToFrozenSet(StringComparer.Ordinal);
 
+    /// <summary>The kit's evidence pattern, unanchored, so links are found as the trace check reads them.</summary>
+    private static readonly Lazy<Regex> _evidence = new(() => new Regex(
+        KitBundle.Embedded.Spec.Ids.Evidence.Pattern,
+        RegexOptions.CultureInvariant,
+        TimeSpan.FromSeconds(1)));
+
     public static IReadOnlyList<AgentLine> Lines(string text)
     {
         return [.. text
@@ -36,6 +43,14 @@ public static partial class RunTranscript
         var text = FactLabel().Replace(line, string.Empty);
 
         return new AgentLine(text.Trim(), label.Success ? label.Groups["label"].Value : null);
+    }
+
+    /// <summary>The evidence links a line of agent text cites, such as <c>legacy/Sales/Pricing.pas#L18</c>.</summary>
+    public static IReadOnlyList<string> Evidence(string text)
+    {
+        return [.. _evidence.Value
+            .Matches(text)
+            .Select(m => m.Value)];
     }
 
     public static bool IsRefusal(ToolResult result)

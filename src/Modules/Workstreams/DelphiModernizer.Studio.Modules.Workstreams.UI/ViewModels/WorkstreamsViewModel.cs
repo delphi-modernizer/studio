@@ -213,16 +213,14 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
 
     private string BlockedReason(LiveRun blocker, Recipe recipe, RoleRow role)
     {
+        var agent = blocker.Recipe.Agent;
+        var owner = agent == role.Workstream.Role.Agent
+            ? null
+            : _workstreams.FirstOrDefault(w => w.Role.Agent == agent)?.Role.Name ?? agent;
+
         var started = RunWords.Time(blocker.StartedAt);
 
-        if (blocker.Recipe.Agent == role.Workstream.Role.Agent)
-        {
-            return $"The run below is writing the {RunWords.Writes(recipe)}, started {started}.";
-        }
-
-        var owner = _workstreams.FirstOrDefault(w => w.Role.Agent == blocker.Recipe.Agent)?.Role.Name ?? blocker.Recipe.Agent;
-
-        return $"{blocker.Recipe.Title} ({owner}) is writing them, started {started}.";
+        return RunNames.BlockedReason(RunWords.Writes(recipe), blocker.Recipe.Title, owner, started);
     }
 
     private void OnRunsChanged(object? sender, EventArgs e)

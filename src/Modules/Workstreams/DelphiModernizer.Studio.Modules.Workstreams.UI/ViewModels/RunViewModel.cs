@@ -390,7 +390,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
         if (RunTranscript.IsRefusal(result))
         {
-            Items[Items.IndexOf(call.Row)] = new RefusalRow(call.Row.Name, call.Row.Input, RunTranscript.RefusalReason(result));
+            var reason = RunTranscript.RefusalReason(result);
+            Items[Items.IndexOf(call.Row)] = new RefusalRow(call.Row.Name, call.Row.Input, call.Path, reason);
             Refusals++;
             OnPropertyChanged(nameof(GuardCount));
 

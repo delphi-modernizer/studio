@@ -12,6 +12,12 @@ namespace DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
 public abstract class TranscriptRow : ObservableObject
 {
     public abstract string AnnouncedName { get; }
+
+    /// <summary>The transcript is a ListView, which names an item's container from the item's text.</summary>
+    public override string ToString()
+    {
+        return AnnouncedName;
+    }
 }
 
 public sealed class SessionRow(string text) : TranscriptRow
@@ -21,12 +27,16 @@ public sealed class SessionRow(string text) : TranscriptRow
     public override string AnnouncedName => $"Session: {Text}";
 }
 
-/// <summary>A line of agent text and the fact label after it, when it has one.</summary>
+/// <summary>A line of agent text, the fact label after it when it has one, and the evidence links it cites.</summary>
 public sealed record AgentLineRow(string Text, FactKind? Label)
 {
     public bool HasLabel => Label is not null;
 
     public FactKind Kind => Label ?? FactKind.Unknown;
+
+    public IReadOnlyList<string> Evidence { get; } = RunTranscript.Evidence(Text);
+
+    public bool HasEvidence => Evidence.Count > 0;
 }
 
 public sealed class AgentRow : TranscriptRow
@@ -34,14 +44,15 @@ public sealed class AgentRow : TranscriptRow
     public AgentRow(string who, IReadOnlyList<AgentLine> lines)
     {
         Who = who;
-        Lines = [.. lines.Select(l => new AgentLineRow(l.Text, Enum.TryParse<FactKind>(l.Label, out var kind) ? kind : null))];
+        Lines = [.. lines.Select(l => new AgentLineRow(l.Text, Enum.TryParse(l.Label, out FactKind k) ? k : null))];
+        AnnouncedName = RunNames.Agent(lines);
     }
 
     public string Who { get; }
 
     public IReadOnlyList<AgentLineRow> Lines { get; }
 
-    public override string AnnouncedName => $"Agent: {string.Join(" ", Lines.Select(l => l.HasLabel ? $"{l.Text} {l.Kind}." : l.Text))}";
+    public override string AnnouncedName { get; }
 }
 
 /// <summary>A tool call, collapsed to its name and input until it is expanded to show its result.</summary>
@@ -71,25 +82,14 @@ public sealed partial class ToolRow(string id, string name, string input) : Tran
 
     public string Chevron => IsExpanded ? StudioIcons.ChevronUp : StudioIcons.ChevronDown;
 
-    public string Summary => Result switch {
-        null => "Working",
-        _ when IsError => "Failed",
-        "" => "Done",
-        var text => Lines(text),
-    };
+    public string Summary => RunNames.ToolSummary(Name, Result, IsError);
 
-    public override string AnnouncedName => $"Tool call {Name}, {Summary}, {(IsExpanded ? "expanded" : "collapsed")}";
-
-    private static string Lines(string text)
-    {
-        var count = text.Split('\n').Length;
-
-        return count == 1 ? "1 line" : $"{count} lines";
-    }
+    public override string AnnouncedName => RunNames.Tool(Name, Summary, IsExpanded);
 }
 
 /// <summary>A tool call the guard refused: not an error of the run, which carries on.</summary>
-public sealed class RefusalRow(string name, string input, string reason) : TranscriptRow
+/// <param name="path">The file the call names, which Narrator reads instead of the raw input; null for none.</param>
+public sealed class RefusalRow(string name, string input, string? path, string reason) : TranscriptRow
 {
     public string Name { get; } = name;
 
@@ -97,7 +97,7 @@ public sealed class RefusalRow(string name, string input, string reason) : Trans
 
     public string Reason { get; } = reason;
 
-    public override string AnnouncedName => $"Refused by the guard: {Name} {Input}. {Reason}";
+    public override string AnnouncedName => RunNames.Refusal(Name, path ?? Input, Reason);
 }
 
 public sealed class DiagnosticRow(string source, string text) : TranscriptRow

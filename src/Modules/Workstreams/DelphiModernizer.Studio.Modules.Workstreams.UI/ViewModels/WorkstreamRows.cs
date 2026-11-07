@@ -23,7 +23,15 @@ public sealed record RoleRow(Workstream Workstream, int Started, bool IsRunning)
 
     public double Percent => Workstream.Deliverables.Count == 0 ? 0 : 100.0 * Started / Workstream.Deliverables.Count;
 
-    public string AnnouncedName => $"{Name}, {Started} of {Workstream.Deliverables.Count} deliverables started{(IsRunning ? ", run in progress" : string.Empty)}";
+    public string AnnouncedName => IsRunning
+        ? $"{Name}, {Started} of {Workstream.Deliverables.Count} deliverables started, run in progress"
+        : $"{Name}, {Started} of {Workstream.Deliverables.Count} deliverables started";
+
+    /// <summary>The role list is a ListView, which names an item's container from the item's text.</summary>
+    public override string ToString()
+    {
+        return AnnouncedName;
+    }
 }
 
 public sealed record DeliverableRow(string Title, PillState Pill);
@@ -42,9 +50,7 @@ public sealed record TaskRow(Recipe Recipe, string RoleName, bool ClaudeReady, L
 
     public bool CanRun => ClaudeReady && !IsBlocked;
 
-    public string AnnouncedName => IsBlocked
-        ? $"{Title}, writes the {RunWords.Writes(Recipe)}, Blocked: {BlockedReason}"
-        : $"{Title}, writes the {RunWords.Writes(Recipe)}";
+    public string AnnouncedName => RunNames.Task(Title, RunWords.Writes(Recipe), IsBlocked ? BlockedReason : null);
 }
 
 /// <summary>One run in a role's history, in progress or recorded.</summary>
@@ -67,6 +73,12 @@ public sealed record HistoryRow(RunRecord Run)
     public string Turns => Run.Turns?.ToString(CultureInfo.CurrentCulture) ?? "—";
 
     public string AnnouncedName => $"{Title}, {ArgumentText}, {PillLook.Of(Pill).Word}, {When}";
+
+    /// <summary>Run history is a ListView, which names an item's container from the item's text.</summary>
+    public override string ToString()
+    {
+        return AnnouncedName;
+    }
 }
 
 /// <summary>The words the Workstreams and Run pages put around recipes, runs and money.</summary>
