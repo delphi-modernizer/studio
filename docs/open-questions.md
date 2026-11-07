@@ -31,4 +31,6 @@ change.
 | The Claude Code card's Narrator name: the handoff words only Not found | "Claude Code, [pill]. [the card's line]" for the other states | `ClaudeCard.AnnouncedName` |
 | The Claude Code card's action: the keyboard notes say Get Claude Code, Update or Open Settings; the artboards draw Set up Claude Code, Test again and Agent settings | The drawn words | `ClaudeCard` |
 | A settings card's control takes the card's Name: on About that would rename Copy versions | Copy versions keeps its own name | `SettingsPage` |
+| Is an artboard's 1280 × 800 the window's visible frame, title bar included? | Yes: screenshots size the frame Windows draws, without the invisible resize borders | `Desktop.SetVisibleFrame` |
+| The brief's sample shows G0 and D01 approved; only a person approves, so the CI workspace has no approval | Screenshots show the freshly scanned workspace: no sign-off approved, every deliverable a template | `ci.yml`, `screenshots` job |
 | The other handoff questions (stale on answered questions, settings defaults, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |

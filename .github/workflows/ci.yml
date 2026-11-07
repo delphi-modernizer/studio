@@ -98,6 +98,69 @@ jobs:
           path: out/studio
           if-no-files-found: error
 
+  # Every page of the running app on the engine's sample workspace, uploaded as the artifact screenshots
+  # (docs/design/ui-screenshots.md). It is also the job that fails when the app does not start or a page throws.
+  screenshots:
+    needs: [engine, build]
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: delphi-modernizer/engine
+          ref: ${{ needs.engine.outputs.ref }}
+          path: .engine
+          submodules: true
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+      - name: Publish the studio and dmz
+        run: |
+          dotnet publish src/App/DelphiModernizer.Studio.App \
+            -c Release -r win-x64 -p:Platform=x64 --self-contained -o out/studio
+          dotnet publish .engine/src/DelphiModernizer.Cli \
+            -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/studio/tools
+      # The brief's sample: the engine's Delphi 7 ERP on the BDE, created and scanned by dmz as a person would.
+      - name: Create the sample workspace
+        env:
+          GIT_AUTHOR_NAME: Studio screenshots
+          GIT_AUTHOR_EMAIL: screenshots@delphi-modernizer.invalid
+          GIT_COMMITTER_NAME: Studio screenshots
+          GIT_COMMITTER_EMAIL: screenshots@delphi-modernizer.invalid
+        run: |
+          workspace="$RUNNER_TEMP/acme-erp"
+          out/studio/tools/dmz.exe init "$workspace" \
+            --name "Acme ERP modernization" \
+            --legacy .engine/tests/fixtures/delphi/legacy-erp \
+            --stack dotnet \
+            --by "Studio screenshots <screenshots@delphi-modernizer.invalid>" \
+            --domain "ERP, a Delphi 7 application on the BDE"
+          out/studio/tools/dmz.exe scan --workspace "$workspace"
+      - name: Capture every page
+        run: >-
+          dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release --
+          --app out/studio/DelphiModernizer.Studio.exe
+          --workspace "$RUNNER_TEMP/acme-erp"
+          --out out/screenshots
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: screenshots
+          path: out/screenshots
+          if-no-files-found: error
+
   checks:
     runs-on: ubuntu-latest
     steps:
