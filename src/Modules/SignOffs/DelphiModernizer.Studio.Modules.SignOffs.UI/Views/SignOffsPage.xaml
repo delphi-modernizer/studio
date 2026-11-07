@@ -10,124 +10,126 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <!--  The next sign-off's ring: AccentFillColorDefault's colours, and the highlight in high contrast.  -->
-        <ResourceDictionary.ThemeDictionaries>
-            <ResourceDictionary x:Key="Light">
-                <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemAccentColorDark1}" />
-            </ResourceDictionary>
-            <ResourceDictionary x:Key="Dark">
-                <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemAccentColorLight2}" />
-            </ResourceDictionary>
-            <ResourceDictionary x:Key="HighContrast">
-                <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemColorHighlightColor}" />
-            </ResourceDictionary>
-        </ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary>
+            <!--  The next sign-off's ring: AccentFillColorDefault's colours, and the highlight in high contrast.  -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemAccentColorDark1}" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemAccentColorLight2}" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="NextRingBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
 
-        <Style
-            x:Key="SectionTitleStyle"
-            BasedOn="{StaticResource BodyStrongTextBlockStyle}"
-            TargetType="TextBlock">
-            <Setter Property="Margin" Value="0,0,0,4" />
-        </Style>
+            <Style
+                x:Key="SectionTitleStyle"
+                BasedOn="{StaticResource BodyStrongTextBlockStyle}"
+                TargetType="TextBlock">
+                <Setter Property="Margin" Value="0,0,0,4" />
+            </Style>
 
-        <DataTemplate x:Key="CheckTemplate" x:DataType="vm:CheckRow">
-            <Grid
-                Padding="0,10"
-                AutomationProperties.Name="{x:Bind AnnouncedName}"
-                ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <!--  One icon per tone: ThemeResource brushes follow the element's theme, high contrast included.  -->
-                <FontIcon
-                    Margin="0,2,0,0"
-                    VerticalAlignment="Top"
-                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
-                    Glyph="{x:Bind Glyph}"
-                    Style="{StaticResource IconStyle}"
-                    Visibility="{x:Bind Passed}" />
-                <FontIcon
-                    Margin="0,2,0,0"
-                    VerticalAlignment="Top"
-                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
-                    Glyph="{x:Bind Glyph}"
-                    Style="{StaticResource IconStyle}"
-                    Visibility="{x:Bind IsFailing}" />
-                <FontIcon
-                    Margin="0,2,0,0"
-                    VerticalAlignment="Top"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Glyph="{x:Bind Glyph}"
-                    Style="{StaticResource IconStyle}"
-                    Visibility="{x:Bind IsNotYet}" />
-                <StackPanel Grid.Column="1">
+            <DataTemplate x:Key="CheckTemplate" x:DataType="vm:CheckRow">
+                <Grid
+                    Padding="0,10"
+                    AutomationProperties.Name="{x:Bind AnnouncedName}"
+                    ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <!--  One icon per tone, so ThemeResource follows the theme, high contrast included.  -->
+                    <FontIcon
+                        Margin="0,2,0,0"
+                        VerticalAlignment="Top"
+                        Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                        Glyph="{x:Bind Glyph}"
+                        Style="{StaticResource IconStyle}"
+                        Visibility="{x:Bind Passed}" />
+                    <FontIcon
+                        Margin="0,2,0,0"
+                        VerticalAlignment="Top"
+                        Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                        Glyph="{x:Bind Glyph}"
+                        Style="{StaticResource IconStyle}"
+                        Visibility="{x:Bind IsFailing}" />
+                    <FontIcon
+                        Margin="0,2,0,0"
+                        VerticalAlignment="Top"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Glyph="{x:Bind Glyph}"
+                        Style="{StaticResource IconStyle}"
+                        Visibility="{x:Bind IsNotYet}" />
+                    <StackPanel Grid.Column="1">
+                        <TextBlock
+                            Style="{StaticResource BodyTextBlockStyle}"
+                            Text="{x:Bind Name}"
+                            TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
+                    </StackPanel>
+                    <HyperlinkButton
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Click="OnShowProblems"
+                        Content="Show the problems"
+                        Visibility="{x:Bind ShowsProblems}" />
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="HistoryTemplate" x:DataType="vm:HistoryRow">
+                <Grid Padding="0,8" ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <FontIcon
+                        Margin="0,2,0,0"
+                        VerticalAlignment="Top"
+                        Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                        Glyph="{x:Bind icons:StudioIcons.Approved}"
+                        Style="{StaticResource IconStyle}"
+                        Visibility="{x:Bind IsApproval}" />
+                    <FontIcon
+                        Margin="0,2,0,0"
+                        VerticalAlignment="Top"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Glyph="{x:Bind icons:StudioIcons.History}"
+                        Style="{StaticResource IconStyle}"
+                        Visibility="{x:Bind IsRevocation}" />
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{x:Bind Text}" />
+                        <TextBlock
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Detail}"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="CoveredFileTemplate" x:DataType="vm:CoveredFileRow">
+                <!--  The path keeps its file name when trimmed; a changed file adds a caution mark.  -->
+                <Grid
+                    Padding="0,2"
+                    ColumnSpacing="8"
+                    ToolTipService.ToolTip="{x:Bind Path}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <controls:PathText Text="{x:Bind Path}" />
                     <TextBlock
-                        Style="{StaticResource BodyTextBlockStyle}"
-                        Text="{x:Bind Name}"
-                        TextWrapping="Wrap" />
-                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
-                </StackPanel>
-                <HyperlinkButton
-                    Grid.Column="2"
-                    VerticalAlignment="Center"
-                    Click="OnShowProblems"
-                    Content="Show the problems"
-                    Visibility="{x:Bind ShowsProblems}" />
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate x:Key="HistoryTemplate" x:DataType="vm:HistoryRow">
-            <Grid Padding="0,8" ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <FontIcon
-                    Margin="0,2,0,0"
-                    VerticalAlignment="Top"
-                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
-                    Glyph="{x:Bind icons:StudioIcons.Approved}"
-                    Style="{StaticResource IconStyle}"
-                    Visibility="{x:Bind IsApproval}" />
-                <FontIcon
-                    Margin="0,2,0,0"
-                    VerticalAlignment="Top"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Glyph="{x:Bind icons:StudioIcons.History}"
-                    Style="{StaticResource IconStyle}"
-                    Visibility="{x:Bind IsRevocation}" />
-                <StackPanel Grid.Column="1">
-                    <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{x:Bind Text}" />
-                    <TextBlock
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind Detail}"
-                        TextWrapping="Wrap" />
-                </StackPanel>
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate x:Key="CoveredFileTemplate" x:DataType="vm:CoveredFileRow">
-            <!--  The path keeps its file name when trimmed; a changed file adds its mark in the caution colour.  -->
-            <Grid
-                Padding="0,2"
-                ColumnSpacing="8"
-                ToolTipService.ToolTip="{x:Bind Path}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <controls:PathText Text="{x:Bind Path}" />
-                <TextBlock
-                    Grid.Column="1"
-                    AutomationProperties.Name="changed since approval"
-                    Foreground="{ThemeResource SystemFillColorCautionBrush}"
-                    Style="{StaticResource MonoTextStyle}"
-                    Text="· changed"
-                    Visibility="{x:Bind Changed}" />
-            </Grid>
-        </DataTemplate>
+                        Grid.Column="1"
+                        AutomationProperties.Name="changed since approval"
+                        Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                        Style="{StaticResource MonoTextStyle}"
+                        Text="· changed"
+                        Visibility="{x:Bind Changed}" />
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
     </Page.Resources>
 
     <Grid>
