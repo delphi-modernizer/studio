@@ -25,7 +25,12 @@ public sealed class InventoryModule : IModule
     public IReadOnlyList<NavigationItem> GetNavigationItems()
     {
         return [
-            new NavigationItem("Inventory", StudioIcons.Inventory, StudioIcons.InventoryFilled, typeof(InventoryPage), 20),
+            new NavigationItem(
+                "Inventory",
+                StudioIcons.Inventory,
+                StudioIcons.InventoryFilled,
+                typeof(InventoryPage),
+                20),
         ];
     }
 }

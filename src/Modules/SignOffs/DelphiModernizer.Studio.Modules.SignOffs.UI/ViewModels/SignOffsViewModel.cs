@@ -21,7 +21,11 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     private readonly IClipboardService _clipboard;
     private string? _requested;
 
-    public SignOffsViewModel(IWorkspaceSession session, ISender sender, INavigationService navigation, IClipboardService clipboard)
+    public SignOffsViewModel(
+        IWorkspaceSession session,
+        ISender sender,
+        INavigationService navigation,
+        IClipboardService clipboard)
         : base(session)
     {
         ArgumentNullException.ThrowIfNull(sender);
@@ -56,6 +60,10 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial string NextName { get; set; } = string.Empty;
 
+    /// <summary>Under 1100 each sign-off's body is one column; the page sets this from its window width.</summary>
+    [ObservableProperty]
+    public partial bool IsNarrow { get; set; }
+
     /// <param name="parameter">The gate to open, as Overview passes it; null opens the next one.</param>
     public override void OnNavigatedTo(object? parameter)
     {
@@ -83,6 +91,14 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     public void Prepare()
     {
         _navigation.NavigateTo("Workstreams", "PA");
+    }
+
+    partial void OnIsNarrowChanged(bool value)
+    {
+        foreach (var row in SignOffs)
+        {
+            row.IsNarrow = value;
+        }
     }
 
     protected override void OnWorkspaceChanged()
@@ -122,7 +138,7 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     {
         var next = signOffs.FirstOrDefault(s => s.Status.State != "approved");
         var rows = signOffs
-            .Select(s => new SignOffRow(s, signOffs.Count, s == next))
+            .Select(s => new SignOffRow(s, signOffs.Count))
             .ToList();
         var open = _requested ?? (expanded.Count > 0 ? null : next?.Status.Gate);
         _requested = null;
@@ -130,6 +146,7 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
         foreach (var row in rows)
         {
             row.IsExpanded = row.Gate == open || expanded.Contains(row.Gate);
+            row.IsNarrow = IsNarrow;
         }
 
         SignOffs = rows;

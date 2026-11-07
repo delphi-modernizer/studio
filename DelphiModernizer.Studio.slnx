@@ -88,5 +88,6 @@
     <Project Path="tests/DelphiModernizer.Studio.Modules.Traceability.Application.Tests/DelphiModernizer.Studio.Modules.Traceability.Application.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Modules.Workspaces.Application.Tests/DelphiModernizer.Studio.Modules.Workspaces.Application.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Modules.Workstreams.Application.Tests/DelphiModernizer.Studio.Modules.Workstreams.Application.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Screenshots/DelphiModernizer.Studio.Screenshots.csproj" />
   </Folder>
 </Solution>

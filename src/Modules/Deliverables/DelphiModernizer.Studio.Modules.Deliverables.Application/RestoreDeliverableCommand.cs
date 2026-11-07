@@ -13,7 +13,8 @@ namespace DelphiModernizer.Studio.Modules.Deliverables.Application;
 /// <summary>Writes a missing deliverable back from the kit's template; a file that exists is never replaced.</summary>
 public sealed record RestoreDeliverableCommand(string Id) : IRequest<Result>;
 
-internal sealed class RestoreDeliverableCommandHandler(IWorkspaceSession session) : IRequestHandler<RestoreDeliverableCommand, Result>
+internal sealed class RestoreDeliverableCommandHandler(IWorkspaceSession session)
+    : IRequestHandler<RestoreDeliverableCommand, Result>
 {
     public async Task<Result> Handle(RestoreDeliverableCommand request, CancellationToken cancellationToken)
     {
@@ -34,7 +35,8 @@ internal sealed class RestoreDeliverableCommandHandler(IWorkspaceSession session
 
         if (File.Exists(path))
         {
-            return Result.Failure(new Error("Deliverables.Exists", $"{deliverable.File} exists; restoring would replace it."));
+            return Result.Failure(
+                new Error("Deliverables.Exists", $"{deliverable.File} exists; restoring would replace it."));
         }
 
         Directory.CreateDirectory(Path.GetDirectoryName(path) ?? throw new InvalidOperationException(path));

@@ -4,7 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DelphiModernizer.Studio.UI.Contracts;
 
-/// <summary>A feature module: it registers its own services and contributes pages to the shell; modules never reference one another.</summary>
+/// <summary>
+/// A feature module: it registers its own services and contributes pages to the shell; modules never reference one
+/// another.
+/// </summary>
 public interface IModule
 {
     string Name { get; }

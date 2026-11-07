@@ -56,6 +56,10 @@ public sealed partial class OverviewPage
         LegendInside.Visibility = wide ? Visibility.Visible : Visibility.Collapsed;
         LegendBelow.Visibility = wide ? Visibility.Collapsed : Visibility.Visible;
         BuildSubtitle.Visibility = wide ? Visibility.Collapsed : Visibility.Visible;
+        BuildLayout.Padding = wide ? new Thickness(12, 6, 12, 6) : new Thickness(12, 8, 12, 8);
+        Grid.SetRow(BuildPill, wide ? 1 : 0);
+        Grid.SetColumn(BuildPill, wide ? 1 : 2);
+        BuildPill.HorizontalAlignment = wide ? HorizontalAlignment.Left : HorizontalAlignment.Stretch;
         Flow.Height = wide ? LayOutWide(available) : LayOutNarrow(available);
         ShowNextGate();
     }
@@ -91,9 +95,19 @@ public sealed partial class OverviewPage
         Place(GatesGroup, x3, top, gateWidth, gatesHeight);
         Place(LegacyNodeButton, x0, middle - (big / 2), legacyWidth, big);
         Place(ArchitectNodeButton, x2, middle - (big / 2), architectWidth, big);
-        PlaceTeams(i => new Rect(x1 + _groupPadding, top + _groupPadding + (i * (_nodeHeight + teamGap)), teamWidth - (2 * _groupPadding), _nodeHeight));
+        PlaceTeams(i => new Rect(
+            x1 + _groupPadding,
+            top + _groupPadding + (i * (_nodeHeight + teamGap)),
+            teamWidth - (2 * _groupPadding),
+            _nodeHeight));
         var gateCentre = x3 + (gateWidth / 2);
-        PlaceGates(i => new Rect(x3 + _groupPadding, top + _groupPadding + (i * (gateHeight + gateGap)), gateWidth - (2 * _groupPadding), gateHeight), gateCentre);
+        PlaceGates(
+            i => new Rect(
+                x3 + _groupPadding,
+                top + _groupPadding + (i * (gateHeight + gateGap)),
+                gateWidth - (2 * _groupPadding),
+                gateHeight),
+            gateCentre);
         HorizontalLine(x0 + legacyWidth, x1, middle, "evidence");
         HorizontalLine(x1 + teamWidth, x2, middle, "drafts");
         HorizontalLine(x2 + architectWidth, x3, middle, "review");
@@ -152,7 +166,13 @@ public sealed partial class OverviewPage
         Place(GatesGroup, x1, top2, groupWidth, gatesHeight);
         Place(ArchitectNodeButton, x0, architectTop, legacyWidth, big);
         VerticalLine(down, elbow, architectTop, arrow: true);
-        PlaceGates(i => new Rect(x1 + _groupPadding, top2 + _groupPadding + (i * (gateHeight + gateGap)), groupWidth - (2 * _groupPadding), gateHeight), groupCentre);
+        PlaceGates(
+            i => new Rect(
+                x1 + _groupPadding,
+                top2 + _groupPadding + (i * (gateHeight + gateGap)),
+                groupWidth - (2 * _groupPadding),
+                gateHeight),
+            groupCentre);
         HorizontalLine(x0 + legacyWidth, x1, middle2, "review");
 
         var buildTop = top2 + gatesHeight + 32;
@@ -212,7 +232,11 @@ public sealed partial class OverviewPage
 
     private void Line(double x, double y, double width, double height)
     {
-        var line = new Rectangle { Width = Math.Max(width, 0), Height = Math.Max(height, 0), Style = (Style)Resources["FlowLineStyle"] };
+        var line = new Rectangle {
+            Width = Math.Max(width, 0),
+            Height = Math.Max(height, 0),
+            Style = (Style)Resources["FlowLineStyle"],
+        };
         Decorate(line, x, y);
     }
 
@@ -230,7 +254,12 @@ public sealed partial class OverviewPage
 
     private void Label(double x, double y, double width, string text, TextAlignment alignment)
     {
-        var label = new TextBlock { Text = text, Width = width, TextAlignment = alignment, Style = (Style)Resources["FlowLabelStyle"] };
+        var label = new TextBlock {
+            Text = text,
+            Width = width,
+            TextAlignment = alignment,
+            Style = (Style)Resources["FlowLabelStyle"],
+        };
         Decorate(label, x, y);
     }
 

@@ -18,6 +18,8 @@ internal sealed class CheckWorkspaceFolderQueryHandler : IRequestHandler<CheckWo
             .EnumerateFileSystemEntries(request.Folder)
             .Any();
 
-        return Task.FromResult(usable ? Result.Success() : Result.Failure(WorkspacesErrors.FolderNotEmpty(request.Folder)));
+        return Task.FromResult(usable
+            ? Result.Success()
+            : Result.Failure(WorkspacesErrors.FolderNotEmpty(request.Folder)));
     }
 }

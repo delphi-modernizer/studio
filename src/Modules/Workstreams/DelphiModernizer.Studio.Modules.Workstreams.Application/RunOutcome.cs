@@ -12,7 +12,9 @@ public enum RunOutcome
 
 public static class RunOutcomes
 {
-    /// <param name="outcome">The engine's <see cref="Engine.Agents.RunCompleted.Outcome"/>; null while the run goes on.</param>
+    /// <param name="outcome">
+    /// The engine's <see cref="Engine.Agents.RunCompleted.Outcome"/>; null while the run goes on.
+    /// </param>
     public static RunOutcome Of(string? outcome)
     {
         return outcome switch {

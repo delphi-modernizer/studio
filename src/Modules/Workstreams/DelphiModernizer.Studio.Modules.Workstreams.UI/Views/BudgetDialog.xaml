@@ -48,7 +48,9 @@
                 Minimum="0.1"
                 SmallChange="0.5"
                 SpinButtonPlacementMode="Inline" />
-            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="A new run starts the task again with the same scope." />
+            <TextBlock
+                Style="{StaticResource SecondaryCaptionTextStyle}"
+                Text="A new run starts the task again with the same scope." />
         </StackPanel>
     </StackPanel>
 </ContentDialog>

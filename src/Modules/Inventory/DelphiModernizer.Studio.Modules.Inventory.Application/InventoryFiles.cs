@@ -15,10 +15,19 @@ internal static class InventoryFiles
         return Path.Combine(workspace.LatestScanFolder, "inventory.json");
     }
 
-    public static async Task WriteAsync(Workspace workspace, LegacyInventory inventory, CancellationToken cancellationToken)
+    public static async Task WriteAsync(
+        Workspace workspace,
+        LegacyInventory inventory,
+        CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(workspace.LatestScanFolder);
-        await File.WriteAllBytesAsync(JsonPath(workspace), JsonSerializer.SerializeToUtf8Bytes(inventory, InventoryJsonContext.Default.LegacyInventory), cancellationToken);
-        await File.WriteAllTextAsync(Path.Combine(workspace.LatestScanFolder, "inventory.md"), InventoryMarkdown.Render(inventory), cancellationToken);
+        await File.WriteAllBytesAsync(
+            JsonPath(workspace),
+            JsonSerializer.SerializeToUtf8Bytes(inventory, InventoryJsonContext.Default.LegacyInventory),
+            cancellationToken);
+        await File.WriteAllTextAsync(
+            Path.Combine(workspace.LatestScanFolder, "inventory.md"),
+            InventoryMarkdown.Render(inventory),
+            cancellationToken);
     }
 }

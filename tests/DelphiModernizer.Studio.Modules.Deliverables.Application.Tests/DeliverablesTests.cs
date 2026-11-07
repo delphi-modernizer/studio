@@ -28,12 +28,14 @@ public sealed class DeliverablesTests
         using var workspace = await TestWorkspace.CreateAsync();
         var sender = Services.Sender(workspace.Session, services => services.AddDeliverablesApplication());
         var cancellationToken = TestContext.Current.CancellationToken;
-        var missing = (await sender.Send(new GetDeliverablesQuery(), cancellationToken)).Value.Deliverables.Single(d => d.Id == "D14");
+        var missing = (await sender.Send(new GetDeliverablesQuery(), cancellationToken)).Value.Deliverables
+            .Single(d => d.Id == "D14");
         File.Delete(Path.Combine(workspace.Workspace.Root, missing.Path));
 
         var restored = await sender.Send(new RestoreDeliverableCommand("D14"), cancellationToken);
         var again = await sender.Send(new RestoreDeliverableCommand("D14"), cancellationToken);
-        var after = (await sender.Send(new GetDeliverablesQuery(), cancellationToken)).Value.Deliverables.Single(d => d.Id == "D14");
+        var after = (await sender.Send(new GetDeliverablesQuery(), cancellationToken)).Value.Deliverables
+            .Single(d => d.Id == "D14");
 
         Assert.True(restored.IsSuccess, restored.Error.Message);
         Assert.Equal("Deliverables.Exists", again.Error.Code);

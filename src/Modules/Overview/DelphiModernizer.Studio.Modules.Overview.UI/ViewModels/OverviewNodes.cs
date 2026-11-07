@@ -20,7 +20,13 @@ public enum NextStepAction
     Traceability,
 }
 
-public sealed record NextStep(NextStepTone Tone, string Title, string Message, string ActionText, NextStepAction Action, string? Gate)
+public sealed record NextStep(
+    NextStepTone Tone,
+    string Title,
+    string Message,
+    string ActionText,
+    NextStepAction Action,
+    string? Gate)
 {
     public bool HasAction => Action != NextStepAction.None;
 
@@ -32,11 +38,19 @@ public sealed record NextStep(NextStepTone Tone, string Title, string Message, s
     };
 }
 
-/// <summary>The Delphi code node: what the latest scan found, or how to get a scan.</summary>
-public sealed record LegacyNode(string Subtitle, string First, string Second, string Third, string AnnouncedName);
-
 /// <summary>A team or the Principal Architect on the diagram.</summary>
-public sealed record TeamNode(string Code, string Name, string Glyph, string Progress, string AnnouncedName, string ToolTip);
+/// <param name="IsRunning">Whether its agent has a run in progress, which the node shows instead of progress.</param>
+public sealed record TeamNode(
+    string Code,
+    string Name,
+    string Glyph,
+    string Progress,
+    string AnnouncedName,
+    string ToolTip,
+    bool IsRunning)
+{
+    public bool IsIdle => !IsRunning;
+}
 
 /// <summary>A sign-off on the diagram, in order; the next one carries the accent.</summary>
 public sealed record GateNode(string Gate, string Name, PillState Pill, bool IsNext, string AnnouncedName)

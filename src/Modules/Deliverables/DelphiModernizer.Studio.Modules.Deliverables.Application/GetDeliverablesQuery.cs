@@ -13,7 +13,9 @@ namespace DelphiModernizer.Studio.Modules.Deliverables.Application;
 /// <summary>The plan's deliverables as their files say they stand, and the sign-offs that need them.</summary>
 public sealed record GetDeliverablesQuery : IRequest<Result<DeliverablesOverview>>;
 
-public sealed record DeliverablesOverview(IReadOnlyList<DeliverableState> Deliverables, IReadOnlyList<GateStatus> Gates);
+public sealed record DeliverablesOverview(
+    IReadOnlyList<DeliverableState> Deliverables,
+    IReadOnlyList<GateStatus> Gates);
 
 internal sealed class GetDeliverablesQueryHandler(IWorkspaceSession session)
     : IRequestHandler<GetDeliverablesQuery, Result<DeliverablesOverview>>

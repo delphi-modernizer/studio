@@ -20,4 +20,23 @@ public sealed class ProblemWordingTests
             Assert.DoesNotContain("TR0", wording.Description, StringComparison.Ordinal);
         });
     }
+
+    [Fact]
+    public void A_problem_row_reads_its_severity_the_problem_and_where_it_is()
+    {
+        var wording = ProblemWordings.Of("TR004");
+
+        var name = ProblemWordings.Announced(
+            "Error",
+            wording.Description,
+            wording.Label,
+            "business rule BR-001",
+            "business-rules.md",
+            12);
+
+        Assert.Equal(
+            "Error: A business rule points to code that doesn’t exist: a missing file, or lines past its end. "
+            + "Broken evidence link, business rule BR-001. business-rules.md, line 12",
+            name);
+    }
 }

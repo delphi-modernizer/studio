@@ -25,7 +25,9 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
         IsRevoke = isRevoke;
         HasIdentity = approver is not null;
         ApproverName = approver?.Name ?? string.Empty;
-        ApproverDetail = approver?.Email is { } email ? $"{email} · from git config in this workspace" : "From git config in this workspace";
+        ApproverDetail = approver?.Email is { } email
+            ? $"{email} · from git config in this workspace"
+            : "From git config in this workspace";
         var announced = approver?.Email is { } address ? $"{approver.Name}, {address}" : ApproverName;
         AnnouncedApprover = $"{AsLabel} {announced}";
     }
@@ -52,10 +54,13 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
     public string Title => IsRevoke ? $"Revoke the {SignOff.Name} approval?" : $"Approve the {SignOff.Name} sign-off?";
 
     public string Lead => IsRevoke
-        ? $"{SignOff.Name} goes back to Ready or Blocked, whichever its checks say. Later sign-offs can’t be approved until it is approved again."
-        : "Approving records that you, a person, reviewed what this sign-off covers. The record goes into the workspace’s git history; an agent can’t make it.";
+        ? $"{SignOff.Name} goes back to Ready or Blocked, whichever its checks say. "
+            + "Later sign-offs can’t be approved until it is approved again."
+        : "Approving records that you, a person, reviewed what this sign-off covers. "
+            + "The record goes into the workspace’s git history; an agent can’t make it.";
 
-    public string NoIdentityMessage => $"An approval records who approved it. Set your name and email for this workspace, then {(IsRevoke ? "revoke" : "approve")}.";
+    public string NoIdentityMessage => "An approval records who approved it. "
+        + $"Set your name and email for this workspace, then {(IsRevoke ? "revoke" : "approve")}.";
 
     public string AsLabel => IsRevoke ? "Revoking as" : "Approving as";
 
@@ -63,11 +68,15 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
 
     public string FieldName => $"{FieldLabel}, required";
 
-    public string Placeholder => IsRevoke ? "Why the approval no longer holds" : "What you reviewed, and anything you accept as still open";
+    public string Placeholder => IsRevoke
+        ? "Why the approval no longer holds"
+        : "What you reviewed, and anything you accept as still open";
 
     public string Fine => IsRevoke
-        ? "Adds a revoke entry to .modernizer/approvals.json and commits it. The history keeps both the approval and the revocation."
-        : "Adds an approve entry to .modernizer/approvals.json and commits it. If a file it covers changes later, this sign-off turns Stale.";
+        ? "Adds a revoke entry to .modernizer/approvals.json and commits it. "
+            + "The history keeps both the approval and the revocation."
+        : "Adds an approve entry to .modernizer/approvals.json and commits it. "
+            + "If a file it covers changes later, this sign-off turns Stale.";
 
     public string PrimaryText => IsRevoke ? "Revoke approval" : "Approve";
 
@@ -92,12 +101,16 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
     [ObservableProperty]
     public partial bool RefusalShowsProblems { get; set; }
 
-    /// <summary>Set when the person chose Show the problems, so the page goes to Traceability after the dialog.</summary>
+    /// <summary>
+    /// Set when the person chose Show the problems, so the page goes to Traceability after the dialog.
+    /// </summary>
     public bool ShowProblemsAfter { get; set; }
 
     public bool CanConfirm => HasIdentity && !IsRefused && !IsRecording && !string.IsNullOrWhiteSpace(Note);
 
-    /// <returns>True when the engine recorded the entry; false keeps the dialog open with the refusal and the note.</returns>
+    /// <returns>
+    /// True when the engine recorded the entry; false keeps the dialog open with the refusal and the note.
+    /// </returns>
     public async Task<bool> ConfirmAsync(CancellationToken cancellationToken)
     {
         if (!CanConfirm)
@@ -135,7 +148,8 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
         var signOffs = await _sender.Send(new GetSignOffsQuery(), cancellationToken);
         var now = signOffs.IsSuccess ? signOffs.Value.FirstOrDefault(s => s.Status.Gate == SignOff.Gate) : null;
         var reason = now is null ? "a check fails now" : SignOffRefusal.Reason(now);
-        Refusal = $"{SignOff.Name} can’t be approved yet: {reason}. A check changed after this dialog opened. Your note is kept.";
+        Refusal = $"{SignOff.Name} can’t be approved yet: {reason}. "
+            + "A check changed after this dialog opened. Your note is kept.";
         RefusalShowsProblems = now?.Checks.Any(c => c is { Passed: false, ShowsProblems: true }) == true;
         IsRefused = true;
     }

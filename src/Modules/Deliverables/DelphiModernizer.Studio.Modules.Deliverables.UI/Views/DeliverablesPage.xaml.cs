@@ -4,6 +4,7 @@ using System.Linq;
 using DelphiModernizer.Studio.Modules.Deliverables.UI.ViewModels;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.Modules.Deliverables.UI.Views;
@@ -17,6 +18,7 @@ public sealed partial class DeliverablesPage : Page, IHasViewModel
         ViewModel = viewModel;
         InitializeComponent();
         ViewModel.PropertyChanged += OnViewModelChanged;
+        Table.ContainerContentChanging += (_, args) => NameRow(args);
     }
 
     public DeliverablesViewModel ViewModel { get; }
@@ -40,7 +42,9 @@ public sealed partial class DeliverablesPage : Page, IHasViewModel
 
         foreach (var choice in ViewModel.Filters)
         {
-            FilterBar.Items.Add(new SelectorBarItem { Text = choice.Text, Tag = choice.Filter });
+            var item = new SelectorBarItem { Text = choice.Text, Tag = choice.Filter };
+            AutomationProperties.SetName(item, choice.AnnouncedName);
+            FilterBar.Items.Add(item);
         }
 
         FilterBar.SelectedItem = FilterBar.Items.FirstOrDefault(i => (DeliverableFilter)i.Tag == ViewModel.Filter);
@@ -62,6 +66,24 @@ public sealed partial class DeliverablesPage : Page, IHasViewModel
     private void OnGoToWorkstreams(object sender, RoutedEventArgs e)
     {
         ViewModel.OpenWorkstreams();
+    }
+
+    /// <summary>A row names its container, which is what Narrator reads as the arrow keys move.</summary>
+    private static void NameRow(ContainerContentChangingEventArgs args)
+    {
+        if (args.Item is DeliverableRow row)
+        {
+            AutomationProperties.SetName(args.ItemContainer, row.AnnouncedName);
+        }
+    }
+
+    /// <summary>Enter or a click on a deliverable opens its file, as its own button does.</summary>
+    private async void OnRowClicked(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is DeliverableRow { CanOpen: true } row)
+        {
+            await ViewModel.OpenAsync(row);
+        }
     }
 
     private async void OnOpenDeliverable(object sender, RoutedEventArgs e)

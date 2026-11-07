@@ -25,7 +25,12 @@ public sealed class DeliverablesModule : IModule
     public IReadOnlyList<NavigationItem> GetNavigationItems()
     {
         return [
-            new NavigationItem("Deliverables", StudioIcons.Deliverables, StudioIcons.DeliverablesFilled, typeof(DeliverablesPage), 40),
+            new NavigationItem(
+                "Deliverables",
+                StudioIcons.Deliverables,
+                StudioIcons.DeliverablesFilled,
+                typeof(DeliverablesPage),
+                40),
         ];
     }
 }

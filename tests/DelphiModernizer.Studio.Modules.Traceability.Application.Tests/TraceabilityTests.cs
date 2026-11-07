@@ -27,13 +27,21 @@ public sealed class TraceabilityTests
         using var workspace = await TestWorkspace.CreateAsync();
         var charter = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter");
         var cancellationToken = TestContext.Current.CancellationToken;
-        await File.AppendAllTextAsync(Path.Combine(charter, "open-questions.md"), "| Q-001 | Which regulations apply to invoices? | Tax. | Test Person | Open |  |\n", cancellationToken);
-        await File.AppendAllTextAsync(Path.Combine(charter, "D01-project-charter.md"), "\nSee BR-404.\n", cancellationToken);
+        await File.AppendAllTextAsync(
+            Path.Combine(charter, "open-questions.md"),
+            "| Q-001 | Which regulations apply to invoices? | Tax. | Test Person | Open |  |\n",
+            cancellationToken);
+        await File.AppendAllTextAsync(
+            Path.Combine(charter, "D01-project-charter.md"),
+            "\nSee BR-404.\n",
+            cancellationToken);
         var sender = Services.Sender(workspace.Session, services => services.AddTraceabilityApplication());
 
         var report = (await sender.Send(new RunTraceQuery(Strict: false), cancellationToken)).Value;
 
-        Assert.Contains(report.Problems, p => p.Description == "Still open: which regulations apply to invoices?" && p.Subject is null);
+        Assert.Contains(
+            report.Problems,
+            p => p.Description == "Still open: which regulations apply to invoices?" && p.Subject is null);
         Assert.Contains(report.Problems, p => p.Subject == "business rule BR-404");
         Assert.True(report.HeldUp >= 1);
     }

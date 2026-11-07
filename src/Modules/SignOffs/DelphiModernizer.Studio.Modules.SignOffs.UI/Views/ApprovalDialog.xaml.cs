@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel;
 using System.Threading;
 using DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.Modules.SignOffs.UI.Views;
@@ -23,16 +25,23 @@ public sealed partial class ApprovalDialog : ContentDialog
         Opened += OnOpened;
         PrimaryButtonClick += OnPrimaryButtonClick;
         ShowProblemsButton.Click += OnShowProblems;
+        ViewModel.PropertyChanged += OnViewModelChanged;
     }
 
     public ApprovalDialogViewModel ViewModel { get; }
 
+    /// <summary>Focus starts in the note; without a git identity the note is disabled and Cancel takes it.</summary>
     private void OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
     {
-        NoteBox.Focus(FocusState.Programmatic);
+        if (ViewModel.HasIdentity)
+        {
+            NoteBox.Focus(FocusState.Programmatic);
+        }
     }
 
-    /// <summary>The engine checks again on confirm; a refusal cancels the close, so the dialog keeps the note.</summary>
+    /// <summary>
+    /// The engine checks again on confirm; a refusal cancels the close, so the dialog keeps the note.
+    /// </summary>
     private async void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         var deferral = args.GetDeferral();
@@ -45,6 +54,21 @@ public sealed partial class ApprovalDialog : ContentDialog
         {
             deferral.Complete();
         }
+    }
+
+    /// <summary>The refusal InfoBar is assertive; opening it is the change Narrator reads at once.</summary>
+    private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(ApprovalDialogViewModel.IsRefused) || !ViewModel.IsRefused)
+        {
+            return;
+        }
+
+        // The InfoBar opens through its binding first, so the announcement waits a turn.
+        DispatcherQueue.TryEnqueue(() => {
+            var peer = FrameworkElementAutomationPeer.FromElement(RefusalBar);
+            peer?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+        });
     }
 
     private void OnShowProblems(object sender, RoutedEventArgs e)

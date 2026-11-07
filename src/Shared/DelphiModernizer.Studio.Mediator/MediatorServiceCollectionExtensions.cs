@@ -14,8 +14,12 @@ public static class MediatorServiceCollectionExtensions
 {
     private static readonly Type[] _handlerInterfaces = [typeof(IRequestHandler<,>), typeof(INotificationHandler<>)];
 
-    /// <summary>Adds the mediator once and every request and notification handler in <paramref name="handlerAssembly"/>.</summary>
-    /// <remarks>Each module calls this for its own Application assembly; the core services are added only once.</remarks>
+    /// <summary>
+    /// Adds the mediator once and every request and notification handler in <paramref name="handlerAssembly"/>.
+    /// </summary>
+    /// <remarks>
+    /// Each module calls this for its own Application assembly; the core services are added only once.
+    /// </remarks>
     public static IServiceCollection AddMediator(this IServiceCollection services, Assembly handlerAssembly)
     {
         ArgumentNullException.ThrowIfNull(services);
@@ -25,7 +29,8 @@ public static class MediatorServiceCollectionExtensions
         services.TryAddTransient<ISender>(provider => provider.GetRequiredService<IMediator>());
         services.TryAddTransient<IPublisher>(provider => provider.GetRequiredService<IMediator>());
         services.TryAddSingleton<IClock, SystemClock>();
-        services.TryAddEnumerable(ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>)));
+        services.TryAddEnumerable(
+            ServiceDescriptor.Transient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>)));
 
         var implementations = handlerAssembly
             .GetTypes()
@@ -35,7 +40,8 @@ public static class MediatorServiceCollectionExtensions
         {
             var handlerServices = implementation
                 .GetInterfaces()
-                .Where(@interface => @interface.IsGenericType && _handlerInterfaces.Contains(@interface.GetGenericTypeDefinition()));
+                .Where(@interface => @interface.IsGenericType
+                    && _handlerInterfaces.Contains(@interface.GetGenericTypeDefinition()));
 
             foreach (var handlerService in handlerServices)
             {
