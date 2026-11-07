@@ -6,5 +6,8 @@ TestResults/
 .vs/
 .idea/
 
+.venv/
+.mypy_cache/
+
 # The engine checkout CI places beside the sources for EngineSource=Source.
 .engine/
