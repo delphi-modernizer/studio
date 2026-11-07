@@ -10,6 +10,12 @@ namespace DelphiModernizer.Studio.Application.Abstractions.Agents;
 public sealed record ClaudeStatus(ClaudeState State, string? Path, Version? Version, string? Problem, Version Minimum)
 {
     public bool IsReady => State == ClaudeState.Ready;
+
+    /// <summary>What Narrator reads when a test ends: "Claude Code 2.1.300 found", or the engine's words.</summary>
+    public string Describe()
+    {
+        return IsReady ? $"Claude Code {Version} found" : Problem ?? "Claude Code not found";
+    }
 }
 
 /// <summary>The states the Start and Settings pages draw for Claude Code.</summary>

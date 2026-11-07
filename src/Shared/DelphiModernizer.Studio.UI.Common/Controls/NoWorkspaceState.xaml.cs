@@ -6,7 +6,9 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
 
-/// <summary>What a page that needs a workspace shows without one: what it would show, New workspace and Open folder.</summary>
+/// <summary>
+/// What a page that needs a workspace shows without one: what it would show, New workspace and Open folder.
+/// </summary>
 public sealed partial class NoWorkspaceState : UserControl
 {
     public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register(

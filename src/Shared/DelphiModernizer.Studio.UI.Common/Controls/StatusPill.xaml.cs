@@ -1,10 +1,15 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
+using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
 
 /// <summary>A state as a word and a glyph in a small rounded chip; colour only adds to them.</summary>
+/// <remarks>
+/// Narrator reads the word alone. With <c>AutomationProperties.LiveSetting</c> set, as on run pills, each change of the
+/// word is announced.
+/// </remarks>
 public sealed partial class StatusPill : UserControl
 {
     public static readonly DependencyProperty StateProperty = DependencyProperty.Register(
@@ -25,11 +30,18 @@ public sealed partial class StatusPill : UserControl
         set => SetValue(StateProperty, value);
     }
 
-    /// <summary>Words that replace the state's own, such as the version Claude Code reports; null keeps the state's.</summary>
+    /// <summary>
+    /// Words that replace the state's own, such as the version Claude Code reports; null keeps the state's.
+    /// </summary>
     public string? Text
     {
         get => (string?)GetValue(TextProperty);
         set => SetValue(TextProperty, value);
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer()
+    {
+        return new TextAutomationPeer(this, nameof(StatusPill));
     }
 
     private static void OnStateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
@@ -42,6 +54,7 @@ public sealed partial class StatusPill : UserControl
         var look = PillLook.Of(State);
         var running = State == PillState.Running;
         var word = string.IsNullOrEmpty(Text) ? look.Word : Text;
+        var changed = Word.Text != word;
         Word.Text = word;
         Glyph.Glyph = look.Glyph;
         Glyph.Visibility = running ? Visibility.Collapsed : Visibility.Visible;
@@ -49,5 +62,10 @@ public sealed partial class StatusPill : UserControl
         Ring.IsActive = running;
         AutomationProperties.SetName(this, word);
         VisualStateManager.GoToState(this, look.Tone.ToString(), false);
+
+        if (changed && IsLoaded && AutomationProperties.GetLiveSetting(this) != AutomationLiveSetting.Off)
+        {
+            FrameworkElementAutomationPeer.FromElement(this)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+        }
     }
 }

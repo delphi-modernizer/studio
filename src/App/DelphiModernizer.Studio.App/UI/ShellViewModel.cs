@@ -7,7 +7,9 @@ using Microsoft.UI.Dispatching;
 
 namespace DelphiModernizer.Studio.App.UI;
 
-/// <summary>What the title bar shows: the open workspace's name as its subtitle, and whether Back has somewhere to go.</summary>
+/// <summary>
+/// What the title bar shows: the open workspace's name as its subtitle, and whether Back has somewhere to go.
+/// </summary>
 public sealed partial class ShellViewModel : ViewModel
 {
     private readonly IWorkspaceSession _session;

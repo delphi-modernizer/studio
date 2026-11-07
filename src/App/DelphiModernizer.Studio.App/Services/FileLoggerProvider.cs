@@ -6,7 +6,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DelphiModernizer.Studio.App.Services;
 
-/// <summary>Appends log lines to one file per day under the studio's data folder, the record outside a debugger.</summary>
+/// <summary>
+/// Appends log lines to one file per day under the studio's data folder, the record outside a debugger.
+/// </summary>
 /// <remarks>A failed write is dropped: logging must never take the app down.</remarks>
 public sealed class FileLoggerProvider : ILoggerProvider
 {
@@ -59,7 +61,12 @@ public sealed class FileLoggerProvider : ILoggerProvider
             return logLevel >= LogLevel.Information;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             ArgumentNullException.ThrowIfNull(formatter);
 

@@ -3,8 +3,12 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.UI.Contracts.Services;
 
-/// <summary>Shows pages, resolved from the container, in the shell's frame; a page's key is its type name without "Page".</summary>
-/// <remarks>Every navigation pushes the page it leaves, so Back returns to it with its scroll position and selection.</remarks>
+/// <summary>
+/// Shows pages, resolved from the container, in the shell's frame; a page's key is its type name without "Page".
+/// </summary>
+/// <remarks>
+/// Every navigation pushes the page it leaves, so Back returns to it with its scroll position and selection.
+/// </remarks>
 public interface INavigationService
 {
     event EventHandler<NavigationEvent>? Navigated;

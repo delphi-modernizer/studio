@@ -61,6 +61,7 @@
                 Foreground="{ThemeResource StatusPillNeutralGlyph}" />
             <ProgressRing
                 x:Name="Ring"
+                AutomationProperties.AccessibilityView="Raw"
                 Width="12"
                 Height="12"
                 MinWidth="12"
@@ -71,6 +72,7 @@
             <!--  Tight line bounds centre the word optically against its glyph (handoff decision).  -->
             <TextBlock
                 x:Name="Word"
+                AutomationProperties.AccessibilityView="Raw"
                 VerticalAlignment="Center"
                 Foreground="{ThemeResource StatusPillText}"
                 Style="{StaticResource CaptionTextBlockStyle}"

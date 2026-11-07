@@ -30,7 +30,9 @@ public sealed class RecentWorkspaceStore
         }
     }
 
-    /// <summary>Puts <paramref name="workspace"/> first, dropping an older entry for the same folder and the oldest beyond ten.</summary>
+    /// <summary>
+    /// Puts <paramref name="workspace"/> first, dropping an older entry for the same folder and the oldest beyond ten.
+    /// </summary>
     public void Remember(RecentWorkspace workspace)
     {
         ArgumentNullException.ThrowIfNull(workspace);
@@ -46,7 +48,9 @@ public sealed class RecentWorkspaceStore
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-                File.WriteAllBytes(_path, JsonSerializer.SerializeToUtf8Bytes(list, RecentJsonContext.Default.ListRecentWorkspace));
+                File.WriteAllBytes(
+                    _path,
+                    JsonSerializer.SerializeToUtf8Bytes(list, RecentJsonContext.Default.ListRecentWorkspace));
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
@@ -60,7 +64,8 @@ public sealed class RecentWorkspaceStore
         try
         {
             return File.Exists(_path)
-                ? JsonSerializer.Deserialize(File.ReadAllBytes(_path), RecentJsonContext.Default.ListRecentWorkspace) ?? []
+                ? JsonSerializer.Deserialize(File.ReadAllBytes(_path), RecentJsonContext.Default.ListRecentWorkspace)
+                    ?? []
                 : [];
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)

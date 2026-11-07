@@ -4,7 +4,9 @@ using Microsoft.UI.Xaml.Markup;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
 
-/// <summary>What a card or page shows when it has nothing yet, and what would fill it; its content is the actions.</summary>
+/// <summary>
+/// What a card or page shows when it has nothing yet, and what would fill it; its content is the actions.
+/// </summary>
 /// <remarks>Every empty state says what agents would add or how to get data in (design rule).</remarks>
 [ContentProperty(Name = nameof(Actions))]
 public sealed partial class EmptyState : UserControl
@@ -53,7 +55,9 @@ public sealed partial class EmptyState : UserControl
         set => SetValue(ActionsProperty, value);
     }
 
-    /// <summary>Whether it fills a page: a 48 px glyph and a Subtitle heading instead of 32 px and BodyStrong.</summary>
+    /// <summary>
+    /// Whether it fills a page: a 48 px glyph and a Subtitle heading instead of 32 px and BodyStrong.
+    /// </summary>
     public bool IsPageLevel
     {
         get => (bool)GetValue(IsPageLevelProperty);
@@ -65,6 +69,7 @@ public sealed partial class EmptyState : UserControl
         var state = (EmptyState)sender;
         var pageLevel = (bool)args.NewValue;
         state.Icon.FontSize = pageLevel ? 48 : 32;
-        state.Heading.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[pageLevel ? "SubtitleTextBlockStyle" : "BodyStrongTextBlockStyle"];
+        var style = pageLevel ? "SubtitleTextBlockStyle" : "BodyStrongTextBlockStyle";
+        state.Heading.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style];
     }
 }

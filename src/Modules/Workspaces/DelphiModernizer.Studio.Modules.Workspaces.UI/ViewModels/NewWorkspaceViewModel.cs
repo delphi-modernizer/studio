@@ -45,7 +45,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         "Name and folder", "Legacy source", "Target platform", "Essential context", "Create the workspace",
     ];
 
-    private static readonly string[] _labels = ["Name and folder", "Legacy source", "Target platform", "Context", "Create"];
+    private static readonly string[] _labels = [
+        "Name and folder", "Legacy source", "Target platform", "Context", "Create",
+    ];
 
     private readonly ISender _sender;
     private readonly INavigationService _navigation;
@@ -53,7 +55,11 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     private CancellationTokenSource? _previewing;
     private string? _commit;
 
-    public NewWorkspaceViewModel(ISender sender, INavigationService navigation, IPickerService picker, IStudioSettings settings)
+    public NewWorkspaceViewModel(
+        ISender sender,
+        INavigationService navigation,
+        IPickerService picker,
+        IStudioSettings settings)
     {
         ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(navigation);
@@ -63,7 +69,8 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         _navigation = navigation;
         _picker = picker;
         Steps = [.. _labels.Select((label, i) => new WizardStep(i + 1, label))];
-        SelectedCodePage = CodePages.Common.FirstOrDefault(c => c.Number == settings.DefaultCodePage) ?? CodePages.Common[0];
+        SelectedCodePage = CodePages.Common.FirstOrDefault(c => c.Number == settings.DefaultCodePage)
+            ?? CodePages.Common[0];
         Steps[0].Show(1);
     }
 
@@ -89,12 +96,14 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     ];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(NextLabel), nameof(CanGoBack), nameof(CanGoNext))]
+    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(StepHeading), nameof(NextLabel))]
+    [NotifyPropertyChangedFor(nameof(CanGoBack), nameof(CanGoNext))]
     [NotifyPropertyChangedFor(nameof(IsStep1), nameof(IsStep2), nameof(IsStep3), nameof(IsStep4), nameof(IsStep5))]
     public partial int Step { get; set; } = 1;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(CanGoBack), nameof(CanGoNext))]
+    [NotifyPropertyChangedFor(nameof(StepOf), nameof(StepTitle), nameof(StepHeading))]
+    [NotifyPropertyChangedFor(nameof(CanGoBack), nameof(CanGoNext))]
     [NotifyPropertyChangedFor(nameof(IsStep1), nameof(IsStep2), nameof(IsStep3), nameof(IsStep4), nameof(IsStep5))]
     [NotifyPropertyChangedFor(nameof(IsCreating), nameof(IsCreated), nameof(HasFooter), nameof(CanCancel))]
     public partial WizardPhase Phase { get; set; }
@@ -106,6 +115,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         WizardPhase.Created => "Created",
         _ => _titles[Step - 1],
     };
+
+    /// <summary>What Narrator reads for the step heading, such as "Step 2 of 5, Legacy source".</summary>
+    public string StepHeading => $"{StepOf}, {StepTitle}";
 
     public bool IsStep1 => IsEditing(1);
 
@@ -157,7 +169,8 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     public partial CodePage SelectedCodePage { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanGoNext), nameof(IsPreviewRunning), nameof(IsPreviewDone), nameof(IsPreviewFailed))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    [NotifyPropertyChangedFor(nameof(IsPreviewRunning), nameof(IsPreviewDone), nameof(IsPreviewFailed))]
     public partial PreviewState Preview { get; set; }
 
     public bool IsPreviewRunning => Preview == PreviewState.Running;
@@ -224,7 +237,8 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
 
     public string CreatedText => _commit is null
         ? $"Created in {Folder}. Project setup can be signed off once you’ve read the project charter."
-        : $"Created in {Folder} with the first commit {_commit}. Project setup can be signed off once you’ve read the project charter.";
+        : $"Created in {Folder} with the first commit {_commit}. "
+            + "Project setup can be signed off once you’ve read the project charter.";
 
     [RelayCommand]
     private async Task LoadAsync(CancellationToken cancellationToken)
@@ -280,7 +294,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         _navigation.NavigateTo("Start");
     }
 
-    /// <summary>Picks where the workspace goes: an empty folder as it is, or a new folder named after the workspace inside it.</summary>
+    /// <summary>
+    /// Picks where the workspace goes: an empty folder as it is, or a new folder named after the workspace inside it.
+    /// </summary>
     [RelayCommand]
     private async Task BrowseFolderAsync(CancellationToken cancellationToken)
     {
@@ -303,7 +319,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         }
     }
 
-    /// <summary>Scans the source folder read-only and shows what it holds; a new run replaces one still going.</summary>
+    /// <summary>
+    /// Scans the source folder read-only and shows what it holds; a new run replaces one still going.
+    /// </summary>
     [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task PreviewAsync()
     {
@@ -396,8 +414,12 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
             .OrderByDescending(e => e.Count)
             .Select(e => e.Count > 1 ? $"{e.Count} {e.Name}" : e.Name);
         var unreadable = summary.BinaryForms > 0 ? $" · {summary.BinaryForms} can’t be read" : string.Empty;
-        var version = preview.DelphiVersion is { } v ? $"{v.Version} · from {v.File}" : "Not named in the project files";
-        var cycles = preview.Cycles.Count == 0 ? "None" : $"{preview.Cycles.Count} · {string.Join(" ↔ ", preview.Cycles[0])}";
+        var version = preview.DelphiVersion is { } v
+            ? $"{v.Version} · from {v.File}"
+            : "Not named in the project files";
+        var cycles = preview.Cycles.Count == 0
+            ? "None"
+            : $"{preview.Cycles.Count} · {string.Join(" ↔ ", preview.Cycles[0])}";
 
         Facts.Clear();
         Facts.Add(new PreviewFact("Files", $"{Number(summary.Files)} · {string.Join(", ", extensions)}"));
@@ -412,10 +434,12 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         CredentialsNote = preview.Credentials switch {
             0 => null,
             1 => "1 hard-coded credential found. It appears as *** everywhere in the studio.",
-            _ => $"{Number(preview.Credentials)} hard-coded credentials found. They appear as *** everywhere in the studio.",
+            _ => $"{Number(preview.Credentials)} hard-coded credentials found. "
+                + "They appear as *** everywhere in the studio.",
         };
         var codePage = SelectedCodePage.Label.Split(' ')[0];
-        LegacySummary = $"{Number(summary.Files)} files · {preview.DelphiVersion?.Version ?? "version unknown"} · code page {codePage}";
+        var delphi = preview.DelphiVersion?.Version ?? "version unknown";
+        LegacySummary = $"{Number(summary.Files)} files · {delphi} · code page {codePage}";
     }
 
     private async Task CreateAsync()
@@ -489,7 +513,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     {
         return uses.Count == 0
             ? "None found"
-            : string.Join(", ", uses.Select(u => $"{u.Name} · {Number(u.Count)} {(u.Count == 1 ? "place" : "places")}"));
+            : string.Join(
+                ", ",
+                uses.Select(u => $"{u.Name} · {Number(u.Count)} {(u.Count == 1 ? "place" : "places")}"));
     }
 
     private static string Named(int count, IReadOnlyList<string> names)

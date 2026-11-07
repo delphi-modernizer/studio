@@ -12,15 +12,15 @@ using Microsoft.UI.Xaml.Media;
 
 namespace DelphiModernizer.Studio.App.UI;
 
-/// <summary>The title bar and the navigation pane around the page frame; the pane is built from the modules' items.</summary>
+/// <summary>
+/// The title bar and the navigation pane around the page frame; the pane is built from the modules' items.
+/// </summary>
 /// <remarks>
 /// The pane stays open down to the 960 px minimum and collapses only from the title-bar toggle (design assumption,
 /// open question 3). Every page stays selectable without a workspace; badges hide until one is open.
 /// </remarks>
 public sealed partial class ShellPage : Page
 {
-    private const double _narrowWidth = 1100;
-
     private readonly INavigationService _navigation;
     private readonly IWorkspaceSession _session;
     private readonly IServiceProvider _services;
@@ -53,6 +53,7 @@ public sealed partial class ShellPage : Page
         InitializeComponent();
         AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
         AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
+        NavView.Loaded += (_, _) => MakePaneOneTabStop();
     }
 
     public ShellViewModel ViewModel { get; }
@@ -102,6 +103,12 @@ public sealed partial class ShellPage : Page
 
         if (item.Placement == NavigationPlacement.Footer)
         {
+            // The NavPane board draws a rule between the pages and Settings.
+            if (NavView.FooterMenuItems.Count == 0)
+            {
+                NavView.FooterMenuItems.Add(new NavigationViewItemSeparator());
+            }
+
             NavView.FooterMenuItems.Add(container);
         }
         else
@@ -168,7 +175,9 @@ public sealed partial class ShellPage : Page
         }
     }
 
-    /// <summary>Clicking the selected item again returns to its page, as from a page reached inside it such as Run.</summary>
+    /// <summary>
+    /// Clicking the selected item again returns to its page, as from a page reached inside it such as Run.
+    /// </summary>
     private void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args.InvokedItemContainer is NavigationViewItem { Tag: string key } container
@@ -220,11 +229,6 @@ public sealed partial class ShellPage : Page
         }
     }
 
-    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        SearchBox.MaxWidth = e.NewSize.Width < _narrowWidth ? 240 : 360;
-    }
-
     private void OnNextRegionInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         args.Handled = MoveRegion(1);
@@ -246,8 +250,40 @@ public sealed partial class ShellPage : Page
         return next switch {
             AutoSuggestBox search => search.Focus(FocusState.Keyboard),
             NavigationView => PaneItemToFocus().Focus(FocusState.Keyboard),
-            _ => FocusManager.FindFirstFocusableElement(NavFrame) is UIElement first && first.Focus(FocusState.Keyboard),
+            _ => FocusManager.FindFirstFocusableElement(NavFrame) is UIElement first
+                && first.Focus(FocusState.Keyboard),
         };
+    }
+
+    /// <summary>The pane, Settings in its footer included, is one tab stop with arrow keys inside.</summary>
+    /// <remarks>NavigationView makes its menu and footer two stops; the grid holding both is a template part.</remarks>
+    private void MakePaneOneTabStop()
+    {
+        if (Descendant(NavView, "PaneContentGrid") is { } pane)
+        {
+            pane.TabFocusNavigation = KeyboardNavigationMode.Once;
+            pane.XYFocusKeyboardNavigation = XYFocusKeyboardNavigationMode.Enabled;
+        }
+    }
+
+    private static FrameworkElement? Descendant(DependencyObject root, string name)
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+
+            if (child is FrameworkElement element && element.Name == name)
+            {
+                return element;
+            }
+
+            if (Descendant(child, name) is { } found)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>The pane is one tab stop, entered at the selected item.</summary>
@@ -272,7 +308,9 @@ public sealed partial class ShellPage : Page
     }
 
     /// <summary>Suggests the studio's pages by name.</summary>
-    /// <remarks>What search covers is an open question (handoff, question 7); pages are the one answer that needs no data.</remarks>
+    /// <remarks>
+    /// What search covers is an open question (handoff, question 7); pages are the one answer that needs no data.
+    /// </remarks>
     private void OnSearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
     {
         if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput)

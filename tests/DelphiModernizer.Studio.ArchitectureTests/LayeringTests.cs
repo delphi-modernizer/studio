@@ -30,7 +30,8 @@ public sealed class LayeringTests
         var crossings = ProjectGraph.Source
             .Where(p => p.Module is not null)
             .SelectMany(p => p.References
-                .Where(r => r.StartsWith("DelphiModernizer.Studio.Modules.", StringComparison.Ordinal) && r.Split('.')[3] != p.Module)
+                .Where(r => r.StartsWith("DelphiModernizer.Studio.Modules.", StringComparison.Ordinal)
+                    && r.Split('.')[3] != p.Module)
                 .Select(r => $"{p.Name} -> {r}"));
 
         Assert.Empty(crossings);
@@ -40,9 +41,13 @@ public sealed class LayeringTests
     public void Domain_and_Application_projects_know_nothing_of_the_UI()
     {
         var leaks = ProjectGraph.Source
-            .Where(p => p.IsApplication || p.IsDomain || p.Name is "DelphiModernizer.Studio.Application.Abstractions" or "DelphiModernizer.Studio.Mediator")
+            .Where(p => p.IsApplication
+                || p.IsDomain
+                || p.Name is "DelphiModernizer.Studio.Application.Abstractions" or "DelphiModernizer.Studio.Mediator")
             .SelectMany(p => p.References
-                .Where(r => r.EndsWith(".UI", StringComparison.Ordinal) || r.Contains(".UI.", StringComparison.Ordinal) || r.EndsWith(".App", StringComparison.Ordinal))
+                .Where(r => r.EndsWith(".UI", StringComparison.Ordinal)
+                    || r.Contains(".UI.", StringComparison.Ordinal)
+                    || r.EndsWith(".App", StringComparison.Ordinal))
                 .Concat(p.Packages.Intersect(_uiPackages))
                 .Select(r => $"{p.Name} -> {r}"));
 
@@ -53,7 +58,9 @@ public sealed class LayeringTests
     public void Only_Application_projects_and_the_abstractions_use_the_engine_directly()
     {
         var direct = ProjectGraph.Source
-            .Where(p => p.EngineReferences.Count > 0 && !p.IsApplication && p.Name != "DelphiModernizer.Studio.Application.Abstractions")
+            .Where(p => p.EngineReferences.Count > 0
+                && !p.IsApplication
+                && p.Name != "DelphiModernizer.Studio.Application.Abstractions")
             .Select(p => p.Name);
 
         Assert.Empty(direct);
@@ -65,7 +72,8 @@ public sealed class LayeringTests
         var upward = ProjectGraph.Source
             .Where(p => p.IsShared)
             .SelectMany(p => p.References
-                .Where(r => r.StartsWith("DelphiModernizer.Studio.Modules.", StringComparison.Ordinal) || r == "DelphiModernizer.Studio.App")
+                .Where(r => r.StartsWith("DelphiModernizer.Studio.Modules.", StringComparison.Ordinal)
+                    || r == "DelphiModernizer.Studio.App")
                 .Select(r => $"{p.Name} -> {r}"));
 
         Assert.Empty(upward);
@@ -75,7 +83,8 @@ public sealed class LayeringTests
     public void Only_the_App_composes_the_module_UIs_and_its_catalog_lists_every_module()
     {
         var composers = ProjectGraph.Source
-            .Where(p => p.References.Any(r => r.StartsWith("DelphiModernizer.Studio.Modules.", StringComparison.Ordinal) && r.EndsWith(".UI", StringComparison.Ordinal)))
+            .Where(p => p.References.Any(r => r.StartsWith("DelphiModernizer.Studio.Modules.", StringComparison.Ordinal)
+                && r.EndsWith(".UI", StringComparison.Ordinal)))
             .Select(p => p.Name);
         var app = ProjectGraph.Source.Single(p => p.Name == "DelphiModernizer.Studio.App");
         var moduleUis = ProjectGraph.Source
@@ -83,16 +92,20 @@ public sealed class LayeringTests
             .Select(p => p.Name)
             .Order(StringComparer.Ordinal)
             .ToList();
-        var catalog = File.ReadAllText(Path.Combine(Path.GetDirectoryName(app.Path)!, "Composition", "ModuleCatalog.cs"));
+        var catalog = File.ReadAllText(
+            Path.Combine(Path.GetDirectoryName(app.Path)!, "Composition", "ModuleCatalog.cs"));
 
         Assert.Equal(["DelphiModernizer.Studio.App"], composers);
 
         var composed = app.References
-            .Where(r => r.EndsWith(".UI", StringComparison.Ordinal) && r.Contains(".Modules.", StringComparison.Ordinal))
+            .Where(r => r.EndsWith(".UI", StringComparison.Ordinal)
+                && r.Contains(".Modules.", StringComparison.Ordinal))
             .Order(StringComparer.Ordinal);
 
         Assert.Equal(moduleUis, composed);
-        Assert.All(moduleUis, ui => Assert.Contains($"new {ui.Split('.')[3]}Module()", catalog, StringComparison.Ordinal));
+        Assert.All(
+            moduleUis,
+            ui => Assert.Contains($"new {ui.Split('.')[3]}Module()", catalog, StringComparison.Ordinal));
     }
 
     [Fact]

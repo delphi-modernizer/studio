@@ -68,8 +68,14 @@ public sealed class ThemeService : IThemeService
         bar.ButtonForegroundColor = foreground;
         bar.ButtonHoverForegroundColor = foreground;
         bar.ButtonPressedForegroundColor = foreground;
-        bar.ButtonInactiveForegroundColor = dark ? Color.FromArgb(0xFF, 0x9A, 0x9A, 0x9A) : Color.FromArgb(0xFF, 0x60, 0x60, 0x60);
-        bar.ButtonHoverBackgroundColor = dark ? Color.FromArgb(0x20, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x14, 0x00, 0x00, 0x00);
-        bar.ButtonPressedBackgroundColor = dark ? Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF) : Color.FromArgb(0x24, 0x00, 0x00, 0x00);
+        bar.ButtonInactiveForegroundColor = dark
+            ? Color.FromArgb(0xFF, 0x9A, 0x9A, 0x9A)
+            : Color.FromArgb(0xFF, 0x60, 0x60, 0x60);
+        bar.ButtonHoverBackgroundColor = dark
+            ? Color.FromArgb(0x20, 0xFF, 0xFF, 0xFF)
+            : Color.FromArgb(0x14, 0x00, 0x00, 0x00);
+        bar.ButtonPressedBackgroundColor = dark
+            ? Color.FromArgb(0x33, 0xFF, 0xFF, 0xFF)
+            : Color.FromArgb(0x24, 0x00, 0x00, 0x00);
     }
 }
