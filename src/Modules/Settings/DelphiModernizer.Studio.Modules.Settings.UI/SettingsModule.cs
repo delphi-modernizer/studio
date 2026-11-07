@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DelphiModernizer.Studio.Modules.Settings.UI.ViewModels;
 using DelphiModernizer.Studio.Modules.Settings.UI.Views;
 using DelphiModernizer.Studio.UI.Common.Icons;
 using DelphiModernizer.Studio.UI.Contracts;
@@ -15,6 +16,7 @@ public sealed class SettingsModule : IModule
     public void RegisterServices(IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
+        services.AddTransient<SettingsViewModel>();
         services.AddTransient<SettingsPage>();
     }
 

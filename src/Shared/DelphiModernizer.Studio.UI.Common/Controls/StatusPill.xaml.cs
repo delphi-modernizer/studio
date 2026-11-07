@@ -10,6 +10,9 @@ public sealed partial class StatusPill : UserControl
     public static readonly DependencyProperty StateProperty = DependencyProperty.Register(
         nameof(State), typeof(PillState), typeof(StatusPill), new PropertyMetadata(PillState.Blocked, OnStateChanged));
 
+    public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
+        nameof(Text), typeof(string), typeof(StatusPill), new PropertyMetadata(null, OnStateChanged));
+
     public StatusPill()
     {
         InitializeComponent();
@@ -22,6 +25,13 @@ public sealed partial class StatusPill : UserControl
         set => SetValue(StateProperty, value);
     }
 
+    /// <summary>Words that replace the state's own, such as the version Claude Code reports; null keeps the state's.</summary>
+    public string? Text
+    {
+        get => (string?)GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
+
     private static void OnStateChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
     {
         ((StatusPill)sender).Show();
@@ -31,12 +41,13 @@ public sealed partial class StatusPill : UserControl
     {
         var look = PillLook.Of(State);
         var running = State == PillState.Running;
-        Word.Text = look.Word;
+        var word = string.IsNullOrEmpty(Text) ? look.Word : Text;
+        Word.Text = word;
         Glyph.Glyph = look.Glyph;
         Glyph.Visibility = running ? Visibility.Collapsed : Visibility.Visible;
         Ring.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
         Ring.IsActive = running;
-        AutomationProperties.SetName(this, look.Word);
+        AutomationProperties.SetName(this, word);
         VisualStateManager.GoToState(this, look.Tone.ToString(), false);
     }
 }

@@ -11,11 +11,8 @@ public sealed record StudioVersions(string Studio, string Engine, string Kit)
         VersionOf(typeof(KitBundle).Assembly),
         KitBundle.Embedded.Version);
 
-    /// <summary>The three on one line, as Copy versions puts them on the clipboard.</summary>
-    public override string ToString()
-    {
-        return $"Studio {Studio} · Engine (dmz) {Engine} · Kit {Kit}";
-    }
+    /// <summary>The three on one line, as Settings shows them and Copy versions puts them on the clipboard.</summary>
+    public string Line => $"Studio {Studio} · Engine (dmz) {Engine} · Kit {Kit}";
 
     /// <remarks>The informational version without the source revision the SDK appends after a plus sign.</remarks>
     private static string VersionOf(Assembly? assembly)
