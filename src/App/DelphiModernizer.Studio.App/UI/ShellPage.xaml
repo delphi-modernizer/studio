@@ -41,6 +41,7 @@
             <AutoSuggestBox
                 x:Name="SearchBox"
                 Width="360"
+                MaxWidth="360"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 AutomationProperties.Name="Search"

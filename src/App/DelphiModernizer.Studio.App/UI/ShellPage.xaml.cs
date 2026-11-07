@@ -231,10 +231,15 @@ public sealed partial class ShellPage : Page
         }
     }
 
-    /// <remarks>The title bar gives its content only the width it asks for, so search sets its width.</remarks>
+    /// <remarks>
+    /// The title bar gives its content only the width it asks for, so search asks for 360. At 960 with a subtitle a
+    /// fixed 240 makes the title bar hide the title and subtitle, so under 1100 search sizes itself up to 240.
+    /// </remarks>
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        SearchBox.Width = e.NewSize.Width < _narrowWidth ? 240 : 360;
+        var narrow = e.NewSize.Width < _narrowWidth;
+        SearchBox.MaxWidth = narrow ? 240 : 360;
+        SearchBox.Width = narrow ? double.NaN : 360;
     }
 
     private void OnNextRegionInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
