@@ -1,4 +1,5 @@
 using DelphiModernizer.Studio.UI.Common.Controls;
+using DelphiModernizer.Studio.UI.Common.Icons;
 
 namespace DelphiModernizer.Studio.Modules.Overview.UI.ViewModels;
 
@@ -22,6 +23,13 @@ public enum NextStepAction
 public sealed record NextStep(NextStepTone Tone, string Title, string Message, string ActionText, NextStepAction Action, string? Gate)
 {
     public bool HasAction => Action != NextStepAction.None;
+
+    public string Glyph => Tone switch {
+        NextStepTone.Success => StudioIcons.Approved,
+        NextStepTone.Caution => StudioIcons.WarningFilled,
+        NextStepTone.Critical => StudioIcons.ErrorFilled,
+        _ => StudioIcons.Ready,
+    };
 }
 
 /// <summary>The Delphi code node: what the latest scan found, or how to get a scan.</summary>

@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using DelphiModernizer.Studio.Modules.Overview.UI.ViewModels;
 using DelphiModernizer.Studio.UI.Common;
-using DelphiModernizer.Studio.UI.Common.Icons;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -32,17 +31,6 @@ public sealed partial class OverviewPage : Page, IHasViewModel
             NextStepTone.Caution => InfoBarSeverity.Warning,
             NextStepTone.Critical => InfoBarSeverity.Error,
             _ => InfoBarSeverity.Informational,
-        };
-    }
-
-    /// <summary>The next-step bar's glyph from the Studio Icons font.</summary>
-    public static string GlyphOf(NextStep step)
-    {
-        return step.Tone switch {
-            NextStepTone.Success => StudioIcons.Approved,
-            NextStepTone.Caution => StudioIcons.WarningFilled,
-            NextStepTone.Critical => StudioIcons.ErrorFilled,
-            _ => StudioIcons.Ready,
         };
     }
 

@@ -72,14 +72,16 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial LegacyNode Legacy { get; set; } = new(string.Empty, string.Empty, string.Empty, string.Empty, "Delphi code");
 
+    /// <summary>The six teams in the kit's order; an <c>IList</c> because the diagram binds each one by index.</summary>
     [ObservableProperty]
-    public partial IReadOnlyList<TeamNode> Teams { get; set; }
+    public partial IList<TeamNode> Teams { get; set; }
 
     [ObservableProperty]
     public partial TeamNode Architect { get; set; }
 
+    /// <summary>The five sign-offs in order; an <c>IList</c> because the diagram binds each one by index.</summary>
     [ObservableProperty]
-    public partial IReadOnlyList<GateNode> Gates { get; set; }
+    public partial IList<GateNode> Gates { get; set; }
 
     [ObservableProperty]
     public partial BuildNode Build { get; set; } = Locked();

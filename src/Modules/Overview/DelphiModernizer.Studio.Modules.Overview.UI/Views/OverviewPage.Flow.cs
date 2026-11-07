@@ -100,7 +100,7 @@ public sealed partial class OverviewPage
         var buildTop = top + gatesHeight + 32;
         VerticalLine(gateCentre, top + gatesHeight, buildTop, arrow: true);
         Label(gateCentre + 8, top + gatesHeight + 8, 60, "unlocks", TextAlignment.Left);
-        Place(BuildNode, x3, buildTop, gateWidth, 60);
+        Place(BuildBox, x3, buildTop, gateWidth, 60);
         var height = buildTop + 60 + 20;
         Place(LegendInside, x0, height - 32, x3 - x0 - 40, 20);
 
@@ -158,7 +158,7 @@ public sealed partial class OverviewPage
         var buildTop = top2 + gatesHeight + 32;
         VerticalLine(groupCentre, top2 + gatesHeight, buildTop, arrow: true);
         Label(groupCentre + 8, top2 + gatesHeight + 8, 60, "unlocks", TextAlignment.Left);
-        Place(BuildNode, x1, buildTop, groupWidth, 52);
+        Place(BuildBox, x1, buildTop, groupWidth, 52);
 
         return buildTop + 52 + 24;
     }

@@ -287,10 +287,10 @@
                         IsClosable="False"
                         IsOpen="True"
                         Message="{x:Bind ViewModel.NextStep.Message, Mode=OneWay}"
-                        Severity="{x:Bind SeverityOf(ViewModel.NextStep), Mode=OneWay}"
+                        Severity="{x:Bind local:OverviewPage.SeverityOf(ViewModel.NextStep), Mode=OneWay}"
                         Title="{x:Bind ViewModel.NextStep.Title, Mode=OneWay}">
                         <InfoBar.IconSource>
-                            <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind GlyphOf(ViewModel.NextStep), Mode=OneWay}" />
+                            <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind ViewModel.NextStep.Glyph, Mode=OneWay}" />
                         </InfoBar.IconSource>
                         <InfoBar.ActionButton>
                             <Button
@@ -549,7 +549,7 @@
                                     ToolTipService.ToolTip="Opens Sign-offs" />
 
                                 <!--  The build is not a stop: it opens on its own once the final plan is approved.  -->
-                                <Grid x:Name="BuildNode" AutomationProperties.Name="{x:Bind ViewModel.Build.AnnouncedName, Mode=OneWay}">
+                                <Grid x:Name="BuildBox" AutomationProperties.Name="{x:Bind ViewModel.Build.AnnouncedName, Mode=OneWay}">
                                     <Rectangle
                                         RadiusX="8"
                                         RadiusY="8"
