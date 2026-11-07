@@ -197,11 +197,13 @@
                         ItemTemplate="{StaticResource StatTemplate}"
                         ItemsSource="{x:Bind ViewModel.Stats, Mode=OneWay}">
                         <ItemsRepeater.Layout>
+                            <!--  Every card takes the first card's size, so each leaves room for two detail lines.  -->
                             <UniformGridLayout
                                 x:Name="StatsLayout"
                                 ItemsStretch="Fill"
                                 MaximumRowsOrColumns="4"
                                 MinColumnSpacing="16"
+                                MinItemHeight="126"
                                 MinItemWidth="160"
                                 MinRowSpacing="16"
                                 Orientation="Horizontal" />

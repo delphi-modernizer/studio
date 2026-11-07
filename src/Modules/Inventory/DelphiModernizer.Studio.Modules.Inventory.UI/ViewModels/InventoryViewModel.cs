@@ -284,7 +284,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
             new(
                 "Risk markers",
                 StudioIcons.Risks,
-                Number(inventory.RiskMarkers.Sum(r => r.Count)),
+                Number(inventory.RiskMarkers.Length),
                 "markers",
                 $"{Count(secrets, "hard-coded credential")} · {Count(cycles, "cycle")}"),
         ];
