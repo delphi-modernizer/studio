@@ -39,13 +39,18 @@ public sealed record NextStep(
 }
 
 /// <summary>A team or the Principal Architect on the diagram.</summary>
+/// <param name="IsRunning">Whether its agent has a run in progress, which the node shows instead of progress.</param>
 public sealed record TeamNode(
     string Code,
     string Name,
     string Glyph,
     string Progress,
     string AnnouncedName,
-    string ToolTip);
+    string ToolTip,
+    bool IsRunning)
+{
+    public bool IsIdle => !IsRunning;
+}
 
 /// <summary>A sign-off on the diagram, in order; the next one carries the accent.</summary>
 public sealed record GateNode(string Gate, string Name, PillState Pill, bool IsNext, string AnnouncedName)

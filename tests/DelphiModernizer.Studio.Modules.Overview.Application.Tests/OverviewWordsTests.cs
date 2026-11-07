@@ -26,7 +26,7 @@ public sealed class OverviewWordsTests
     {
         var progress = new WorkstreamProgress(_discovery, ["D02", "D06"], 2);
 
-        var name = OverviewWords.TeamName(_discovery, progress, approved: false);
+        var name = OverviewWords.TeamName(_discovery, progress, approved: false, running: false);
 
         Assert.Equal(
             "Legacy discovery team, 2 of 2 deliverables started. "
@@ -40,7 +40,7 @@ public sealed class OverviewWordsTests
     {
         var progress = new WorkstreamProgress(_architect, ["D01", "D16"], 1);
 
-        var name = OverviewWords.TeamName(_architect, progress, approved: false);
+        var name = OverviewWords.TeamName(_architect, progress, approved: false, running: false);
 
         Assert.Equal(
             "Principal Architect, 1 of 2 deliverables started. Combines the teams’ drafts. Opens Workstreams.",
@@ -55,7 +55,7 @@ public sealed class OverviewWordsTests
         Assert.Equal("2 of 2 approved", OverviewWords.Progress(progress, approved: true));
         Assert.StartsWith(
             "Legacy discovery team, 2 of 2 deliverables approved.",
-            OverviewWords.TeamName(_discovery, progress, approved: true));
+            OverviewWords.TeamName(_discovery, progress, approved: true, running: false));
     }
 
     [Fact]
@@ -83,5 +83,15 @@ public sealed class OverviewWordsTests
     private static InventorySummary Summary(int files, int units, int forms, int dataModules)
     {
         return new InventorySummary(files, 3, units, forms, dataModules, 1, 205, 153, [], [], ["Delphi 7"], []);
+    }
+
+    [Fact]
+    public void A_team_whose_agent_runs_says_so()
+    {
+        var progress = new WorkstreamProgress(_discovery, ["D02", "D06"], 2);
+
+        var name = OverviewWords.TeamName(_discovery, progress, approved: false, running: true);
+
+        Assert.StartsWith("Legacy discovery team, 2 of 2 deliverables started, agent running. Drafts ", name);
     }
 }

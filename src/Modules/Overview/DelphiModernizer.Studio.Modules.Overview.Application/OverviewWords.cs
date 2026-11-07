@@ -42,7 +42,8 @@ public static class OverviewWords
     }
 
     /// <summary>"Legacy discovery team, 2 of 2 deliverables started. Drafts …. Opens Workstreams."</summary>
-    public static string TeamName(WorkstreamRole role, WorkstreamProgress? progress, bool approved)
+    /// <param name="running">Whether the role's agent has a run in progress, which adds ", agent running".</param>
+    public static string TeamName(WorkstreamRole role, WorkstreamProgress? progress, bool approved, bool running)
     {
         var name = _drafts.ContainsKey(role.Code) ? $"{role.Name} team" : role.Name;
         var total = progress?.Deliverables.Count ?? 0;
@@ -50,7 +51,9 @@ public static class OverviewWords
             ? $"{total} of {total} deliverables approved"
             : $"{progress?.Started ?? 0} of {total} deliverables started";
 
-        return $"{name}, {counted}. {Does(role)} Opens Workstreams.";
+        var agent = running ? ", agent running" : string.Empty;
+
+        return $"{name}, {counted}{agent}. {Does(role)} Opens Workstreams.";
     }
 
     public static string TeamToolTip(WorkstreamRole role)

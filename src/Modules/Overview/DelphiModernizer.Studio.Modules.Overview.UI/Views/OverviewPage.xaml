@@ -107,7 +107,21 @@
                             Style="{StaticResource SecondaryCaptionTextStyle}"
                             Text="{x:Bind Progress}"
                             TextTrimming="CharacterEllipsis"
-                            TextWrapping="NoWrap" />
+                            TextWrapping="NoWrap"
+                            Visibility="{x:Bind IsIdle}" />
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Spacing="6"
+                            Visibility="{x:Bind IsRunning}">
+                            <ProgressRing
+                                Width="12"
+                                Height="12"
+                                IsActive="{x:Bind IsRunning}" />
+                            <TextBlock
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="Agent running" />
+                        </StackPanel>
                     </StackPanel>
                     <FontIcon
                         Grid.Column="2"
@@ -135,7 +149,21 @@
                             Style="{StaticResource SecondaryCaptionTextStyle}"
                             Text="{x:Bind Progress}"
                             TextTrimming="CharacterEllipsis"
-                            TextWrapping="NoWrap" />
+                            TextWrapping="NoWrap"
+                            Visibility="{x:Bind IsIdle}" />
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Spacing="6"
+                            Visibility="{x:Bind IsRunning}">
+                            <ProgressRing
+                                Width="12"
+                                Height="12"
+                                IsActive="{x:Bind IsRunning}" />
+                            <TextBlock
+                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="Agent running" />
+                        </StackPanel>
                     </StackPanel>
                     <FontIcon
                         Grid.Column="1"

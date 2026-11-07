@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,7 @@ using DelphiModernizer.Studio.Modules.Overview.Application;
 using DelphiModernizer.Studio.UI.Common;
 using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Contracts.Services;
+using Microsoft.UI.Dispatching;
 
 namespace DelphiModernizer.Studio.Modules.Overview.UI.ViewModels;
 
@@ -26,24 +28,29 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     private readonly ISender _sender;
     private readonly INavigationService _navigation;
     private readonly IEditorLauncher _editor;
+    private readonly IRunsInProgress _runs;
+    private readonly DispatcherQueue _dispatcher;
+    private WorkspaceOverview? _overview;
 
     public OverviewViewModel(
         IWorkspaceSession session,
         ISender sender,
         INavigationService navigation,
-        IEditorLauncher editor)
+        IEditorLauncher editor,
+        IRunsInProgress runs)
         : base(session)
     {
         ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(navigation);
         ArgumentNullException.ThrowIfNull(editor);
+        ArgumentNullException.ThrowIfNull(runs);
         _sender = sender;
         _navigation = navigation;
         _editor = editor;
-        Teams = [.. WorkstreamRole.All
-            .Skip(1)
-            .Select(r => Team(r, null, approved: false))];
-        Architect = Team(WorkstreamRole.All[0], null, approved: false);
+        _runs = runs;
+        _dispatcher = DispatcherQueue.GetForCurrentThread();
+        _runs.Changed += OnRunsChanged;
+        ShowTeams();
         Gates = [.. SignOffNames.Gates
             .Order(StringComparer.Ordinal)
             .Select(g => new GateNode(g, SignOffNames.Of(g), PillState.Blocked, false, SignOffNames.Of(g)))];
@@ -202,16 +209,13 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
             .FirstOrDefault(g => g.gate.State != "approved");
         var nextIndex = next.gate is null ? -1 : next.index;
         var approved = next.gate is null && overview.Gates.Count > 0;
-        var architect = overview.Workstreams.FirstOrDefault(w => w.Role.Code == WorkstreamRole.All[0].Code);
 
         Purpose = $"How {overview.Name} stands, from the Delphi code to an approved plan.";
         NextStep = NextStepFor(overview, next.gate);
         Summary = SummaryOf(overview, approved);
         Legacy = OverviewWords.DelphiCode(overview.Inventory, overview.Cycles);
-        Teams = [.. overview.Workstreams
-            .Where(w => w.Role.Code != WorkstreamRole.All[0].Code)
-            .Select(w => Team(w.Role, w, approved))];
-        Architect = Team(WorkstreamRole.All[0], architect, approved);
+        _overview = overview;
+        ShowTeams();
         Gates = [.. overview.Gates.Select((gate, index) => GateOf(
             gate,
             index,
@@ -304,15 +308,50 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         return $"{started} · {signedOff} of {overview.Gates.Count} sign-offs approved · {tail}";
     }
 
-    private static TeamNode Team(WorkstreamRole role, WorkstreamProgress? progress, bool approved)
+    protected override void Dispose(bool disposing)
     {
-        return new TeamNode(
-            role.Code,
-            role.Name,
-            RoleGlyphs.Of(role.Code),
-            OverviewWords.Progress(progress, approved),
-            OverviewWords.TeamName(role, progress, approved),
-            OverviewWords.TeamToolTip(role));
+        if (disposing)
+        {
+            _runs.Changed -= OnRunsChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+
+    /// <remarks>Runs start and end on any thread; the nodes are rebuilt on the UI thread.</remarks>
+    private void OnRunsChanged(object? sender, EventArgs e)
+    {
+        _dispatcher.TryEnqueue(ShowTeams);
+    }
+
+    /// <summary>Builds the team and architect nodes from the last overview and the runs in progress.</summary>
+    [MemberNotNull(nameof(Teams), nameof(Architect))]
+    private void ShowTeams()
+    {
+        var approved = _overview is { Gates.Count: > 0 } overview
+            && overview.Gates.All(g => g.State == "approved");
+        var running = _session.Current is { } workspace
+            ? _runs.AgentsRunning(workspace.Root)
+            : new HashSet<string>();
+        TeamNode Team(WorkstreamRole role)
+        {
+            var progress = _overview?.Workstreams.FirstOrDefault(w => w.Role.Code == role.Code);
+            var isRunning = running.Contains(role.Agent);
+
+            return new TeamNode(
+                role.Code,
+                role.Name,
+                RoleGlyphs.Of(role.Code),
+                OverviewWords.Progress(progress, approved),
+                OverviewWords.TeamName(role, progress, approved, isRunning),
+                OverviewWords.TeamToolTip(role),
+                isRunning);
+        }
+
+        Teams = [.. WorkstreamRole.All
+            .Skip(1)
+            .Select(Team)];
+        Architect = Team(WorkstreamRole.All[0]);
     }
 
     private static GateNode GateOf(GateStatus gate, int index, bool isNext, int count)
