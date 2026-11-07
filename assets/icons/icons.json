@@ -1,0 +1,479 @@
+{
+  "family": "Studio Icons",
+  "icons": [
+    {
+      "name": "Back",
+      "codepoint": "E100",
+      "source": "arrow_left_20_regular",
+      "use": "Title bar Back"
+    },
+    {
+      "name": "Navigation",
+      "codepoint": "E101",
+      "source": "navigation_20_regular",
+      "use": "Pane toggle"
+    },
+    {
+      "name": "Search",
+      "codepoint": "E102",
+      "source": "search_20_regular",
+      "use": "Title-bar search"
+    },
+    {
+      "name": "Start",
+      "codepoint": "E103",
+      "source": "home_20_regular",
+      "use": "Start in the pane"
+    },
+    {
+      "name": "StartFilled",
+      "codepoint": "E104",
+      "source": "home_20_filled",
+      "use": "Start, selected"
+    },
+    {
+      "name": "Overview",
+      "codepoint": "E105",
+      "source": "board_20_regular",
+      "use": "Overview in the pane"
+    },
+    {
+      "name": "OverviewFilled",
+      "codepoint": "E106",
+      "source": "board_20_filled",
+      "use": "Overview, selected"
+    },
+    {
+      "name": "Inventory",
+      "codepoint": "E107",
+      "source": "library_20_regular",
+      "use": "Inventory in the pane"
+    },
+    {
+      "name": "InventoryFilled",
+      "codepoint": "E108",
+      "source": "library_20_filled",
+      "use": "Inventory, selected"
+    },
+    {
+      "name": "Workstreams",
+      "codepoint": "E109",
+      "source": "people_team_20_regular",
+      "use": "Workstreams in the pane"
+    },
+    {
+      "name": "WorkstreamsFilled",
+      "codepoint": "E10A",
+      "source": "people_team_20_filled",
+      "use": "Workstreams, selected"
+    },
+    {
+      "name": "Deliverables",
+      "codepoint": "E10B",
+      "source": "document_20_regular",
+      "use": "Deliverables in the pane; a document"
+    },
+    {
+      "name": "DeliverablesFilled",
+      "codepoint": "E10C",
+      "source": "document_20_filled",
+      "use": "Deliverables, selected"
+    },
+    {
+      "name": "Traceability",
+      "codepoint": "E10D",
+      "source": "link_20_regular",
+      "use": "Traceability in the pane"
+    },
+    {
+      "name": "TraceabilityFilled",
+      "codepoint": "E10E",
+      "source": "link_20_filled",
+      "use": "Traceability, selected"
+    },
+    {
+      "name": "SignOffs",
+      "codepoint": "E10F",
+      "source": "flag_20_regular",
+      "use": "Sign-offs in the pane; Review sign-offs"
+    },
+    {
+      "name": "SignOffsFilled",
+      "codepoint": "E110",
+      "source": "flag_20_filled",
+      "use": "Sign-offs, selected"
+    },
+    {
+      "name": "Settings",
+      "codepoint": "E111",
+      "source": "settings_20_regular",
+      "use": "Settings in the pane"
+    },
+    {
+      "name": "SettingsFilled",
+      "codepoint": "E112",
+      "source": "settings_20_filled",
+      "use": "Settings, selected"
+    },
+    {
+      "name": "ChevronRight",
+      "codepoint": "E113",
+      "source": "chevron_right_20_regular",
+      "use": "Diagram nodes, breadcrumbs, folder rows"
+    },
+    {
+      "name": "ChevronDown",
+      "codepoint": "E114",
+      "source": "chevron_down_20_regular",
+      "use": "Expanders, ComboBox, sort"
+    },
+    {
+      "name": "ChevronUp",
+      "codepoint": "E115",
+      "source": "chevron_up_20_regular",
+      "use": "Expanded expanders, NumberBox"
+    },
+    {
+      "name": "Approved",
+      "codepoint": "E116",
+      "source": "certificate_20_filled",
+      "use": "Approved pill: a person approved it"
+    },
+    {
+      "name": "Approve",
+      "codepoint": "E117",
+      "source": "certificate_20_regular",
+      "use": "Approve and Re-approve buttons"
+    },
+    {
+      "name": "Ready",
+      "codepoint": "E118",
+      "source": "checkmark_circle_20_regular",
+      "use": "Ready pill"
+    },
+    {
+      "name": "CheckPassed",
+      "codepoint": "E119",
+      "source": "checkmark_circle_20_filled",
+      "use": "A check that passes"
+    },
+    {
+      "name": "NotYet",
+      "codepoint": "E11A",
+      "source": "circle_20_regular",
+      "use": "A check not met yet; Template pill"
+    },
+    {
+      "name": "Checkmark",
+      "codepoint": "E11B",
+      "source": "checkmark_20_regular",
+      "use": "Completed run; wizard steps done"
+    },
+    {
+      "name": "Blocked",
+      "codepoint": "E11C",
+      "source": "prohibited_20_regular",
+      "use": "Blocked pill"
+    },
+    {
+      "name": "Warning",
+      "codepoint": "E11D",
+      "source": "warning_20_regular",
+      "use": "Warnings filter"
+    },
+    {
+      "name": "WarningFilled",
+      "codepoint": "E11E",
+      "source": "warning_20_filled",
+      "use": "Stale, Warning and Budget reached pills; caution InfoBars"
+    },
+    {
+      "name": "Error",
+      "codepoint": "E11F",
+      "source": "error_circle_20_regular",
+      "use": "Errors filter"
+    },
+    {
+      "name": "ErrorFilled",
+      "codepoint": "E120",
+      "source": "error_circle_20_filled",
+      "use": "Something broken: problems, Failed, Missing"
+    },
+    {
+      "name": "InfoFilled",
+      "codepoint": "E121",
+      "source": "info_20_filled",
+      "use": "Informational InfoBars"
+    },
+    {
+      "name": "Question",
+      "codepoint": "E122",
+      "source": "question_circle_20_regular",
+      "use": "Open question"
+    },
+    {
+      "name": "Locked",
+      "codepoint": "E123",
+      "source": "lock_closed_20_regular",
+      "use": "Build locked"
+    },
+    {
+      "name": "Unlocked",
+      "codepoint": "E124",
+      "source": "lock_open_20_regular",
+      "use": "Build unlocked"
+    },
+    {
+      "name": "Draft",
+      "codepoint": "E125",
+      "source": "edit_20_regular",
+      "use": "Draft pill"
+    },
+    {
+      "name": "InReview",
+      "codepoint": "E126",
+      "source": "eye_20_regular",
+      "use": "In review pill; files an agent read"
+    },
+    {
+      "name": "Refresh",
+      "codepoint": "E127",
+      "source": "arrow_clockwise_20_regular",
+      "use": "Check traceability, Check again, Scan again"
+    },
+    {
+      "name": "Add",
+      "codepoint": "E128",
+      "source": "add_20_regular",
+      "use": "New workspace"
+    },
+    {
+      "name": "OpenFolder",
+      "codepoint": "E129",
+      "source": "folder_open_20_regular",
+      "use": "Open folder…, Open docs/"
+    },
+    {
+      "name": "Folder",
+      "codepoint": "E12A",
+      "source": "folder_20_regular",
+      "use": "Recent workspace, Browse…"
+    },
+    {
+      "name": "Clone",
+      "codepoint": "E12B",
+      "source": "arrow_download_20_regular",
+      "use": "Clone from Git…"
+    },
+    {
+      "name": "OpenInEditor",
+      "codepoint": "E12C",
+      "source": "open_20_regular",
+      "use": "Open a file in your editor"
+    },
+    {
+      "name": "Copy",
+      "codepoint": "E12D",
+      "source": "copy_20_regular",
+      "use": "Copy the fingerprint, Copy versions"
+    },
+    {
+      "name": "Fingerprint",
+      "codepoint": "E12E",
+      "source": "fingerprint_20_regular",
+      "use": "Fingerprint of the files a sign-off covers"
+    },
+    {
+      "name": "History",
+      "codepoint": "E12F",
+      "source": "history_20_regular",
+      "use": "Revoked entry; run history"
+    },
+    {
+      "name": "Person",
+      "codepoint": "E130",
+      "source": "person_20_regular",
+      "use": "Approving as"
+    },
+    {
+      "name": "Agent",
+      "codepoint": "E131",
+      "source": "bot_20_regular",
+      "use": "Agent runs and agent text"
+    },
+    {
+      "name": "Run",
+      "codepoint": "E132",
+      "source": "play_20_regular",
+      "use": "Run…, Run again"
+    },
+    {
+      "name": "Stop",
+      "codepoint": "E133",
+      "source": "record_stop_20_regular",
+      "use": "Stop a run; Stopped pill"
+    },
+    {
+      "name": "ToolCall",
+      "codepoint": "E134",
+      "source": "wrench_20_regular",
+      "use": "Tool call in a transcript"
+    },
+    {
+      "name": "GuardRefused",
+      "codepoint": "E135",
+      "source": "shield_prohibited_20_regular",
+      "use": "Refused by the guard"
+    },
+    {
+      "name": "Diagnostics",
+      "codepoint": "E136",
+      "source": "bug_20_regular",
+      "use": "Diagnostics tab and lines"
+    },
+    {
+      "name": "FilesWritten",
+      "codepoint": "E137",
+      "source": "document_edit_20_regular",
+      "use": "Files a run wrote"
+    },
+    {
+      "name": "DelphiCode",
+      "codepoint": "E138",
+      "source": "code_20_regular",
+      "use": "Delphi code node; Code modules; code page"
+    },
+    {
+      "name": "Screens",
+      "codepoint": "E139",
+      "source": "form_20_regular",
+      "use": "Screens"
+    },
+    {
+      "name": "Database",
+      "codepoint": "E13A",
+      "source": "database_20_regular",
+      "use": "Data and libraries; SQL; Data and integration team"
+    },
+    {
+      "name": "Connection",
+      "codepoint": "E13B",
+      "source": "plug_connected_20_regular",
+      "use": "Database connection"
+    },
+    {
+      "name": "Secret",
+      "codepoint": "E13C",
+      "source": "key_20_regular",
+      "use": "Embedded password"
+    },
+    {
+      "name": "Components",
+      "codepoint": "E13D",
+      "source": "puzzle_piece_20_regular",
+      "use": "Third-party libraries"
+    },
+    {
+      "name": "ExternalRoutines",
+      "codepoint": "E13E",
+      "source": "window_20_regular",
+      "use": "External routines and COM"
+    },
+    {
+      "name": "Risks",
+      "codepoint": "E13F",
+      "source": "shield_error_20_regular",
+      "use": "SQL and risks; risk markers"
+    },
+    {
+      "name": "Cycle",
+      "codepoint": "E140",
+      "source": "arrow_repeat_all_20_regular",
+      "use": "Circular dependency"
+    },
+    {
+      "name": "Discover",
+      "codepoint": "E141",
+      "source": "document_search_20_regular",
+      "use": "Legacy discovery team; not scanned yet"
+    },
+    {
+      "name": "ClaudeCode",
+      "codepoint": "E142",
+      "source": "window_console_20_regular",
+      "use": "Claude Code executable"
+    },
+    {
+      "name": "Effort",
+      "codepoint": "E143",
+      "source": "timer_20_regular",
+      "use": "Effort setting"
+    },
+    {
+      "name": "Budget",
+      "codepoint": "E144",
+      "source": "money_20_regular",
+      "use": "Budget and cost"
+    },
+    {
+      "name": "Theme",
+      "codepoint": "E145",
+      "source": "dark_theme_20_regular",
+      "use": "Theme setting"
+    },
+    {
+      "name": "Versions",
+      "codepoint": "E146",
+      "source": "tag_20_regular",
+      "use": "About and versions"
+    },
+    {
+      "name": "Filter",
+      "codepoint": "E147",
+      "source": "filter_20_regular",
+      "use": "Filters"
+    },
+    {
+      "name": "Sort",
+      "codepoint": "E148",
+      "source": "arrow_sort_20_regular",
+      "use": "Sortable column"
+    },
+    {
+      "name": "PrincipalArchitect",
+      "codepoint": "E149",
+      "source": "person_board_20_regular",
+      "use": "Principal Architect"
+    },
+    {
+      "name": "Requirements",
+      "codepoint": "E14A",
+      "source": "clipboard_task_list_ltr_20_regular",
+      "use": "Requirements team"
+    },
+    {
+      "name": "Architecture",
+      "codepoint": "E14B",
+      "source": "building_20_regular",
+      "use": "Architecture team"
+    },
+    {
+      "name": "MigrationPlanning",
+      "codepoint": "E14C",
+      "source": "calendar_ltr_20_regular",
+      "use": "Migration planning team"
+    },
+    {
+      "name": "QualitySecurity",
+      "codepoint": "E14D",
+      "source": "shield_checkmark_20_regular",
+      "use": "Quality and security team"
+    },
+    {
+      "name": "Build",
+      "codepoint": "E14E",
+      "source": "rocket_20_regular",
+      "use": "Build the new system"
+    }
+  ]
+}

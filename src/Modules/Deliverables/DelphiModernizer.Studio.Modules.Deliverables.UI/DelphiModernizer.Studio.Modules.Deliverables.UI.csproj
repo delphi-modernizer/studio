@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>DelphiModernizer.Studio.Modules.Deliverables.UI</RootNamespace>
+    <AssemblyName>DelphiModernizer.Studio.Modules.Deliverables.UI</AssemblyName>
+    <UseWinUI>true</UseWinUI>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <Platforms>x64;ARM64</Platforms>
+    <!-- The XAML type generator references a property the Windows App SDK deprecated. -->
+    <NoWarn>$(NoWarn);CS0612;CS0618</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.UI.Common\DelphiModernizer.Studio.UI.Common.csproj" />
+    <ProjectReference Include="..\DelphiModernizer.Studio.Modules.Deliverables.Application\DelphiModernizer.Studio.Modules.Deliverables.Application.csproj" />
+    <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.UI.Contracts\DelphiModernizer.Studio.UI.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

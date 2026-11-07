@@ -1,0 +1,38 @@
+<ContentDialog
+    x:Class="DelphiModernizer.Studio.UI.Common.Controls.ClaudeCodeDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons"
+    CloseButtonText="Not now"
+    DefaultButton="Primary"
+    Style="{StaticResource DefaultContentDialogStyle}">
+
+    <StackPanel Spacing="16">
+        <TextBlock
+            x:Name="Lead"
+            Style="{StaticResource BodyTextBlockStyle}"
+            TextWrapping="Wrap" />
+        <InfoBar
+            IsClosable="False"
+            IsOpen="True"
+            Severity="Warning">
+            <InfoBar.IconSource>
+                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+            </InfoBar.IconSource>
+            <TextBlock
+                x:Name="EngineMessage"
+                Margin="0,0,0,14"
+                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                Style="{StaticResource MonoTextStyle}"
+                TextTrimming="None"
+                TextWrapping="Wrap" />
+        </InfoBar>
+        <StackPanel Spacing="6">
+            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="What agents add when Claude Code is ready" />
+            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="•  Workstream agents draft deliverables, each claim with an evidence link and a fact label." TextWrapping="Wrap" />
+            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="•  The Principal Architect agent combines the drafts and lists contradictions before each sign-off." TextWrapping="Wrap" />
+            <TextBlock Style="{StaticResource CaptionTextBlockStyle}" Text="•  You still review every draft and approve every sign-off yourself." TextWrapping="Wrap" />
+        </StackPanel>
+        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Agents run on your own Claude Code installation and account; the studio stores no keys. Everything except agent runs keeps working without it." />
+    </StackPanel>
+</ContentDialog>

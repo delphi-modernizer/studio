@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<defs><mask id="m"><rect width="256" height="256" fill="#fff"/><path d="M70 122 L186 122 Q182 156 148 156 L142 156 L142 230 L114 230 L114 156 L108 156 Q74 156 70 122 Z" fill="#000"/></mask></defs>
+<g transform="translate(128 128) scale(1.18) translate(-128 -124)">
+<path d="M128 24 Q98 24 72 36 Q96 52 104 70 L128 70 Z" fill="#FFC23D"/><path d="M128 24 Q158 24 184 36 Q160 52 152 70 L128 70 Z" fill="#F5A623"/>
+<g mask="url(#m)"><path d="M128 80 C88 80 58 100 57 142 L54 190 Q54 218 88 222 L128 218 Z" fill="#2F64E6"/><path d="M128 80 C168 80 198 100 199 142 L202 190 Q202 218 168 222 L128 218 Z" fill="#2758D8"/></g>
+</g>
+</svg>

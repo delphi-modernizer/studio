@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog
+    x:Class="DelphiModernizer.Studio.Modules.Workstreams.UI.Views.RunRecipeDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons"
+    CloseButtonText="Cancel"
+    DefaultButton="Primary"
+    PrimaryButtonText="Run"
+    Style="{StaticResource DefaultContentDialogStyle}">
+
+    <ContentDialog.Title>
+        <StackPanel Spacing="2">
+            <TextBlock x:Name="RoleText" Style="{StaticResource SecondaryCaptionTextStyle}" />
+            <TextBlock x:Name="TitleText" Style="{StaticResource SubtitleTextBlockStyle}" />
+        </StackPanel>
+    </ContentDialog.Title>
+
+    <StackPanel Spacing="16">
+        <TextBlock
+            x:Name="Lead"
+            Style="{StaticResource BodyTextBlockStyle}"
+            TextWrapping="Wrap" />
+        <StackPanel x:Name="ArgumentField" Spacing="4">
+            <TextBox x:Name="ArgumentBox" />
+            <ComboBox
+                x:Name="GateBox"
+                MinWidth="240"
+                Visibility="Collapsed" />
+            <TextBlock
+                x:Name="ArgumentError"
+                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Visibility="Collapsed" />
+            <TextBlock
+                x:Name="ArgumentHelp"
+                Style="{StaticResource SecondaryCaptionTextStyle}"
+                Text="One line, for example legacy/Sales or Pricing.pas." />
+        </StackPanel>
+        <StackPanel MaxWidth="240" HorizontalAlignment="Left" Spacing="4">
+            <NumberBox
+                x:Name="BudgetBox"
+                AutomationProperties.HelpText="The run stops when it reaches this. The default comes from Settings."
+                Header="Budget for this run"
+                LargeChange="1"
+                Minimum="0.1"
+                SmallChange="0.5"
+                SpinButtonPlacementMode="Inline" />
+            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="The run stops when it reaches this. The default comes from Settings." />
+        </StackPanel>
+        <InfoBar
+            IsClosable="False"
+            IsOpen="True"
+            Message="The guard keeps the agent in docs/. It can’t change the Delphi code, approve a sign-off, choose the platform, or write new code before the final plan is approved."
+            Severity="Informational">
+            <InfoBar.IconSource>
+                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.GuardRefused}" />
+            </InfoBar.IconSource>
+        </InfoBar>
+        <InfoBar
+            x:Name="StartProblem"
+            IsClosable="False"
+            Severity="Error"
+            Title="The run didn’t start.">
+            <InfoBar.IconSource>
+                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+            </InfoBar.IconSource>
+        </InfoBar>
+    </StackPanel>
+</ContentDialog>

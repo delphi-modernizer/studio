@@ -1,0 +1,92 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="nuget.config" />
+    <File Path="engine.lock" />
+    <File Path="README.md" />
+    <File Path="Version.props" />
+  </Folder>
+  <Folder Name="/src/App/">
+    <Project Path="src/App/DelphiModernizer.Studio.App/DelphiModernizer.Studio.App.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/Deliverables/">
+    <Project Path="src/Modules/Deliverables/DelphiModernizer.Studio.Modules.Deliverables.Application/DelphiModernizer.Studio.Modules.Deliverables.Application.csproj" />
+    <Project Path="src/Modules/Deliverables/DelphiModernizer.Studio.Modules.Deliverables.UI/DelphiModernizer.Studio.Modules.Deliverables.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/Inventory/">
+    <Project Path="src/Modules/Inventory/DelphiModernizer.Studio.Modules.Inventory.Application/DelphiModernizer.Studio.Modules.Inventory.Application.csproj" />
+    <Project Path="src/Modules/Inventory/DelphiModernizer.Studio.Modules.Inventory.UI/DelphiModernizer.Studio.Modules.Inventory.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/Overview/">
+    <Project Path="src/Modules/Overview/DelphiModernizer.Studio.Modules.Overview.Application/DelphiModernizer.Studio.Modules.Overview.Application.csproj" />
+    <Project Path="src/Modules/Overview/DelphiModernizer.Studio.Modules.Overview.UI/DelphiModernizer.Studio.Modules.Overview.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/Settings/">
+    <Project Path="src/Modules/Settings/DelphiModernizer.Studio.Modules.Settings.UI/DelphiModernizer.Studio.Modules.Settings.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/SignOffs/">
+    <Project Path="src/Modules/SignOffs/DelphiModernizer.Studio.Modules.SignOffs.Application/DelphiModernizer.Studio.Modules.SignOffs.Application.csproj" />
+    <Project Path="src/Modules/SignOffs/DelphiModernizer.Studio.Modules.SignOffs.UI/DelphiModernizer.Studio.Modules.SignOffs.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/Traceability/">
+    <Project Path="src/Modules/Traceability/DelphiModernizer.Studio.Modules.Traceability.Application/DelphiModernizer.Studio.Modules.Traceability.Application.csproj" />
+    <Project Path="src/Modules/Traceability/DelphiModernizer.Studio.Modules.Traceability.Domain/DelphiModernizer.Studio.Modules.Traceability.Domain.csproj" />
+    <Project Path="src/Modules/Traceability/DelphiModernizer.Studio.Modules.Traceability.UI/DelphiModernizer.Studio.Modules.Traceability.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/Workspaces/">
+    <Project Path="src/Modules/Workspaces/DelphiModernizer.Studio.Modules.Workspaces.Application/DelphiModernizer.Studio.Modules.Workspaces.Application.csproj" />
+    <Project Path="src/Modules/Workspaces/DelphiModernizer.Studio.Modules.Workspaces.UI/DelphiModernizer.Studio.Modules.Workspaces.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Modules/Workstreams/">
+    <Project Path="src/Modules/Workstreams/DelphiModernizer.Studio.Modules.Workstreams.Application/DelphiModernizer.Studio.Modules.Workstreams.Application.csproj" />
+    <Project Path="src/Modules/Workstreams/DelphiModernizer.Studio.Modules.Workstreams.UI/DelphiModernizer.Studio.Modules.Workstreams.UI.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/DelphiModernizer.Studio.Application.Abstractions/DelphiModernizer.Studio.Application.Abstractions.csproj" />
+    <Project Path="src/Shared/DelphiModernizer.Studio.Mediator/DelphiModernizer.Studio.Mediator.csproj" />
+    <Project Path="src/Shared/DelphiModernizer.Studio.UI.Common/DelphiModernizer.Studio.UI.Common.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/Shared/DelphiModernizer.Studio.UI.Contracts/DelphiModernizer.Studio.UI.Contracts.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DelphiModernizer.Studio.Application.Abstractions.Tests/DelphiModernizer.Studio.Application.Abstractions.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.ArchitectureTests/DelphiModernizer.Studio.ArchitectureTests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Mediator.Tests/DelphiModernizer.Studio.Mediator.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.Deliverables.Application.Tests/DelphiModernizer.Studio.Modules.Deliverables.Application.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.Inventory.Application.Tests/DelphiModernizer.Studio.Modules.Inventory.Application.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.Overview.Application.Tests/DelphiModernizer.Studio.Modules.Overview.Application.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.SignOffs.Application.Tests/DelphiModernizer.Studio.Modules.SignOffs.Application.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.Traceability.Application.Tests/DelphiModernizer.Studio.Modules.Traceability.Application.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.Workspaces.Application.Tests/DelphiModernizer.Studio.Modules.Workspaces.Application.Tests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.Modules.Workstreams.Application.Tests/DelphiModernizer.Studio.Modules.Workstreams.Application.Tests.csproj" />
+  </Folder>
+</Solution>

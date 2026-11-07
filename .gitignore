@@ -1,0 +1,10 @@
+bin/
+obj/
+artifacts/
+TestResults/
+*.user
+.vs/
+.idea/
+
+# The engine checkout CI places beside the sources for EngineSource=Source.
+.engine/

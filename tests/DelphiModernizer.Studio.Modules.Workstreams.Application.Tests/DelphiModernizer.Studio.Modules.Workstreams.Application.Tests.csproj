@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\*.cs" Link="Shared\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Modules\Workstreams\DelphiModernizer.Studio.Modules.Workstreams.Application\DelphiModernizer.Studio.Modules.Workstreams.Application.csproj" />
+    <!-- Stands in for the Claude Code CLI, as in the engine's runner tests. -->
+    <ProjectReference Include="$(EngineRoot)tests/DelphiModernizer.Engine.Agents.FakeClaude/DelphiModernizer.Engine.Agents.FakeClaude.csproj" />
+  </ItemGroup>
+
+</Project>

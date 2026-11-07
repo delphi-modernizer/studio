@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="DelphiModernizer.Studio.Modules.Workspaces.UI.Views.NewWorkspacePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
+    xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons"
+    xmlns:settings="using:DelphiModernizer.Studio.Application.Abstractions.Settings"
+    xmlns:vm="using:DelphiModernizer.Studio.Modules.Workspaces.UI.ViewModels"
+    Loaded="OnLoaded">
+
+    <Page.Resources>
+        <!--  A target choice reads as a card: the radio, its name and what choosing it writes.  -->
+        <Style
+            x:Key="ChoiceStyle"
+            BasedOn="{StaticResource DefaultRadioButtonStyle}"
+            TargetType="RadioButton">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Padding" Value="12,12,16,12" />
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Wide">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1100" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <!--  Under 1100 the steps run across the top in five columns and the preview has two.  -->
+                <VisualState x:Name="Narrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="PageContent.Spacing" Value="16" />
+                        <Setter Target="Layout.ColumnSpacing" Value="0" />
+                        <Setter Target="Layout.RowSpacing" Value="12" />
+                        <Setter Target="StepColumn.Width" Value="*" />
+                        <Setter Target="FormColumn.Width" Value="0" />
+                        <Setter Target="FormCard.(Grid.Row)" Value="1" />
+                        <Setter Target="FormCard.(Grid.Column)" Value="0" />
+                        <Setter Target="StepsLayout.MaximumRowsOrColumns" Value="5" />
+                        <Setter Target="FactsLayout.MaximumRowsOrColumns" Value="2" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer>
+            <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+                <controls:PageHeader Purpose="Five steps. Nothing is written to disk until you choose Create." Title="New workspace" />
+
+                <Grid x:Name="Layout" ColumnSpacing="24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="StepColumn" Width="208" />
+                        <ColumnDefinition x:Name="FormColumn" Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!--  Not a tab stop: the step heading inside the card says where the person is.  -->
+                    <ItemsRepeater
+                        VerticalAlignment="Top"
+                        AutomationProperties.AccessibilityView="Raw"
+                        ItemsSource="{x:Bind ViewModel.Steps}">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout
+                                x:Name="StepsLayout"
+                                ItemsStretch="Fill"
+                                MaximumRowsOrColumns="1"
+                                MinColumnSpacing="4"
+                                MinItemHeight="40"
+                                MinItemWidth="96"
+                                MinRowSpacing="2"
+                                Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:WizardStep">
+                                <Grid
+                                    Padding="8,4"
+                                    ColumnSpacing="12"
+                                    CornerRadius="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="24" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border
+                                        Grid.ColumnSpan="2"
+                                        Margin="-8,-4"
+                                        Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                        CornerRadius="4"
+                                        Visibility="{x:Bind IsCurrent, Mode=OneWay}" />
+                                    <Border
+                                        Width="24"
+                                        Height="24"
+                                        Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                        CornerRadius="12"
+                                        Visibility="{x:Bind IsDone, Mode=OneWay}">
+                                        <FontIcon
+                                            FontSize="12"
+                                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                            Glyph="{x:Bind icons:StudioIcons.Checkmark}"
+                                            Style="{StaticResource IconStyle}" />
+                                    </Border>
+                                    <Border
+                                        Width="24"
+                                        Height="24"
+                                        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                                        BorderThickness="2"
+                                        CornerRadius="12"
+                                        Visibility="{x:Bind IsCurrent, Mode=OneWay}">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="{x:Bind NumberText}" />
+                                    </Border>
+                                    <Border
+                                        Width="24"
+                                        Height="24"
+                                        BorderBrush="{ThemeResource ControlStrongStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="12"
+                                        Visibility="{x:Bind IsTodo, Mode=OneWay}">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontWeight="SemiBold"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="{x:Bind NumberText}" />
+                                    </Border>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="{x:Bind Label}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="NoWrap" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+
+                    <Border
+                        x:Name="FormCard"
+                        Grid.Column="1"
+                        Padding="24,20,24,24"
+                        Style="{StaticResource CardStyle}">
+                        <StackPanel MaxWidth="640" HorizontalAlignment="Left" Spacing="16">
+                            <StackPanel>
+                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.StepOf, Mode=OneWay}" />
+                                <TextBlock
+                                    x:Name="StepHeading"
+                                    AutomationProperties.HeadingLevel="Level2"
+                                    AutomationProperties.LiveSetting="Polite"
+                                    Style="{StaticResource SubtitleTextBlockStyle}"
+                                    Text="{x:Bind ViewModel.StepTitle, Mode=OneWay}" />
+                            </StackPanel>
+
+                            <!--  Step 1: name and folder.  -->
+                            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsStep1, Mode=OneWay}">
+                                <TextBox
+                                    x:Name="NameBox"
+                                    AutomationProperties.IsRequiredForForm="True"
+                                    Header="Workspace name"
+                                    Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox
+                                            AutomationProperties.HelpText="{x:Bind ViewModel.FolderProblem, Mode=OneWay}"
+                                            AutomationProperties.IsRequiredForForm="True"
+                                            Header="Folder"
+                                            Text="{x:Bind ViewModel.Folder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Grid.Column="1"
+                                            VerticalAlignment="Bottom"
+                                            Command="{x:Bind ViewModel.BrowseFolderCommand}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenFolder}" Style="{StaticResource IconStyle}" />
+                                                <TextBlock Text="Browse…" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        Spacing="6"
+                                        Visibility="{x:Bind ViewModel.HasFolderProblem, Mode=OneWay}">
+                                        <FontIcon
+                                            FontSize="12"
+                                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}"
+                                            Style="{StaticResource IconStyle}" />
+                                        <TextBlock
+                                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="{x:Bind ViewModel.FolderProblem, Mode=OneWay}"
+                                            TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="A new or empty folder. It becomes the workspace’s git repository." />
+                                </StackPanel>
+                                <InfoBar
+                                    IsClosable="False"
+                                    IsOpen="True"
+                                    Message="It will hold a copy of your legacy source, which can contain credentials, customer data and business rules."
+                                    Severity="Warning"
+                                    Title="Keep this repository private.">
+                                    <InfoBar.IconSource>
+                                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                                    </InfoBar.IconSource>
+                                </InfoBar>
+                            </StackPanel>
+
+                            <!--  Step 2: the legacy source, its code page and a read-only preview.  -->
+                            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsStep2, Mode=OneWay}">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox
+                                            x:Name="LegacyBox"
+                                            AutomationProperties.IsRequiredForForm="True"
+                                            Header="Legacy source folder"
+                                            LostFocus="OnLegacySourceLostFocus"
+                                            Text="{x:Bind ViewModel.LegacySource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Button
+                                            Grid.Column="1"
+                                            VerticalAlignment="Bottom"
+                                            Command="{x:Bind ViewModel.BrowseLegacyCommand}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenFolder}" Style="{StaticResource IconStyle}" />
+                                                <TextBlock Text="Browse…" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Copied read-only into legacy/. The original folder isn’t changed." />
+                                </StackPanel>
+                                <ComboBox
+                                    MinWidth="360"
+                                    DisplayMemberPath="Label"
+                                    Header="Code page for files without a byte-order mark"
+                                    ItemsSource="{x:Bind settings:CodePages.Common}"
+                                    SelectedItem="{x:Bind ViewModel.SelectedCodePage, Mode=TwoWay}" />
+
+                                <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.IsPreviewDone, Mode=OneWay}">
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Preview" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="A quick scan. Numbers are findings to confirm, not compiler output." />
+                                    </Grid>
+                                    <Border BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+                                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Facts}">
+                                            <ItemsRepeater.Layout>
+                                                <UniformGridLayout
+                                                    x:Name="FactsLayout"
+                                                    ItemsStretch="Fill"
+                                                    MaximumRowsOrColumns="3"
+                                                    MinItemWidth="160"
+                                                    Orientation="Horizontal" />
+                                            </ItemsRepeater.Layout>
+                                            <ItemsRepeater.ItemTemplate>
+                                                <DataTemplate x:DataType="vm:PreviewFact">
+                                                    <Border
+                                                        Padding="0,10,12,10"
+                                                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                                        BorderThickness="0,0,0,1">
+                                                        <StackPanel>
+                                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
+                                                            <TextBlock
+                                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                                Text="{x:Bind Value}"
+                                                                TextWrapping="Wrap" />
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsRepeater.ItemTemplate>
+                                        </ItemsRepeater>
+                                    </Border>
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        Spacing="6"
+                                        Visibility="{x:Bind ViewModel.HasCredentials, Mode=OneWay}">
+                                        <FontIcon
+                                            FontSize="12"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Glyph="{x:Bind icons:StudioIcons.Secret}"
+                                            Style="{StaticResource IconStyle}" />
+                                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.CredentialsNote, Mode=OneWay}" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel
+                                    AutomationProperties.LiveSetting="Polite"
+                                    Spacing="8"
+                                    Visibility="{x:Bind ViewModel.IsPreviewRunning, Mode=OneWay}">
+                                    <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Preview" />
+                                    <Border Style="{StaticResource CardStyle}">
+                                        <StackPanel Spacing="10">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <ProgressRing
+                                                    Width="16"
+                                                    Height="16"
+                                                    IsActive="{x:Bind ViewModel.IsPreviewRunning, Mode=OneWay}" />
+                                                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Scanning the folder…" />
+                                            </StackPanel>
+                                            <ProgressBar IsIndeterminate="True" />
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="You can keep going once the preview finishes; it takes a few seconds for most trees." />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <InfoBar
+                                    AutomationProperties.LiveSetting="Assertive"
+                                    IsClosable="False"
+                                    IsOpen="{x:Bind ViewModel.IsPreviewFailed, Mode=OneWay}"
+                                    Message="{x:Bind ViewModel.PreviewProblem, Mode=OneWay}"
+                                    Severity="Error"
+                                    Title="Couldn’t preview this folder.">
+                                    <InfoBar.IconSource>
+                                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                                    </InfoBar.IconSource>
+                                    <InfoBar.ActionButton>
+                                        <Button Command="{x:Bind ViewModel.PreviewCommand}" Content="Try again" />
+                                    </InfoBar.ActionButton>
+                                </InfoBar>
+                            </StackPanel>
+
+                            <!--  Step 3: the target platform; only a person chooses it.  -->
+                            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsStep3, Mode=OneWay}">
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Text="Choose the target now or after discovery. Only a person picks the platform; agents are refused."
+                                    TextWrapping="Wrap" />
+                                <RadioButtons
+                                    x:Name="TargetChoices"
+                                    AutomationProperties.Name="Target platform"
+                                    SelectedIndex="{x:Bind ViewModel.TargetIndex, Mode=TwoWay}">
+                                    <RadioButton AutomationProperties.Name="C#/.NET. Writes DEC-001 to the decision log with you as the decider." Style="{StaticResource ChoiceStyle}">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="C#/.NET" />
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Recorded in the decision log, with you as the decider." />
+                                        </StackPanel>
+                                    </RadioButton>
+                                    <RadioButton AutomationProperties.Name="Java/JVM. Writes DEC-001 to the decision log with you as the decider." Style="{StaticResource ChoiceStyle}">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Java/JVM" />
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Recorded in the decision log, with you as the decider." />
+                                        </StackPanel>
+                                    </RadioButton>
+                                    <RadioButton AutomationProperties.Name="Decide after discovery. Adds an open question; the Architecture sign-off stays blocked until someone decides." Style="{StaticResource ChoiceStyle}">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Decide after discovery" />
+                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Adds an open question. The Architecture sign-off stays blocked until someone decides." />
+                                        </StackPanel>
+                                    </RadioButton>
+                                </RadioButtons>
+                                <StackPanel MaxWidth="420" HorizontalAlignment="Left" Spacing="4">
+                                    <TextBox
+                                        MinWidth="420"
+                                        AutomationProperties.IsRequiredForForm="True"
+                                        Header="Decided by"
+                                        Text="{x:Bind ViewModel.DecidedBy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Recorded in the decision log." />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!--  Step 4: the essential context; Unknown is an answer and becomes a question.  -->
+                            <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.IsStep4, Mode=OneWay}">
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Text="Fill what you know. Each field left as Unknown becomes an open question in docs/00-project-charter/open-questions.md."
+                                    TextWrapping="Wrap" />
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Context}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:ContextField">
+                                            <Grid
+                                                MinHeight="44"
+                                                Padding="0,6"
+                                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                                BorderThickness="0,1,0,0"
+                                                ColumnSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="120" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="112" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    Style="{StaticResource BodyTextBlockStyle}"
+                                                    Text="{x:Bind Label}" />
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="2">
+                                                    <TextBox
+                                                        AutomationProperties.Name="{x:Bind Label}"
+                                                        IsEnabled="{x:Bind IsEditable, Mode=OneWay}"
+                                                        PlaceholderText="{x:Bind Placeholder, Mode=OneWay}"
+                                                        Text="{x:Bind Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                    <TextBlock
+                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                        Text="Becomes an open question."
+                                                        Visibility="{x:Bind IsUnknown, Mode=OneWay}" />
+                                                </StackPanel>
+                                                <CheckBox
+                                                    Grid.Column="2"
+                                                    VerticalAlignment="Center"
+                                                    AutomationProperties.Name="{x:Bind UnknownName}"
+                                                    Content="Unknown"
+                                                    IsChecked="{x:Bind IsUnknown, Mode=TwoWay}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </StackPanel>
+
+                            <!--  Step 5: what will be written, then Create.  -->
+                            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsStep5, Mode=OneWay}">
+                                <Grid ColumnSpacing="16" RowSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Name" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="{x:Bind ViewModel.Name, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="Folder" />
+                                    <TextBlock
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                        Style="{StaticResource MonoTextStyle}"
+                                        Text="{x:Bind ViewModel.Folder, Mode=OneWay}" />
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="Legacy source" />
+                                    <TextBlock
+                                        Grid.Row="2"
+                                        Grid.Column="1"
+                                        Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="{x:Bind ViewModel.LegacySummary, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Grid.Row="3"
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="Target platform" />
+                                    <TextBlock
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="{x:Bind ViewModel.TargetSummary, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Grid.Row="4"
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="Context" />
+                                    <TextBlock
+                                        Grid.Row="4"
+                                        Grid.Column="1"
+                                        Style="{StaticResource BodyTextBlockStyle}"
+                                        Text="{x:Bind ViewModel.ContextSummary, Mode=OneWay}"
+                                        TextWrapping="Wrap" />
+                                </Grid>
+                                <CheckBox Content="Initialise git and make the first commit" IsChecked="{x:Bind ViewModel.InitializeGit, Mode=TwoWay}" />
+                                <InfoBar
+                                    IsClosable="False"
+                                    IsOpen="True"
+                                    Message="Push it only to a private remote your organisation controls."
+                                    Severity="Warning"
+                                    Title="Keep this repository private.">
+                                    <InfoBar.IconSource>
+                                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                                    </InfoBar.IconSource>
+                                </InfoBar>
+                                <InfoBar
+                                    AutomationProperties.LiveSetting="Assertive"
+                                    IsClosable="False"
+                                    IsOpen="{x:Bind ViewModel.HasCreateProblem, Mode=OneWay}"
+                                    Message="{x:Bind ViewModel.CreateProblem, Mode=OneWay}"
+                                    Severity="Error"
+                                    Title="The workspace wasn’t created.">
+                                    <InfoBar.IconSource>
+                                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                                    </InfoBar.IconSource>
+                                </InfoBar>
+                            </StackPanel>
+
+                            <!--  Creating: each step as the engine reports it.  -->
+                            <ItemsRepeater
+                                AutomationProperties.LiveSetting="Polite"
+                                ItemsSource="{x:Bind ViewModel.Creation}"
+                                Visibility="{x:Bind ViewModel.IsCreating, Mode=OneWay}">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:CreationStepRow">
+                                        <Grid
+                                            Padding="0,10"
+                                            AutomationProperties.Name="{x:Bind AnnouncedName, Mode=OneWay}"
+                                            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                            BorderThickness="0,1,0,0"
+                                            ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="20" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <ProgressRing
+                                                Width="16"
+                                                Height="16"
+                                                IsActive="{x:Bind IsWorking, Mode=OneWay}"
+                                                Visibility="{x:Bind IsWorking, Mode=OneWay}" />
+                                            <FontIcon
+                                                Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                                Glyph="{x:Bind icons:StudioIcons.CheckPassed}"
+                                                Style="{StaticResource IconStyle}"
+                                                Visibility="{x:Bind IsDone, Mode=OneWay}" />
+                                            <FontIcon
+                                                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                Glyph="{x:Bind icons:StudioIcons.ErrorFilled}"
+                                                Style="{StaticResource IconStyle}"
+                                                Visibility="{x:Bind IsFailed, Mode=OneWay}" />
+                                            <FontIcon
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Glyph="{x:Bind icons:StudioIcons.NotYet}"
+                                                Style="{StaticResource IconStyle}"
+                                                Visibility="{x:Bind IsWaiting, Mode=OneWay}" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                Text="{x:Bind Label}"
+                                                TextWrapping="Wrap" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                Text="{x:Bind StatusText, Mode=OneWay}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+
+                            <!--  Created.  -->
+                            <StackPanel
+                                Padding="16,32"
+                                HorizontalAlignment="Center"
+                                Spacing="8"
+                                Visibility="{x:Bind ViewModel.IsCreated, Mode=OneWay}">
+                                <FontIcon
+                                    Margin="0,0,0,4"
+                                    FontSize="48"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Glyph="{x:Bind icons:StudioIcons.Ready}"
+                                    Style="{StaticResource IconStyle}" />
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    AutomationProperties.HeadingLevel="Level3"
+                                    Style="{StaticResource SubtitleTextBlockStyle}"
+                                    Text="{x:Bind ViewModel.CreatedTitle, Mode=OneWay}"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap" />
+                                <TextBlock
+                                    MaxWidth="480"
+                                    HorizontalAlignment="Center"
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Text="{x:Bind ViewModel.CreatedText, Mode=OneWay}"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap" />
+                                <Button
+                                    x:Name="OpenOverviewButton"
+                                    Margin="0,8,0,0"
+                                    HorizontalAlignment="Center"
+                                    Command="{x:Bind ViewModel.OpenOverviewCommand}"
+                                    Content="Open the Overview"
+                                    Style="{StaticResource AccentButtonStyle}" />
+                            </StackPanel>
+
+                            <Grid
+                                Padding="0,4,0,0"
+                                ColumnSpacing="8"
+                                Visibility="{x:Bind ViewModel.HasFooter, Mode=OneWay}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <!--  Tab order follows the markup: Back, Next or Create, then Cancel, which sits on the left.  -->
+                                <Button
+                                    Grid.Column="2"
+                                    Click="OnBack"
+                                    Content="Back"
+                                    IsEnabled="{x:Bind ViewModel.CanGoBack, Mode=OneWay}" />
+                                <Button
+                                    Grid.Column="3"
+                                    Click="OnNext"
+                                    Content="{x:Bind ViewModel.NextLabel, Mode=OneWay}"
+                                    IsEnabled="{x:Bind ViewModel.CanGoNext, Mode=OneWay}"
+                                    Style="{StaticResource AccentButtonStyle}" />
+                                <Button
+                                    Command="{x:Bind ViewModel.CancelCommand}"
+                                    Content="Cancel"
+                                    IsEnabled="{x:Bind ViewModel.CanCancel, Mode=OneWay}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

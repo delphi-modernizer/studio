@@ -1,0 +1,48 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup Label="Analyzers in every project">
+    <GlobalPackageReference Include="SonarAnalyzer.CSharp" Version="10.35.0.4138" />
+    <GlobalPackageReference Include="DelphiModernizer.Analyzers" Version="$(EngineVersion)" Condition="'$(EngineSource)' == 'Package'" />
+  </ItemGroup>
+
+  <ItemGroup Label="Engine (EngineSource=Package)">
+    <PackageVersion Include="DelphiModernizer.Engine.Core" Version="$(EngineVersion)" />
+    <PackageVersion Include="DelphiModernizer.Engine.Delphi" Version="$(EngineVersion)" />
+    <PackageVersion Include="DelphiModernizer.Engine.Kit" Version="$(EngineVersion)" />
+    <PackageVersion Include="DelphiModernizer.Engine.Traceability" Version="$(EngineVersion)" />
+    <PackageVersion Include="DelphiModernizer.Engine.Workspaces" Version="$(EngineVersion)" />
+    <PackageVersion Include="DelphiModernizer.Engine.Agents" Version="$(EngineVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Label="WinUI / Windows App SDK">
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
+    <PackageVersion Include="WinUIEx" Version="2.9.2" />
+  </ItemGroup>
+
+  <ItemGroup Label="MVVM">
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup Label="Dependency injection, hosting and logging">
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="10.0.14" />
+  </ItemGroup>
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="NSubstitute" Version="6.2.0" />
+    <PackageVersion Include="coverlet.collector" Version="10.1.0" />
+  </ItemGroup>
+
+</Project>

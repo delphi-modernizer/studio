@@ -1,0 +1,169 @@
+using System;
+using System.ComponentModel;
+using DelphiModernizer.Studio.Modules.Workstreams.Application;
+using DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Contracts;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation.Peers;
+using Microsoft.UI.Xaml.Controls;
+
+namespace DelphiModernizer.Studio.Modules.Workstreams.UI.Views;
+
+/// <summary>The Run page: one agent run, live or recorded.</summary>
+public sealed partial class RunPage : Page, IHasViewModel
+{
+    /// <summary>How much a new run's budget grows after a run reached its own; the design draws "[higher budget]".</summary>
+    private const decimal _budgetGrowth = 2m;
+
+    public RunPage(RunViewModel viewModel)
+    {
+        ArgumentNullException.ThrowIfNull(viewModel);
+        ViewModel = viewModel;
+        InitializeComponent();
+        ViewModel.PropertyChanged += OnViewModelChanged;
+        ViewModel.BudgetReached += OnBudgetReached;
+    }
+
+    public RunViewModel ViewModel { get; }
+
+    DelphiModernizer.Studio.UI.Contracts.ViewModel IHasViewModel.ViewModel => ViewModel;
+
+    public static string FailedText(string? message)
+    {
+        return $"{message ?? "The CLI ended without a result."} Anything it wrote before that stays as Draft.";
+    }
+
+    public static string CostName(string cost)
+    {
+        return $"Cost {cost}";
+    }
+
+    public static string OpenName(string name)
+    {
+        return $"Open {name} in your editor";
+    }
+
+    public static string WorkingText(bool isStarting, string roleName)
+    {
+        return isStarting
+            ? $"Starting Claude Code… Loading the {roleName} agent, the guard that keeps it in docs/, and the budget."
+            : "Working…";
+    }
+
+    /// <summary>Open the draft is the accent action once the agent finished; otherwise a plain button.</summary>
+    public static Style DraftStyle(RunOutcome outcome)
+    {
+        var key = outcome == RunOutcome.Completed ? "AccentButtonStyle" : "DefaultButtonStyle";
+
+        return (Style)Microsoft.UI.Xaml.Application.Current.Resources[key];
+    }
+
+    private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(RunViewModel.Outcome))
+        {
+            return;
+        }
+
+        // The pill takes its new word through its binding first, so the announcement waits a turn.
+        DispatcherQueue.TryEnqueue(() => {
+            FrameworkElementAutomationPeer.FromElement(Pill)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+            FrameworkElementAutomationPeer.FromElement(EndCard)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+        });
+    }
+
+    private async void OnBudgetReached(object? sender, EventArgs e)
+    {
+        var turns = ViewModel.Turns == "1" ? "1 turn" : $"{ViewModel.Turns} turns";
+        var dialog = new BudgetDialog(
+            $"{ViewModel.Title} stopped at its {RunWords.Dollars(ViewModel.BudgetUsd)} budget after {turns}. What it wrote so far is in the {ViewModel.Writing} as a Draft.",
+            ViewModel.Cost,
+            ViewModel.BudgetUsd * _budgetGrowth) { XamlRoot = XamlRoot };
+
+        switch (await dialog.ShowAsync())
+        {
+            case ContentDialogResult.Primary:
+                await ViewModel.RunAgainAsync(ViewModel.Argument, dialog.BudgetUsd);
+                break;
+            case ContentDialogResult.Secondary:
+                await ViewModel.OpenDraftAsync();
+                break;
+        }
+    }
+
+    private async void OnRunAgain(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel.Recipe is not { } recipe)
+        {
+            return;
+        }
+
+        var dialog = new RunRecipeDialog(recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null) { XamlRoot = XamlRoot };
+
+        while (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        {
+            var problem = await ViewModel.RunAgainAsync(dialog.Argument, dialog.BudgetUsd);
+
+            if (problem is null)
+            {
+                return;
+            }
+
+            dialog.ShowProblem(problem);
+        }
+    }
+
+    private void OnStop(object sender, RoutedEventArgs e)
+    {
+        ViewModel.Stop();
+    }
+
+    private void OnOpenWorkstreams(object sender, RoutedEventArgs e)
+    {
+        ViewModel.OpenWorkstreams();
+    }
+
+    private void OnOpenRole(object sender, RoutedEventArgs e)
+    {
+        ViewModel.OpenRole();
+    }
+
+    private async void OnOpenDraft(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.OpenDraftAsync();
+    }
+
+    private void OnExpandAll(object sender, RoutedEventArgs e)
+    {
+        ViewModel.ExpandAll();
+    }
+
+    private void OnToolClicked(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: ToolRow row })
+        {
+            ViewModel.Toggle(row);
+        }
+    }
+
+    private async void OnOpenWrite(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: WriteRow row })
+        {
+            await ViewModel.OpenFileAsync(row.Path);
+        }
+    }
+
+    private async void OnOpenFile(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: FileRow row })
+        {
+            await ViewModel.OpenFileAsync(row.Path);
+        }
+    }
+
+    private async void OnOpenTranscript(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.OpenFileAsync(ViewModel.TranscriptFile);
+    }
+}
