@@ -99,6 +99,10 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial IReadOnlyList<UnitRow> Units { get; set; } = [];
 
+    /// <summary>The sortable column headers in table order; an <c>IList</c> because the header binds each by index.</summary>
+    [ObservableProperty]
+    public partial IList<SortHeader> Headers { get; set; } = HeadersFor(UnitSort.FanIn, descending: true);
+
     [ObservableProperty]
     public partial string UnitsNote { get; set; } = string.Empty;
 
@@ -147,6 +151,16 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         int? line = hash >= 0 && int.TryParse(link[(hash + 2)..], CultureInfo.InvariantCulture, out var number) ? number : null;
 
         return _editor.OpenAsync(_legacy + path, line);
+    }
+
+    /// <summary>Sorts by <paramref name="column"/>, or turns the order round when it is the column already sorted by.</summary>
+    /// <remarks>Numbers sort largest first and names A to Z, so the first click shows what matters most.</remarks>
+    public void SortBy(UnitSort column)
+    {
+        var current = Headers.First(h => h.IsSorted);
+        var descending = current.Column == column ? !current.Descending : column != UnitSort.Name;
+        Headers = HeadersFor(column, descending);
+        Units = FilteredUnits();
     }
 
     public Task<bool> OpenMarkdownAsync()
@@ -244,12 +258,12 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         Facts = $"{(version is null ? "Delphi version not named" : $"{version.DelphiVersion}, from {System.IO.Path.GetFileName(version.Path)}")}   ·   Encodings: {encodings}   ·   {shortFingerprint}";
 
         _units = [.. inventory.Units
-            .OrderByDescending(u => u.FanIn)
-            .ThenBy(u => u.Name, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase)
             .Select(u => new UnitRow(
                 u.Name,
                 u.Path,
-                $"{Number(u.CodeLines)} / {Number(u.Lines)}",
+                u.CodeLines,
+                u.Lines,
                 u.Routines,
                 u.GlobalVariables,
                 u.FanIn,
@@ -258,7 +272,8 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
                 u.Types.Length == 0 ? "—" : string.Join(", ", u.Types.Select(t => t.Name)),
                 cycleUnits.Contains(u.Name),
                 u.Kind == "program",
-                false))];
+                false,
+                InventoryWords.CodeModule(u, cycleUnits.Contains(u.Name))))];
         IsLarge = _units.Count > _groupAbove;
         Units = FilteredUnits();
         UnitsNote = inventory.UnresolvedUnits.Length == 0
@@ -296,9 +311,9 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     /// <remarks>A large codebase reads by folder: each folder heading is followed by its modules.</remarks>
     private List<UnitRow> FilteredUnits()
     {
-        var matching = Search.Length == 0
+        var matching = Sorted(Search.Length == 0
             ? _units
-            : _units.FindAll(u => u.Name.Contains(Search, StringComparison.OrdinalIgnoreCase) || u.Path.Contains(Search, StringComparison.OrdinalIgnoreCase));
+            : _units.FindAll(u => u.Name.Contains(Search, StringComparison.OrdinalIgnoreCase) || u.Path.Contains(Search, StringComparison.OrdinalIgnoreCase)));
 
         if (_units.Count <= _groupAbove)
         {
@@ -311,11 +326,44 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
             .SelectMany(g => g.Prepend(Folder(g.Key, g.Count())))];
     }
 
+    /// <remarks>Ties keep the order by name the rows are built in.</remarks>
+    private List<UnitRow> Sorted(List<UnitRow> units)
+    {
+        var sort = Headers.First(h => h.IsSorted);
+        Func<UnitRow, IComparable> key = sort.Column switch {
+            UnitSort.CodeLines => u => u.CodeLines,
+            UnitSort.Routines => u => u.Routines,
+            UnitSort.Globals => u => u.Globals,
+            UnitSort.FanIn => u => u.FanIn,
+            UnitSort.FanOut => u => u.FanOut,
+            UnitSort.Uses => u => u.Uses,
+            _ => u => u.Name.ToUpperInvariant(),
+        };
+
+        return sort.Descending ? [.. units.OrderByDescending(key)] : [.. units.OrderBy(key)];
+    }
+
     private static UnitRow Folder(string folder, int count)
     {
         var name = folder.Length == 0 ? "legacy/" : folder.Replace('\\', '/') + "/";
+        var modules = Count(count, "code module");
 
-        return new UnitRow(name, Count(count, "code module"), string.Empty, 0, 0, 0, 0, 0, string.Empty, false, false, true);
+        return new UnitRow(name, modules, 0, 0, 0, 0, 0, 0, 0, string.Empty, false, false, true, $"Folder {name}, {modules}");
+    }
+
+    private static List<SortHeader> HeadersFor(UnitSort sorted, bool descending)
+    {
+        (UnitSort Column, string Label)[] columns = [
+            (UnitSort.Name, "Code module and path"),
+            (UnitSort.CodeLines, "Code lines"),
+            (UnitSort.Routines, "Routines"),
+            (UnitSort.Globals, "Globals"),
+            (UnitSort.FanIn, "Fan-in"),
+            (UnitSort.FanOut, "Fan-out"),
+            (UnitSort.Uses, "Uses"),
+        ];
+
+        return [.. columns.Select(c => new SortHeader(c.Column, c.Label, c.Column == sorted, descending))];
     }
 
     private static string? UnreadableNote(IEnumerable<FormInfo> forms)

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Globalization;
+using DelphiModernizer.Studio.UI.Common.Icons;
 
 namespace DelphiModernizer.Studio.Modules.Inventory.UI.ViewModels;
 
@@ -12,10 +14,34 @@ public enum InventoryTab
     Diagnostics,
 }
 
+/// <summary>A column the code modules table sorts by.</summary>
+public enum UnitSort
+{
+    Name,
+    CodeLines,
+    Routines,
+    Globals,
+    FanIn,
+    FanOut,
+    Uses,
+}
+
 /// <summary>A tab of the inventory with how many findings it holds.</summary>
 public sealed record InventoryTabChoice(InventoryTab Tab, string Label, int Count)
 {
     public string Text => $"{Label} {Count}";
+
+    public string AnnouncedName => $"{Label}, {Count}";
+}
+
+/// <summary>A column header of the code modules table; the one the table is sorted by shows a chevron.</summary>
+public sealed record SortHeader(UnitSort Column, string Label, bool IsSorted, bool Descending)
+{
+    public string Glyph => Descending ? StudioIcons.ChevronDown : StudioIcons.ChevronUp;
+
+    public string AnnouncedName => IsSorted ? $"{Label}, sorted {_order}" : Label;
+
+    private string _order => Descending ? "descending" : "ascending";
 }
 
 /// <summary>One of the four summary cards above the tabs.</summary>
@@ -25,7 +51,8 @@ public sealed record InventoryStat(string Label, string Glyph, string Number, st
 public sealed record UnitRow(
     string Name,
     string Path,
-    string CodeLines,
+    int CodeLines,
+    int Lines,
     int Routines,
     int Globals,
     int FanIn,
@@ -34,13 +61,13 @@ public sealed record UnitRow(
     string Types,
     bool InCycle,
     bool IsProgram,
-    bool IsFolder)
+    bool IsFolder,
+    string AnnouncedName)
 {
     public bool IsUnit => !IsFolder;
 
-    public string AnnouncedName => IsFolder ? $"Folder {Name}, {Path}" : $"{Name}, {Path}{_cycleWord}, {CodeLines} code lines, fan-in {FanIn}, fan-out {FanOut}";
-
-    private string _cycleWord => InCycle ? ", cycle" : string.Empty;
+    public string CodeLinesText =>
+        $"{CodeLines.ToString("N0", CultureInfo.CurrentCulture)} / {Lines.ToString("N0", CultureInfo.CurrentCulture)}";
 
     public string OpenName => $"Open {Path} in your editor";
 }
@@ -48,6 +75,8 @@ public sealed record UnitRow(
 public sealed record ScreenRow(string Root, string Path, bool IsBinary, int Controls, int Events)
 {
     public string Format => IsBinary ? "Binary" : "Text";
+
+    public string AnnouncedName => $"{Root}, {Path}, {Format}, {Controls} controls, {Events} events";
 
     public string OpenName => $"Open {Path} in your editor";
 }
@@ -71,9 +100,15 @@ public sealed record Setting(string Key, string Value)
 
 public sealed record ExternalRow(string Routine, string Library, string Link);
 
-public sealed record SqlRow(string Link, string Kind, string Text, string Note, bool BuiltByConcatenation);
+public sealed record SqlRow(string Link, string Kind, string Text, string Note, bool BuiltByConcatenation)
+{
+    public string AnnouncedName => $"{Kind}: {Text}. {Note}{(BuiltByConcatenation ? ", built by concatenation" : string.Empty)}";
+}
 
-public sealed record RiskRow(string Kind, string Link, int Count, string Detail);
+public sealed record RiskRow(string Kind, string Link, int Count, string Detail)
+{
+    public string AnnouncedName => $"{Kind}, {Count}, {Detail}";
+}
 
 public sealed record CycleRow(string Units, IReadOnlyList<string> Members);
 
