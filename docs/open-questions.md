@@ -19,4 +19,11 @@ change.
 | Problem wording: the canvas words three trace rules (broken evidence, missing evidence, open question); the other eleven are new | Labels and sentences in the same style, one place to change | `ProblemWordings` |
 | Default window height | 760, as the brief says | `MainWindow.xaml` |
 | When does the pane collapse on its own? | Never; only from the title-bar toggle | `ShellPage` |
-| The other handoff questions (stale on answered questions, settings defaults, tool calls collapsed, Run again, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |
+| Guard refusals: the engine streams a refused tool call as a failed tool result, with no event of its own | A failed result whose text carries Claude Code's hook or permission wording reads as a refusal | `RunTranscript` |
+| A run's cost and turns while it runs: the stream reports them only in its result | "—" until the run ends, then the result's numbers | `RunViewModel` |
+| A run from an earlier session: the engine's transcript parser is internal, so the studio cannot replay the recorded `.jsonl` | The summary the run store keeps, and the transcript file with Open in editor | `RunViewModel.ShowRecordAsync` |
+| The budget a new run offers after one reached its own ("[higher budget]") | Twice the budget that was reached | `RunPage` |
+| Blocked by a run the studio did not start, such as `dmz run` in a terminal: the engine's leases name no holder publicly | Run… is offered; the engine refuses the lease and the dialog shows its reason | `StartRunCommand` |
+| The Run an agent task dialog's description: the kit has none per recipe; the canvas draws one for Extract business rules | One sentence from what the recipe writes | `RunRecipeDialog` |
+| Short names for what a recipe writes ("Writes the functional requirements") | The kit's deliverable titles | `RunWords.Writes` |
+| The other handoff questions (stale on answered questions, settings defaults, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |

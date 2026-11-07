@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using DelphiModernizer.Engine.Agents;
 using DelphiModernizer.Engine.Core;
 using DelphiModernizer.Engine.Kit;
-using DelphiModernizer.Engine.Kit.Spec;
 using DelphiModernizer.Engine.Workspaces;
 using DelphiModernizer.Studio.Application.Abstractions;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
@@ -16,63 +15,92 @@ using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
-/// <summary>Starts a kit recipe in the open workspace with the person's Claude Code settings.</summary>
+/// <summary>Starts a kit recipe in the open workspace with the person's Claude Code settings and this run's budget.</summary>
 /// <remarks>
-/// The run holds a lease on each deliverable the recipe writes until <see cref="AgentRun.Events"/> ends, so the caller
-/// must enumerate it to the end; cancelling the enumeration stops the agent and releases the leases.
+/// The run holds a lease on each deliverable the recipe writes until it ends; <see cref="RunMonitor"/> reads it to the
+/// end, and <see cref="LiveRun.Stop"/> stops the agent and releases the leases.
 /// </remarks>
-public sealed record StartRunCommand(string RecipeId, string? Argument) : IRequest<Result<AgentRun>>;
+public sealed record StartRunCommand(string RecipeId, string? Argument, decimal BudgetUsd) : IRequest<Result<LiveRun>>;
 
-public sealed record AgentRun(string RunId, Recipe Recipe, IAsyncEnumerable<AgentEvent> Events);
-
-internal sealed class StartRunCommandHandler(IWorkspaceSession session, IStudioSettings settings, IClock clock)
-    : IRequestHandler<StartRunCommand, Result<AgentRun>>
+internal sealed class StartRunCommandHandler(
+    IWorkspaceSession session,
+    IStudioSettings settings,
+    IClaudeLocator locator,
+    RunMonitor monitor,
+    IClock clock)
+    : IRequestHandler<StartRunCommand, Result<LiveRun>>
 {
-    public async Task<Result<AgentRun>> Handle(StartRunCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LiveRun>> Handle(StartRunCommand request, CancellationToken cancellationToken)
     {
         if (session.Current is not { } workspace)
         {
-            return Result.Failure<AgentRun>(WorkspaceRequired.Error);
+            return Result.Failure<LiveRun>(WorkspaceRequired.Error);
         }
 
         var recipe = KitBundle.Embedded.Spec.Recipes.Recipes.FirstOrDefault(r => r.Id == request.RecipeId);
 
         if (recipe is null)
         {
-            return Result.Failure<AgentRun>(WorkstreamsErrors.UnknownRecipe(request.RecipeId));
+            return Result.Failure<LiveRun>(WorkstreamsErrors.UnknownRecipe(request.RecipeId));
+        }
+
+        if (request.BudgetUsd <= 0)
+        {
+            return Result.Failure<LiveRun>(WorkstreamsErrors.NoBudget);
         }
 
         var prompt = RecipePrompt.Render(recipe, request.Argument);
-        var executable = ClaudeExecutable.Locate(settings.Agents.ClaudePath);
+        var executable = locator.Locate(settings.Agents.ClaudePath);
 
         if (prompt.IsFailure || executable.IsFailure)
         {
-            return Result.Failure<AgentRun>(prompt.IsFailure ? prompt.Error : executable.Error);
-        }
-
-        var version = await executable.Value.VersionAsync(cancellationToken);
-
-        if (version.IsFailure)
-        {
-            return Result.Failure<AgentRun>(version.Error);
+            return Result.Failure<LiveRun>(prompt.IsFailure ? prompt.Error : executable.Error);
         }
 
         var agents = settings.Agents;
+        var startedAt = clock.UtcNow;
         var run = new AgentRunRequest(
-            $"{clock.UtcNow:yyyyMMddHHmmss}-{recipe.Id}",
+            $"{startedAt:yyyyMMddHHmmss}-{recipe.Id}",
             workspace.Root,
             recipe.Agent,
             prompt.Value,
             $"{Guid.NewGuid()}",
-            agents.BudgetUsd,
+            request.BudgetUsd,
             settings.ToolDirectory,
             agents.Model,
             agents.Effort);
         var leased = RunLocks.Acquire(workspace, run.RunId, recipe.Writes);
 
-        return leased.IsSuccess
-            ? new AgentRun(run.RunId, recipe, Leased(new AgentRunner(executable.Value), run, workspace, recipe.Writes, CancellationToken.None))
-            : Result.Failure<AgentRun>(leased.Error);
+        if (leased.IsFailure)
+        {
+            return Result.Failure<LiveRun>(leased.Error);
+        }
+
+        var tracked = false;
+
+        // The leases come first, so a task another run blocks is refused without waiting for the CLI.
+        try
+        {
+            var version = await executable.Value.VersionAsync(cancellationToken);
+
+            if (version.IsFailure)
+            {
+                return Result.Failure<LiveRun>(version.Error);
+            }
+
+            var argument = string.IsNullOrWhiteSpace(request.Argument) ? null : request.Argument.Trim();
+            var events = Leased(new AgentRunner(executable.Value), run, workspace, recipe.Writes, CancellationToken.None);
+            tracked = true;
+
+            return monitor.Track(run.RunId, workspace.Root, recipe, argument, request.BudgetUsd, startedAt, events);
+        }
+        finally
+        {
+            if (!tracked)
+            {
+                RunLocks.Release(workspace, run.RunId, recipe.Writes);
+            }
+        }
     }
 
     private static async IAsyncEnumerable<AgentEvent> Leased(

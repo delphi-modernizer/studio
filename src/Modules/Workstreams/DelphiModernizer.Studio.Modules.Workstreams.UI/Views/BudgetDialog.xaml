@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog
+    x:Class="DelphiModernizer.Studio.Modules.Workstreams.UI.Views.BudgetDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    CloseButtonText="Close"
+    DefaultButton="Close"
+    PrimaryButtonText="Run again"
+    SecondaryButtonText="Open the draft"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="This run reached its budget">
+
+    <StackPanel Spacing="16">
+        <TextBlock
+            x:Name="Lead"
+            Style="{StaticResource BodyTextBlockStyle}"
+            TextWrapping="Wrap" />
+        <Grid ColumnSpacing="16" RowSpacing="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Spent" />
+            <TextBlock
+                x:Name="Spent"
+                Grid.Column="1"
+                Style="{StaticResource BodyTextBlockStyle}" />
+            <TextBlock
+                Grid.Row="1"
+                Style="{StaticResource SecondaryCaptionTextStyle}"
+                Text="Outcome" />
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource MonoTextStyle}"
+                Text="error_max_budget_usd" />
+        </Grid>
+        <StackPanel MaxWidth="240" HorizontalAlignment="Left" Spacing="4">
+            <NumberBox
+                x:Name="BudgetBox"
+                AutomationProperties.HelpText="A new run starts the task again with the same scope."
+                Header="Budget for a new run"
+                LargeChange="1"
+                Minimum="0.1"
+                SmallChange="0.5"
+                SpinButtonPlacementMode="Inline" />
+            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="A new run starts the task again with the same scope." />
+        </StackPanel>
+    </StackPanel>
+</ContentDialog>
