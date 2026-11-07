@@ -466,7 +466,7 @@
                                             Style="{StaticResource FlowNodeStyle}"
                                             ToolTipService.ToolTip="Opens Inventory">
                                             <StackPanel Spacing="8">
-                                                <Grid Margin="0,0,0,4">
+                                                <Grid>
                                                     <Border
                                                         HorizontalAlignment="Left"
                                                         Style="{StaticResource NodeTileStyle}">
@@ -492,16 +492,23 @@
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
                                                         Text="{x:Bind ViewModel.Legacy.Subtitle}" />
                                                 </StackPanel>
+                                                <!--  One fact a line, as drawn, so all three fit the node.  -->
                                                 <StackPanel>
                                                     <TextBlock
                                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="{x:Bind ViewModel.Legacy.First}" />
+                                                        Text="{x:Bind ViewModel.Legacy.First}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        TextWrapping="NoWrap" />
                                                     <TextBlock
                                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="{x:Bind ViewModel.Legacy.Second}" />
+                                                        Text="{x:Bind ViewModel.Legacy.Second}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        TextWrapping="NoWrap" />
                                                     <TextBlock
                                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="{x:Bind ViewModel.Legacy.Third}" />
+                                                        Text="{x:Bind ViewModel.Legacy.Third}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        TextWrapping="NoWrap" />
                                                 </StackPanel>
                                             </StackPanel>
                                         </Button>
@@ -686,15 +693,22 @@
                                                 BorderThickness="1"
                                                 CornerRadius="8"
                                                 Visibility="{x:Bind ViewModel.Build.IsUnlocked}" />
+                                            <!--  Flow.cs puts the pill under the name when wide, as drawn.  -->
                                             <Grid
+                                                x:Name="BuildLayout"
                                                 Padding="12,8"
                                                 VerticalAlignment="Center"
-                                                ColumnSpacing="10">
+                                                ColumnSpacing="10"
+                                                RowSpacing="4">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
                                                 <FontIcon
                                                     x:DefaultBindMode="OneTime"
                                                     Glyph="{x:Bind icons:StudioIcons.Build}"
@@ -711,6 +725,7 @@
                                                         Text="{x:Bind ViewModel.Build.Subtitle}" />
                                                 </StackPanel>
                                                 <controls:StatusPill
+                                                    x:Name="BuildPill"
                                                     Grid.Column="2"
                                                     State="{x:Bind ViewModel.Build.Pill}" />
                                             </Grid>

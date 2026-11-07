@@ -56,6 +56,10 @@ public sealed partial class OverviewPage
         LegendInside.Visibility = wide ? Visibility.Visible : Visibility.Collapsed;
         LegendBelow.Visibility = wide ? Visibility.Collapsed : Visibility.Visible;
         BuildSubtitle.Visibility = wide ? Visibility.Collapsed : Visibility.Visible;
+        BuildLayout.Padding = wide ? new Thickness(12, 6, 12, 6) : new Thickness(12, 8, 12, 8);
+        Grid.SetRow(BuildPill, wide ? 1 : 0);
+        Grid.SetColumn(BuildPill, wide ? 1 : 2);
+        BuildPill.HorizontalAlignment = wide ? HorizontalAlignment.Left : HorizontalAlignment.Stretch;
         Flow.Height = wide ? LayOutWide(available) : LayOutNarrow(available);
         ShowNextGate();
     }
