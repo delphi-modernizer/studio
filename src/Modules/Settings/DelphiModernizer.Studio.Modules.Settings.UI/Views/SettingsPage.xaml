@@ -312,7 +312,7 @@
                         <Button
                             Grid.Column="2"
                             VerticalAlignment="Center"
-                            Click="OnCopyVersions">
+                            Command="{x:Bind ViewModel.CopyVersionsCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <FontIcon Glyph="{x:Bind icons:StudioIcons.Copy}" Style="{StaticResource IconStyle}" />
                                 <TextBlock Text="Copy versions" />

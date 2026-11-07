@@ -28,6 +28,7 @@ internal static class AppHost
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<IPickerService, PickerService>();
+        services.AddSingleton<IClipboardService, ClipboardService>();
         services.AddSingleton<IEditorLauncher, EditorLauncher>();
         services.AddSingleton<MainWindow>();
         services.AddSingleton<ShellViewModel>();

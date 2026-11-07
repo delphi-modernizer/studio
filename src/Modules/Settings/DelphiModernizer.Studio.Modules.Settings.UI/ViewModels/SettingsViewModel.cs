@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DelphiModernizer.Studio.Application.Abstractions;
 using DelphiModernizer.Studio.Application.Abstractions.Agents;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Settings;
@@ -25,19 +26,27 @@ public sealed partial class SettingsViewModel : ViewModel
     private readonly IStudioSettings _settings;
     private readonly IThemeService _theme;
     private readonly IPickerService _picker;
+    private readonly IClipboardService _clipboard;
     private readonly bool _loaded;
     private DateTimeOffset? _testedAt;
 
-    public SettingsViewModel(ISender sender, IStudioSettings settings, IThemeService theme, IPickerService picker)
+    public SettingsViewModel(
+        ISender sender,
+        IStudioSettings settings,
+        IThemeService theme,
+        IPickerService picker,
+        IClipboardService clipboard)
     {
         ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentNullException.ThrowIfNull(theme);
         ArgumentNullException.ThrowIfNull(picker);
+        ArgumentNullException.ThrowIfNull(clipboard);
         _sender = sender;
         _settings = settings;
         _theme = theme;
         _picker = picker;
+        _clipboard = clipboard;
         var agents = settings.Agents;
         ClaudePath = agents.ClaudePath ?? string.Empty;
         Model = agents.Model ?? string.Empty;
@@ -121,6 +130,12 @@ public sealed partial class SettingsViewModel : ViewModel
             ClaudePath = path;
             await TestAsync(cancellationToken);
         }
+    }
+
+    [RelayCommand]
+    private void CopyVersions()
+    {
+        _clipboard.SetText(StudioVersions.Current.Line);
     }
 
     partial void OnModelChanged(string value)

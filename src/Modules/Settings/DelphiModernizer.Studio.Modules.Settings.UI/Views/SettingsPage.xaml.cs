@@ -1,10 +1,8 @@
 using System;
-using DelphiModernizer.Studio.Application.Abstractions;
 using DelphiModernizer.Studio.Modules.Settings.UI.ViewModels;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.ApplicationModel.DataTransfer;
 
 namespace DelphiModernizer.Studio.Modules.Settings.UI.Views;
 
@@ -25,12 +23,5 @@ public sealed partial class SettingsPage : Page, IHasViewModel
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.TestCommand.ExecuteAsync(parameter: null);
-    }
-
-    private void OnCopyVersions(object sender, RoutedEventArgs e)
-    {
-        var package = new DataPackage();
-        package.SetText(StudioVersions.Current.Line);
-        Clipboard.SetContent(package);
     }
 }
