@@ -21,6 +21,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Modules\Workstreams\DelphiModernizer.Studio.Modules.Workstreams.Application\DelphiModernizer.Studio.Modules.Workstreams.Application.csproj" />
+    <!-- Stands in for the Claude Code CLI, as in the engine's runner tests. -->
+    <ProjectReference Include="$(EngineRoot)tests/DelphiModernizer.Engine.Agents.FakeClaude/DelphiModernizer.Engine.Agents.FakeClaude.csproj" />
   </ItemGroup>
 
 </Project>

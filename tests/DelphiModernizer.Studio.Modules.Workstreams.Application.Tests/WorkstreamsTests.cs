@@ -34,7 +34,7 @@ public sealed class WorkstreamsTests
         using var workspace = await TestWorkspace.CreateAsync();
         var sender = Sender(workspace.Session);
 
-        var started = await sender.Send(new StartRunCommand("ws99-nothing", null), TestContext.Current.CancellationToken);
+        var started = await sender.Send(new StartRunCommand("ws99-nothing", null, 1m), TestContext.Current.CancellationToken);
 
         Assert.Equal("Workstreams.UnknownRecipe", started.Error.Code);
     }
@@ -45,7 +45,7 @@ public sealed class WorkstreamsTests
         using var workspace = await TestWorkspace.CreateAsync();
         var sender = Sender(workspace.Session);
 
-        var started = await sender.Send(new StartRunCommand("ws01-discover", null), TestContext.Current.CancellationToken);
+        var started = await sender.Send(new StartRunCommand("ws01-discover", null, 1m), TestContext.Current.CancellationToken);
         var status = await sender.Send(new GetClaudeStatusQuery(), TestContext.Current.CancellationToken);
 
         Assert.True(started.IsFailure);

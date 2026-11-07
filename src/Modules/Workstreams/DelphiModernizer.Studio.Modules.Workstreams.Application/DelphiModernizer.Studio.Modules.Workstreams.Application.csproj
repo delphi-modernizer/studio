@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <EngineReference Include="DelphiModernizer.Engine.Agents" />
+    <EngineReference Include="DelphiModernizer.Engine.Traceability" />
     <EngineReference Include="DelphiModernizer.Engine.Workspaces" />
   </ItemGroup>
 
