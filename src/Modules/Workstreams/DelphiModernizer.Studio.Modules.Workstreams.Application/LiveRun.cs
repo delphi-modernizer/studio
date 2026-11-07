@@ -7,16 +7,25 @@ using DelphiModernizer.Engine.Kit.Spec;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
-/// <summary>A run this studio started: what it was asked, every event it has streamed so far, and how it ended.</summary>
+/// <summary>
+/// A run this studio started: what it was asked, every event it has streamed so far, and how it ended.
+/// </summary>
 public sealed class LiveRun : IDisposable
 {
     private readonly Lock _gate = new();
     private readonly List<AgentEvent> _events = [];
     private readonly CancellationTokenSource _stop = new();
-    private readonly TaskCompletionSource<RunCompleted> _ended = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource<RunCompleted> _ended =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
     private EventHandler<AgentEvent>? _received;
 
-    internal LiveRun(string runId, string workspaceRoot, Recipe recipe, string? argument, decimal budgetUsd, DateTimeOffset startedAt)
+    internal LiveRun(
+        string runId,
+        string workspaceRoot,
+        Recipe recipe,
+        string? argument,
+        decimal budgetUsd,
+        DateTimeOffset startedAt)
     {
         RunId = runId;
         WorkspaceRoot = workspaceRoot;
@@ -44,12 +53,16 @@ public sealed class LiveRun : IDisposable
 
     public bool IsEnded => Completed is not null;
 
-    /// <summary>Completes with the run's last event once the engine has closed the run: summary written, leases released.</summary>
+    /// <summary>
+    /// Completes with the run's last event once the engine has closed the run: summary written, leases released.
+    /// </summary>
     public Task<RunCompleted> Ended => _ended.Task;
 
     internal CancellationToken _stopToken => _stop.Token;
 
-    /// <summary>Returns every event so far and calls <paramref name="handler"/>, on any thread, for each one after them.</summary>
+    /// <summary>
+    /// Returns every event so far and calls <paramref name="handler"/>, on any thread, for each one after them.
+    /// </summary>
     /// <remarks>Taken together under one lock, so no event is missed or seen twice.</remarks>
     public IReadOnlyList<AgentEvent> Subscribe(EventHandler<AgentEvent> handler)
     {

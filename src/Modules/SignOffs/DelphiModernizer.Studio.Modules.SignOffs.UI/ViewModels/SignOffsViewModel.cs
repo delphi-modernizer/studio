@@ -21,7 +21,11 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
     private readonly IClipboardService _clipboard;
     private string? _requested;
 
-    public SignOffsViewModel(IWorkspaceSession session, ISender sender, INavigationService navigation, IClipboardService clipboard)
+    public SignOffsViewModel(
+        IWorkspaceSession session,
+        ISender sender,
+        INavigationService navigation,
+        IClipboardService clipboard)
         : base(session)
     {
         ArgumentNullException.ThrowIfNull(sender);

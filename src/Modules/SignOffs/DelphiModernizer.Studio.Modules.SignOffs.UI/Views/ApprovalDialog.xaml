@@ -22,11 +22,16 @@
         <InfoBar
             IsClosable="False"
             IsOpen="{x:Bind ViewModel.IsFinalPlan}"
-            Message="Agents may then write the new code under target/ until a document the final plan covers changes, or someone revokes this approval."
             Severity="Warning"
             Title="This allows building the new system.">
+            <InfoBar.Message>
+                Agents may then write the new code under target/ until a document the final plan covers changes, or
+                someone revokes this approval.
+            </InfoBar.Message>
             <InfoBar.IconSource>
-                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                <FontIconSource
+                    FontFamily="{StaticResource StudioIconsFontFamily}"
+                    Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
             </InfoBar.IconSource>
         </InfoBar>
 
@@ -39,7 +44,9 @@
             Severity="Error"
             Title="Approval refused.">
             <InfoBar.IconSource>
-                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                <FontIconSource
+                    FontFamily="{StaticResource StudioIconsFontFamily}"
+                    Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
             </InfoBar.IconSource>
             <InfoBar.ActionButton>
                 <Button
@@ -63,8 +70,12 @@
                     Glyph="{x:Bind icons:StudioIcons.Approved}"
                     Style="{StaticResource IconStyle}" />
                 <StackPanel Grid.Column="1">
-                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.SignOff.ApprovedBy}" />
-                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.SignOff.ApprovedWhen}" />
+                    <TextBlock
+                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                        Text="{x:Bind ViewModel.SignOff.ApprovedBy}" />
+                    <TextBlock
+                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                        Text="{x:Bind ViewModel.SignOff.ApprovedWhen}" />
                 </StackPanel>
             </Grid>
         </StackPanel>
@@ -85,8 +96,12 @@
                     Glyph="{x:Bind icons:StudioIcons.Person}"
                     Style="{StaticResource IconStyle}" />
                 <StackPanel Grid.Column="1">
-                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.ApproverName}" />
-                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.ApproverDetail}" />
+                    <TextBlock
+                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                        Text="{x:Bind ViewModel.ApproverName}" />
+                    <TextBlock
+                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                        Text="{x:Bind ViewModel.ApproverDetail}" />
                 </StackPanel>
             </Grid>
         </StackPanel>
@@ -99,7 +114,9 @@
                 Severity="Warning"
                 Title="No git identity.">
                 <InfoBar.IconSource>
-                    <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                    <FontIconSource
+                        FontFamily="{StaticResource StudioIconsFontFamily}"
+                        Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                 </InfoBar.IconSource>
             </InfoBar>
             <!--  The stroke keeps the box visible in high contrast, where the subtle fill is transparent.  -->

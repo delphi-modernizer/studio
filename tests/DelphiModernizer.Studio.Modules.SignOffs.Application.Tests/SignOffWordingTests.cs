@@ -29,7 +29,9 @@ public sealed class SignOffWordingTests
 
         var signOffs = (await sender.Send(new GetSignOffsQuery(), TestContext.Current.CancellationToken)).Value;
 
-        Assert.Equal(["Project setup", "Discovery", "Requirements", "Architecture", "Final plan"], signOffs.Select(s => s.Name));
+        Assert.Equal(
+            ["Project setup", "Discovery", "Requirements", "Architecture", "Final plan"],
+            signOffs.Select(s => s.Name));
         Assert.Contains(signOffs[0].Checks, c => c is { Name: "Project charter drafted", Passed: true });
         Assert.Contains(signOffs[1].Checks, c => c is { Name: "Project setup approved", Passed: false });
         Assert.Contains(signOffs[4].Checks, c => c.Name == "All 20 deliverables in review");

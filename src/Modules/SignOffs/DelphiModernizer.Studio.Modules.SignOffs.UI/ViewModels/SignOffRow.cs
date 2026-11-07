@@ -98,7 +98,8 @@ public sealed partial class SignOffRow : ObservableObject
         ChangedSummary = signOff.Changed.Count switch {
             0 => "A file it covers differs from the one approved.",
             1 => $"{FileName(signOff.Changed[0])} differs from {ApprovedCommit(signOff)}.",
-            _ => $"{FileName(signOff.Changed[0])} and {signOff.Changed.Count - 1} more differ from {ApprovedCommit(signOff)}.",
+            _ => $"{FileName(signOff.Changed[0])} and {signOff.Changed.Count - 1} more differ from "
+                + $"{ApprovedCommit(signOff)}.",
         };
 
         if (signOff.Status.Approval is { } approval)
@@ -114,9 +115,15 @@ public sealed partial class SignOffRow : ObservableObject
 
         (Summary, SummaryDetail) = signOff.Status.State switch {
             "approved" => (ApprovedBy, ApprovedWhen),
-            "stale" => ("Changed since approval", signOff.Changed.Count > 0 ? string.Join(", ", signOff.Changed.Select(FileName)) : "A file it covers was edited"),
+            "stale" => (
+                "Changed since approval",
+                signOff.Changed.Count > 0
+                    ? string.Join(", ", signOff.Changed.Select(FileName))
+                    : "A file it covers was edited"),
             "ready" => ($"{passed} of {Checks.Count} checks pass", "Waiting for a person"),
-            _ => ($"{passed} of {Checks.Count} checks pass", Checks.FirstOrDefault(c => !c.Passed)?.Name ?? string.Empty),
+            _ => (
+                $"{passed} of {Checks.Count} checks pass",
+                Checks.FirstOrDefault(c => !c.Passed)?.Name ?? string.Empty),
         };
         AnnouncedName = $"{Name}, sign-off {Number} of {count}, {PillLook.Of(Pill).Word}, {Summary}";
     }
@@ -155,7 +162,9 @@ public sealed partial class SignOffRow : ObservableObject
 
     public bool HasHistory => History.Count > 0;
 
-    /// <summary>What the stale InfoBar says changed: the files git reports, or the fingerprint alone when it cannot tell.</summary>
+    /// <summary>
+    /// What the stale InfoBar says changed: the files git reports, or the fingerprint alone when it cannot tell.
+    /// </summary>
     public string ChangedSummary { get; }
 
     public string ApprovedBy { get; } = string.Empty;

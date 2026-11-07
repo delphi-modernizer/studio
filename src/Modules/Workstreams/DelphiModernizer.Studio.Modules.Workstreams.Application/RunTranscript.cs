@@ -10,18 +10,29 @@ using DelphiModernizer.Engine.Kit;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
-/// <summary>One line of agent text with the fact label it carries, such as <c>[Confirmed]</c>, taken out of it.</summary>
-/// <param name="Label"><c>Confirmed</c>, <c>Inferred</c>, <c>Assumption</c> or <c>Unknown</c>; null for a line without one.</param>
+/// <summary>
+/// One line of agent text with the fact label it carries, such as <c>[Confirmed]</c>, taken out of it.
+/// </summary>
+/// <param name="Label">
+/// <c>Confirmed</c>, <c>Inferred</c>, <c>Assumption</c> or <c>Unknown</c>; null for a line without one.
+/// </param>
 public sealed record AgentLine(string Text, string? Label);
 
-/// <summary>What the Run page reads from the engine's events: fact labels, guard refusals and the files a tool used.</summary>
+/// <summary>
+/// What the Run page reads from the engine's events: fact labels, guard refusals and the files a tool used.
+/// </summary>
 public static partial class RunTranscript
 {
-    /// <summary>Claude Code's words for a tool call its PreToolUse hook (the guard) or the workspace's permissions blocked.</summary>
-    /// <remarks>The engine streams these as failed tool results; the markers live here until it types them (open questions).</remarks>
+    /// <summary>
+    /// Claude Code's words for a tool call its PreToolUse hook (the guard) or the workspace's permissions blocked.
+    /// </summary>
+    /// <remarks>
+    /// The engine streams these as failed tool results; the markers live here until it types them (open questions).
+    /// </remarks>
     private static readonly string[] _refusalMarkers = ["PreToolUse:", "Permission to use "];
 
-    private static readonly FrozenSet<string> _editingTools = new[] { "Edit", "Write", "MultiEdit", "NotebookEdit" }.ToFrozenSet(StringComparer.Ordinal);
+    private static readonly FrozenSet<string> _editingTools =
+        new[] { "Edit", "Write", "MultiEdit", "NotebookEdit" }.ToFrozenSet(StringComparer.Ordinal);
 
     /// <summary>The kit's evidence pattern, unanchored, so links are found as the trace check reads them.</summary>
     private static readonly Lazy<Regex> _evidence = new(() => new Regex(
@@ -72,8 +83,12 @@ public static partial class RunTranscript
         return _editingTools.Contains(call.Name);
     }
 
-    /// <summary>The workspace file or folder a tool call names, relative and with forward slashes; null for none or one outside.</summary>
-    /// <remarks>The engine shortens long inputs, so the path is read from the JSON text, not a parse of the whole input.</remarks>
+    /// <summary>
+    /// The workspace file or folder a tool call names, relative and with forward slashes; null for none or one outside.
+    /// </summary>
+    /// <remarks>
+    /// The engine shortens long inputs, so the path is read from the JSON text, not a parse of the whole input.
+    /// </remarks>
     public static string? PathOf(ToolCall call, string workspaceRoot)
     {
         var match = PathProperty().Match(call.Input);

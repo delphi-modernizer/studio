@@ -11,7 +11,8 @@ namespace DelphiModernizer.Studio.Modules.SignOffs.Application;
 /// <summary>Where every gate of the open workspace stands now.</summary>
 public sealed record GetGatesQuery : IRequest<Result<IReadOnlyList<GateStatus>>>;
 
-internal sealed class GetGatesQueryHandler(IWorkspaceSession session) : IRequestHandler<GetGatesQuery, Result<IReadOnlyList<GateStatus>>>
+internal sealed class GetGatesQueryHandler(IWorkspaceSession session)
+    : IRequestHandler<GetGatesQuery, Result<IReadOnlyList<GateStatus>>>
 {
     public Task<Result<IReadOnlyList<GateStatus>>> Handle(GetGatesQuery request, CancellationToken cancellationToken)
     {

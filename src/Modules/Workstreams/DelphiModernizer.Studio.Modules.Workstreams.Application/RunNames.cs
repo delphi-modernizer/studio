@@ -29,7 +29,9 @@ public static class RunNames
         return $"Agent: {string.Join(" ", lines.Select(l => l.Label is null ? l.Text : $"{l.Text} {l.Label}."))}";
     }
 
-    /// <summary>What a tool call says after its input: "Working", "Failed", "Done", "2 matches" or "31 lines".</summary>
+    /// <summary>
+    /// What a tool call says after its input: "Working", "Failed", "Done", "2 matches" or "31 lines".
+    /// </summary>
     public static string ToolSummary(string tool, string? result, bool isError)
     {
         if (result is null)

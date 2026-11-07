@@ -35,7 +35,9 @@ public sealed partial class ApprovalDialog : ContentDialog
         NoteBox.Focus(FocusState.Programmatic);
     }
 
-    /// <summary>The engine checks again on confirm; a refusal cancels the close, so the dialog keeps the note.</summary>
+    /// <summary>
+    /// The engine checks again on confirm; a refusal cancels the close, so the dialog keeps the note.
+    /// </summary>
     private async void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         var deferral = args.GetDeferral();

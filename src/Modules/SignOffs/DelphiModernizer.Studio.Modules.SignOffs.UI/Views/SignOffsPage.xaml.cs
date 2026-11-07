@@ -43,7 +43,9 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
         });
     }
 
-    /// <summary>A current approval shows the filled certificate in the success colour; a stale one, the outline.</summary>
+    /// <summary>
+    /// A current approval shows the filled certificate in the success colour; a stale one, the outline.
+    /// </summary>
     public static Brush ApprovalBrush(bool isApproved)
     {
         return Resource(isApproved ? "SystemFillColorSuccessBrush" : "TextFillColorSecondaryBrush");

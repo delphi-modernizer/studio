@@ -22,7 +22,9 @@ using Microsoft.UI.Dispatching;
 namespace DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
 
 /// <summary>One run: its session, its live transcript, what it writes and touches, and how it ended.</summary>
-/// <remarks>Nothing here approves a sign-off or changes a deliverable's status; what a run writes stays Draft.</remarks>
+/// <remarks>
+/// Nothing here approves a sign-off or changes a deliverable's status; what a run writes stays Draft.
+/// </remarks>
 public sealed partial class RunViewModel : WorkspacePageViewModel
 {
     private readonly ISender _sender;
@@ -37,7 +39,13 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     private RunRecord? _record;
     private string _roleCode = string.Empty;
 
-    public RunViewModel(IWorkspaceSession session, ISender sender, INavigationService navigation, IEditorLauncher editor, IStudioSettings settings, RunMonitor monitor)
+    public RunViewModel(
+        IWorkspaceSession session,
+        ISender sender,
+        INavigationService navigation,
+        IEditorLauncher editor,
+        IStudioSettings settings,
+        RunMonitor monitor)
         : base(session)
     {
         ArgumentNullException.ThrowIfNull(sender);
@@ -76,7 +84,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     public partial string Subtitle { get; set; } = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Pill), nameof(IsLive), nameof(IsEnded), nameof(IsFailed), nameof(TimeLabel), nameof(WritesNote), nameof(EndTitle), nameof(EndText), nameof(BackText))]
+    [NotifyPropertyChangedFor(nameof(Pill), nameof(IsLive), nameof(IsEnded), nameof(IsFailed), nameof(TimeLabel))]
+    [NotifyPropertyChangedFor(nameof(WritesNote), nameof(EndTitle), nameof(EndText), nameof(BackText))]
     public partial RunOutcome Outcome { get; set; }
 
     public PillState Pill => RunWords.PillOf(Outcome);
@@ -130,7 +139,9 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
     public bool HasProblem => Problem is not null;
 
-    /// <summary>A run from an earlier session: the store keeps its summary, and its transcript only as the raw file.</summary>
+    /// <summary>
+    /// A run from an earlier session: the store keeps its summary, and its transcript only as the raw file.
+    /// </summary>
     [ObservableProperty]
     public partial bool IsRecordOnly { get; set; }
 
@@ -149,7 +160,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     };
 
     public string EndText => Outcome switch {
-        RunOutcome.Completed => $"It wrote the {Writing} as a Draft. Read it, then move it to In review yourself; the agent can’t.",
+        RunOutcome.Completed =>
+            $"It wrote the {Writing} as a Draft. Read it, then move it to In review yourself; the agent can’t.",
         RunOutcome.Failed => "Anything it wrote before failing stays as a Draft. Run it again or write it yourself.",
         RunOutcome.Stopped => "What it wrote before you stopped it stays as a Draft.",
         RunOutcome.BudgetReached => "What it wrote so far stays as a Draft.",
@@ -177,7 +189,9 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
     public decimal BudgetUsd { get; private set; }
 
-    /// <summary>The budget a new run of this task starts with: this run's, or the Settings default for a recorded run.</summary>
+    /// <summary>
+    /// The budget a new run of this task starts with: this run's, or the Settings default for a recorded run.
+    /// </summary>
     public decimal NextBudgetUsd => BudgetUsd > 0 ? BudgetUsd : _settings.Agents.BudgetUsd;
 
     public string Writing => Recipe is null ? "draft" : RunWords.Writes(Recipe);
@@ -329,7 +343,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         Title = recipe?.Title ?? "Agent run";
         Subtitle = recipe is null
             ? RoleName
-            : $"{RoleName} · {RunWords.ArgumentText(recipe, argument)} · writes the {RunWords.Writes(recipe)} as a draft";
+            : $"{RoleName} · {RunWords.ArgumentText(recipe, argument)} · "
+                + $"writes the {RunWords.Writes(recipe)} as a draft";
         var deliverables = KitBundle.Embedded.Spec.Deliverables.Deliverables;
         Writes = recipe is null
             ? []
@@ -353,7 +368,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 IsStarting = false;
                 Model = session.Model ?? "—";
                 CliVersion = session.CliVersion ?? "—";
-                SessionLine = $"Started {RunWords.Time(_live?.StartedAt ?? DateTimeOffset.Now)} · model {Model} · Claude Code {CliVersion}";
+                var started = RunWords.Time(_live?.StartedAt ?? DateTimeOffset.Now);
+                SessionLine = $"Started {started} · model {Model} · Claude Code {CliVersion}";
                 break;
             case AssistantText text:
                 var lines = RunTranscript.Lines(text.Text);
@@ -366,7 +382,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 break;
             case ToolCall call:
                 var row = new ToolRow(call.Id, call.Name, call.Input);
-                _calls[call.Id] = (row, _session.Current is { } workspace ? RunTranscript.PathOf(call, workspace.Root) : null, RunTranscript.Edits(call));
+                var path = _session.Current is { } workspace ? RunTranscript.PathOf(call, workspace.Root) : null;
+                _calls[call.Id] = (row, path, RunTranscript.Edits(call));
                 Items.Add(row);
                 break;
             case ToolResult result:
@@ -420,8 +437,12 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         _clock.Stop();
         IsStarting = false;
         Outcome = RunOutcomes.Of(completed.Outcome);
-        Cost = completed.CostUsd is { } cost ? $"{RunWords.Dollars(cost)} of {RunWords.Dollars(BudgetUsd)}" : $"— of {RunWords.Dollars(BudgetUsd)}";
-        CostPercent = completed.CostUsd is { } spent && BudgetUsd > 0 ? (double)Math.Min(1m, spent / BudgetUsd) * 100 : 0;
+        Cost = completed.CostUsd is { } cost
+            ? $"{RunWords.Dollars(cost)} of {RunWords.Dollars(BudgetUsd)}"
+            : $"— of {RunWords.Dollars(BudgetUsd)}";
+        CostPercent = completed.CostUsd is { } spent && BudgetUsd > 0
+            ? (double)Math.Min(1m, spent / BudgetUsd) * 100
+            : 0;
         Turns = completed.Turns?.ToString(CultureInfo.CurrentCulture) ?? "—";
         Denials = completed.PermissionDenials.ToString(CultureInfo.CurrentCulture);
         Time = completed.DurationMs is { } ms ? RunWords.Duration(TimeSpan.FromMilliseconds(ms)) : Time;

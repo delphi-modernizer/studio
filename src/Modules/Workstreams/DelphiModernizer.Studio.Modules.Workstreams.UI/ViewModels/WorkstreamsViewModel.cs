@@ -20,7 +20,9 @@ using Microsoft.UI.Dispatching;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
 
-/// <summary>The seven roles, and for the one selected: what it drafts, the tasks its agent runs and its run history.</summary>
+/// <summary>
+/// The seven roles, and for the one selected: what it drafts, the tasks its agent runs and its run history.
+/// </summary>
 public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
 {
     private readonly ISender _sender;
@@ -34,7 +36,12 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
     private IReadOnlyList<RunRecord> _runs = [];
     private string? _requested;
 
-    public WorkstreamsViewModel(IWorkspaceSession session, ISender sender, INavigationService navigation, IStudioSettings settings, RunMonitor monitor)
+    public WorkstreamsViewModel(
+        IWorkspaceSession session,
+        ISender sender,
+        INavigationService navigation,
+        IStudioSettings settings,
+        RunMonitor monitor)
         : base(session)
     {
         ArgumentNullException.ThrowIfNull(sender);
@@ -77,7 +84,8 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
 
     public string ClaudeMessage => Claude is null
         ? string.Empty
-        : $"You can read every role, its deliverables and its history. Running an agent task needs Claude Code {Claude.Minimum} or later.";
+        : "You can read every role, its deliverables and its history. "
+            + $"Running an agent task needs Claude Code {Claude.Minimum} or later.";
 
     [ObservableProperty]
     public partial bool IsOpen { get; set; }
@@ -88,11 +96,15 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
 
     public bool HasProblem => Problem is not null;
 
-    public string RoleKind => SelectedRole?.Code == "PA" ? "Lead role · combines the six teams’ work" : "Team · works side by side with five others";
+    public string RoleKind => SelectedRole?.Code == "PA"
+        ? "Lead role · combines the six teams’ work"
+        : "Team · works side by side with five others";
 
     public decimal DefaultBudget => _settings.Agents.BudgetUsd;
 
-    /// <summary>The first sign-off without a current approval, which a gate argument starts from; null when all are.</summary>
+    /// <summary>
+    /// The first sign-off without a current approval, which a gate argument starts from; null when all are.
+    /// </summary>
     public string? NextGate => _gates.FirstOrDefault(g => g.State != "approved")?.Gate;
 
     /// <param name="parameter">The role code to select, such as <c>WS01</c>, as Overview and Sign-offs pass it.</param>
@@ -195,14 +207,19 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         Tasks = [.. role.Workstream.Recipes.Select(recipe => {
             var blocker = _monitor.Writing(workspace.Root, recipe.Writes);
 
-            return new TaskRow(recipe, role.Name, ready, blocker, blocker is null ? string.Empty : BlockedReason(blocker, recipe, role));
+            var reason = blocker is null ? string.Empty : BlockedReason(blocker, recipe, role);
+
+            return new TaskRow(recipe, role.Name, ready, blocker, reason);
         })];
         History = [.. _runs
             .Where(r => r.Agent == role.Workstream.Role.Agent)
             .Select(r => new HistoryRow(r))];
     }
 
-    /// <summary>Approved while the deliverable's sign-off has a current approval, as Deliverables shows it; else its file's status.</summary>
+    /// <summary>
+    /// Approved while the deliverable's sign-off has a current approval, as Deliverables shows it; else its file's
+    /// status.
+    /// </summary>
     private PillState PillOf(string deliverable, string gate)
     {
         var status = _states.FirstOrDefault(s => s.Id == deliverable)?.Status ?? "missing";

@@ -104,11 +104,19 @@
 
         <ScrollViewer>
             <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
-                <controls:PageHeader Purpose="The Principal Architect and six teams: what each one drafts, and the tasks its agent can run." Title="Workstreams" />
+                <controls:PageHeader Title="Workstreams">
+                    <controls:PageHeader.Purpose>
+                        The Principal Architect and six teams: what each one drafts, and the tasks its agent can run.
+                    </controls:PageHeader.Purpose>
+                </controls:PageHeader>
                 <controls:NoWorkspaceState
                     Glyph="{x:Bind icons:StudioIcons.Workstreams}"
-                    Message="Workstreams shows a workspace’s Principal Architect and six teams: what each one drafts, and the tasks its agent can run. Open or start a workspace to see them."
-                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        Workstreams shows a workspace’s Principal Architect and six teams: what each one drafts, and the
+                        tasks its agent can run. Open or start a workspace to see them.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
 
                 <InfoBar
                     IsClosable="False"
@@ -117,7 +125,9 @@
                     Severity="Warning"
                     Title="Claude Code isn’t set up.">
                     <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                     </InfoBar.IconSource>
                     <InfoBar.ActionButton>
                         <Button Click="OnSetUpClaude" Content="Set up in Settings" />
@@ -131,7 +141,9 @@
                     Severity="Error"
                     Title="Couldn’t read the deliverables.">
                     <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                     </InfoBar.IconSource>
                 </InfoBar>
 
@@ -218,7 +230,9 @@
                                             AutomationProperties.HeadingLevel="Level2"
                                             Style="{StaticResource SubtitleTextBlockStyle}"
                                             Text="{x:Bind ViewModel.SelectedRole.Name, Mode=OneWay}" />
-                                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.RoleKind, Mode=OneWay}" />
+                                        <TextBlock
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="{x:Bind ViewModel.RoleKind, Mode=OneWay}" />
                                     </StackPanel>
                                 </Grid>
                                 <TextBlock
@@ -300,9 +314,15 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Spacing="2">
-                                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Title}" />
-                                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ArgumentLine}" />
-                                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind WritesLine}" />
+                                                    <TextBlock
+                                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                        Text="{x:Bind Title}" />
+                                                    <TextBlock
+                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                        Text="{x:Bind ArgumentLine}" />
+                                                    <TextBlock
+                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                        Text="{x:Bind WritesLine}" />
                                                     <StackPanel
                                                         Margin="0,4,0,0"
                                                         Orientation="Horizontal"
@@ -326,7 +346,9 @@
                                                     Click="OnRun"
                                                     IsEnabled="{x:Bind CanRun}">
                                                     <StackPanel Orientation="Horizontal" Spacing="8">
-                                                        <FontIcon Glyph="{x:Bind icons:StudioIcons.Run}" Style="{StaticResource IconStyle}" />
+                                                        <FontIcon
+                                                            Glyph="{x:Bind icons:StudioIcons.Run}"
+                                                            Style="{StaticResource IconStyle}" />
                                                         <TextBlock Text="Run…" />
                                                     </StackPanel>
                                                 </Button>
@@ -358,8 +380,10 @@
                                 <TextBlock
                                     Padding="16,8,16,16"
                                     Style="{StaticResource SecondaryCaptionTextStyle}"
-                                    Text="No runs yet. A run shows its live transcript, and what it writes lands as Draft for a person to review."
-                                    Visibility="{x:Bind ViewModel.HasNoHistory, Mode=OneWay}" />
+                                    Visibility="{x:Bind ViewModel.HasNoHistory, Mode=OneWay}">
+                                    No runs yet. A run shows its live transcript, and what it writes lands as Draft for
+                                    a person to review.
+                                </TextBlock>
                                 <StackPanel Visibility="{x:Bind ViewModel.HasHistory, Mode=OneWay}">
                                     <Grid x:Name="HistoryHeader" Style="{StaticResource TableHeaderStyle}">
                                         <Grid.ColumnDefinitions>
@@ -369,7 +393,9 @@
                                             <ColumnDefinition x:Name="CostColumn" Width="56" />
                                             <ColumnDefinition x:Name="TurnsColumn" Width="48" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Task and scope" />
+                                        <TextBlock
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Task and scope" />
                                         <TextBlock
                                             x:Name="StartedHeader"
                                             Grid.Column="1"

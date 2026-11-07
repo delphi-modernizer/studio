@@ -10,7 +10,9 @@ using DelphiModernizer.Studio.UI.Common.Controls;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
 
-/// <summary>One role in the master list: its name, how many of its deliverables are started and whether it runs.</summary>
+/// <summary>
+/// One role in the master list: its name, how many of its deliverables are started and whether it runs.
+/// </summary>
 public sealed record RoleRow(Workstream Workstream, int Started, bool IsRunning)
 {
     public string Code => Workstream.Role.Code;
@@ -117,7 +119,8 @@ public static class RunWords
     /// <summary>The titles of the deliverables a recipe writes, as the kit names them.</summary>
     public static string Writes(Recipe recipe)
     {
-        var titles = recipe.Writes.Select(id => KitBundle.Embedded.Spec.Deliverables.Deliverables.FirstOrDefault(d => d.Id == id)?.Title ?? id);
+        var deliverables = KitBundle.Embedded.Spec.Deliverables.Deliverables;
+        var titles = recipe.Writes.Select(id => deliverables.FirstOrDefault(d => d.Id == id)?.Title ?? id);
 
         return string.Join(" and the ", titles);
     }

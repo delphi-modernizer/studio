@@ -52,7 +52,8 @@ public sealed class ApprovalTests
         var workspace = repository.Workspace;
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
 
-        var approved = await sender.Send(new ApproveGateCommand("G0", "Read the charter."), TestContext.Current.CancellationToken);
+        var approved = await sender.Send(
+            new ApproveGateCommand("G0", "Read the charter."), TestContext.Current.CancellationToken);
         var log = await GitAsync(workspace, "log", "--format=%s", "--", ".modernizer/approvals.json");
 
         Assert.Equal("Dana Reviewer <dana@example.com>", approved.Value.By);
@@ -67,7 +68,8 @@ public sealed class ApprovalTests
         var workspace = repository.Workspace;
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
 
-        var approved = await sender.Send(new ApproveGateCommand("G1", "Looks fine."), TestContext.Current.CancellationToken);
+        var approved = await sender.Send(
+            new ApproveGateCommand("G1", "Looks fine."), TestContext.Current.CancellationToken);
         var signOffs = await sender.Send(new GetSignOffsQuery(), TestContext.Current.CancellationToken);
 
         Assert.True(SignOffRefusal.IsRefusal(approved.Error));
@@ -82,7 +84,8 @@ public sealed class ApprovalTests
         await MakeDiscoveryReadyAsync(workspace);
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
         var cancellationToken = TestContext.Current.CancellationToken;
-        Assert.True((await sender.Send(new ApproveGateCommand("G0", "Read the charter."), cancellationToken)).IsSuccess);
+        var setup = await sender.Send(new ApproveGateCommand("G0", "Read the charter."), cancellationToken);
+        Assert.True(setup.IsSuccess);
         var discovery = await sender.Send(new ApproveGateCommand("G1", "Read the inventory."), cancellationToken);
         Assert.True(discovery.IsSuccess, discovery.IsFailure ? discovery.Error.Message : null);
 
@@ -144,22 +147,29 @@ public sealed class ApprovalTests
         return repository;
     }
 
-    /// <summary>Puts the system inventory in review and saves a scan, so Discovery waits only on Project setup.</summary>
+    /// <summary>
+    /// Puts the system inventory in review and saves a scan, so Discovery waits only on Project setup.
+    /// </summary>
     private static async Task MakeDiscoveryReadyAsync(TestWorkspace workspace)
     {
         var root = workspace.Workspace.Root;
         var inventory = Path.Combine(root, "docs", "01-discovery", "D02-system-inventory.md");
         var text = await File.ReadAllTextAsync(inventory, CancellationToken.None);
-        await File.WriteAllTextAsync(inventory, text.Replace("status: template", "status: in-review"), CancellationToken.None);
+        var inReview = text.Replace("status: template", "status: in-review");
+        await File.WriteAllTextAsync(inventory, inReview, CancellationToken.None);
         var scan = LegacyScanner.Scan(workspace.Workspace.LegacyRoot, new ScanOptions(1252), CancellationToken.None);
         Directory.CreateDirectory(workspace.Workspace.LatestScanFolder);
         var json = JsonSerializer.SerializeToUtf8Bytes(scan, InventoryJsonContext.Default.LegacyInventory);
-        await File.WriteAllBytesAsync(Path.Combine(workspace.Workspace.LatestScanFolder, "inventory.json"), json, CancellationToken.None);
+        var file = Path.Combine(workspace.Workspace.LatestScanFolder, "inventory.json");
+        await File.WriteAllBytesAsync(file, json, CancellationToken.None);
     }
 
     private static async Task<string> GitAsync(TestWorkspace workspace, params string[] arguments)
     {
-        var start = new ProcessStartInfo("git") { WorkingDirectory = workspace.Workspace.Root, RedirectStandardOutput = true };
+        var start = new ProcessStartInfo("git") {
+            WorkingDirectory = workspace.Workspace.Root,
+            RedirectStandardOutput = true,
+        };
 
         foreach (var argument in arguments)
         {
@@ -173,7 +183,9 @@ public sealed class ApprovalTests
         return output;
     }
 
-    /// <summary>A test workspace made a git repository; Windows refuses to delete the read-only objects git writes.</summary>
+    /// <summary>
+    /// A test workspace made a git repository; Windows refuses to delete the read-only objects git writes.
+    /// </summary>
     private sealed class GitWorkspace(TestWorkspace workspace) : IDisposable
     {
         public TestWorkspace Workspace { get; } = workspace;

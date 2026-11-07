@@ -9,10 +9,15 @@ using DelphiModernizer.Studio.Application.Abstractions.Workstreams;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
-/// <summary>The seven roles with the deliverables each owns and the recipes its agent runs, from the embedded kit.</summary>
+/// <summary>
+/// The seven roles with the deliverables each owns and the recipes its agent runs, from the embedded kit.
+/// </summary>
 public sealed record GetWorkstreamsQuery : IRequest<IReadOnlyList<Workstream>>;
 
-public sealed record Workstream(WorkstreamRole Role, IReadOnlyList<Deliverable> Deliverables, IReadOnlyList<Recipe> Recipes);
+public sealed record Workstream(
+    WorkstreamRole Role,
+    IReadOnlyList<Deliverable> Deliverables,
+    IReadOnlyList<Recipe> Recipes);
 
 internal sealed class GetWorkstreamsQueryHandler : IRequestHandler<GetWorkstreamsQuery, IReadOnlyList<Workstream>>
 {

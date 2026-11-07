@@ -122,7 +122,9 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ToolTemplate" x:DataType="vm:ToolRow">
-            <Grid AutomationProperties.Name="{x:Bind AnnouncedName, Mode=OneWay}" Style="{StaticResource TranscriptItemStyle}">
+            <Grid
+                AutomationProperties.Name="{x:Bind AnnouncedName, Mode=OneWay}"
+                Style="{StaticResource TranscriptItemStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="*" />
@@ -207,7 +209,9 @@
                         </Border>
                     </Grid>
                     <TextBlock Text="{x:Bind Reason}" TextWrapping="Wrap" />
-                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="The call was not made. The run carries on." />
+                    <TextBlock
+                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                        Text="The call was not made. The run carries on." />
                 </StackPanel>
             </Grid>
         </DataTemplate>
@@ -358,7 +362,9 @@
                     Severity="Error"
                     Title="The run failed.">
                     <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                     </InfoBar.IconSource>
                     <InfoBar.ActionButton>
                         <Button Click="OnRunAgain" Content="Run again…" />
@@ -372,7 +378,9 @@
                     Severity="Error"
                     Title="Couldn’t show or start the run.">
                     <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                     </InfoBar.IconSource>
                 </InfoBar>
 
@@ -428,7 +436,9 @@
                             Padding="16,10"
                             BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                             BorderThickness="1,0,0,0">
-                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.TimeLabel, Mode=OneWay}" />
+                            <TextBlock
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="{x:Bind ViewModel.TimeLabel, Mode=OneWay}" />
                             <TextBlock Text="{x:Bind ViewModel.Time, Mode=OneWay}" />
                         </StackPanel>
                     </Grid>
@@ -443,7 +453,9 @@
                     <StackPanel Spacing="12">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <controls:StatusPill State="{x:Bind ViewModel.Pill, Mode=OneWay}" />
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind ViewModel.EndTitle, Mode=OneWay}" />
+                            <TextBlock
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind ViewModel.EndTitle, Mode=OneWay}" />
                         </StackPanel>
                         <Grid ColumnSpacing="24">
                             <Grid.ColumnDefinitions>
@@ -465,7 +477,9 @@
                                 <TextBlock Text="{x:Bind ViewModel.Turns, Mode=OneWay}" />
                             </StackPanel>
                             <StackPanel Grid.Column="3">
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Permission denials" />
+                                <TextBlock
+                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                    Text="Permission denials" />
                                 <TextBlock Text="{x:Bind ViewModel.Denials, Mode=OneWay}" />
                             </StackPanel>
                         </Grid>
@@ -474,9 +488,13 @@
                             Text="{x:Bind ViewModel.EndText, Mode=OneWay}"
                             TextWrapping="Wrap" />
                         <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button Click="OnOpenDraft" Style="{x:Bind local:RunPage.DraftStyle(ViewModel.Outcome), Mode=OneWay}">
+                            <Button
+                                Click="OnOpenDraft"
+                                Style="{x:Bind local:RunPage.DraftStyle(ViewModel.Outcome), Mode=OneWay}">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Deliverables}" Style="{StaticResource IconStyle}" />
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Deliverables}"
+                                        Style="{StaticResource IconStyle}" />
                                     <TextBlock Text="Open the draft" />
                                 </StackPanel>
                             </Button>
@@ -541,19 +559,25 @@
                                 <TextBlock
                                     Grid.Column="1"
                                     Style="{StaticResource SecondaryCaptionTextStyle}"
-                                    Text="{x:Bind local:RunPage.WorkingText(ViewModel.IsStarting, ViewModel.RoleName), Mode=OneWay}" />
+                                    Text="{x:Bind local:RunPage.WorkingText(ViewModel.IsStarting, ViewModel.RoleName),
+                                          Mode=OneWay}" />
                             </Grid>
                             <StackPanel
                                 Padding="16,10,16,16"
                                 Spacing="8"
                                 Visibility="{x:Bind ViewModel.IsRecordOnly, Mode=OneWay}">
-                                <TextBlock
-                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                    Text="This run ran in an earlier session of the studio. Its full transcript is kept in the workspace:" />
+                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                    This run ran in an earlier session of the studio. Its full transcript is kept in the
+                                    workspace:
+                                </TextBlock>
                                 <Button Click="OnOpenTranscript">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
-                                        <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind ViewModel.TranscriptFile, Mode=OneWay}" />
+                                        <FontIcon
+                                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                            Style="{StaticResource IconStyle}" />
+                                        <TextBlock
+                                            Style="{StaticResource MonoTextStyle}"
+                                            Text="{x:Bind ViewModel.TranscriptFile, Mode=OneWay}" />
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
@@ -606,13 +630,17 @@
                                                     AutomationProperties.Name="{x:Bind local:RunPage.OpenName(Title)}"
                                                     Click="OnOpenWrite"
                                                     Style="{StaticResource SubtleButtonStyle}">
-                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
+                                                    <FontIcon
+                                                        Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                                        Style="{StaticResource IconStyle}" />
                                                 </Button>
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsRepeater.ItemTemplate>
                                 </ItemsRepeater>
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.WritesNote, Mode=OneWay}" />
+                                <TextBlock
+                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                    Text="{x:Bind ViewModel.WritesNote, Mode=OneWay}" />
                             </StackPanel>
                         </Border>
 
@@ -654,7 +682,9 @@
                                                     AutomationProperties.Name="{x:Bind local:RunPage.OpenName(Name)}"
                                                     Click="OnOpenFile"
                                                     Style="{StaticResource SubtleButtonStyle}">
-                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
+                                                    <FontIcon
+                                                        Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                                        Style="{StaticResource IconStyle}" />
                                                 </Button>
                                             </Grid>
                                         </DataTemplate>
@@ -689,7 +719,9 @@
                                         Style="{StaticResource SecondaryCaptionTextStyle}"
                                         Text="{x:Bind ViewModel.GuardCount, Mode=OneWay}" />
                                 </Grid>
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Agents edit docs/ only. Refusals appear in the transcript and the run carries on." />
+                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                    Agents edit docs/ only. Refusals appear in the transcript and the run carries on.
+                                </TextBlock>
                             </StackPanel>
                         </Border>
                     </Grid>
