@@ -10,289 +10,309 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <Style
-            x:Key="NumberCellStyle"
-            BasedOn="{StaticResource BodyTextBlockStyle}"
-            TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style
-            x:Key="NumberHeaderStyle"
-            BasedOn="{StaticResource TableHeaderTextStyle}"
-            TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-        </Style>
-        <Style x:Key="LinkStyle" TargetType="HyperlinkButton">
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontFamily" Value="Cascadia Mono,Consolas" />
-            <Setter Property="FontSize" Value="12" />
-        </Style>
-        <!--  A column header that sorts: Enter or a click sorts by it, and the sorted one shows a chevron.  -->
-        <Style
-            x:Key="SortHeaderStyle"
-            BasedOn="{StaticResource SubtleButtonStyle}"
-            TargetType="Button">
-            <Setter Property="MinHeight" Value="24" />
-            <Setter Property="Padding" Value="2,0" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <!--  In high contrast a row under the pointer takes a button's colours, so secondary text stays.  -->
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPressed"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPressed"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
 
-        <!--  The folder heading of a large codebase fills its row, padding included.  -->
-        <DataTemplate x:Key="UnitRowTemplate" x:DataType="vm:UnitRow">
-            <Grid>
-                <Grid
-                    MinHeight="44"
-                    Margin="-16,-6"
-                    Padding="16,6"
-                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-                    ColumnSpacing="8"
-                    Visibility="{x:Bind IsFolder}">
+            <Style
+                x:Key="NumberCellStyle"
+                BasedOn="{StaticResource BodyTextBlockStyle}"
+                TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style
+                x:Key="NumberHeaderStyle"
+                BasedOn="{StaticResource TableHeaderTextStyle}"
+                TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style>
+            <Style x:Key="LinkStyle" TargetType="HyperlinkButton">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontFamily" Value="Cascadia Mono,Consolas" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+            <!--  A column header that sorts: Enter or a click sorts by it, and the sorted one shows a chevron.  -->
+            <Style
+                x:Key="SortHeaderStyle"
+                BasedOn="{StaticResource SubtleButtonStyle}"
+                TargetType="Button">
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="Padding" Value="2,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
+            <!--  The folder heading of a large codebase fills its row, padding included.  -->
+            <DataTemplate x:Key="UnitRowTemplate" x:DataType="vm:UnitRow">
+                <Grid>
+                    <Grid
+                        MinHeight="44"
+                        Margin="-16,-6"
+                        Padding="16,6"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsFolder}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Path}" />
+                    </Grid>
+                    <Grid ColumnSpacing="12" Visibility="{x:Bind IsUnit}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="72" />
+                            <ColumnDefinition Width="72" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="48" />
+                            <ColumnDefinition Width="140" />
+                            <ColumnDefinition Width="32" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                <controls:StatusPill
+                                    State="Warning"
+                                    Text="Cycle"
+                                    Visibility="{x:Bind InCycle}" />
+                                <Border Style="{StaticResource TagStyle}" Visibility="{x:Bind IsProgram}">
+                                    <TextBlock
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="main program"
+                                        TextLineBounds="Tight" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind CodeLinesText}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind Routines.ToString()}" />
+                        <TextBlock
+                            Grid.Column="3"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind Globals.ToString()}" />
+                        <TextBlock
+                            Grid.Column="4"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanIn.ToString()}" />
+                        <TextBlock
+                            Grid.Column="5"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanOut.ToString()}" />
+                        <TextBlock
+                            Grid.Column="6"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind Uses.ToString()}" />
+                        <TextBlock
+                            Grid.Column="7"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource MonoTextStyle}"
+                            Text="{x:Bind Types}" />
+                        <Button
+                            Grid.Column="8"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind OpenName}"
+                            Click="OnLinkClicked"
+                            Style="{StaticResource SubtleButtonStyle}"
+                            Tag="{x:Bind Path}"
+                            ToolTipService.ToolTip="Open in your editor">
+                            <FontIcon
+                                Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                Style="{StaticResource IconStyle}" />
+                        </Button>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <!--  Under 1100 the table drops Routines, Globals, Uses and Types.  -->
+            <DataTemplate x:Key="UnitRowNarrowTemplate" x:DataType="vm:UnitRow">
+                <Grid>
+                    <Grid
+                        MinHeight="44"
+                        Margin="-16,-6"
+                        Padding="16,6"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsFolder}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Path}" />
+                    </Grid>
+                    <Grid ColumnSpacing="12" Visibility="{x:Bind IsUnit}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="32" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                <controls:StatusPill
+                                    State="Warning"
+                                    Text="Cycle"
+                                    Visibility="{x:Bind InCycle}" />
+                                <Border Style="{StaticResource TagStyle}" Visibility="{x:Bind IsProgram}">
+                                    <TextBlock
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="main program"
+                                        TextLineBounds="Tight" />
+                                </Border>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind CodeLinesText}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanIn.ToString()}" />
+                        <TextBlock
+                            Grid.Column="3"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanOut.ToString()}" />
+                        <Button
+                            Grid.Column="4"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind OpenName}"
+                            Click="OnLinkClicked"
+                            Style="{StaticResource SubtleButtonStyle}"
+                            Tag="{x:Bind Path}"
+                            ToolTipService.ToolTip="Open in your editor">
+                            <FontIcon
+                                Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                Style="{StaticResource IconStyle}" />
+                        </Button>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="SqlRowTemplate" x:DataType="vm:SqlRow">
+                <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="64" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind Name}" />
-                    <TextBlock
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind Path}" />
-                </Grid>
-                <Grid ColumnSpacing="12" Visibility="{x:Bind IsUnit}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="88" />
-                        <ColumnDefinition Width="72" />
-                        <ColumnDefinition Width="72" />
-                        <ColumnDefinition Width="64" />
-                        <ColumnDefinition Width="64" />
-                        <ColumnDefinition Width="48" />
-                        <ColumnDefinition Width="140" />
-                        <ColumnDefinition Width="32" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
-                            <controls:StatusPill
-                                State="Warning"
-                                Text="Cycle"
-                                Visibility="{x:Bind InCycle}" />
-                            <Border Style="{StaticResource TagStyle}" Visibility="{x:Bind IsProgram}">
-                                <TextBlock
-                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                    Text="main program"
-                                    TextLineBounds="Tight" />
-                            </Border>
-                        </StackPanel>
-                        <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
-                    </StackPanel>
+                    <HyperlinkButton
+                        AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
+                        Click="OnLinkClicked"
+                        Content="{x:Bind Link}"
+                        Style="{StaticResource LinkStyle}"
+                        Tag="{x:Bind Link}" />
                     <TextBlock
                         Grid.Column="1"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind CodeLinesText}" />
+                        VerticalAlignment="Center"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="{x:Bind Kind}" />
                     <TextBlock
                         Grid.Column="2"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind Routines.ToString()}" />
-                    <TextBlock
-                        Grid.Column="3"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind Globals.ToString()}" />
-                    <TextBlock
-                        Grid.Column="4"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind FanIn.ToString()}" />
-                    <TextBlock
-                        Grid.Column="5"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind FanOut.ToString()}" />
-                    <TextBlock
-                        Grid.Column="6"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind Uses.ToString()}" />
-                    <TextBlock
-                        Grid.Column="7"
                         VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                         Style="{StaticResource MonoTextStyle}"
-                        Text="{x:Bind Types}" />
-                    <Button
-                        Grid.Column="8"
+                        Text="{x:Bind Text}"
+                        ToolTipService.ToolTip="{x:Bind Text}" />
+                    <StackPanel
+                        Grid.Column="3"
                         VerticalAlignment="Center"
-                        AutomationProperties.Name="{x:Bind OpenName}"
-                        Click="OnLinkClicked"
-                        Style="{StaticResource SubtleButtonStyle}"
-                        Tag="{x:Bind Path}"
-                        ToolTipService.ToolTip="Open in your editor">
-                        <FontIcon
-                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
-                            Style="{StaticResource IconStyle}" />
-                    </Button>
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Note}" />
+                        <controls:StatusPill
+                            State="Error"
+                            Text="Built by concatenation"
+                            Visibility="{x:Bind BuiltByConcatenation}" />
+                    </StackPanel>
                 </Grid>
-            </Grid>
-        </DataTemplate>
+            </DataTemplate>
 
-        <!--  Under 1100 the table drops Routines, Globals, Uses and Types.  -->
-        <DataTemplate x:Key="UnitRowNarrowTemplate" x:DataType="vm:UnitRow">
-            <Grid>
-                <Grid
-                    MinHeight="44"
-                    Margin="-16,-6"
-                    Padding="16,6"
-                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-                    ColumnSpacing="8"
-                    Visibility="{x:Bind IsFolder}">
+            <!--  Under 1100 the SQL table drops Kind.  -->
+            <DataTemplate x:Key="SqlRowNarrowTemplate" x:DataType="vm:SqlRow">
+                <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                        Text="{x:Bind Name}" />
-                    <TextBlock
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind Path}" />
-                </Grid>
-                <Grid ColumnSpacing="12" Visibility="{x:Bind IsUnit}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="88" />
-                        <ColumnDefinition Width="64" />
-                        <ColumnDefinition Width="64" />
-                        <ColumnDefinition Width="32" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
-                            <controls:StatusPill
-                                State="Warning"
-                                Text="Cycle"
-                                Visibility="{x:Bind InCycle}" />
-                            <Border Style="{StaticResource TagStyle}" Visibility="{x:Bind IsProgram}">
-                                <TextBlock
-                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                    Text="main program"
-                                    TextLineBounds="Tight" />
-                            </Border>
-                        </StackPanel>
-                        <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
-                    </StackPanel>
-                    <TextBlock
-                        Grid.Column="1"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind CodeLinesText}" />
-                    <TextBlock
-                        Grid.Column="2"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind FanIn.ToString()}" />
-                    <TextBlock
-                        Grid.Column="3"
-                        Style="{StaticResource NumberCellStyle}"
-                        Text="{x:Bind FanOut.ToString()}" />
-                    <Button
-                        Grid.Column="4"
-                        VerticalAlignment="Center"
-                        AutomationProperties.Name="{x:Bind OpenName}"
+                    <HyperlinkButton
+                        AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
                         Click="OnLinkClicked"
-                        Style="{StaticResource SubtleButtonStyle}"
-                        Tag="{x:Bind Path}"
-                        ToolTipService.ToolTip="Open in your editor">
-                        <FontIcon
-                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
-                            Style="{StaticResource IconStyle}" />
-                    </Button>
+                        Content="{x:Bind Link}"
+                        Style="{StaticResource LinkStyle}"
+                        Tag="{x:Bind Link}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        Style="{StaticResource MonoTextStyle}"
+                        Text="{x:Bind Text}"
+                        ToolTipService.ToolTip="{x:Bind Text}" />
+                    <StackPanel
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Note}" />
+                        <controls:StatusPill
+                            State="Error"
+                            Text="Built by concatenation"
+                            Visibility="{x:Bind BuiltByConcatenation}" />
+                    </StackPanel>
                 </Grid>
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate x:Key="SqlRowTemplate" x:DataType="vm:SqlRow">
-            <Grid ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition Width="64" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <HyperlinkButton
-                    AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
-                    Click="OnLinkClicked"
-                    Content="{x:Bind Link}"
-                    Style="{StaticResource LinkStyle}"
-                    Tag="{x:Bind Link}" />
-                <TextBlock
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource CaptionTextBlockStyle}"
-                    Text="{x:Bind Kind}" />
-                <TextBlock
-                    Grid.Column="2"
-                    VerticalAlignment="Center"
-                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                    Style="{StaticResource MonoTextStyle}"
-                    Text="{x:Bind Text}"
-                    ToolTipService.ToolTip="{x:Bind Text}" />
-                <StackPanel
-                    Grid.Column="3"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="8">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind Note}" />
-                    <controls:StatusPill
-                        State="Error"
-                        Text="Built by concatenation"
-                        Visibility="{x:Bind BuiltByConcatenation}" />
-                </StackPanel>
-            </Grid>
-        </DataTemplate>
-
-        <!--  Under 1100 the SQL table drops Kind.  -->
-        <DataTemplate x:Key="SqlRowNarrowTemplate" x:DataType="vm:SqlRow">
-            <Grid ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <HyperlinkButton
-                    AutomationProperties.Name="{x:Bind local:InventoryPage.EvidenceName(Link)}"
-                    Click="OnLinkClicked"
-                    Content="{x:Bind Link}"
-                    Style="{StaticResource LinkStyle}"
-                    Tag="{x:Bind Link}" />
-                <TextBlock
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                    Style="{StaticResource MonoTextStyle}"
-                    Text="{x:Bind Text}"
-                    ToolTipService.ToolTip="{x:Bind Text}" />
-                <StackPanel
-                    Grid.Column="2"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="8">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind Note}" />
-                    <controls:StatusPill
-                        State="Error"
-                        Text="Built by concatenation"
-                        Visibility="{x:Bind BuiltByConcatenation}" />
-                </StackPanel>
-            </Grid>
-        </DataTemplate>
+            </DataTemplate>
+        </ResourceDictionary>
     </Page.Resources>
 
     <Grid>

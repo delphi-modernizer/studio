@@ -10,76 +10,96 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <DataTemplate x:Key="StatTemplate" x:DataType="vm:StatCard">
-            <Border Style="{StaticResource CardStyle}">
-                <StackPanel Spacing="4">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <FontIcon
-                            FontSize="12"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Glyph="{x:Bind Glyph}"
-                            Style="{StaticResource IconStyle}" />
-                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon
-                            VerticalAlignment="Center"
-                            FontSize="20"
-                            Foreground="{x:Bind local:TraceabilityPage.ToneBrush(Tone)}"
-                            Glyph="{x:Bind StatusGlyph}"
-                            Style="{StaticResource IconStyle}"
-                            Visibility="{x:Bind HasStatus}" />
-                        <TextBlock
-                            Style="{StaticResource TitleTextBlockStyle}"
-                            Text="{x:Bind Number}" />
-                        <TextBlock
-                            Margin="0,0,0,5"
-                            VerticalAlignment="Bottom"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Style="{StaticResource BodyTextBlockStyle}"
-                            Text="{x:Bind Unit}" />
-                    </StackPanel>
-                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
-                </StackPanel>
-            </Border>
-        </DataTemplate>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <!--  In high contrast a row under the pointer takes a button's colours, so secondary text stays.  -->
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPressed"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPressed"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
 
-        <!--  Under 1100 the stat numbers drop to 24 / 32.  -->
-        <DataTemplate x:Key="StatNarrowTemplate" x:DataType="vm:StatCard">
-            <Border Style="{StaticResource CardStyle}">
-                <StackPanel Spacing="4">
-                    <StackPanel Orientation="Horizontal" Spacing="6">
-                        <FontIcon
-                            FontSize="12"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Glyph="{x:Bind Glyph}"
-                            Style="{StaticResource IconStyle}" />
-                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
+            <DataTemplate x:Key="StatTemplate" x:DataType="vm:StatCard">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon
+                                FontSize="12"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="{x:Bind Glyph}"
+                                Style="{StaticResource IconStyle}" />
+                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontSize="20"
+                                Foreground="{x:Bind local:TraceabilityPage.ToneBrush(Tone)}"
+                                Glyph="{x:Bind StatusGlyph}"
+                                Style="{StaticResource IconStyle}"
+                                Visibility="{x:Bind HasStatus}" />
+                            <TextBlock
+                                Style="{StaticResource TitleTextBlockStyle}"
+                                Text="{x:Bind Number}" />
+                            <TextBlock
+                                Margin="0,0,0,5"
+                                VerticalAlignment="Bottom"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource BodyTextBlockStyle}"
+                                Text="{x:Bind Unit}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon
-                            VerticalAlignment="Center"
-                            FontSize="20"
-                            Foreground="{x:Bind local:TraceabilityPage.ToneBrush(Tone)}"
-                            Glyph="{x:Bind StatusGlyph}"
-                            Style="{StaticResource IconStyle}"
-                            Visibility="{x:Bind HasStatus}" />
-                        <TextBlock
-                            FontSize="24"
-                            LineHeight="32"
-                            Style="{StaticResource TitleTextBlockStyle}"
-                            Text="{x:Bind Number}" />
-                        <TextBlock
-                            Margin="0,0,0,5"
-                            VerticalAlignment="Bottom"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Style="{StaticResource BodyTextBlockStyle}"
-                            Text="{x:Bind Unit}" />
+                </Border>
+            </DataTemplate>
+
+            <!--  Under 1100 the stat numbers drop to 24 / 32.  -->
+            <DataTemplate x:Key="StatNarrowTemplate" x:DataType="vm:StatCard">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon
+                                FontSize="12"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="{x:Bind Glyph}"
+                                Style="{StaticResource IconStyle}" />
+                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon
+                                VerticalAlignment="Center"
+                                FontSize="20"
+                                Foreground="{x:Bind local:TraceabilityPage.ToneBrush(Tone)}"
+                                Glyph="{x:Bind StatusGlyph}"
+                                Style="{StaticResource IconStyle}"
+                                Visibility="{x:Bind HasStatus}" />
+                            <TextBlock
+                                FontSize="24"
+                                LineHeight="32"
+                                Style="{StaticResource TitleTextBlockStyle}"
+                                Text="{x:Bind Number}" />
+                            <TextBlock
+                                Margin="0,0,0,5"
+                                VerticalAlignment="Bottom"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource BodyTextBlockStyle}"
+                                Text="{x:Bind Unit}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
                     </StackPanel>
-                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
-                </StackPanel>
-            </Border>
-        </DataTemplate>
+                </Border>
+            </DataTemplate>
+        </ResourceDictionary>
     </Page.Resources>
 
     <Grid>
