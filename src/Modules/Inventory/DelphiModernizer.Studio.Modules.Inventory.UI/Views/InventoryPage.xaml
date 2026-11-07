@@ -9,810 +9,1359 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <Style
-            x:Key="NumberCellStyle"
-            BasedOn="{StaticResource BodyTextBlockStyle}"
-            TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-        <Style
-            x:Key="NumberHeaderStyle"
-            BasedOn="{StaticResource TableHeaderTextStyle}"
-            TargetType="TextBlock">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-        </Style>
-        <Style x:Key="LinkStyle" TargetType="HyperlinkButton">
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontFamily" Value="Cascadia Mono,Consolas" />
-            <Setter Property="FontSize" Value="12" />
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <!--  In high contrast a row under the pointer takes a button's colours, so secondary text stays.  -->
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemBackgroundPressed"
+                        Color="{ThemeResource SystemColorHighlightTextColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPointerOver"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                    <SolidColorBrush
+                        x:Key="ListViewItemForegroundPressed"
+                        Color="{ThemeResource SystemColorHighlightColor}" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <Style
+                x:Key="NumberCellStyle"
+                BasedOn="{StaticResource BodyTextBlockStyle}"
+                TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style
+                x:Key="NumberHeaderStyle"
+                BasedOn="{StaticResource TableHeaderTextStyle}"
+                TargetType="TextBlock">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style>
+            <!--  A connection setting's value: Cascadia Mono in the primary text colour.  -->
+            <Style
+                x:Key="ValueTextStyle"
+                BasedOn="{StaticResource MonoTextStyle}"
+                TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+            </Style>
+            <Style x:Key="LinkStyle" TargetType="HyperlinkButton">
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="FontFamily" Value="Cascadia Mono,Consolas" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+            <!--  A column header that sorts: Enter or a click sorts by it, and the sorted one shows a chevron.  -->
+            <Style
+                x:Key="SortHeaderStyle"
+                BasedOn="{StaticResource SubtleButtonStyle}"
+                TargetType="Button">
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="Padding" Value="2,0" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
+            <!--  The folder heading of a large codebase fills its row, padding included.  -->
+            <DataTemplate x:Key="UnitRowTemplate" x:DataType="vm:UnitRow">
+                <Grid>
+                    <Grid
+                        MinHeight="44"
+                        Margin="-16,-6"
+                        Padding="16,6"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsFolder}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Path}" />
+                    </Grid>
+                    <Grid ColumnSpacing="12" Visibility="{x:Bind IsUnit}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="72" />
+                            <ColumnDefinition Width="72" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="48" />
+                            <ColumnDefinition Width="140" />
+                            <ColumnDefinition Width="32" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                <controls:StatusPill
+                                    State="Warning"
+                                    Text="Cycle"
+                                    Visibility="{x:Bind InCycle}" />
+                                <Border Style="{StaticResource TagStyle}" Visibility="{x:Bind IsProgram}">
+                                    <TextBlock
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="main program"
+                                        TextLineBounds="Tight" />
+                                </Border>
+                            </StackPanel>
+                            <controls:PathText Text="{x:Bind Path}" />
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind CodeLinesText}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind Routines.ToString()}" />
+                        <TextBlock
+                            Grid.Column="3"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind Globals.ToString()}" />
+                        <TextBlock
+                            Grid.Column="4"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanIn.ToString()}" />
+                        <TextBlock
+                            Grid.Column="5"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanOut.ToString()}" />
+                        <TextBlock
+                            Grid.Column="6"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind Uses.ToString()}" />
+                        <TextBlock
+                            Grid.Column="7"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource MonoTextStyle}"
+                            Text="{x:Bind Types}" />
+                        <Button
+                            Grid.Column="8"
+                            Padding="8"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind OpenName}"
+                            Click="OnLinkClicked"
+                            Style="{StaticResource SubtleButtonStyle}"
+                            Tag="{x:Bind Path}"
+                            ToolTipService.ToolTip="Open in your editor">
+                            <FontIcon
+                                Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                Style="{StaticResource IconStyle}" />
+                        </Button>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <!--  Under 1100 the table drops Routines, Globals, Uses and Types.  -->
+            <DataTemplate x:Key="UnitRowNarrowTemplate" x:DataType="vm:UnitRow">
+                <Grid>
+                    <Grid
+                        MinHeight="44"
+                        Margin="-16,-6"
+                        Padding="16,6"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsFolder}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Name}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Path}" />
+                    </Grid>
+                    <Grid ColumnSpacing="12" Visibility="{x:Bind IsUnit}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="88" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="32" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                <controls:StatusPill
+                                    State="Warning"
+                                    Text="Cycle"
+                                    Visibility="{x:Bind InCycle}" />
+                                <Border Style="{StaticResource TagStyle}" Visibility="{x:Bind IsProgram}">
+                                    <TextBlock
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Text="main program"
+                                        TextLineBounds="Tight" />
+                                </Border>
+                            </StackPanel>
+                            <controls:PathText Text="{x:Bind Path}" />
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="1"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind CodeLinesText}" />
+                        <TextBlock
+                            Grid.Column="2"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanIn.ToString()}" />
+                        <TextBlock
+                            Grid.Column="3"
+                            Style="{StaticResource NumberCellStyle}"
+                            Text="{x:Bind FanOut.ToString()}" />
+                        <Button
+                            Grid.Column="4"
+                            Padding="8"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind OpenName}"
+                            Click="OnLinkClicked"
+                            Style="{StaticResource SubtleButtonStyle}"
+                            Tag="{x:Bind Path}"
+                            ToolTipService.ToolTip="Open in your editor">
+                            <FontIcon
+                                Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                Style="{StaticResource IconStyle}" />
+                        </Button>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="SqlRowTemplate" x:DataType="vm:SqlRow">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="64" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <HyperlinkButton
+                        AutomationProperties.Name="{x:Bind LinkName}"
+                        Click="OnLinkClicked"
+                        Content="{x:Bind Link}"
+                        Style="{StaticResource LinkStyle}"
+                        Tag="{x:Bind Link}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="{x:Bind Kind}" />
+                    <TextBlock
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        Style="{StaticResource MonoTextStyle}"
+                        Text="{x:Bind Text}"
+                        ToolTipService.ToolTip="{x:Bind Text}" />
+                    <StackPanel
+                        Grid.Column="3"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Note}" />
+                        <controls:StatusPill
+                            State="Error"
+                            Text="Built by concatenation"
+                            Visibility="{x:Bind BuiltByConcatenation}" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+
+            <!--  Under 1100 the SQL table drops Kind.  -->
+            <DataTemplate x:Key="SqlRowNarrowTemplate" x:DataType="vm:SqlRow">
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <HyperlinkButton
+                        AutomationProperties.Name="{x:Bind LinkName}"
+                        Click="OnLinkClicked"
+                        Content="{x:Bind Link}"
+                        Style="{StaticResource LinkStyle}"
+                        Tag="{x:Bind Link}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                        Style="{StaticResource MonoTextStyle}"
+                        Text="{x:Bind Text}"
+                        ToolTipService.ToolTip="{x:Bind Text}" />
+                    <StackPanel
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Note}" />
+                        <controls:StatusPill
+                            State="Error"
+                            Text="Built by concatenation"
+                            Visibility="{x:Bind BuiltByConcatenation}" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate x:Key="TechnologyCardTemplate" x:DataType="vm:TechnologyCard">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="10">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="{x:Bind icons:StudioIcons.Components}"
+                                Style="{StaticResource IconStyle}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                AutomationProperties.HeadingLevel="Level2"
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind Name}" />
+                            <Border Grid.Column="2" Style="{StaticResource TagStyle}">
+                                <TextBlock
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="{x:Bind Category}"
+                                    TextLineBounds="Tight" />
+                            </Border>
+                            <TextBlock
+                                Grid.Column="3"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="{x:Bind Places}" />
+                        </Grid>
+                        <ItemsRepeater ItemsSource="{x:Bind Evidence}">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="vm:Place">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <HyperlinkButton
+                                            AutomationProperties.Name="{x:Bind LinkName}"
+                                            Click="OnLinkClicked"
+                                            Content="{x:Bind Link}"
+                                            Style="{StaticResource LinkStyle}"
+                                            Tag="{x:Bind Link}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="{x:Bind Detail}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
+            <DataTemplate x:Key="ConnectionCardTemplate" x:DataType="vm:ConnectionCard">
+                <Border Style="{StaticResource CardStyle}">
+                    <StackPanel Spacing="8">
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="{x:Bind icons:StudioIcons.Connection}"
+                                Style="{StaticResource IconStyle}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                AutomationProperties.HeadingLevel="Level2"
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind Name}" />
+                            <controls:StatusPill
+                                Grid.Column="2"
+                                State="Error"
+                                Text="Embedded password"
+                                Visibility="{x:Bind HasEmbeddedPassword}" />
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="{x:Bind Meta}" />
+                            <HyperlinkButton
+                                AutomationProperties.Name="{x:Bind LinkName}"
+                                Click="OnLinkClicked"
+                                Content="{x:Bind Link}"
+                                Style="{StaticResource LinkStyle}"
+                                Tag="{x:Bind Link}" />
+                        </StackPanel>
+                        <ItemsRepeater ItemsSource="{x:Bind Settings}">
+                            <ItemsRepeater.ItemTemplate>
+                                <DataTemplate x:DataType="vm:Setting">
+                                    <Grid ColumnSpacing="16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="128" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            AutomationProperties.AccessibilityView="Raw"
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="{x:Bind Key}" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            AutomationProperties.Name="{x:Bind AnnouncedName}"
+                                            Style="{StaticResource ValueTextStyle}"
+                                            Text="{x:Bind Value}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsRepeater.ItemTemplate>
+                        </ItemsRepeater>
+                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                            Secrets found in legacy code always show as ***. The studio has
+                            no control to reveal them.
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+            </DataTemplate>
+        </ResourceDictionary>
     </Page.Resources>
 
-    <ScrollViewer>
-        <StackPanel Style="{StaticResource PageContentStyle}">
-            <controls:PageHeader Purpose="What the scanner found in legacy/. Findings to confirm, not compiler output." Title="Inventory">
-                <controls:PageHeader.Actions>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="8"
-                        Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
-                        <Button Click="OnOpenMarkdown" IsEnabled="{x:Bind ViewModel.IsScanned, Mode=OneWay}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="{x:Bind icons:StudioIcons.Deliverables}" Style="{StaticResource IconStyle}" />
-                                <TextBlock Text="Open inventory.md" />
-                            </StackPanel>
-                        </Button>
-                        <Button Command="{x:Bind ViewModel.ScanCommand}" Style="{StaticResource AccentButtonStyle}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="{x:Bind icons:StudioIcons.Refresh}" Style="{StaticResource IconStyle}" />
-                                <TextBlock Text="{x:Bind ViewModel.ScanLabel, Mode=OneWay}" />
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </controls:PageHeader.Actions>
-            </controls:PageHeader>
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Wide">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1100" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <!--  Under 1100 the stats sit two to a row and the tables drop the columns the design marks.  -->
+                <VisualState x:Name="Narrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="PageContent.Spacing" Value="16" />
+                        <Setter Target="StatsLayout.MaximumRowsOrColumns" Value="2" />
+                        <Setter Target="UnitsHeader.Visibility" Value="Collapsed" />
+                        <Setter Target="UnitsHeaderNarrow.Visibility" Value="Visible" />
+                        <Setter Target="UnitsList.ItemTemplate" Value="{StaticResource UnitRowNarrowTemplate}" />
+                        <Setter Target="SqlHeader.Visibility" Value="Collapsed" />
+                        <Setter Target="SqlHeaderNarrow.Visibility" Value="Visible" />
+                        <Setter Target="SqlList.ItemTemplate" Value="{StaticResource SqlRowNarrowTemplate}" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
-            <controls:NoWorkspaceState
-                Glyph="{x:Bind icons:StudioIcons.Inventory}"
-                Message="The inventory lists what the scanner found in a workspace’s legacy/ folder: code modules, screens, database access, SQL and risks. Open or start a workspace to see it."
-                Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
-
-            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
-                <InfoBar
-                    IsClosable="False"
-                    IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
-                    Message="{x:Bind ViewModel.Problem, Mode=OneWay}"
-                    Severity="Error"
-                    Title="The scan didn’t finish.">
-                    <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
-                    </InfoBar.IconSource>
-                </InfoBar>
-
-                <Border
-                    AutomationProperties.LiveSetting="Polite"
-                    Style="{StaticResource CardStyle}"
-                    Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay}">
-                    <StackPanel Spacing="10">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <ProgressRing
-                                Width="16"
-                                Height="16"
-                                IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" />
-                            <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Scanning legacy/…" />
+        <ScrollViewer x:Name="PageScroller">
+            <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+                <controls:PageHeader
+                    Purpose="What the scanner found in legacy/. Findings to confirm, not compiler output."
+                    Title="Inventory">
+                    <controls:PageHeader.Actions>
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
+                            <Button Click="OnOpenMarkdown" IsEnabled="{x:Bind ViewModel.IsScanned, Mode=OneWay}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Deliverables}"
+                                        Style="{StaticResource IconStyle}" />
+                                    <TextBlock Text="Open inventory.md" />
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{x:Bind ViewModel.ScanCommand}" Style="{StaticResource AccentButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Refresh}"
+                                        Style="{StaticResource IconStyle}" />
+                                    <TextBlock Text="{x:Bind ViewModel.ScanLabel, Mode=OneWay}" />
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
-                        <ProgressBar IsIndeterminate="True" />
-                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="The scan only reads legacy/. Results replace the previous inventory when it finishes." />
-                    </StackPanel>
-                </Border>
+                    </controls:PageHeader.Actions>
+                </controls:PageHeader>
 
-                <ItemsRepeater AutomationProperties.Name="Summary" ItemsSource="{x:Bind ViewModel.Stats, Mode=OneWay}">
-                    <ItemsRepeater.Layout>
-                        <UniformGridLayout
-                            ItemsStretch="Fill"
-                            MaximumRowsOrColumns="4"
-                            MinColumnSpacing="16"
-                            MinItemWidth="160"
-                            MinRowSpacing="16"
-                            Orientation="Horizontal" />
-                    </ItemsRepeater.Layout>
-                    <ItemsRepeater.ItemTemplate>
-                        <DataTemplate x:DataType="vm:InventoryStat">
-                            <Border Style="{StaticResource CardStyle}">
-                                <StackPanel Spacing="4">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <FontIcon
-                                            FontSize="12"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Glyph="{x:Bind Glyph}"
-                                            Style="{StaticResource IconStyle}" />
-                                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind Number}" />
+                <controls:NoWorkspaceState
+                    Glyph="{x:Bind icons:StudioIcons.Inventory}"
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        The inventory lists what the scanner found in a workspace’s legacy/ folder: code modules,
+                        screens, database access, SQL and risks. Open or start a workspace to see it.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
+
+                <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
+                    <InfoBar
+                        IsClosable="False"
+                        IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
+                        Message="{x:Bind ViewModel.Problem, Mode=OneWay}"
+                        Severity="Error"
+                        Title="The scan didn’t finish.">
+                        <InfoBar.IconSource>
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                        </InfoBar.IconSource>
+                    </InfoBar>
+
+                    <Border
+                        AutomationProperties.LiveSetting="Polite"
+                        Style="{StaticResource CardStyle}"
+                        Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay}">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <ProgressRing
+                                    Width="16"
+                                    Height="16"
+                                    IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" />
+                                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Scanning legacy/…" />
+                            </StackPanel>
+                            <ProgressBar IsIndeterminate="True" />
+                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                The scan only reads legacy/. Results replace the previous inventory when it
+                                finishes.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <ItemsRepeater
+                        AutomationProperties.Name="Summary"
+                        ItemsSource="{x:Bind ViewModel.Stats, Mode=OneWay}">
+                        <ItemsRepeater.Layout>
+                            <!--  Every card takes the first card's size, so each leaves room for two detail lines.  -->
+                            <UniformGridLayout
+                                x:Name="StatsLayout"
+                                ItemsStretch="Fill"
+                                MaximumRowsOrColumns="4"
+                                MinColumnSpacing="16"
+                                MinItemHeight="126"
+                                MinItemWidth="160"
+                                MinRowSpacing="16"
+                                Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:InventoryStat">
+                                <Border Style="{StaticResource CardStyle}">
+                                    <StackPanel Spacing="4">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon
+                                                FontSize="12"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Glyph="{x:Bind Glyph}"
+                                                Style="{StaticResource IconStyle}" />
+                                            <TextBlock
+                                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                Text="{x:Bind Label}" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock
+                                                Style="{StaticResource TitleTextBlockStyle}"
+                                                Text="{x:Bind Number}" />
+                                            <TextBlock
+                                                Margin="0,0,0,5"
+                                                VerticalAlignment="Bottom"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                Text="{x:Bind Unit}" />
+                                        </StackPanel>
                                         <TextBlock
-                                            Margin="0,0,0,5"
-                                            VerticalAlignment="Bottom"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Style="{StaticResource BodyTextBlockStyle}"
-                                            Text="{x:Bind Unit}" />
+                                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                                            Text="{x:Bind Detail}" />
                                     </StackPanel>
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
+                                </Border>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+
+                    <Border
+                        Style="{StaticResource CardStyle}"
+                        Visibility="{x:Bind ViewModel.IsNotScanned, Mode=OneWay}">
+                        <controls:EmptyState
+                            Glyph="{x:Bind icons:StudioIcons.Discover}"
+                            Title="legacy/ hasn’t been scanned">
+                            <controls:EmptyState.Message>
+                                The scan reads every .pas, .dfm, .dpr and project file and lists code modules, screens,
+                                database access, SQL and risks. It never changes legacy/. With Claude Code, the Legacy
+                                discovery agent can then draft D02 from it.
+                            </controls:EmptyState.Message>
+                            <Button Command="{x:Bind ViewModel.ScanCommand}" Style="{StaticResource AccentButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Refresh}"
+                                        Style="{StaticResource IconStyle}" />
+                                    <TextBlock Text="Scan legacy/" />
+                                </StackPanel>
+                            </Button>
+                        </controls:EmptyState>
+                    </Border>
+
+                    <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsScanned, Mode=OneWay}">
+                        <TextBlock
+                            IsTextSelectionEnabled="True"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind ViewModel.Facts, Mode=OneWay}" />
+                        <SelectorBar
+                            x:Name="TabBar"
+                            AutomationProperties.Name="Inventory sections"
+                            SelectionChanged="OnTabChanged" />
+
+                        <!--  Code modules.  -->
+                        <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsUnits, Mode=OneWay}">
+                            <TextBox
+                                Width="320"
+                                HorizontalAlignment="Left"
+                                AutomationProperties.Name="Search code modules"
+                                PlaceholderText="Search code modules and paths"
+                                Text="{x:Bind ViewModel.Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Visibility="{x:Bind ViewModel.IsLarge, Mode=OneWay}" />
+                            <Border Style="{StaticResource FlushCardStyle}">
+                                <StackPanel>
+                                    <Grid
+                                        x:Name="UnitsHeader"
+                                        x:DefaultBindMode="OneWay"
+                                        Style="{StaticResource TableHeaderStyle}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="88" />
+                                            <ColumnDefinition Width="72" />
+                                            <ColumnDefinition Width="72" />
+                                            <ColumnDefinition Width="64" />
+                                            <ColumnDefinition Width="64" />
+                                            <ColumnDefinition Width="48" />
+                                            <ColumnDefinition Width="140" />
+                                            <ColumnDefinition Width="32" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button
+                                            Margin="-2,0,0,0"
+                                            HorizontalAlignment="Left"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[0].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[0]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[0].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[0].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[0].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="1"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[1].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[1]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[1].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[1].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[1].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="2"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[2].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[2]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[2].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[2].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[2].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="3"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[3].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[3]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[3].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[3].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[3].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="4"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[4].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[4]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[4].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[4].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[4].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="5"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[5].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[5]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[5].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[5].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[5].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="6"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[6].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[6]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[6].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[6].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[6].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <TextBlock
+                                            Grid.Column="7"
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Types" />
+                                    </Grid>
+                                    <Grid
+                                        x:Name="UnitsHeaderNarrow"
+                                        x:DefaultBindMode="OneWay"
+                                        Style="{StaticResource TableHeaderStyle}"
+                                        Visibility="Collapsed">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="88" />
+                                            <ColumnDefinition Width="64" />
+                                            <ColumnDefinition Width="64" />
+                                            <ColumnDefinition Width="32" />
+                                        </Grid.ColumnDefinitions>
+                                        <Button
+                                            Margin="-2,0,0,0"
+                                            HorizontalAlignment="Left"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[0].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[0]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[0].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[0].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[0].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="1"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[1].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[1]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[1].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[1].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[1].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="2"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[4].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[4]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[4].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[4].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[4].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="3"
+                                            Margin="0,0,-2,0"
+                                            HorizontalAlignment="Right"
+                                            AutomationProperties.Name="{x:Bind ViewModel.Headers[5].AnnouncedName}"
+                                            Click="OnSortClicked"
+                                            Style="{StaticResource SortHeaderStyle}"
+                                            Tag="{x:Bind ViewModel.Headers[5]}">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <TextBlock
+                                                    Style="{StaticResource TableHeaderTextStyle}"
+                                                    Text="{x:Bind ViewModel.Headers[5].Label}" />
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind ViewModel.Headers[5].Glyph}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind ViewModel.Headers[5].IsSorted}" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                    <ListView
+                                        x:Name="UnitsList"
+                                        AutomationProperties.Name="Code modules"
+                                        IsItemClickEnabled="True"
+                                        ItemClick="OnRowClicked"
+                                        ItemContainerStyle="{StaticResource TableRowStyle}"
+                                        ItemTemplate="{StaticResource UnitRowTemplate}"
+                                        ItemsSource="{x:Bind ViewModel.Units, Mode=OneWay}"
+                                        SelectionMode="None" />
                                 </StackPanel>
                             </Border>
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
+                            <TextBlock
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="{x:Bind ViewModel.UnitsNote, Mode=OneWay}" />
+                        </StackPanel>
 
-                <Border Style="{StaticResource CardStyle}" Visibility="{x:Bind ViewModel.IsNotScanned, Mode=OneWay}">
-                    <controls:EmptyState
-                        Glyph="{x:Bind icons:StudioIcons.Discover}"
-                        Message="The scan reads every .pas, .dfm, .dpr and project file and lists code modules, screens, database access, SQL and risks. It never changes legacy/. With Claude Code, the Legacy discovery agent can then draft D02 from it."
-                        Title="legacy/ hasn’t been scanned">
-                        <Button Command="{x:Bind ViewModel.ScanCommand}" Style="{StaticResource AccentButtonStyle}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="{x:Bind icons:StudioIcons.Refresh}" Style="{StaticResource IconStyle}" />
-                                <TextBlock Text="Scan legacy/" />
-                            </StackPanel>
-                        </Button>
-                    </controls:EmptyState>
-                </Border>
-
-                <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsScanned, Mode=OneWay}">
-                    <TextBlock
-                        IsTextSelectionEnabled="True"
-                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                        Text="{x:Bind ViewModel.Facts, Mode=OneWay}" />
-                    <SelectorBar
-                        x:Name="TabBar"
-                        AutomationProperties.Name="Inventory sections"
-                        SelectionChanged="OnTabChanged" />
-
-                    <!--  Code modules.  -->
-                    <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsUnits, Mode=OneWay}">
-                        <TextBox
-                            Width="320"
-                            HorizontalAlignment="Left"
-                            AutomationProperties.Name="Search code modules"
-                            PlaceholderText="Search code modules and paths"
-                            Text="{x:Bind ViewModel.Search, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                            Visibility="{x:Bind ViewModel.IsLarge, Mode=OneWay}" />
-                        <Border Style="{StaticResource FlushCardStyle}">
-                            <StackPanel AutomationProperties.Name="Code modules">
-                                <Grid Style="{StaticResource TableHeaderStyle}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="88" />
-                                        <ColumnDefinition Width="64" />
-                                        <ColumnDefinition Width="64" />
-                                        <ColumnDefinition Width="64" />
-                                        <ColumnDefinition Width="64" />
-                                        <ColumnDefinition Width="48" />
-                                        <ColumnDefinition Width="140" />
-                                        <ColumnDefinition Width="32" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Code module and path" />
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Code lines" />
-                                    <TextBlock
-                                        Grid.Column="2"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Routines" />
-                                    <TextBlock
-                                        Grid.Column="3"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Globals" />
-                                    <TextBlock
-                                        Grid.Column="4"
-                                        AutomationProperties.Name="Fan-in, sorted descending"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Fan-in" />
-                                    <TextBlock
-                                        Grid.Column="5"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Fan-out" />
-                                    <TextBlock
-                                        Grid.Column="6"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Uses" />
-                                    <TextBlock
-                                        Grid.Column="7"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Types" />
-                                </Grid>
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Units, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:UnitRow">
-                                            <Grid AutomationProperties.Name="{x:Bind AnnouncedName}">
-                                                <Grid
-                                                    MinHeight="36"
-                                                    Padding="16,6"
-                                                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-                                                    BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                                    BorderThickness="0,1,0,0"
-                                                    ColumnSpacing="8"
-                                                    Visibility="{x:Bind IsFolder}">
+                        <!--  Screens and the controls on them.  -->
+                        <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsScreens, Mode=OneWay}">
+                            <InfoBar
+                                IsClosable="False"
+                                IsOpen="{x:Bind ViewModel.HasUnreadable, Mode=OneWay}"
+                                Message="{x:Bind ViewModel.Unreadable, Mode=OneWay}"
+                                Severity="Warning"
+                                Title="Some screens can’t be read.">
+                                <InfoBar.IconSource>
+                                    <FontIconSource
+                                        FontFamily="{StaticResource StudioIconsFontFamily}"
+                                        Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                                </InfoBar.IconSource>
+                            </InfoBar>
+                            <Border Style="{StaticResource FlushCardStyle}">
+                                <StackPanel>
+                                    <Grid Style="{StaticResource TableHeaderStyle}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="96" />
+                                            <ColumnDefinition Width="72" />
+                                            <ColumnDefinition Width="72" />
+                                            <ColumnDefinition Width="32" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Screen and its file" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Format" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Style="{StaticResource NumberHeaderStyle}"
+                                            Text="Controls" />
+                                        <TextBlock
+                                            Grid.Column="3"
+                                            Style="{StaticResource NumberHeaderStyle}"
+                                            Text="Events" />
+                                    </Grid>
+                                    <ListView
+                                        x:Name="ScreensList"
+                                        AutomationProperties.Name="Screens"
+                                        IsItemClickEnabled="True"
+                                        ItemClick="OnRowClicked"
+                                        ItemContainerStyle="{StaticResource TableRowStyle}"
+                                        ItemsSource="{x:Bind ViewModel.Screens, Mode=OneWay}"
+                                        SelectionMode="None">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:ScreenRow">
+                                                <Grid ColumnSpacing="12">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                        Text="{x:Bind Name}" />
-                                                    <TextBlock
-                                                        Grid.Column="1"
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind Path}" />
-                                                </Grid>
-                                                <Grid
-                                                    MinHeight="44"
-                                                    Padding="16,6"
-                                                    BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                                    BorderThickness="0,1,0,0"
-                                                    ColumnSpacing="12"
-                                                    Visibility="{x:Bind IsUnit}">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="88" />
-                                                        <ColumnDefinition Width="64" />
-                                                        <ColumnDefinition Width="64" />
-                                                        <ColumnDefinition Width="64" />
-                                                        <ColumnDefinition Width="64" />
-                                                        <ColumnDefinition Width="48" />
-                                                        <ColumnDefinition Width="140" />
+                                                        <ColumnDefinition Width="96" />
+                                                        <ColumnDefinition Width="72" />
+                                                        <ColumnDefinition Width="72" />
                                                         <ColumnDefinition Width="32" />
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel VerticalAlignment="Center">
-                                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
-                                                            <controls:StatusPill
-                                                                State="Warning"
-                                                                Text="Cycle"
-                                                                Visibility="{x:Bind InCycle}" />
-                                                            <Border Style="{StaticResource TagStyle}" Visibility="{x:Bind IsProgram}">
-                                                                <TextBlock
-                                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                                    Text="main program"
-                                                                    TextLineBounds="Tight" />
-                                                            </Border>
-                                                        </StackPanel>
-                                                        <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
+                                                        <TextBlock
+                                                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                            Text="{x:Bind Root}" />
+                                                        <controls:PathText Text="{x:Bind Path}" />
                                                     </StackPanel>
-                                                    <TextBlock
+                                                    <Border
                                                         Grid.Column="1"
-                                                        Style="{StaticResource NumberCellStyle}"
-                                                        Text="{x:Bind CodeLines}" />
+                                                        Style="{StaticResource TagStyle}">
+                                                        <TextBlock
+                                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                                            Text="{x:Bind Format}"
+                                                            TextLineBounds="Tight" />
+                                                    </Border>
                                                     <TextBlock
                                                         Grid.Column="2"
                                                         Style="{StaticResource NumberCellStyle}"
-                                                        Text="{x:Bind Routines.ToString()}" />
+                                                        Text="{x:Bind Controls.ToString()}" />
                                                     <TextBlock
                                                         Grid.Column="3"
                                                         Style="{StaticResource NumberCellStyle}"
-                                                        Text="{x:Bind Globals.ToString()}" />
-                                                    <TextBlock
-                                                        Grid.Column="4"
-                                                        Style="{StaticResource NumberCellStyle}"
-                                                        Text="{x:Bind FanIn.ToString()}" />
-                                                    <TextBlock
-                                                        Grid.Column="5"
-                                                        Style="{StaticResource NumberCellStyle}"
-                                                        Text="{x:Bind FanOut.ToString()}" />
-                                                    <TextBlock
-                                                        Grid.Column="6"
-                                                        Style="{StaticResource NumberCellStyle}"
-                                                        Text="{x:Bind Uses.ToString()}" />
-                                                    <TextBlock
-                                                        Grid.Column="7"
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource MonoTextStyle}"
-                                                        Text="{x:Bind Types}" />
+                                                        Text="{x:Bind Events.ToString()}" />
                                                     <Button
-                                                        Grid.Column="8"
+                                                        Grid.Column="4"
+                                                        Padding="8"
                                                         VerticalAlignment="Center"
                                                         AutomationProperties.Name="{x:Bind OpenName}"
                                                         Click="OnLinkClicked"
                                                         Style="{StaticResource SubtleButtonStyle}"
                                                         Tag="{x:Bind Path}"
                                                         ToolTipService.ToolTip="Open in your editor">
-                                                        <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
+                                                        <FontIcon
+                                                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                                            Style="{StaticResource IconStyle}" />
                                                     </Button>
                                                 </Grid>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </StackPanel>
-                        </Border>
-                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.UnitsNote, Mode=OneWay}" />
-                    </StackPanel>
-
-                    <!--  Screens and the controls on them.  -->
-                    <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsScreens, Mode=OneWay}">
-                        <InfoBar
-                            IsClosable="False"
-                            IsOpen="{x:Bind ViewModel.HasUnreadable, Mode=OneWay}"
-                            Message="{x:Bind ViewModel.Unreadable, Mode=OneWay}"
-                            Severity="Warning"
-                            Title="Some screens can’t be read.">
-                            <InfoBar.IconSource>
-                                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
-                            </InfoBar.IconSource>
-                        </InfoBar>
-                        <Border Style="{StaticResource FlushCardStyle}">
-                            <StackPanel AutomationProperties.Name="Screens">
-                                <Grid Style="{StaticResource TableHeaderStyle}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="96" />
-                                        <ColumnDefinition Width="72" />
-                                        <ColumnDefinition Width="72" />
-                                        <ColumnDefinition Width="32" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Screen and its file" />
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Format" />
-                                    <TextBlock
-                                        Grid.Column="2"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Controls" />
-                                    <TextBlock
-                                        Grid.Column="3"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Events" />
-                                </Grid>
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Screens, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ScreenRow">
-                                            <Grid
-                                                MinHeight="44"
-                                                Padding="16,6"
-                                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                                BorderThickness="0,1,0,0"
-                                                ColumnSpacing="12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="96" />
-                                                    <ColumnDefinition Width="72" />
-                                                    <ColumnDefinition Width="72" />
-                                                    <ColumnDefinition Width="32" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel VerticalAlignment="Center">
-                                                    <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Root}" />
-                                                    <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind Path}" />
-                                                </StackPanel>
-                                                <Border
-                                                    Grid.Column="1"
-                                                    Style="{StaticResource TagStyle}">
-                                                    <TextBlock
-                                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="{x:Bind Format}"
-                                                        TextLineBounds="Tight" />
-                                                </Border>
-                                                <TextBlock
-                                                    Grid.Column="2"
-                                                    Style="{StaticResource NumberCellStyle}"
-                                                    Text="{x:Bind Controls.ToString()}" />
-                                                <TextBlock
-                                                    Grid.Column="3"
-                                                    Style="{StaticResource NumberCellStyle}"
-                                                    Text="{x:Bind Events.ToString()}" />
-                                                <Button
-                                                    Grid.Column="4"
-                                                    VerticalAlignment="Center"
-                                                    AutomationProperties.Name="{x:Bind OpenName}"
-                                                    Click="OnLinkClicked"
-                                                    Style="{StaticResource SubtleButtonStyle}"
-                                                    Tag="{x:Bind Path}"
-                                                    ToolTipService.ToolTip="Open in your editor">
-                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.OpenInEditor}" Style="{StaticResource IconStyle}" />
-                                                </Button>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource FlushCardStyle}">
-                            <StackPanel AutomationProperties.Name="Controls">
-                                <Grid Style="{StaticResource TableHeaderStyle}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="72" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="120" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Control type" />
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Style="{StaticResource NumberHeaderStyle}"
-                                        Text="Count" />
-                                    <TextBlock
-                                        Grid.Column="2"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Vendor" />
-                                    <TextBlock
-                                        Grid.Column="3"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Category" />
-                                </Grid>
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Controls, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ControlRow">
-                                            <Grid
-                                                MinHeight="36"
-                                                Padding="16,6"
-                                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                                BorderThickness="0,1,0,0"
-                                                ColumnSpacing="12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="72" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="120" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock
-                                                    VerticalAlignment="Center"
-                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                    Style="{StaticResource MonoTextStyle}"
-                                                    Text="{x:Bind ClassName}" />
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    Style="{StaticResource NumberCellStyle}"
-                                                    Text="{x:Bind Count.ToString()}" />
-                                                <TextBlock
-                                                    Grid.Column="2"
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                    Text="{x:Bind Vendor}" />
-                                                <TextBlock
-                                                    Grid.Column="3"
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="{x:Bind Category}" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-
-                    <!--  Data access, connections, libraries and external routines.  -->
-                    <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsData, Mode=OneWay}">
-                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Technologies, Mode=OneWay}">
-                            <ItemsRepeater.Layout>
-                                <UniformGridLayout
-                                    ItemsStretch="Fill"
-                                    MaximumRowsOrColumns="2"
-                                    MinColumnSpacing="16"
-                                    MinItemWidth="280"
-                                    MinRowSpacing="16"
-                                    Orientation="Horizontal" />
-                            </ItemsRepeater.Layout>
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="vm:TechnologyCard">
-                                    <Border Style="{StaticResource CardStyle}">
-                                        <StackPanel Spacing="10">
-                                            <Grid ColumnSpacing="8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <FontIcon
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind icons:StudioIcons.Components}"
-                                                    Style="{StaticResource IconStyle}" />
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    AutomationProperties.HeadingLevel="Level2"
-                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                    Text="{x:Bind Name}" />
-                                                <Border Grid.Column="2" Style="{StaticResource TagStyle}">
-                                                    <TextBlock
-                                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="{x:Bind Category}"
-                                                        TextLineBounds="Tight" />
-                                                </Border>
-                                                <TextBlock
-                                                    Grid.Column="3"
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                    Text="{x:Bind Places}" />
-                                            </Grid>
-                                            <ItemsRepeater ItemsSource="{x:Bind Evidence}">
-                                                <ItemsRepeater.ItemTemplate>
-                                                    <DataTemplate x:DataType="vm:Place">
-                                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                                            <HyperlinkButton
-                                                                Click="OnLinkClicked"
-                                                                Content="{x:Bind Link}"
-                                                                Style="{StaticResource LinkStyle}"
-                                                                Tag="{x:Bind Link}" />
-                                                            <TextBlock
-                                                                VerticalAlignment="Center"
-                                                                Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                                Text="{x:Bind Detail}"
-                                                                TextTrimming="CharacterEllipsis" />
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </ItemsRepeater.ItemTemplate>
-                                            </ItemsRepeater>
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.Connections, Mode=OneWay}">
-                            <ItemsRepeater.Layout>
-                                <UniformGridLayout
-                                    ItemsStretch="Fill"
-                                    MaximumRowsOrColumns="2"
-                                    MinColumnSpacing="16"
-                                    MinItemWidth="280"
-                                    MinRowSpacing="16"
-                                    Orientation="Horizontal" />
-                            </ItemsRepeater.Layout>
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="vm:ConnectionCard">
-                                    <Border Style="{StaticResource CardStyle}">
-                                        <StackPanel Spacing="8">
-                                            <Grid ColumnSpacing="8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <FontIcon
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind icons:StudioIcons.Connection}"
-                                                    Style="{StaticResource IconStyle}" />
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    AutomationProperties.HeadingLevel="Level2"
-                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                    Text="{x:Bind Name}" />
-                                                <controls:StatusPill
-                                                    Grid.Column="2"
-                                                    State="Error"
-                                                    Text="Embedded password"
-                                                    Visibility="{x:Bind HasEmbeddedPassword}" />
-                                            </Grid>
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <TextBlock
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                    Text="{x:Bind Meta}" />
-                                                <HyperlinkButton
-                                                    Click="OnLinkClicked"
-                                                    Content="{x:Bind Link}"
-                                                    Style="{StaticResource LinkStyle}"
-                                                    Tag="{x:Bind Link}" />
-                                            </StackPanel>
-                                            <ItemsRepeater ItemsSource="{x:Bind Settings}">
-                                                <ItemsRepeater.ItemTemplate>
-                                                    <DataTemplate x:DataType="vm:Setting">
-                                                        <Grid AutomationProperties.Name="{x:Bind AnnouncedName}" ColumnSpacing="16">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="128" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Key}" />
-                                                            <TextBlock
-                                                                Grid.Column="1"
-                                                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                                Style="{StaticResource MonoTextStyle}"
-                                                                Text="{x:Bind Value}" />
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ItemsRepeater.ItemTemplate>
-                                            </ItemsRepeater>
-                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Secrets found in legacy code always show as ***. The studio has no control to reveal them." />
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                        <Border Style="{StaticResource CardStyle}">
-                            <StackPanel Spacing="8">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                        Glyph="{x:Bind icons:StudioIcons.ExternalRoutines}"
-                                        Style="{StaticResource IconStyle}" />
-                                    <TextBlock
-                                        AutomationProperties.HeadingLevel="Level2"
-                                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                                        Text="External routines and COM" />
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
                                 </StackPanel>
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Externals, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ExternalRow">
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <TextBlock
-                                                    VerticalAlignment="Center"
-                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                    Style="{StaticResource MonoTextStyle}"
-                                                    Text="{x:Bind Routine}" />
-                                                <TextBlock
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                    Text="{x:Bind Library}" />
-                                                <HyperlinkButton
-                                                    Click="OnLinkClicked"
-                                                    Content="{x:Bind Link}"
-                                                    Style="{StaticResource LinkStyle}"
-                                                    Tag="{x:Bind Link}" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ViewModel.ComNote, Mode=OneWay}" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource FlushCardStyle}">
+                                <StackPanel AutomationProperties.Name="Controls">
+                                    <Grid Style="{StaticResource TableHeaderStyle}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="72" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="120" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Control type" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Style="{StaticResource NumberHeaderStyle}"
+                                            Text="Count" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Vendor" />
+                                        <TextBlock
+                                            Grid.Column="3"
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Category" />
+                                    </Grid>
+                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.Controls, Mode=OneWay}">
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:ControlRow">
+                                                <Grid
+                                                    MinHeight="36"
+                                                    Padding="16,6"
+                                                    BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                                    BorderThickness="0,1,0,0"
+                                                    ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="72" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="120" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                        Style="{StaticResource MonoTextStyle}"
+                                                        Text="{x:Bind ClassName}" />
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        Style="{StaticResource NumberCellStyle}"
+                                                        Text="{x:Bind Count.ToString()}" />
+                                                    <TextBlock
+                                                        Grid.Column="2"
+                                                        VerticalAlignment="Center"
+                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                        Text="{x:Bind Vendor}" />
+                                                    <TextBlock
+                                                        Grid.Column="3"
+                                                        VerticalAlignment="Center"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        Text="{x:Bind Category}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-                    <!--  SQL statements and risk markers.  -->
-                    <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsRisks, Mode=OneWay}">
-                        <Border Style="{StaticResource FlushCardStyle}">
-                            <StackPanel AutomationProperties.Name="SQL statements">
-                                <TextBlock
-                                    Padding="16,12,16,8"
-                                    AutomationProperties.HeadingLevel="Level2"
-                                    Style="{StaticResource BodyStrongTextBlockStyle}"
-                                    Text="SQL statements" />
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Sql, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:SqlRow">
-                                            <Grid
-                                                MinHeight="44"
-                                                Padding="16,6"
-                                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                                BorderThickness="0,1,0,0"
-                                                ColumnSpacing="12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="200" />
-                                                    <ColumnDefinition Width="64" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <HyperlinkButton
-                                                    Click="OnLinkClicked"
-                                                    Content="{x:Bind Link}"
-                                                    Style="{StaticResource LinkStyle}"
-                                                    Tag="{x:Bind Link}" />
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="{x:Bind Kind}" />
-                                                <TextBlock
-                                                    Grid.Column="2"
-                                                    VerticalAlignment="Center"
-                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                    Style="{StaticResource MonoTextStyle}"
-                                                    Text="{x:Bind Text}"
-                                                    ToolTipService.ToolTip="{x:Bind Text}" />
-                                                <StackPanel
-                                                    Grid.Column="3"
-                                                    VerticalAlignment="Center"
-                                                    Orientation="Horizontal"
-                                                    Spacing="8">
+                        <!--  Data access, connections, libraries and external routines.  -->
+                        <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsData, Mode=OneWay}">
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.TechnologyRows, Mode=OneWay}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="16" />
+                                </ItemsRepeater.Layout>
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:TechnologyPair">
+                                        <Grid ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Left}"
+                                                ContentTemplate="{StaticResource TechnologyCardTemplate}" />
+                                            <ContentPresenter
+                                                Grid.Column="1"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Right}"
+                                                ContentTemplate="{StaticResource TechnologyCardTemplate}"
+                                                Visibility="{x:Bind HasRight}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.ConnectionRows, Mode=OneWay}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="16" />
+                                </ItemsRepeater.Layout>
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ConnectionPair">
+                                        <Grid ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <ContentPresenter
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Left}"
+                                                ContentTemplate="{StaticResource ConnectionCardTemplate}" />
+                                            <ContentPresenter
+                                                Grid.Column="1"
+                                                HorizontalContentAlignment="Stretch"
+                                                VerticalContentAlignment="Stretch"
+                                                Content="{x:Bind Right}"
+                                                ContentTemplate="{StaticResource ConnectionCardTemplate}"
+                                                Visibility="{x:Bind HasRight}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                            <Border Style="{StaticResource CardStyle}">
+                                <StackPanel Spacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Glyph="{x:Bind icons:StudioIcons.ExternalRoutines}"
+                                            Style="{StaticResource IconStyle}" />
+                                        <TextBlock
+                                            AutomationProperties.HeadingLevel="Level2"
+                                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                                            Text="External routines and COM" />
+                                    </StackPanel>
+                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.Externals, Mode=OneWay}">
+                                        <ItemsRepeater.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:ExternalRow">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                        Style="{StaticResource MonoTextStyle}"
+                                                        Text="{x:Bind Routine}" />
                                                     <TextBlock
                                                         VerticalAlignment="Center"
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind Note}" />
-                                                    <controls:StatusPill
-                                                        State="Error"
-                                                        Text="Built by concatenation"
-                                                        Visibility="{x:Bind BuiltByConcatenation}" />
+                                                        Text="{x:Bind Library}" />
+                                                    <HyperlinkButton
+                                                        AutomationProperties.Name="{x:Bind LinkName}"
+                                                        Click="OnLinkClicked"
+                                                        Content="{x:Bind Link}"
+                                                        Style="{StaticResource LinkStyle}"
+                                                        Tag="{x:Bind Link}" />
                                                 </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource FlushCardStyle}">
-                            <StackPanel AutomationProperties.Name="Risk markers">
-                                <TextBlock
-                                    Padding="16,12,16,8"
-                                    AutomationProperties.HeadingLevel="Level2"
-                                    Style="{StaticResource BodyStrongTextBlockStyle}"
-                                    Text="Risk markers" />
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Risks, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:RiskRow">
-                                            <Grid
-                                                MinHeight="34"
-                                                Padding="16,4"
-                                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                                BorderThickness="0,1,0,0"
-                                                ColumnSpacing="12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="160" />
-                                                    <ColumnDefinition Width="200" />
-                                                    <ColumnDefinition Width="56" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource BodyTextBlockStyle}"
-                                                    Text="{x:Bind Kind}" />
-                                                <HyperlinkButton
-                                                    Grid.Column="1"
-                                                    Click="OnLinkClicked"
-                                                    Content="{x:Bind Link}"
-                                                    Style="{StaticResource LinkStyle}"
-                                                    Tag="{x:Bind Link}" />
-                                                <TextBlock
-                                                    Grid.Column="2"
-                                                    Style="{StaticResource NumberCellStyle}"
-                                                    Text="{x:Bind Count.ToString()}" />
-                                                <TextBlock
-                                                    Grid.Column="3"
-                                                    VerticalAlignment="Center"
-                                                    Style="{StaticResource MonoTextStyle}"
-                                                    Text="{x:Bind Detail}" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsRepeater.ItemTemplate>
+                                    </ItemsRepeater>
+                                    <TextBlock
+                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                        Text="{x:Bind ViewModel.ComNote, Mode=OneWay}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-                    <!--  Circular dependencies.  -->
-                    <Border Style="{StaticResource FlushCardStyle}" Visibility="{x:Bind ViewModel.IsCycles, Mode=OneWay}">
-                        <ItemsRepeater AutomationProperties.Name="Cycles" ItemsSource="{x:Bind ViewModel.Cycles, Mode=OneWay}">
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="vm:CycleRow">
-                                    <StackPanel
-                                        Padding="16,10"
-                                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                        BorderThickness="0,1,0,0"
-                                        Orientation="Horizontal"
-                                        Spacing="8">
-                                        <FontIcon
-                                            Foreground="{ThemeResource SystemFillColorCautionBrush}"
-                                            Glyph="{x:Bind icons:StudioIcons.Cycle}"
-                                            Style="{StaticResource IconStyle}" />
-                                        <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{x:Bind Units}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                    </Border>
-
-                    <!--  What the scanner could not read.  -->
-                    <Border Style="{StaticResource FlushCardStyle}" Visibility="{x:Bind ViewModel.IsDiagnostics, Mode=OneWay}">
-                        <ItemsRepeater AutomationProperties.Name="Diagnostics" ItemsSource="{x:Bind ViewModel.Diagnostics, Mode=OneWay}">
-                            <ItemsRepeater.ItemTemplate>
-                                <DataTemplate x:DataType="vm:DiagnosticRow">
+                        <!--  SQL statements and risk markers.  -->
+                        <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsRisks, Mode=OneWay}">
+                            <Border Style="{StaticResource FlushCardStyle}">
+                                <StackPanel>
+                                    <TextBlock
+                                        Padding="16,12,16,8"
+                                        AutomationProperties.HeadingLevel="Level2"
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        Text="SQL statements" />
                                     <Grid
-                                        Padding="16,8"
-                                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                        BorderThickness="0,1,0,0"
-                                        ColumnSpacing="12">
+                                        x:Name="SqlHeader"
+                                        Style="{StaticResource TableHeaderStyle}">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="240" />
+                                            <ColumnDefinition Width="200" />
+                                            <ColumnDefinition Width="64" />
                                             <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <FontIcon
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Glyph="{x:Bind icons:StudioIcons.Diagnostics}"
-                                            Style="{StaticResource IconStyle}" />
-                                        <HyperlinkButton
+                                        <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Location" />
+                                        <TextBlock
                                             Grid.Column="1"
-                                            Click="OnLinkClicked"
-                                            Content="{x:Bind Link}"
-                                            Style="{StaticResource LinkStyle}"
-                                            Tag="{x:Bind Link}" />
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Kind" />
                                         <TextBlock
                                             Grid.Column="2"
-                                            VerticalAlignment="Center"
-                                            Style="{StaticResource BodyTextBlockStyle}"
-                                            Text="{x:Bind Message}"
-                                            TextWrapping="Wrap" />
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Text" />
                                     </Grid>
-                                </DataTemplate>
-                            </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                    </Border>
+                                    <Grid
+                                        x:Name="SqlHeaderNarrow"
+                                        Style="{StaticResource TableHeaderStyle}"
+                                        Visibility="Collapsed">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Location" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Text" />
+                                    </Grid>
+                                    <ListView
+                                        x:Name="SqlList"
+                                        AutomationProperties.Name="SQL statements"
+                                        IsItemClickEnabled="True"
+                                        ItemClick="OnRowClicked"
+                                        ItemContainerStyle="{StaticResource TableRowStyle}"
+                                        ItemTemplate="{StaticResource SqlRowTemplate}"
+                                        ItemsSource="{x:Bind ViewModel.Sql, Mode=OneWay}"
+                                        SelectionMode="None" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource FlushCardStyle}">
+                                <StackPanel>
+                                    <TextBlock
+                                        Padding="16,12,16,8"
+                                        AutomationProperties.HeadingLevel="Level2"
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        Text="Risk markers" />
+                                    <Grid Style="{StaticResource TableHeaderStyle}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="160" />
+                                            <ColumnDefinition Width="200" />
+                                            <ColumnDefinition Width="56" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Kind" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Where" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Style="{StaticResource NumberHeaderStyle}"
+                                            Text="Count" />
+                                        <TextBlock
+                                            Grid.Column="3"
+                                            Style="{StaticResource TableHeaderTextStyle}"
+                                            Text="Detail" />
+                                    </Grid>
+                                    <ListView
+                                        x:Name="RisksList"
+                                        AutomationProperties.Name="Risk markers"
+                                        IsItemClickEnabled="True"
+                                        ItemClick="OnRowClicked"
+                                        ItemContainerStyle="{StaticResource TableRowStyle}"
+                                        ItemsSource="{x:Bind ViewModel.Risks, Mode=OneWay}"
+                                        SelectionMode="None">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:RiskRow">
+                                                <Grid ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="160" />
+                                                        <ColumnDefinition Width="200" />
+                                                        <ColumnDefinition Width="56" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Style="{StaticResource BodyTextBlockStyle}"
+                                                        Text="{x:Bind Kind}" />
+                                                    <HyperlinkButton
+                                                        Grid.Column="1"
+                                                        AutomationProperties.Name="{x:Bind LinkName}"
+                                                        Click="OnLinkClicked"
+                                                        Content="{x:Bind Link}"
+                                                        Style="{StaticResource LinkStyle}"
+                                                        Tag="{x:Bind Link}" />
+                                                    <TextBlock
+                                                        Grid.Column="2"
+                                                        Style="{StaticResource NumberCellStyle}"
+                                                        Text="{x:Bind Count.ToString()}" />
+                                                    <TextBlock
+                                                        Grid.Column="3"
+                                                        VerticalAlignment="Center"
+                                                        Style="{StaticResource MonoTextStyle}"
+                                                        Text="{x:Bind Detail}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!--  Circular dependencies.  -->
+                        <Border
+                            Style="{StaticResource FlushCardStyle}"
+                            Visibility="{x:Bind ViewModel.IsCycles, Mode=OneWay}">
+                            <ItemsRepeater
+                                AutomationProperties.Name="Cycles"
+                                ItemsSource="{x:Bind ViewModel.Cycles, Mode=OneWay}">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:CycleRow">
+                                        <StackPanel
+                                            Padding="16,10"
+                                            BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                            BorderThickness="0,1,0,0"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <FontIcon
+                                                Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                                Glyph="{x:Bind icons:StudioIcons.Cycle}"
+                                                Style="{StaticResource IconStyle}" />
+                                            <TextBlock
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                Text="{x:Bind Units}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </Border>
+
+                        <!--  What the scanner could not read.  -->
+                        <Border
+                            Style="{StaticResource FlushCardStyle}"
+                            Visibility="{x:Bind ViewModel.IsDiagnostics, Mode=OneWay}">
+                            <ListView
+                                x:Name="DiagnosticsList"
+                                AutomationProperties.Name="Diagnostics"
+                                IsItemClickEnabled="True"
+                                ItemClick="OnRowClicked"
+                                ItemContainerStyle="{StaticResource TableRowStyle}"
+                                ItemsSource="{x:Bind ViewModel.Diagnostics, Mode=OneWay}"
+                                SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:DiagnosticRow">
+                                        <Grid ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <FontIcon
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Glyph="{x:Bind icons:StudioIcons.Diagnostics}"
+                                                Style="{StaticResource IconStyle}" />
+                                            <HyperlinkButton
+                                                Grid.Column="1"
+                                                AutomationProperties.Name="{x:Bind LinkName}"
+                                                Click="OnLinkClicked"
+                                                Content="{x:Bind Link}"
+                                                Style="{StaticResource LinkStyle}"
+                                                Tag="{x:Bind Link}" />
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                Text="{x:Bind Message}"
+                                                TextWrapping="Wrap" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Border>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Page>

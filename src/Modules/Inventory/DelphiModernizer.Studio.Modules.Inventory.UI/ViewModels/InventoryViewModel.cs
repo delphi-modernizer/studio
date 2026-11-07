@@ -39,7 +39,13 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsScanned), nameof(IsNotScanned), nameof(ScanLabel))]
-    [NotifyPropertyChangedFor(nameof(IsUnits), nameof(IsScreens), nameof(IsData), nameof(IsRisks), nameof(IsCycles), nameof(IsDiagnostics))]
+    [NotifyPropertyChangedFor(
+        nameof(IsUnits),
+        nameof(IsScreens),
+        nameof(IsData),
+        nameof(IsRisks),
+        nameof(IsCycles),
+        nameof(IsDiagnostics))]
     public partial LegacyInventory? Inventory { get; set; }
 
     [ObservableProperty]
@@ -74,7 +80,13 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     public partial IReadOnlyList<InventoryTabChoice> Tabs { get; set; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsUnits), nameof(IsScreens), nameof(IsData), nameof(IsRisks), nameof(IsCycles), nameof(IsDiagnostics))]
+    [NotifyPropertyChangedFor(
+        nameof(IsUnits),
+        nameof(IsScreens),
+        nameof(IsData),
+        nameof(IsRisks),
+        nameof(IsCycles),
+        nameof(IsDiagnostics))]
     public partial InventoryTab Tab { get; set; }
 
     public bool IsUnits => IsScanned && Tab == InventoryTab.Units;
@@ -99,6 +111,11 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial IReadOnlyList<UnitRow> Units { get; set; } = [];
 
+    /// <summary>The sortable column headers in table order.</summary>
+    /// <remarks>An <c>IList</c> because the header binds each by index.</remarks>
+    [ObservableProperty]
+    public partial IList<SortHeader> Headers { get; set; } = HeadersFor(UnitSort.FanIn, descending: true);
+
     [ObservableProperty]
     public partial string UnitsNote { get; set; } = string.Empty;
 
@@ -115,10 +132,20 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     public partial IReadOnlyList<ControlRow> Controls { get; set; } = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(TechnologyRows))]
     public partial IReadOnlyList<TechnologyCard> Technologies { get; set; } = [];
 
+    public IReadOnlyList<TechnologyPair> TechnologyRows => [.. Technologies
+        .Chunk(2)
+        .Select(p => new TechnologyPair(p[0], p.Length > 1 ? p[1] : null))];
+
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ConnectionRows))]
     public partial IReadOnlyList<ConnectionCard> Connections { get; set; } = [];
+
+    public IReadOnlyList<ConnectionPair> ConnectionRows => [.. Connections
+        .Chunk(2)
+        .Select(p => new ConnectionPair(p[0], p.Length > 1 ? p[1] : null))];
 
     [ObservableProperty]
     public partial IReadOnlyList<ExternalRow> Externals { get; set; } = [];
@@ -144,9 +171,21 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         ArgumentNullException.ThrowIfNull(link);
         var hash = link.IndexOf("#L", StringComparison.Ordinal);
         var path = hash < 0 ? link : link[..hash];
-        int? line = hash >= 0 && int.TryParse(link[(hash + 2)..], CultureInfo.InvariantCulture, out var number) ? number : null;
+        int? line = hash >= 0 && int.TryParse(link[(hash + 2)..], CultureInfo.InvariantCulture, out var number)
+            ? number
+            : null;
 
         return _editor.OpenAsync(_legacy + path, line);
+    }
+
+    /// <summary>Sorts by <paramref name="column"/>, or reverses the order when already sorted by it.</summary>
+    /// <remarks>Numbers sort largest first and names A to Z, so the first click shows what matters most.</remarks>
+    public void SortBy(UnitSort column)
+    {
+        var current = Headers.First(h => h.IsSorted);
+        var descending = current.Column == column ? !current.Descending : column != UnitSort.Name;
+        Headers = HeadersFor(column, descending);
+        Units = FilteredUnits();
     }
 
     public Task<bool> OpenMarkdownAsync()
@@ -233,23 +272,49 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         var unreadable = summary.BinaryForms > 0 ? $" · {Number(summary.BinaryForms)} can’t be read" : string.Empty;
 
         Stats = [
-            new("Files", StudioIcons.Deliverables, Number(summary.Files), "files", $"{string.Join(" · ", extensions)} · {Count(summary.Projects, "project file")}"),
-            new("Code modules", StudioIcons.DelphiCode, Number(summary.Units), "modules", $"{Number(summary.CodeLines)} code lines of {Number(summary.Lines)}"),
-            new("Screens", StudioIcons.Screens, Number(summary.Forms), "form files", $"{Count(summary.Forms - summary.DataModules, "screen")}, {Count(summary.DataModules, "data module")}{unreadable}"),
-            new("Risk markers", StudioIcons.Risks, Number(inventory.RiskMarkers.Sum(r => r.Count)), "markers", $"{Count(secrets, "hard-coded credential")} · {Count(cycles, "cycle")}"),
+            new(
+                "Files",
+                StudioIcons.Deliverables,
+                Number(summary.Files),
+                "files",
+                $"{string.Join(" · ", extensions)} · {Count(summary.Projects, "project file")}"),
+            new(
+                "Code modules",
+                StudioIcons.DelphiCode,
+                Number(summary.Units),
+                "modules",
+                $"{Number(summary.CodeLines)} code lines of {Number(summary.Lines)}"),
+            new(
+                "Screens",
+                StudioIcons.Screens,
+                Number(summary.Forms),
+                "form files",
+                $"{Count(summary.Forms - summary.DataModules, "screen")}, "
+                + $"{Count(summary.DataModules, "data module")}{unreadable}"),
+            new(
+                "Risk markers",
+                StudioIcons.Risks,
+                Number(inventory.RiskMarkers.Length),
+                "markers",
+                $"{Count(secrets, "hard-coded credential")} · {Count(cycles, "cycle")}"),
         ];
         var version = inventory.Projects.FirstOrDefault(p => p.DelphiVersion is not null);
         var encodings = string.Join(", ", summary.Encodings.Select(e => $"{e.Name} {Number(e.Count)}"));
-        var shortFingerprint = inventory.SourceFingerprint.Length > 19 ? inventory.SourceFingerprint[..19] + "…" : inventory.SourceFingerprint;
-        Facts = $"{(version is null ? "Delphi version not named" : $"{version.DelphiVersion}, from {System.IO.Path.GetFileName(version.Path)}")}   ·   Encodings: {encodings}   ·   {shortFingerprint}";
+        var shortFingerprint = inventory.SourceFingerprint.Length > 19
+            ? inventory.SourceFingerprint[..19] + "…"
+            : inventory.SourceFingerprint;
+        var versionNote = version is null
+            ? "Delphi version not named"
+            : $"{version.DelphiVersion}, from {System.IO.Path.GetFileName(version.Path)}";
+        Facts = $"{versionNote}   ·   Encodings: {encodings}   ·   {shortFingerprint}";
 
         _units = [.. inventory.Units
-            .OrderByDescending(u => u.FanIn)
-            .ThenBy(u => u.Name, StringComparer.OrdinalIgnoreCase)
+            .OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase)
             .Select(u => new UnitRow(
                 u.Name,
                 u.Path,
-                $"{Number(u.CodeLines)} / {Number(u.Lines)}",
+                u.CodeLines,
+                u.Lines,
                 u.Routines,
                 u.GlobalVariables,
                 u.FanIn,
@@ -258,27 +323,49 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
                 u.Types.Length == 0 ? "—" : string.Join(", ", u.Types.Select(t => t.Name)),
                 cycleUnits.Contains(u.Name),
                 u.Kind == "program",
-                false))];
+                false,
+                InventoryWords.CodeModule(u, cycleUnits.Contains(u.Name))))];
         IsLarge = _units.Count > _groupAbove;
         Units = FilteredUnits();
         UnitsNote = inventory.UnresolvedUnits.Length == 0
             ? "Code modules that are used but missing: none."
             : $"Code modules that are used but missing: {string.Join(", ", inventory.UnresolvedUnits)}.";
 
-        Screens = [.. inventory.Forms.Select(f => new ScreenRow(f.RootName ?? System.IO.Path.GetFileNameWithoutExtension(f.Path), f.Path, f.IsBinary, f.Components.Length, f.Events.Length))];
+        Screens = [.. inventory.Forms.Select(f => new ScreenRow(
+            f.RootName ?? System.IO.Path.GetFileNameWithoutExtension(f.Path),
+            f.Path,
+            f.IsBinary,
+            f.Components.Length,
+            f.Events.Length))];
         Unreadable = UnreadableNote(inventory.Forms);
-        Controls = [.. inventory.Components.Select(c => new ControlRow(c.ClassName, c.Count, c.Vendor ?? "Not reported", c.Category))];
+        Controls = [.. inventory.Components.Select(c => new ControlRow(
+            c.ClassName,
+            c.Count,
+            c.Vendor ?? "Not reported",
+            c.Category))];
 
         Technologies = [.. inventory.DatabaseAccess
             .Concat(inventory.ThirdParty)
-            .Select(t => new TechnologyCard(t.Name, t.Category, Count(t.Occurrences, "place"), [.. t.Evidence.Select(e => new Place(Link(e.Path, e.Line), e.Detail))]))];
+            .Select(t => new TechnologyCard(
+                t.Name,
+                t.Category,
+                Count(t.Occurrences, "place"),
+                [.. t.Evidence.Select(e => new Place(Link(e.Path, e.Line), e.Detail))]))];
         Connections = [.. inventory.Connections.Select(Connection)];
-        Externals = [.. inventory.ExternalRoutines.Select(e => new ExternalRow(e.Routine, e.Library, Link(e.Path, e.Line)))];
+        Externals = [.. inventory.ExternalRoutines.Select(e => new ExternalRow(
+            e.Routine,
+            e.Library,
+            Link(e.Path, e.Line)))];
         ComNote = inventory.ComObjects.Length == 0
             ? "COM objects: none found."
             : $"COM objects: {string.Join(", ", inventory.ComObjects.Select(c => c.ProgId))}.";
 
-        Sql = [.. inventory.Sql.Select(s => new SqlRow(Link(s.Path, s.Line), s.Kind, s.Text, Owner(s), s.BuiltByConcatenation))];
+        Sql = [.. inventory.Sql.Select(s => new SqlRow(
+            Link(s.Path, s.Line),
+            s.Kind,
+            s.Text,
+            Owner(s),
+            s.BuiltByConcatenation))];
         Risks = [.. inventory.RiskMarkers.Select(r => new RiskRow(r.Kind, Link(r.Path, r.Line), r.Count, r.Detail))];
         Cycles = [.. inventory.Dependencies.Cycles.Select(c => new CycleRow(string.Join(" ↔ ", c), [.. c]))];
         Diagnostics = [.. inventory.Diagnostics.Select(d => new DiagnosticRow(Link(d.Path, d.Line), d.Message))];
@@ -296,9 +383,10 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     /// <remarks>A large codebase reads by folder: each folder heading is followed by its modules.</remarks>
     private List<UnitRow> FilteredUnits()
     {
-        var matching = Search.Length == 0
+        var matching = Sorted(Search.Length == 0
             ? _units
-            : _units.FindAll(u => u.Name.Contains(Search, StringComparison.OrdinalIgnoreCase) || u.Path.Contains(Search, StringComparison.OrdinalIgnoreCase));
+            : _units.FindAll(u => u.Name.Contains(Search, StringComparison.OrdinalIgnoreCase)
+                || u.Path.Contains(Search, StringComparison.OrdinalIgnoreCase)));
 
         if (_units.Count <= _groupAbove)
         {
@@ -311,11 +399,58 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
             .SelectMany(g => g.Prepend(Folder(g.Key, g.Count())))];
     }
 
+    /// <remarks>Ties keep the order by name the rows are built in.</remarks>
+    private List<UnitRow> Sorted(List<UnitRow> units)
+    {
+        var sort = Headers.First(h => h.IsSorted);
+        Func<UnitRow, IComparable> key = sort.Column switch {
+            UnitSort.CodeLines => u => u.CodeLines,
+            UnitSort.Routines => u => u.Routines,
+            UnitSort.Globals => u => u.Globals,
+            UnitSort.FanIn => u => u.FanIn,
+            UnitSort.FanOut => u => u.FanOut,
+            UnitSort.Uses => u => u.Uses,
+            _ => u => u.Name.ToUpperInvariant(),
+        };
+
+        return sort.Descending ? [.. units.OrderByDescending(key)] : [.. units.OrderBy(key)];
+    }
+
     private static UnitRow Folder(string folder, int count)
     {
         var name = folder.Length == 0 ? "legacy/" : folder.Replace('\\', '/') + "/";
+        var modules = Count(count, "code module");
 
-        return new UnitRow(name, Count(count, "code module"), string.Empty, 0, 0, 0, 0, 0, string.Empty, false, false, true);
+        return new UnitRow(
+            name,
+            modules,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            string.Empty,
+            false,
+            false,
+            true,
+            $"Folder {name}, {modules}");
+    }
+
+    private static List<SortHeader> HeadersFor(UnitSort sorted, bool descending)
+    {
+        (UnitSort Column, string Label)[] columns = [
+            (UnitSort.Name, "Code module and path"),
+            (UnitSort.CodeLines, "Code lines"),
+            (UnitSort.Routines, "Routines"),
+            (UnitSort.Globals, "Globals"),
+            (UnitSort.FanIn, "Fan-in"),
+            (UnitSort.FanOut, "Fan-out"),
+            (UnitSort.Uses, "Uses"),
+        ];
+
+        return [.. columns.Select(c => new SortHeader(c.Column, c.Label, c.Column == sorted, descending))];
     }
 
     private static string? UnreadableNote(IEnumerable<FormInfo> forms)
@@ -332,7 +467,8 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
 
         var (verb, pronoun) = binary.Count == 1 ? ("is", "it") : ("are", "them");
 
-        return $"{string.Join(", ", binary)} {verb} stored in binary. Convert {pronoun} to text with convert.exe, then scan again.";
+        return $"{string.Join(", ", binary)} {verb} stored in binary. "
+            + $"Convert {pronoun} to text with convert.exe, then scan again.";
     }
 
     private static string Owner(SqlStatement statement)
@@ -347,11 +483,34 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         var settings = connection.Details
             .Split("; ", StringSplitOptions.RemoveEmptyEntries)
             .Select(pair => pair.Split('=', 2))
-            .Select(kv => new Setting(kv[0], kv.Length > 1 ? kv[1] : string.Empty))
+            .SelectMany(kv => kv.Length > 1 ? Settings(kv[0], kv[1]) : [new Setting(kv[0], string.Empty)])
             .ToList();
-        var meta = connection.Technology is null ? connection.ClassName : $"{connection.ClassName} · {connection.Technology}";
+        var meta = connection.Technology is null
+            ? connection.ClassName
+            : $"{connection.ClassName} · {connection.Technology}";
 
-        return new ConnectionCard($"Connection {connection.Component}", meta, Link(connection.Path, connection.Line), connection.HasEmbeddedPassword, settings);
+        return new ConnectionCard(
+            $"Connection {connection.Component}",
+            meta,
+            Link(connection.Path, connection.Line),
+            connection.HasEmbeddedPassword,
+            settings);
+    }
+
+    /// <summary>A setting, or the settings a list such as Params.Strings holds, one per name.</summary>
+    /// <remarks>A list's secret then reads alone, as "PASSWORD, redacted", never inside the list's text.</remarks>
+    private static IEnumerable<Setting> Settings(string key, string value)
+    {
+        var parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length == 0 || !parts.All(p => p.Contains('=', StringComparison.Ordinal)))
+        {
+            return [new Setting(key, value)];
+        }
+
+        return parts
+            .Select(p => p.Split('=', 2))
+            .Select(kv => new Setting(kv[0].Trim(), kv[1].Trim()));
     }
 
     private static string Link(string path, int line)

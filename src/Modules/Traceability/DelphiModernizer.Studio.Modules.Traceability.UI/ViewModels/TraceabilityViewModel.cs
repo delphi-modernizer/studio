@@ -7,9 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DelphiModernizer.Engine.Kit;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 using DelphiModernizer.Studio.Modules.Traceability.Application;
+using DelphiModernizer.Studio.Modules.Traceability.Domain;
 using DelphiModernizer.Studio.UI.Common;
 using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Common.Icons;
@@ -155,8 +157,22 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
                 WarningsDetail(trace.Warnings, questions),
                 StudioIcons.WarningFilled,
                 trace.Warnings == 0 ? StatTone.None : StatTone.Caution),
-            new StatCard("Sign-offs", StudioIcons.SignOffs, Number(report.HeldUp), "held up", "by problems in the documents", string.Empty, StatTone.None),
-            new StatCard("Checks", StudioIcons.Traceability, Number(report.Checks), "checks", "Run over every document in docs/", string.Empty, StatTone.None),
+            new StatCard(
+                "Sign-offs",
+                StudioIcons.SignOffs,
+                Number(report.HeldUp),
+                "held up",
+                "by problems in the documents",
+                string.Empty,
+                StatTone.None),
+            new StatCard(
+                "Checks",
+                StudioIcons.Traceability,
+                Number(report.Checks),
+                "checks",
+                "Run over every document in docs/",
+                string.Empty,
+                StatTone.None),
         ];
         Views = [new(TraceView.Issues, "Issues", _all.Count), new(TraceView.Matrix, "Matrix", trace.Matrix.Length)];
         Severities = [
@@ -204,15 +220,29 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
         };
     }
 
+    /// <remarks>A rule the kit makes a warning reports as an error only when warnings count, and says so.</remarks>
     private static ProblemRow Row(Problem problem)
     {
         var issue = problem.Issue;
         var pill = issue.Severity == "error" ? PillState.Error : PillState.Warning;
-        var rule = problem.Subject is null ? problem.Wording.Label : $"{problem.Wording.Label} · {problem.Subject}";
-        var folder = Path.GetDirectoryName(issue.Path)?.Replace('\\', '/') is { Length: > 0 } directory ? directory + "/" : string.Empty;
-        var link = issue.Line > 0 ? $"{Path.GetFileName(issue.Path)}#L{issue.Line}" : Path.GetFileName(issue.Path);
+        var subject = problem.Subject is null ? string.Empty : $" · {problem.Subject}";
+        var promoted = issue.Severity == "error"
+            && KitBundle.Embedded.Spec.TraceRules.Rules.Any(r => r.Id == issue.RuleId && r.Severity == "warning");
+        var rule = $"{problem.Wording.Label}{subject}{(promoted ? " · counts as an error now" : string.Empty)}";
+        var folder = Path.GetDirectoryName(issue.Path)?.Replace('\\', '/') is { Length: > 0 } directory
+            ? directory + "/"
+            : string.Empty;
+        var file = Path.GetFileName(issue.Path);
+        var link = issue.Line > 0 ? $"{file}#L{issue.Line}" : file;
+        var announced = ProblemWordings.Announced(
+            PillLook.Of(pill).Word,
+            problem.Description,
+            problem.Wording.Label,
+            problem.Subject,
+            file,
+            issue.Line);
 
-        return new ProblemRow(pill, problem.Description, rule, issue.Path, issue.Line, link, folder);
+        return new ProblemRow(pill, problem.Description, rule, issue.Path, issue.Line, link, folder, announced);
     }
 
     private static string Joined(IReadOnlyCollection<string> ids)

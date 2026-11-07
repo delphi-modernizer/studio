@@ -26,7 +26,12 @@ public sealed class TraceabilityModule : IModule
     public IReadOnlyList<NavigationItem> GetNavigationItems()
     {
         return [
-            new NavigationItem("Traceability", StudioIcons.Traceability, StudioIcons.TraceabilityFilled, typeof(TraceabilityPage), 50) {
+            new NavigationItem(
+                "Traceability",
+                StudioIcons.Traceability,
+                StudioIcons.TraceabilityFilled,
+                typeof(TraceabilityPage),
+                50) {
                 Badge = provider => provider.GetRequiredService<ProblemsBadge>(),
             },
         ];

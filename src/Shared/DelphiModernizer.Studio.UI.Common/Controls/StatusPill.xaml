@@ -69,14 +69,14 @@
                 VerticalAlignment="Center"
                 IsActive="False"
                 Visibility="Collapsed" />
-            <!--  Tight line bounds centre the word optically against its glyph (handoff decision).  -->
+            <!--  Trimmed to the cap height on top only: centred like Tight, with room for descenders.  -->
             <TextBlock
                 x:Name="Word"
                 AutomationProperties.AccessibilityView="Raw"
                 VerticalAlignment="Center"
                 Foreground="{ThemeResource StatusPillText}"
                 Style="{StaticResource CaptionTextBlockStyle}"
-                TextLineBounds="Tight" />
+                TextLineBounds="TrimToCapHeight" />
         </StackPanel>
     </Border>
 </UserControl>

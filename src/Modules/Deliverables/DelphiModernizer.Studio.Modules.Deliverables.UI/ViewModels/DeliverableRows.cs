@@ -15,9 +15,21 @@ public enum DeliverableFilter
 }
 
 /// <summary>One deliverable: its title and file, the team that drafts it, and where it stands.</summary>
-public sealed record DeliverableRow(string Id, string Title, string Path, string Owner, PillState Pill, string AnnouncedName)
+/// <param name="IsGroup">The heading of a sign-off's deliverables: its name, its number as Path, and its state.</param>
+public sealed record DeliverableRow(
+    string Id,
+    string Title,
+    string Path,
+    string Owner,
+    PillState Pill,
+    string AnnouncedName,
+    bool IsGroup = false)
 {
-    public bool CanOpen => Pill != PillState.Missing;
+    public bool IsDeliverable => !IsGroup;
+
+    public bool CanOpen => IsDeliverable && Pill != PillState.Missing;
+
+    public string PathText => Pill == PillState.Missing ? $"Not found: {Path}" : Path;
 
     public string OpenName => $"Open {Title} in your editor";
 }
@@ -29,4 +41,6 @@ public sealed record SignOffGroup(string Name, string Number, PillState Pill, IR
 public sealed record FilterChoice(DeliverableFilter Filter, string Label, int Count)
 {
     public string Text => $"{Label} {Count}";
+
+    public string AnnouncedName => $"{Label}, {Count}";
 }

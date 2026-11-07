@@ -4,7 +4,9 @@ namespace DelphiModernizer.Studio.Modules.Inventory.Application;
 
 public static class InventoryErrors
 {
-    public static readonly Error NotScanned = new("Inventory.NotScanned", "The legacy source has not been scanned yet.");
+    public static readonly Error NotScanned = new(
+        "Inventory.NotScanned",
+        "The legacy source has not been scanned yet.");
 
     public static Error Unreadable(string message)
     {
