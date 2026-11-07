@@ -33,6 +33,10 @@ public sealed record CheckRow(SignOffCheck Check)
         _ => StudioIcons.NotYet,
     };
 
+    public bool IsFailing => Tone == CheckTone.Failing;
+
+    public bool IsNotYet => Tone == CheckTone.NotYet;
+
     public string AnnouncedName => Check.AnnouncedName;
 }
 
@@ -48,12 +52,16 @@ public sealed record CoveredFileRow(string Path, bool Changed)
 {
     public string Text => Changed ? $"{Path}  · changed" : Path;
 
+    public bool IsUnchanged => !Changed;
+
     public string AnnouncedName => Changed ? $"{Path}, changed since approval" : Path;
 }
 
 /// <summary>One approval or revocation in a sign-off's history.</summary>
 public sealed record HistoryRow(string Text, string Detail, bool IsApproval)
 {
+    public bool IsRevocation => !IsApproval;
+
     public static HistoryRow Of(ApprovalEntry entry)
     {
         var when = entry.At.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
@@ -139,6 +147,8 @@ public sealed partial class SignOffRow : ObservableObject
     public PillState Pill { get; }
 
     public bool IsNext { get; }
+
+    public bool IsNotNext => !IsNext;
 
     public bool IsLast { get; }
 
