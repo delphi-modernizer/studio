@@ -7,6 +7,7 @@ using DelphiModernizer.Engine.Agents;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Settings;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
+using DelphiModernizer.Studio.Application.Abstractions.Workstreams;
 using DelphiModernizer.Studio.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -91,6 +92,27 @@ public sealed class RunTests
         Assert.Equal(RunOutcome.Stopped, RunOutcomes.Of(stopped.Outcome));
         Assert.True(again.IsSuccess);
         Assert.Null(monitor.Writing(workspace.Workspace.Root, ["D03"]));
+    }
+
+    [Fact]
+    public async Task Pages_outside_Workstreams_see_which_agents_have_a_run_in_progress()
+    {
+        using var workspace = await TestWorkspace.CreateAsync();
+        var fake = new FakeClaude(workspace.Parent, _init, "#sleep 5000");
+        var (sender, monitor) = Build(workspace.Session, fake);
+        IRunsInProgress runs = monitor;
+
+        var run = await sender.Send(
+            new StartRunCommand("ws01-business-rules", "legacy/Sales", 1m),
+            TestContext.Current.CancellationToken);
+        var running = runs.AgentsRunning(workspace.Workspace.Root);
+        var elsewhere = runs.AgentsRunning(workspace.Parent);
+        run.Value.Stop();
+        await run.Value.Ended;
+
+        Assert.Equal("ws01-legacy-discovery", Assert.Single(running));
+        Assert.Empty(elsewhere);
+        Assert.Empty(runs.AgentsRunning(workspace.Workspace.Root));
     }
 
     [Fact]
