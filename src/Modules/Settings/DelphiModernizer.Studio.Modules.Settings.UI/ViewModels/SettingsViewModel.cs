@@ -66,7 +66,8 @@ public sealed partial class SettingsViewModel : ViewModel
     public partial string ClaudePath { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Pill), nameof(PillText), nameof(Help), nameof(Problem), nameof(HasProblem), nameof(IsMissing), nameof(HasStatus))]
+    [NotifyPropertyChangedFor(nameof(Pill), nameof(PillText), nameof(Help), nameof(PathHelp), nameof(Problem))]
+    [NotifyPropertyChangedFor(nameof(HasProblem), nameof(IsMissing), nameof(HasStatus))]
     public partial ClaudeStatus? Claude { get; set; }
 
     public bool HasStatus => Claude is not null;
@@ -91,6 +92,9 @@ public sealed partial class SettingsViewModel : ViewModel
     public string? Problem => Claude is { State: ClaudeState.TooOld or ClaudeState.Unusable } ? Claude.Problem : null;
 
     public bool HasProblem => Problem is not null;
+
+    /// <summary>What Narrator adds to the path box: the problem with the file chosen, else the card's description.</summary>
+    public string PathHelp => Problem ?? Help;
 
     public bool IsMissing => Claude is { State: ClaudeState.NotFound };
 
