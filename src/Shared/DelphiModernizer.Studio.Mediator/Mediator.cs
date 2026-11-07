@@ -28,7 +28,8 @@ public sealed class Mediator : IMediator
         ArgumentNullException.ThrowIfNull(request);
         var wrapper = (IRequestHandlerWrapper<TResponse>)_requestWrappers.GetOrAdd(
             request.GetType(),
-            requestType => Activator.CreateInstance(typeof(RequestHandlerWrapper<,>).MakeGenericType(requestType, typeof(TResponse)))!);
+            requestType => Activator.CreateInstance(
+                typeof(RequestHandlerWrapper<,>).MakeGenericType(requestType, typeof(TResponse)))!);
 
         return wrapper.Handle(request, _services, cancellationToken);
     }

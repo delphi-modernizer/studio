@@ -31,7 +31,10 @@ public sealed record ClaudeCard(
 
     public bool HasLink => Action != ClaudeCardAction.None;
 
-    public string AnnouncedName => $"Claude Code, {PillLook.Of(Pill).Word}. {Text}";
+    /// <summary>What Narrator reads for the card, such as "Claude Code, Not found. Agent runs need it; …".</summary>
+    public string AnnouncedName => Pill == PillState.NotFound
+        ? "Claude Code, Not found. Agent runs need it; everything else works without it."
+        : $"Claude Code, {PillLook.Of(Pill).Word}. {Text}";
 
     public static ClaudeCard Of(ClaudeStatus status)
     {
@@ -50,7 +53,8 @@ public sealed record ClaudeCard(
                     ? "The Claude Code CLI is not on PATH. Everything works without it except agent runs."
                     : status.Problem ?? string.Empty,
                 null,
-                "With it, workstream agents draft deliverables with evidence links and fact labels for people to review.",
+                "With it, workstream agents draft deliverables with evidence links and fact labels "
+                    + "for people to review.",
                 "Set up Claude Code",
                 ClaudeCardAction.SetUp,
                 status),

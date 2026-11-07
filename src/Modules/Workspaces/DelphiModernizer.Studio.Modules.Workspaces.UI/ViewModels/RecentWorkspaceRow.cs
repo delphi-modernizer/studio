@@ -16,4 +16,10 @@ public sealed class RecentWorkspaceRow(RecentWorkspace workspace)
     public string OpenedAt { get; } = workspace.OpenedAt.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
 
     public string AnnouncedName => $"{Name}, {Target}, {Root}, opened {OpenedAt}";
+
+    /// <remarks>A list item with no name of its own reads its item's text, so this is what Narrator reads.</remarks>
+    public override string ToString()
+    {
+        return AnnouncedName;
+    }
 }

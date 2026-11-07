@@ -11,7 +11,9 @@ public sealed record GetRecentWorkspacesQuery : IRequest<IReadOnlyList<RecentWor
 internal sealed class GetRecentWorkspacesQueryHandler(RecentWorkspaceStore store)
     : IRequestHandler<GetRecentWorkspacesQuery, IReadOnlyList<RecentWorkspace>>
 {
-    public Task<IReadOnlyList<RecentWorkspace>> Handle(GetRecentWorkspacesQuery request, CancellationToken cancellationToken)
+    public Task<IReadOnlyList<RecentWorkspace>> Handle(
+        GetRecentWorkspacesQuery request,
+        CancellationToken cancellationToken)
     {
         return Task.FromResult(store.Load());
     }

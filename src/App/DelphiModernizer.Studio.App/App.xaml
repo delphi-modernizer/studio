@@ -8,11 +8,12 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!--  Application.Resources is the one scope every module's pages see; ms-appx:///<assembly>/ reaches another assembly's file.  -->
+                <!--  Application.Resources is the one scope every module's pages see;
+                      ms-appx:///<assembly>/ reaches another assembly's file.  -->
                 <ResourceDictionary Source="ms-appx:///DelphiModernizer.Studio.UI.Common/Styles/Studio.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!--  Every icon comes from the app's own font (docs/icons.md); its glyphs are the StudioIcons constants.  -->
+            <!--  Every icon comes from the app's own font (docs/icons.md); its glyphs are StudioIcons constants.  -->
             <FontFamily x:Key="StudioIconsFontFamily">ms-appx:///Assets/Fonts/StudioIcons.ttf#Studio Icons</FontFamily>
             <Style x:Key="IconStyle" TargetType="FontIcon">
                 <Setter Property="FontFamily" Value="{StaticResource StudioIconsFontFamily}" />

@@ -3,7 +3,9 @@ using DelphiModernizer.Engine.Kit;
 
 namespace DelphiModernizer.Studio.Application.Abstractions;
 
-/// <summary>The versions Start and Settings show: the studio, the engine it runs, and the kit the engine embeds.</summary>
+/// <summary>
+/// The versions Start and Settings show: the studio, the engine it runs, and the kit the engine embeds.
+/// </summary>
 public sealed record StudioVersions(string Studio, string Engine, string Kit)
 {
     public static StudioVersions Current { get; } = new(
