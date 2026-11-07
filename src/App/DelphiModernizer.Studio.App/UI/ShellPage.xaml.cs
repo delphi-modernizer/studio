@@ -105,6 +105,12 @@ public sealed partial class ShellPage : Page
 
         if (item.Placement == NavigationPlacement.Footer)
         {
+            // The NavPane board draws a rule between the pages and Settings.
+            if (NavView.FooterMenuItems.Count == 0)
+            {
+                NavView.FooterMenuItems.Add(new NavigationViewItemSeparator());
+            }
+
             NavView.FooterMenuItems.Add(container);
         }
         else
@@ -225,9 +231,10 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    /// <remarks>The title bar gives its content only the width it asks for, so search sets its width.</remarks>
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        SearchBox.MaxWidth = e.NewSize.Width < _narrowWidth ? 240 : 360;
+        SearchBox.Width = e.NewSize.Width < _narrowWidth ? 240 : 360;
     }
 
     private void OnNextRegionInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
