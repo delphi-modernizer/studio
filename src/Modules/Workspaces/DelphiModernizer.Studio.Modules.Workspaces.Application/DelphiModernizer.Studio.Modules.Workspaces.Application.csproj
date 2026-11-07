@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>DelphiModernizer.Studio.Modules.Workspaces.Application</RootNamespace>
+    <AssemblyName>DelphiModernizer.Studio.Modules.Workspaces.Application</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.Application.Abstractions\DelphiModernizer.Studio.Application.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Shared\DelphiModernizer.Studio.Mediator\DelphiModernizer.Studio.Mediator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EngineReference Include="DelphiModernizer.Engine.Delphi" />
+    <EngineReference Include="DelphiModernizer.Engine.Workspaces" />
+  </ItemGroup>
+
+</Project>

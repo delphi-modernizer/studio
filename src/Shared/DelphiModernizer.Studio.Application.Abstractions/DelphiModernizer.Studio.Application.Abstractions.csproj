@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>DelphiModernizer.Studio.Application.Abstractions</RootNamespace>
+    <AssemblyName>DelphiModernizer.Studio.Application.Abstractions</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EngineReference Include="DelphiModernizer.Engine.Workspaces" />
+  </ItemGroup>
+
+</Project>
