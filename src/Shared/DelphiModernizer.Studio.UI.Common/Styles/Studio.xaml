@@ -12,7 +12,7 @@
             <StaticResource x:Key="StatusPillCriticalBackground" ResourceKey="SystemFillColorCriticalBackgroundBrush" />
             <StaticResource x:Key="StatusPillAttentionBackground" ResourceKey="SystemFillColorSolidAttentionBackgroundBrush" />
             <StaticResource x:Key="StatusPillOutline" ResourceKey="ControlStrokeColorDefaultBrush" />
-            <SolidColorBrush x:Key="StatusPillToneOutline" Color="Transparent" />
+            <StaticResource x:Key="StatusPillToneOutline" ResourceKey="SubtleFillColorTransparentBrush" />
             <StaticResource x:Key="StatusPillText" ResourceKey="TextFillColorPrimaryBrush" />
             <StaticResource x:Key="StatusPillNeutralGlyph" ResourceKey="TextFillColorSecondaryBrush" />
             <StaticResource x:Key="StatusPillSuccessGlyph" ResourceKey="SystemFillColorSuccessBrush" />
@@ -27,7 +27,7 @@
             <StaticResource x:Key="StatusPillCriticalBackground" ResourceKey="SystemFillColorCriticalBackgroundBrush" />
             <StaticResource x:Key="StatusPillAttentionBackground" ResourceKey="SystemFillColorSolidAttentionBackgroundBrush" />
             <StaticResource x:Key="StatusPillOutline" ResourceKey="ControlStrokeColorDefaultBrush" />
-            <SolidColorBrush x:Key="StatusPillToneOutline" Color="Transparent" />
+            <StaticResource x:Key="StatusPillToneOutline" ResourceKey="SubtleFillColorTransparentBrush" />
             <StaticResource x:Key="StatusPillText" ResourceKey="TextFillColorPrimaryBrush" />
             <StaticResource x:Key="StatusPillNeutralGlyph" ResourceKey="TextFillColorSecondaryBrush" />
             <StaticResource x:Key="StatusPillSuccessGlyph" ResourceKey="SystemFillColorSuccessBrush" />
@@ -36,11 +36,11 @@
             <StaticResource x:Key="StatusPillAttentionForeground" ResourceKey="AccentTextFillColorPrimaryBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
-            <SolidColorBrush x:Key="StatusPillNeutralBackground" Color="Transparent" />
-            <SolidColorBrush x:Key="StatusPillSuccessBackground" Color="Transparent" />
-            <SolidColorBrush x:Key="StatusPillCautionBackground" Color="Transparent" />
-            <SolidColorBrush x:Key="StatusPillCriticalBackground" Color="Transparent" />
-            <SolidColorBrush x:Key="StatusPillAttentionBackground" Color="Transparent" />
+            <StaticResource x:Key="StatusPillNeutralBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="StatusPillSuccessBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="StatusPillCautionBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="StatusPillCriticalBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="StatusPillAttentionBackground" ResourceKey="SubtleFillColorTransparentBrush" />
             <SolidColorBrush x:Key="StatusPillOutline" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="StatusPillToneOutline" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="StatusPillText" Color="{ThemeResource SystemColorWindowTextColor}" />

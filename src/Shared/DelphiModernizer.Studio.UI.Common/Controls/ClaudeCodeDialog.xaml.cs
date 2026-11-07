@@ -1,5 +1,6 @@
 using System;
 using DelphiModernizer.Studio.Application.Abstractions.Agents;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
@@ -19,8 +20,18 @@ public sealed partial class ClaudeCodeDialog : ContentDialog
         EngineMessage.Text = status.Problem ?? string.Empty;
         PrimaryButtonText = IsUpdate ? "Test again" : "Get Claude Code";
         SecondaryButtonText = IsUpdate ? "Open Settings" : "Choose claude.exe…";
+        Opened += (_, _) => FocusPrimary();
     }
 
     /// <summary>True when Claude Code is found but too old, so the buttons offer a test and Settings.</summary>
     public bool IsUpdate { get; }
+
+    /// <summary>Focus starts on the primary action, so Tab goes on to the secondary one and then Not now.</summary>
+    private void FocusPrimary()
+    {
+        if (GetTemplateChild("PrimaryButton") is Button primary)
+        {
+            primary.Focus(FocusState.Programmatic);
+        }
+    }
 }
