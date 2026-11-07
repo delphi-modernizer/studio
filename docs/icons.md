@@ -7,8 +7,8 @@ is not used, so no glyph depends on a code point that may or may not exist in th
   `assets/icons/LICENSE`), 20 px regular, or filled where the name ends in `Filled`.
 - `assets/icons/icons.json` pins each icon's code point (E100 upwards) and records its Fluent source file and where
   the design uses it. Add new icons at the end so existing glyphs keep their code points.
-- `scripts/build-icon-font.py` writes `Assets/Fonts/StudioIcons.ttf` and the `StudioIcons` constants
-  (`StudioIcons.g.cs`). `font_path`, `table_path` and `NAMESPACE` at the top of the script name the project layout.
+- `scripts/build_icon_font.py` writes `Assets/Fonts/StudioIcons.ttf` and the `StudioIcons` constants
+  (`StudioIcons.g.cs`). `FONT`, `TABLE` and `NAMESPACE` at the top of the script name the project layout.
 
 ```xml
 <!-- App.xaml -->
@@ -28,6 +28,6 @@ A selected navigation item shows the `…Filled` glyph of its icon.
 ## App icon
 
 `assets/app-icon` holds four masters: `app.svg` (unplated, 32 px and up), `app-small.svg` (unplated, 24 px and
-below: wider crest, no nose guard), and the plated versions of both. `scripts/build-app-icon.py` writes `app.ico`
+below: wider crest, no nose guard), and the plated versions of both. `scripts/build_app_icon.py` writes `app.ico`
 (16 to 256), the `Square44x44Logo` target sizes (plated, and unplated for the taskbar and Start), the
 `Square150x150Logo` and `StoreLogo` scales, and a 256 px `StudioLogo.png`. Flat colours only, no gradients.
