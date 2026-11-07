@@ -17,7 +17,16 @@ namespace DelphiModernizer.Studio.Modules.SignOffs.Application;
 /// <summary>The five sign-offs in order, each with its checks in words; the current approval is on its status.</summary>
 public sealed record GetSignOffsQuery : IRequest<Result<IReadOnlyList<SignOff>>>;
 
-public sealed record SignOff(GateStatus Status, int Number, string Name, string Approves, IReadOnlyList<SignOffCheck> Checks);
+/// <param name="History">Every approval and revocation of the sign-off, oldest first.</param>
+/// <param name="Changed">The covered files changed since a stale approval's commit; empty when git cannot tell.</param>
+public sealed record SignOff(
+    GateStatus Status,
+    int Number,
+    string Name,
+    string Approves,
+    IReadOnlyList<SignOffCheck> Checks,
+    IReadOnlyList<ApprovalEntry> History,
+    IReadOnlyList<string> Changed);
 
 /// <param name="ShowsProblems">Whether the check fails on problems in the documents, so it offers Show the problems.</param>
 public sealed record SignOffCheck(string Name, string Detail, bool Passed, bool ShowsProblems);
@@ -27,16 +36,31 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
     /// <summary>A gate that needs more deliverables than this shows them as one check, as the final plan does.</summary>
     private const int _listedDeliverables = 7;
 
-    public Task<Result<IReadOnlyList<SignOff>>> Handle(GetSignOffsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<SignOff>>> Handle(GetSignOffsQuery request, CancellationToken cancellationToken)
     {
-        return Task.Run(
-            () => session.Current is { } workspace
-                ? Result.Success(Gather(workspace))
-                : Result.Failure<IReadOnlyList<SignOff>>(WorkspaceRequired.Error),
-            cancellationToken);
+        if (session.Current is not { } workspace)
+        {
+            return Result.Failure<IReadOnlyList<SignOff>>(WorkspaceRequired.Error);
+        }
+
+        var signOffs = await Task.Run(() => Gather(workspace), cancellationToken);
+
+        return await Task.WhenAll(signOffs.Select(s => WithChangesAsync(workspace, s, cancellationToken)));
     }
 
-    private static IReadOnlyList<SignOff> Gather(Workspace workspace)
+    private static async Task<SignOff> WithChangesAsync(Workspace workspace, SignOff signOff, CancellationToken cancellationToken)
+    {
+        if (signOff.Status.State != "stale")
+        {
+            return signOff;
+        }
+
+        var changed = await ApprovalService.ChangedSinceApprovalAsync(workspace, signOff.Status, cancellationToken);
+
+        return signOff with { Changed = changed ?? [] };
+    }
+
+    private static List<SignOff> Gather(Workspace workspace)
     {
         var spec = KitBundle.Embedded.Spec;
         var checker = new TraceChecker(spec);
@@ -51,7 +75,9 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session) : IRequ
             index + 1,
             SignOffNames.Of(status.Gate),
             SignOffWordings.Approves(status.Gate, status.Approves),
-            Checks(status, index == 0 ? null : gates[index - 1], spec.Gates.Gates.First(g => g.Id == status.Gate), context)))];
+            Checks(status, index == 0 ? null : gates[index - 1], spec.Gates.Gates.First(g => g.Id == status.Gate), context),
+            ApprovalService.History(workspace, status.Gate),
+            []))];
     }
 
     /// <remarks>
