@@ -21,8 +21,6 @@ namespace DelphiModernizer.Studio.App.UI;
 /// </remarks>
 public sealed partial class ShellPage : Page
 {
-    private const double _narrowWidth = 1100;
-
     private readonly INavigationService _navigation;
     private readonly IWorkspaceSession _session;
     private readonly IServiceProvider _services;
@@ -229,17 +227,6 @@ public sealed partial class ShellPage : Page
             _navigation.GoBack();
             e.Handled = true;
         }
-    }
-
-    /// <remarks>
-    /// The title bar gives its content only the width it asks for, so search asks for 360. At 960 with a subtitle a
-    /// fixed 240 makes the title bar hide the title and subtitle, so under 1100 search sizes itself up to 240.
-    /// </remarks>
-    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        var narrow = e.NewSize.Width < _narrowWidth;
-        SearchBox.MaxWidth = narrow ? 240 : 360;
-        SearchBox.Width = narrow ? double.NaN : 360;
     }
 
     private void OnNextRegionInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
