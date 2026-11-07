@@ -26,4 +26,9 @@ change.
 | Blocked by a run the studio did not start, such as `dmz run` in a terminal: the engine's leases name no holder publicly | Run… is offered; the engine refuses the lease and the dialog shows its reason | `StartRunCommand` |
 | The Run an agent task dialog's description: the kit has none per recipe; the canvas draws one for Extract business rules | One sentence from what the recipe writes | `RunRecipeDialog` |
 | Short names for what a recipe writes ("Writes the functional requirements") | The kit's deliverable titles | `RunWords.Writes` |
+| Title-bar Back from a New workspace with fields filled: the navigation model says it asks first, but no dialog is drawn | Leaves without asking; nothing is on disk before Create | `NewWorkspaceViewModel` |
+| The step heading takes focus on Next, and focus also moves to the first field of each step | The heading takes focus, so it is read; Tab goes on to the first field | `NewWorkspacePage` |
+| The Claude Code card's Narrator name: the handoff words only Not found | "Claude Code, [pill]. [the card's line]" for the other states | `ClaudeCard.AnnouncedName` |
+| The Claude Code card's action: the keyboard notes say Get Claude Code, Update or Open Settings; the artboards draw Set up Claude Code, Test again and Agent settings | The drawn words | `ClaudeCard` |
+| A settings card's control takes the card's Name: on About that would rename Copy versions | Copy versions keeps its own name | `SettingsPage` |
 | The other handoff questions (stale on answered questions, settings defaults, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |
