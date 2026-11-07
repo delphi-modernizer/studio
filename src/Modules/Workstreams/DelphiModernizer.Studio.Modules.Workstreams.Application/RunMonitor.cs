@@ -11,7 +11,9 @@ using DelphiModernizer.Studio.Application.Abstractions.Workstreams;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
-/// <summary>The runs this studio started since it opened, newest first, each read to its end in the background.</summary>
+/// <summary>
+/// The runs this studio started since it opened, newest first, each read to its end in the background.
+/// </summary>
 public sealed class RunMonitor : IRunsInProgress, IDisposable
 {
     private readonly Lock _gate = new();
@@ -45,12 +47,16 @@ public sealed class RunMonitor : IRunsInProgress, IDisposable
         return Runs.FirstOrDefault(r => r.RunId == runId);
     }
 
-    /// <summary>The run in progress in the workspace at <paramref name="workspaceRoot"/> that writes any of <paramref name="deliverables"/>.</summary>
+    /// <summary>
+    /// The run in progress in the workspace at <paramref name="workspaceRoot"/> that writes any of <paramref
+    /// name="deliverables"/>.
+    /// </summary>
     public LiveRun? Writing(string workspaceRoot, IEnumerable<string> deliverables)
     {
         var wanted = deliverables.ToHashSet(StringComparer.Ordinal);
 
-        return Runs.FirstOrDefault(r => !r.IsEnded && r.WorkspaceRoot == workspaceRoot && r.Recipe.Writes.Any(wanted.Contains));
+        return Runs.FirstOrDefault(r =>
+            !r.IsEnded && r.WorkspaceRoot == workspaceRoot && r.Recipe.Writes.Any(wanted.Contains));
     }
 
     public void Dispose()
@@ -62,7 +68,14 @@ public sealed class RunMonitor : IRunsInProgress, IDisposable
     }
 
     /// <param name="events">The engine's stream; it is enumerated to its end, or until the run is stopped.</param>
-    internal LiveRun Track(string runId, string workspaceRoot, Recipe recipe, string? argument, decimal budgetUsd, DateTimeOffset startedAt, IAsyncEnumerable<AgentEvent> events)
+    internal LiveRun Track(
+        string runId,
+        string workspaceRoot,
+        Recipe recipe,
+        string? argument,
+        decimal budgetUsd,
+        DateTimeOffset startedAt,
+        IAsyncEnumerable<AgentEvent> events)
     {
         var run = new LiveRun(runId, workspaceRoot, recipe, argument, budgetUsd, startedAt);
 

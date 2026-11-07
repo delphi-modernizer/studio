@@ -34,7 +34,9 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
         }
     }
 
-    /// <summary>Run…: the dialog stays open with the engine's reason until the run starts or the person cancels.</summary>
+    /// <summary>
+    /// Run…: the dialog stays open with the engine's reason until the run starts or the person cancels.
+    /// </summary>
     private async void OnRun(object sender, RoutedEventArgs e)
     {
         if (sender is not Button { DataContext: TaskRow task })
@@ -42,7 +44,10 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
             return;
         }
 
-        var dialog = new RunRecipeDialog(task.Recipe, task.RoleName, null, ViewModel.DefaultBudget, ViewModel.NextGate) { XamlRoot = XamlRoot };
+        var dialog = new RunRecipeDialog(
+            task.Recipe, task.RoleName, null, ViewModel.DefaultBudget, ViewModel.NextGate) {
+            XamlRoot = XamlRoot,
+        };
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {

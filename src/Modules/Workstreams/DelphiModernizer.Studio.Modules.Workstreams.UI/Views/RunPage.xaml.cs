@@ -12,7 +12,9 @@ namespace DelphiModernizer.Studio.Modules.Workstreams.UI.Views;
 /// <summary>The Run page: one agent run, live or recorded.</summary>
 public sealed partial class RunPage : Page, IHasViewModel
 {
-    /// <summary>How much a new run's budget grows after a run reached its own; the design draws "[higher budget]".</summary>
+    /// <summary>
+    /// How much a new run's budget grows after a run reached its own; the design draws "[higher budget]".
+    /// </summary>
     private const decimal _budgetGrowth = 2m;
 
     public RunPage(RunViewModel viewModel)
@@ -68,7 +70,8 @@ public sealed partial class RunPage : Page, IHasViewModel
         // The pill takes its new word through its binding first, so the announcement waits a turn.
         DispatcherQueue.TryEnqueue(() => {
             FrameworkElementAutomationPeer.FromElement(Pill)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
-            FrameworkElementAutomationPeer.FromElement(EndCard)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+            var endCard = FrameworkElementAutomationPeer.FromElement(EndCard);
+            endCard?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
         });
     }
 
@@ -76,7 +79,8 @@ public sealed partial class RunPage : Page, IHasViewModel
     {
         var turns = ViewModel.Turns == "1" ? "1 turn" : $"{ViewModel.Turns} turns";
         var dialog = new BudgetDialog(
-            $"{ViewModel.Title} stopped at its {RunWords.Dollars(ViewModel.BudgetUsd)} budget after {turns}. What it wrote so far is in the {ViewModel.Writing} as a Draft.",
+            $"{ViewModel.Title} stopped at its {RunWords.Dollars(ViewModel.BudgetUsd)} budget after {turns}. "
+                + $"What it wrote so far is in the {ViewModel.Writing} as a Draft.",
             ViewModel.Cost,
             ViewModel.BudgetUsd * _budgetGrowth) { XamlRoot = XamlRoot };
 
@@ -98,7 +102,10 @@ public sealed partial class RunPage : Page, IHasViewModel
             return;
         }
 
-        var dialog = new RunRecipeDialog(recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null) { XamlRoot = XamlRoot };
+        var dialog = new RunRecipeDialog(
+            recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null) {
+            XamlRoot = XamlRoot,
+        };
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
@@ -138,9 +145,9 @@ public sealed partial class RunPage : Page, IHasViewModel
         ViewModel.ExpandAll();
     }
 
-    private void OnToolClicked(object sender, RoutedEventArgs e)
+    private void OnTranscriptItemClick(object sender, ItemClickEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: ToolRow row })
+        if (e.ClickedItem is ToolRow row)
         {
             ViewModel.Toggle(row);
         }

@@ -16,382 +16,503 @@
             TargetType="TextBlock">
             <Setter Property="Margin" Value="0,0,0,4" />
         </Style>
+
+        <DataTemplate x:Key="CheckTemplate" x:DataType="vm:CheckRow">
+            <Grid
+                Padding="0,10"
+                AutomationProperties.Name="{x:Bind AnnouncedName}"
+                ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <!--  One icon per tone, so ThemeResource follows the theme, high contrast included.  -->
+                <FontIcon
+                    Margin="0,2,0,0"
+                    VerticalAlignment="Top"
+                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                    Glyph="{x:Bind Glyph}"
+                    Style="{StaticResource IconStyle}"
+                    Visibility="{x:Bind Passed}" />
+                <FontIcon
+                    Margin="0,2,0,0"
+                    VerticalAlignment="Top"
+                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                    Glyph="{x:Bind Glyph}"
+                    Style="{StaticResource IconStyle}"
+                    Visibility="{x:Bind IsFailing}" />
+                <FontIcon
+                    Margin="0,2,0,0"
+                    VerticalAlignment="Top"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Glyph="{x:Bind Glyph}"
+                    Style="{StaticResource IconStyle}"
+                    Visibility="{x:Bind IsNotYet}" />
+                <StackPanel Grid.Column="1">
+                    <TextBlock
+                        Style="{StaticResource BodyTextBlockStyle}"
+                        Text="{x:Bind Name}"
+                        TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
+                </StackPanel>
+                <HyperlinkButton
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Click="OnShowProblems"
+                    Content="Show the problems"
+                    Visibility="{x:Bind ShowsProblems}" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="HistoryTemplate" x:DataType="vm:HistoryRow">
+            <Grid Padding="0,8" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <FontIcon
+                    Margin="0,2,0,0"
+                    VerticalAlignment="Top"
+                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                    Glyph="{x:Bind icons:StudioIcons.Approved}"
+                    Style="{StaticResource IconStyle}"
+                    Visibility="{x:Bind IsApproval}" />
+                <FontIcon
+                    Margin="0,2,0,0"
+                    VerticalAlignment="Top"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Glyph="{x:Bind icons:StudioIcons.History}"
+                    Style="{StaticResource IconStyle}"
+                    Visibility="{x:Bind IsRevocation}" />
+                <StackPanel Grid.Column="1">
+                    <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{x:Bind Text}" />
+                    <TextBlock
+                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                        Text="{x:Bind Detail}"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="CoveredFileTemplate" x:DataType="vm:CoveredFileRow">
+            <!--  The path keeps its file name when trimmed; a changed file adds a caution mark.  -->
+            <Grid
+                Padding="0,2"
+                ColumnSpacing="8"
+                ToolTipService.ToolTip="{x:Bind Path}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <controls:PathText Text="{x:Bind Path}" />
+                <TextBlock
+                    Grid.Column="1"
+                    AutomationProperties.Name="changed since approval"
+                    Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                    Style="{StaticResource MonoTextStyle}"
+                    Text="· changed"
+                    Visibility="{x:Bind Changed}" />
+            </Grid>
+        </DataTemplate>
     </Page.Resources>
 
-    <ScrollViewer>
-        <StackPanel Style="{StaticResource PageContentStyle}">
-            <controls:PageHeader Purpose="Five sign-offs, in order. Approving one records who you are (from git), your note and a fingerprint of the files it covers." Title="Sign-offs">
-                <controls:PageHeader.Actions>
-                    <Button Command="{x:Bind ViewModel.LoadCommand}" Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon Glyph="{x:Bind icons:StudioIcons.Refresh}" Style="{StaticResource IconStyle}" />
-                            <TextBlock Text="Check again" />
-                        </StackPanel>
-                    </Button>
-                </controls:PageHeader.Actions>
-            </controls:PageHeader>
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="Layout" CurrentStateChanged="OnLayoutChanged">
+                <VisualState x:Name="Wide">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1100" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <!--  Under 1100 each sign-off's body is one column; the rows take that from ViewModel.IsNarrow.  -->
+                <VisualState x:Name="Narrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="PageContent.Spacing" Value="16" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
-            <controls:NoWorkspaceState
-                Glyph="{x:Bind icons:StudioIcons.SignOffs}"
-                Message="Sign-offs shows a workspace’s five sign-offs in order and what each one still needs. Open or start a workspace to review them."
-                Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}" />
+        <ScrollViewer>
+            <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+                <controls:PageHeader Title="Sign-offs">
+                    <controls:PageHeader.Purpose>
+                        Five sign-offs, in order. Approving one records who you are (from git), your note and a
+                        fingerprint of the files it covers.
+                    </controls:PageHeader.Purpose>
+                    <controls:PageHeader.Actions>
+                        <Button
+                            Command="{x:Bind ViewModel.LoadCommand}"
+                            Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon
+                                    Glyph="{x:Bind icons:StudioIcons.Refresh}"
+                                    Style="{StaticResource IconStyle}" />
+                                <TextBlock Text="Check again" />
+                            </StackPanel>
+                        </Button>
+                    </controls:PageHeader.Actions>
+                </controls:PageHeader>
 
-            <InfoBar
-                IsClosable="False"
-                IsOpen="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}"
-                Message="{x:Bind ViewModel.LoadProblem, Mode=OneWay}"
-                Severity="Error"
-                Title="Couldn’t check the sign-offs.">
-                <InfoBar.IconSource>
-                    <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
-                </InfoBar.IconSource>
-            </InfoBar>
+                <controls:NoWorkspaceState
+                    Glyph="{x:Bind icons:StudioIcons.SignOffs}"
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        Sign-offs shows a workspace’s five sign-offs in order and what each one still needs. Open or
+                        start a workspace to review them.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
 
-            <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsOpen, Mode=OneWay}">
                 <InfoBar
                     IsClosable="False"
-                    IsOpen="{x:Bind ViewModel.HasStale, Mode=OneWay}"
-                    Message="A file it covers was edited. Re-approve or revoke it; later sign-offs wait until then."
-                    Severity="Warning"
-                    Title="{x:Bind ViewModel.StaleTitle, Mode=OneWay}">
+                    IsOpen="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}"
+                    Message="{x:Bind ViewModel.LoadProblem, Mode=OneWay}"
+                    Severity="Error"
+                    Title="Couldn’t check the sign-offs.">
                     <InfoBar.IconSource>
-                        <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                     </InfoBar.IconSource>
                 </InfoBar>
 
-                <ItemsRepeater AutomationProperties.Name="Five sign-offs, in order" ItemsSource="{x:Bind ViewModel.SignOffs, Mode=OneWay}">
-                    <ItemsRepeater.Layout>
-                        <StackLayout Spacing="8" />
-                    </ItemsRepeater.Layout>
-                    <ItemsRepeater.ItemTemplate>
-                        <DataTemplate x:DataType="vm:SignOffRow">
-                            <Expander
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Stretch"
-                                AutomationProperties.Name="{x:Bind AnnouncedName}"
-                                IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}">
-                                <Expander.Header>
-                                    <Grid MinHeight="64" ColumnSpacing="16">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border
-                                            Width="24"
-                                            Height="24"
-                                            VerticalAlignment="Center"
-                                            BorderBrush="{x:Bind local:SignOffsPage.NumberBrush(IsNext)}"
-                                            BorderThickness="{x:Bind local:SignOffsPage.NumberThickness(IsNext)}"
-                                            CornerRadius="12">
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
+                <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsOpen, Mode=OneWay}">
+                    <InfoBar
+                        IsClosable="False"
+                        IsOpen="{x:Bind ViewModel.HasStale, Mode=OneWay}"
+                        Message="A file it covers was edited. Re-approve or revoke it; later sign-offs wait until then."
+                        Severity="Warning"
+                        Title="{x:Bind ViewModel.StaleTitle, Mode=OneWay}">
+                        <InfoBar.IconSource>
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                        </InfoBar.IconSource>
+                    </InfoBar>
+
+                    <ItemsRepeater
+                        AutomationProperties.Name="Five sign-offs, in order"
+                        ItemsSource="{x:Bind ViewModel.SignOffs, Mode=OneWay}">
+                        <ItemsRepeater.Layout>
+                            <StackLayout Spacing="8" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SignOffRow">
+                                <Expander
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    AutomationProperties.Name="{x:Bind AnnouncedName}"
+                                    IsExpanded="{x:Bind IsExpanded, Mode=TwoWay}">
+                                    <Expander.Header>
+                                        <Grid MinHeight="64" ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border
+                                                Width="40"
+                                                Height="40"
                                                 VerticalAlignment="Center"
-                                                FontWeight="SemiBold"
-                                                Style="{StaticResource CaptionTextBlockStyle}"
-                                                Text="{x:Bind Number}" />
-                                        </Border>
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Name}" />
+                                                Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="8">
                                                 <TextBlock
+                                                    HorizontalAlignment="Center"
                                                     VerticalAlignment="Center"
-                                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="Next"
-                                                    Visibility="{x:Bind IsNext}" />
+                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                    Text="{x:Bind Number}" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock
+                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                    Text="{x:Bind Name}" />
+                                                <TextBlock
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="{x:Bind Approves}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap" />
                                             </StackPanel>
-                                            <TextBlock
-                                                Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                Text="{x:Bind Approves}"
-                                                TextTrimming="CharacterEllipsis"
-                                                TextWrapping="NoWrap" />
-                                        </StackPanel>
-                                        <StackPanel
-                                            Grid.Column="2"
-                                            MaxWidth="260"
-                                            VerticalAlignment="Center">
-                                            <TextBlock
-                                                Style="{StaticResource BodyTextBlockStyle}"
-                                                Text="{x:Bind Summary}"
-                                                TextTrimming="CharacterEllipsis"
-                                                TextWrapping="NoWrap" />
-                                            <TextBlock
-                                                Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                Text="{x:Bind SummaryDetail}"
-                                                TextTrimming="CharacterEllipsis"
-                                                TextWrapping="NoWrap" />
-                                        </StackPanel>
-                                        <controls:StatusPill
-                                            Grid.Column="3"
-                                            VerticalAlignment="Center"
-                                            State="{x:Bind Pill}" />
-                                    </Grid>
-                                </Expander.Header>
-
-                                <Grid ColumnSpacing="24" RowSpacing="16">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="320" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel>
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Checks" />
-                                            <TextBlock
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Style="{StaticResource BodyTextBlockStyle}"
-                                                Text="{x:Bind PassCount}" />
-                                        </StackPanel>
-                                        <ItemsRepeater ItemsSource="{x:Bind Checks}">
-                                            <ItemsRepeater.ItemTemplate>
-                                                <DataTemplate x:DataType="vm:CheckRow">
-                                                    <Grid
-                                                        Padding="0,10"
-                                                        AutomationProperties.Name="{x:Bind AnnouncedName}"
-                                                        ColumnSpacing="12">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <FontIcon
-                                                            Margin="0,2,0,0"
-                                                            VerticalAlignment="Top"
-                                                            Foreground="{x:Bind local:SignOffsPage.CheckBrush(Tone)}"
-                                                            Glyph="{x:Bind Glyph}"
-                                                            Style="{StaticResource IconStyle}" />
-                                                        <StackPanel Grid.Column="1">
-                                                            <TextBlock
-                                                                Style="{StaticResource BodyTextBlockStyle}"
-                                                                Text="{x:Bind Name}"
-                                                                TextWrapping="Wrap" />
-                                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Detail}" />
-                                                        </StackPanel>
-                                                        <HyperlinkButton
-                                                            Grid.Column="2"
-                                                            VerticalAlignment="Center"
-                                                            Click="OnShowProblems"
-                                                            Content="Show the problems"
-                                                            Visibility="{x:Bind ShowsProblems}" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsRepeater.ItemTemplate>
-                                        </ItemsRepeater>
-                                        <StackPanel Margin="0,16,0,0" Visibility="{x:Bind HasHistory}">
-                                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="History" />
-                                            <ItemsRepeater ItemsSource="{x:Bind History}">
-                                                <ItemsRepeater.ItemTemplate>
-                                                    <DataTemplate x:DataType="vm:HistoryRow">
-                                                        <Grid Padding="0,8" ColumnSpacing="12">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <FontIcon
-                                                                Margin="0,2,0,0"
-                                                                VerticalAlignment="Top"
-                                                                Foreground="{x:Bind local:SignOffsPage.ApprovalBrush(IsApproval)}"
-                                                                Glyph="{x:Bind local:SignOffsPage.HistoryGlyph(IsApproval)}"
-                                                                Style="{StaticResource IconStyle}" />
-                                                            <StackPanel Grid.Column="1">
-                                                                <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="{x:Bind Text}" />
-                                                                <TextBlock
-                                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                                    Text="{x:Bind Detail}"
-                                                                    TextWrapping="Wrap" />
-                                                            </StackPanel>
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ItemsRepeater.ItemTemplate>
-                                            </ItemsRepeater>
-                                        </StackPanel>
-                                    </StackPanel>
-
-                                    <StackPanel
-                                        Grid.Column="1"
-                                        Padding="16"
-                                        Background="{ThemeResource SubtleFillColorSecondaryBrush}"
-                                        CornerRadius="8"
-                                        Spacing="8">
-                                        <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Approval" />
-                                        <TextBlock
-                                            Style="{StaticResource BodyTextBlockStyle}"
-                                            TextWrapping="Wrap"
-                                            Visibility="{x:Bind IsBlocked}">
-                                            <Run Text="Not approved." />
-                                            <Run Text="{x:Bind NotMet}" />
-                                        </TextBlock>
-                                        <TextBlock
-                                            Style="{StaticResource BodyTextBlockStyle}"
-                                            Text="Every check passes. Read what this sign-off covers, then approve it yourself."
-                                            TextWrapping="Wrap"
-                                            Visibility="{x:Bind IsReady}" />
-                                        <InfoBar
-                                            IsClosable="False"
-                                            IsOpen="{x:Bind IsStale}"
-                                            Message="{x:Bind ChangedSummary}"
-                                            Severity="Warning"
-                                            Title="Changed after approval.">
-                                            <InfoBar.IconSource>
-                                                <FontIconSource FontFamily="{StaticResource StudioIconsFontFamily}" Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
-                                            </InfoBar.IconSource>
-                                        </InfoBar>
-                                        <Grid ColumnSpacing="12" Visibility="{x:Bind HasApproval}">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                            </Grid.ColumnDefinitions>
-                                            <FontIcon
-                                                VerticalAlignment="Top"
-                                                FontSize="20"
-                                                Foreground="{x:Bind local:SignOffsPage.ApprovalBrush(IsApproved)}"
-                                                Glyph="{x:Bind local:SignOffsPage.ApprovalGlyph(IsApproved)}"
-                                                Style="{StaticResource IconStyle}" />
-                                            <StackPanel Grid.Column="1">
-                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind ApprovedBy}" />
-                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ApproverEmail}" />
-                                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind ApprovedWhen}" />
-                                            </StackPanel>
-                                        </Grid>
-                                        <TextBlock
-                                            Style="{StaticResource CaptionTextBlockStyle}"
-                                            Text="{x:Bind Note}"
-                                            TextWrapping="Wrap"
-                                            Visibility="{x:Bind HasApproval}" />
-                                        <StackPanel Spacing="8" Visibility="{x:Bind IsBlocked}">
-                                            <Button
-                                                AutomationProperties.HelpText="Opens when every check passes."
-                                                AutomationProperties.Name="{x:Bind ApproveName}"
-                                                IsEnabled="False"
-                                                Style="{StaticResource AccentButtonStyle}">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Approve}" Style="{StaticResource IconStyle}" />
-                                                    <TextBlock Text="{x:Bind ApproveText}" />
-                                                </StackPanel>
-                                            </Button>
-                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Approve opens when every check passes." />
-                                        </StackPanel>
-                                        <StackPanel Spacing="8" Visibility="{x:Bind IsReady}">
-                                            <Button
-                                                AutomationProperties.HelpText="Opens a confirmation. Records your git identity and a note."
-                                                AutomationProperties.Name="{x:Bind ApproveName}"
-                                                Click="OnApprove"
-                                                Style="{StaticResource AccentButtonStyle}">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Approve}" Style="{StaticResource IconStyle}" />
-                                                    <TextBlock Text="{x:Bind ApproveText}" />
-                                                </StackPanel>
-                                            </Button>
-                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Records your git identity and a note. Agents are refused." />
-                                        </StackPanel>
-                                        <StackPanel Spacing="8" Visibility="{x:Bind IsApproved}">
-                                            <Button
-                                                HorizontalAlignment="Left"
-                                                Click="OnRevoke"
-                                                Content="Revoke approval…" />
-                                            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Revoking keeps this approval in the history." />
-                                        </StackPanel>
-                                        <StackPanel
-                                            Orientation="Horizontal"
-                                            Spacing="8"
-                                            Visibility="{x:Bind IsStale}">
-                                            <Button Click="OnApprove" Style="{StaticResource AccentButtonStyle}">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <FontIcon Glyph="{x:Bind icons:StudioIcons.Approve}" Style="{StaticResource IconStyle}" />
-                                                    <TextBlock Text="Re-approve…" />
-                                                </StackPanel>
-                                            </Button>
-                                            <Button Click="OnRevoke" Content="Revoke approval…" />
-                                        </StackPanel>
-                                        <Rectangle
-                                            Height="1"
-                                            Margin="0,4"
-                                            Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Covers" />
-                                            <TextBlock
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Style="{StaticResource BodyTextBlockStyle}"
-                                                Text="{x:Bind CoversCount}" />
-                                        </StackPanel>
-                                        <ItemsRepeater ItemsSource="{x:Bind Covers}">
-                                            <ItemsRepeater.ItemTemplate>
-                                                <DataTemplate x:DataType="vm:CoveredFileRow">
-                                                    <TextBlock
-                                                        Padding="0,2"
-                                                        AutomationProperties.Name="{x:Bind AnnouncedName}"
-                                                        Foreground="{x:Bind local:SignOffsPage.CoveredBrush(Changed)}"
-                                                        Style="{StaticResource MonoTextStyle}"
-                                                        Text="{x:Bind Text}"
-                                                        ToolTipService.ToolTip="{x:Bind Path}" />
-                                                </DataTemplate>
-                                            </ItemsRepeater.ItemTemplate>
-                                        </ItemsRepeater>
-                                        <Grid ColumnSpacing="8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <FontIcon
-                                                FontSize="12"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Glyph="{x:Bind icons:StudioIcons.Fingerprint}"
-                                                Style="{StaticResource IconStyle}" />
-                                            <TextBlock
-                                                Grid.Column="1"
-                                                VerticalAlignment="Center"
-                                                IsTextSelectionEnabled="True"
-                                                Style="{StaticResource MonoTextStyle}"
-                                                Text="{x:Bind Fingerprint}"
-                                                TextTrimming="CharacterEllipsis" />
-                                            <Button
+                                            <StackPanel
                                                 Grid.Column="2"
-                                                AutomationProperties.Name="Copy the fingerprint"
-                                                Click="OnCopyFingerprint"
-                                                Style="{StaticResource SubtleButtonStyle}"
-                                                Tag="{x:Bind Fingerprint}"
-                                                ToolTipService.ToolTip="Copy the fingerprint">
-                                                <FontIcon Glyph="{x:Bind icons:StudioIcons.Copy}" Style="{StaticResource IconStyle}" />
-                                            </Button>
+                                                MaxWidth="260"
+                                                VerticalAlignment="Center">
+                                                <TextBlock
+                                                    Style="{StaticResource BodyTextBlockStyle}"
+                                                    Text="{x:Bind Summary}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap" />
+                                                <TextBlock
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="{x:Bind SummaryDetail}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap"
+                                                    Visibility="{x:Bind ShowsSummaryDetail, Mode=OneWay}" />
+                                            </StackPanel>
+                                            <controls:StatusPill
+                                                Grid.Column="3"
+                                                VerticalAlignment="Center"
+                                                State="{x:Bind Pill}" />
                                         </Grid>
-                                    </StackPanel>
-                                </Grid>
-                            </Expander>
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
+                                    </Expander.Header>
 
-                <Grid ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <FontIcon
-                        VerticalAlignment="Top"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Glyph="{x:Bind icons:StudioIcons.Agent}"
-                        Style="{StaticResource IconStyle}" />
-                    <TextBlock Grid.Column="1" Style="{StaticResource SecondaryCaptionTextStyle}">
-                        <Run Text="Agents can prepare a sign-off, never approve one. The Principal Architect’s “Consolidate the baseline” task reads the drafts for" />
-                        <Run Text="{x:Bind ViewModel.NextName, Mode=OneWay}" />
-                        <Run Text="and lists contradictions before you decide. Without Claude Code, everything on this page still works." />
-                    </TextBlock>
-                    <HyperlinkButton
-                        Grid.Column="2"
-                        Padding="0"
-                        VerticalAlignment="Top"
-                        Click="OnPrepare">
-                        <TextBlock Style="{StaticResource CaptionTextBlockStyle}">
-                            <Run Text="Prepare" />
+                                    <Grid
+                                        ColumnSpacing="{x:Bind local:SignOffsPage.ColumnGap(IsNarrow), Mode=OneWay}"
+                                        RowSpacing="{x:Bind local:SignOffsPage.RowGap(IsNarrow), Mode=OneWay}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition
+                                                Width="{x:Bind local:SignOffsPage.PanelWidth(IsNarrow), Mode=OneWay}" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Checks" />
+                                                <TextBlock
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Style="{StaticResource BodyTextBlockStyle}"
+                                                    Text="{x:Bind PassCount}" />
+                                            </StackPanel>
+                                            <ItemsRepeater
+                                                ItemTemplate="{StaticResource CheckTemplate}"
+                                                ItemsSource="{x:Bind Checks}" />
+                                            <StackPanel Margin="0,16,0,0" Visibility="{x:Bind HasHistory}">
+                                                <TextBlock Style="{StaticResource SectionTitleStyle}" Text="History" />
+                                                <ItemsRepeater
+                                                    ItemTemplate="{StaticResource HistoryTemplate}"
+                                                    ItemsSource="{x:Bind History}" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!--  A card with its stroke, so it keeps its edge in high contrast.  -->
+                                        <StackPanel
+                                            Grid.Row="{x:Bind local:SignOffsPage.PanelRow(IsNarrow), Mode=OneWay}"
+                                            Grid.Column="{x:Bind local:SignOffsPage.PanelColumn(IsNarrow), Mode=OneWay}"
+                                            Padding="16"
+                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Spacing="12">
+                                            <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Approval" />
+                                            <TextBlock
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                TextWrapping="Wrap"
+                                                Visibility="{x:Bind IsBlocked}">
+                                                <Run Text="Not approved." />
+                                                <Run Text="{x:Bind NotMet}" />
+                                            </TextBlock>
+                                            <TextBlock
+                                                Style="{StaticResource BodyTextBlockStyle}"
+                                                TextWrapping="Wrap"
+                                                Visibility="{x:Bind IsReady}">
+                                                Every check passes. Read what this sign-off covers, then approve it
+                                                yourself.
+                                            </TextBlock>
+                                            <InfoBar
+                                                IsClosable="False"
+                                                IsOpen="{x:Bind IsStale}"
+                                                Message="{x:Bind ChangedSummary}"
+                                                Severity="Warning"
+                                                Title="Changed after approval.">
+                                                <InfoBar.IconSource>
+                                                    <FontIconSource
+                                                        FontFamily="{StaticResource StudioIconsFontFamily}"
+                                                        Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
+                                                </InfoBar.IconSource>
+                                            </InfoBar>
+                                            <Grid ColumnSpacing="12" Visibility="{x:Bind HasApproval}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <!--  Current: filled certificate; stale: outline.  -->
+                                                <FontIcon
+                                                    VerticalAlignment="Top"
+                                                    FontSize="20"
+                                                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                                    Glyph="{x:Bind icons:StudioIcons.Approved}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind IsApproved}" />
+                                                <FontIcon
+                                                    VerticalAlignment="Top"
+                                                    FontSize="20"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind icons:StudioIcons.Approve}"
+                                                    Style="{StaticResource IconStyle}"
+                                                    Visibility="{x:Bind IsStale}" />
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock
+                                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                        Text="{x:Bind ApprovedBy}" />
+                                                    <TextBlock
+                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                        Text="{x:Bind ApproverEmail}" />
+                                                    <TextBlock
+                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                        Text="{x:Bind ApprovedWhen}" />
+                                                </StackPanel>
+                                            </Grid>
+                                            <TextBlock
+                                                Style="{StaticResource CaptionTextBlockStyle}"
+                                                Text="{x:Bind Note}"
+                                                TextWrapping="Wrap"
+                                                Visibility="{x:Bind HasApproval}" />
+                                            <StackPanel Spacing="8" Visibility="{x:Bind IsBlocked}">
+                                                <Button
+                                                    AutomationProperties.HelpText="Opens when every check passes."
+                                                    AutomationProperties.Name="{x:Bind ApproveName}"
+                                                    IsEnabled="False"
+                                                    Style="{StaticResource AccentButtonStyle}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon
+                                                            Glyph="{x:Bind icons:StudioIcons.Approve}"
+                                                            Style="{StaticResource IconStyle}" />
+                                                        <TextBlock Text="{x:Bind ApproveText}" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <TextBlock
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="Approve opens when every check passes." />
+                                            </StackPanel>
+                                            <StackPanel Spacing="8" Visibility="{x:Bind IsReady}">
+                                                <Button
+                                                    AutomationProperties.Name="{x:Bind ApproveName}"
+                                                    Click="OnApprove"
+                                                    Style="{StaticResource AccentButtonStyle}">
+                                                    <AutomationProperties.HelpText>
+                                                        Opens a confirmation. Records your git identity and a note.
+                                                    </AutomationProperties.HelpText>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon
+                                                            Glyph="{x:Bind icons:StudioIcons.Approve}"
+                                                            Style="{StaticResource IconStyle}" />
+                                                        <TextBlock Text="{x:Bind ApproveText}" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <TextBlock
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="Records your git identity and a note. Agents are refused." />
+                                            </StackPanel>
+                                            <StackPanel Spacing="8" Visibility="{x:Bind IsApproved}">
+                                                <Button
+                                                    HorizontalAlignment="Left"
+                                                    Click="OnRevoke"
+                                                    Content="Revoke approval…" />
+                                                <TextBlock
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="Revoking keeps this approval in the history." />
+                                            </StackPanel>
+                                            <StackPanel
+                                                Orientation="Horizontal"
+                                                Spacing="8"
+                                                Visibility="{x:Bind IsStale}">
+                                                <Button Click="OnApprove" Style="{StaticResource AccentButtonStyle}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <FontIcon
+                                                            Glyph="{x:Bind icons:StudioIcons.Approve}"
+                                                            Style="{StaticResource IconStyle}" />
+                                                        <TextBlock Text="Re-approve…" />
+                                                    </StackPanel>
+                                                </Button>
+                                                <Button Click="OnRevoke" Content="Revoke approval…" />
+                                            </StackPanel>
+                                            <Rectangle
+                                                Height="1"
+                                                Margin="0,4"
+                                                Fill="{ThemeResource DividerStrokeColorDefaultBrush}" />
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Style="{StaticResource SectionTitleStyle}" Text="Covers" />
+                                                <TextBlock
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Style="{StaticResource BodyTextBlockStyle}"
+                                                    Text="{x:Bind CoversCount}" />
+                                            </StackPanel>
+                                            <ItemsRepeater
+                                                ItemTemplate="{StaticResource CoveredFileTemplate}"
+                                                ItemsSource="{x:Bind Covers}" />
+                                            <Grid ColumnSpacing="8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <FontIcon
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="{x:Bind icons:StudioIcons.Fingerprint}"
+                                                    Style="{StaticResource IconStyle}" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    IsTextSelectionEnabled="True"
+                                                    Style="{StaticResource MonoTextStyle}"
+                                                    Text="{x:Bind Fingerprint}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                                <Button
+                                                    Grid.Column="2"
+                                                    AutomationProperties.Name="Copy the fingerprint"
+                                                    Click="OnCopyFingerprint"
+                                                    Style="{StaticResource SubtleButtonStyle}"
+                                                    Tag="{x:Bind Fingerprint}"
+                                                    ToolTipService.ToolTip="Copy the fingerprint">
+                                                    <FontIcon
+                                                        Glyph="{x:Bind icons:StudioIcons.Copy}"
+                                                        Style="{StaticResource IconStyle}" />
+                                                </Button>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon
+                            VerticalAlignment="Top"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Glyph="{x:Bind icons:StudioIcons.Agent}"
+                            Style="{StaticResource IconStyle}" />
+                        <TextBlock Grid.Column="1" Style="{StaticResource SecondaryCaptionTextStyle}">
+                            <Run>
+                                Agents can prepare a sign-off, never approve one. The Principal Architect’s “Consolidate
+                                the baseline” task reads the drafts for
+                            </Run>
                             <Run Text="{x:Bind ViewModel.NextName, Mode=OneWay}" />
+                            <Run>
+                                and lists contradictions before you decide. Without Claude Code, everything on this page
+                                still works.
+                            </Run>
                         </TextBlock>
-                    </HyperlinkButton>
-                </Grid>
+                        <HyperlinkButton
+                            Grid.Column="2"
+                            Padding="0"
+                            VerticalAlignment="Top"
+                            Click="OnPrepare">
+                            <TextBlock Style="{StaticResource CaptionTextBlockStyle}">
+                                <Run Text="Prepare" />
+                                <Run Text="{x:Bind ViewModel.NextName, Mode=OneWay}" />
+                            </TextBlock>
+                        </HyperlinkButton>
+                    </Grid>
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Page>

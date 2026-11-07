@@ -22,7 +22,9 @@ public static class SignOffRefusal
         ArgumentNullException.ThrowIfNull(signOff);
         var failing = signOff.Checks
             .Where(c => !c.Passed)
-            .Select(c => c.ShowsProblems ? $"{c.Detail.Split(';')[0]} in the documents" : $"{c.Name} ({Lowered(c.Detail)})")
+            .Select(c => c.ShowsProblems
+                ? $"{c.Detail.Split(';')[0]} in the documents"
+                : $"{c.Name} ({Lowered(c.Detail)})")
             .ToList();
 
         return failing.Count == 0 ? "a check fails now" : string.Join("; ", failing);

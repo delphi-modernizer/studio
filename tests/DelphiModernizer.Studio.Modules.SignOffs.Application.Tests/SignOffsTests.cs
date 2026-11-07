@@ -24,7 +24,8 @@ public sealed class SignOffsTests
         using var workspace = await TestWorkspace.CreateAsync();
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
 
-        var approved = await sender.Send(new ApproveGateCommand("G9", "Looks fine."), TestContext.Current.CancellationToken);
+        var approved = await sender.Send(
+            new ApproveGateCommand("G9", "Looks fine."), TestContext.Current.CancellationToken);
 
         Assert.True(approved.IsFailure);
     }
@@ -34,7 +35,8 @@ public sealed class SignOffsTests
     {
         var sender = Services.Sender(new WorkspaceSession(), services => services.AddSignOffsApplication());
 
-        var revoked = await sender.Send(new RevokeGateCommand("G0", "Changed my mind."), TestContext.Current.CancellationToken);
+        var revoked = await sender.Send(
+            new RevokeGateCommand("G0", "Changed my mind."), TestContext.Current.CancellationToken);
 
         Assert.Equal(WorkspaceRequired.Error, revoked.Error);
     }

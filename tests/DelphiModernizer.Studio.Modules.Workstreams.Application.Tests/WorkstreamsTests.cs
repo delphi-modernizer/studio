@@ -13,7 +13,9 @@ namespace DelphiModernizer.Studio.Modules.Workstreams.Application.Tests;
 
 public sealed class WorkstreamsTests
 {
-    private static readonly AgentSettings _noClaude = AgentSettings.Default with { ClaudePath = Path.Combine(Path.GetTempPath(), "no-such-dir", "claude.exe") };
+    private static readonly AgentSettings _noClaude = AgentSettings.Default with {
+        ClaudePath = Path.Combine(Path.GetTempPath(), "no-such-dir", "claude.exe"),
+    };
 
     [Fact]
     public async Task Each_role_lists_its_deliverables_and_recipes_from_the_kit()
@@ -34,7 +36,8 @@ public sealed class WorkstreamsTests
         using var workspace = await TestWorkspace.CreateAsync();
         var sender = Sender(workspace.Session);
 
-        var started = await sender.Send(new StartRunCommand("ws99-nothing", null, 1m), TestContext.Current.CancellationToken);
+        var started = await sender.Send(
+            new StartRunCommand("ws99-nothing", null, 1m), TestContext.Current.CancellationToken);
 
         Assert.Equal("Workstreams.UnknownRecipe", started.Error.Code);
     }
@@ -45,7 +48,8 @@ public sealed class WorkstreamsTests
         using var workspace = await TestWorkspace.CreateAsync();
         var sender = Sender(workspace.Session);
 
-        var started = await sender.Send(new StartRunCommand("ws01-discover", null, 1m), TestContext.Current.CancellationToken);
+        var started = await sender.Send(
+            new StartRunCommand("ws01-discover", null, 1m), TestContext.Current.CancellationToken);
         var status = await sender.Send(new GetClaudeStatusQuery(), TestContext.Current.CancellationToken);
 
         Assert.True(started.IsFailure);

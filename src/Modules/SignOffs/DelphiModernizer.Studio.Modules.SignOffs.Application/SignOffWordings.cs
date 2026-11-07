@@ -4,7 +4,9 @@ using System.Collections.Generic;
 namespace DelphiModernizer.Studio.Modules.SignOffs.Application;
 
 /// <summary>The design's words for what each sign-off approves and for the deliverables its checks name.</summary>
-/// <remarks>Deliverables D01 to D09 are named on the design canvas; the rest follow them (docs/open-questions.md).</remarks>
+/// <remarks>
+/// Deliverables D01 to D09 are named on the design canvas; the rest follow them (docs/open-questions.md).
+/// </remarks>
 public static class SignOffWordings
 {
     private static readonly FrozenDictionary<string, string> _approves = new Dictionary<string, string> {

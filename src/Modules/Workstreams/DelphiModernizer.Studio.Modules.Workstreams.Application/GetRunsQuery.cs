@@ -61,7 +61,9 @@ public sealed record RunRecord(
             summary.Turns);
     }
 
-    /// <summary>Reads a prompt <see cref="RecipePrompt"/> rendered, <c>/skill</c> or <c>/skill argument</c>, back.</summary>
+    /// <summary>
+    /// Reads a prompt <see cref="RecipePrompt"/> rendered, <c>/skill</c> or <c>/skill argument</c>, back.
+    /// </summary>
     private static (Recipe? Recipe, string? Argument) RecipeOf(string agent, string prompt)
     {
         foreach (var recipe in KitBundle.Embedded.Spec.Recipes.Recipes.Where(r => r.Agent == agent))
