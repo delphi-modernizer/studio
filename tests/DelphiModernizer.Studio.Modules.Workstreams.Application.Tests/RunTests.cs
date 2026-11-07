@@ -97,15 +97,17 @@ public sealed class RunTests
     }
 
     [Fact]
-    public async Task Each_deliverable_has_the_status_its_file_records()
+    public async Task Each_deliverable_has_the_status_its_file_records_and_no_sign_off_starts_approved()
     {
         using var workspace = await TestWorkspace.CreateAsync();
         var (sender, _) = Build(workspace.Session, new FakeClaude(workspace.Parent));
 
         var states = await sender.Send(new GetDeliverableStatesQuery(), TestContext.Current.CancellationToken);
 
-        Assert.Equal(20, states.Value.Count);
-        Assert.Contains(states.Value, d => d.Id == "D03" && d.Owner == "WS02");
+        Assert.Equal(20, states.Value.Deliverables.Count);
+        Assert.Contains(states.Value.Deliverables, d => d.Id == "D03" && d.Owner == "WS02");
+        Assert.Equal(["G0", "G1", "G2", "G3", "G4"], states.Value.Gates.Select(g => g.Gate));
+        Assert.DoesNotContain(states.Value.Gates, g => g.State == "approved");
     }
 
     [Fact]

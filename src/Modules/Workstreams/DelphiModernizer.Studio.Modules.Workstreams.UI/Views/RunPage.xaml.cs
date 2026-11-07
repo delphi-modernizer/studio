@@ -98,7 +98,7 @@ public sealed partial class RunPage : Page, IHasViewModel
             return;
         }
 
-        var dialog = new RunRecipeDialog(recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd) { XamlRoot = XamlRoot };
+        var dialog = new RunRecipeDialog(recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null) { XamlRoot = XamlRoot };
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {

@@ -42,7 +42,7 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
             return;
         }
 
-        var dialog = new RunRecipeDialog(task.Recipe, task.RoleName, null, ViewModel.DefaultBudget) { XamlRoot = XamlRoot };
+        var dialog = new RunRecipeDialog(task.Recipe, task.RoleName, null, ViewModel.DefaultBudget, ViewModel.NextGate) { XamlRoot = XamlRoot };
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {

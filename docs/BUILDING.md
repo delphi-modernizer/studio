@@ -10,6 +10,10 @@ decides how:
 | `Source` | An engine checkout exists at `.engine/` (CI) or `../engine/` (beside this repository), or `EngineRoot` names one | Project references into the checkout, so a change can span both repositories |
 | `Package` | No checkout is found | Package references to `DelphiModernizer.Engine.*` at `EngineVersion` from GitHub Packages |
 
+The test projects need `Source`: the Workstreams tests run the engine's fake Claude Code CLI
+(`tests/DelphiModernizer.Engine.Agents.FakeClaude`) through `$(EngineRoot)`, so they do not build with
+`EngineSource=Package`.
+
 The engine checkout needs its `kit` submodule (`git submodule update --init`). CI checks the engine out at the commit
 [engine.lock](../engine.lock) pins.
 

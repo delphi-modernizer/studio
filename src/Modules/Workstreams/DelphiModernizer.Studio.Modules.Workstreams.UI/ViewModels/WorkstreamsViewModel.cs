@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DelphiModernizer.Engine.Kit.Spec;
 using DelphiModernizer.Engine.Traceability;
+using DelphiModernizer.Engine.Workspaces;
 using DelphiModernizer.Studio.Application.Abstractions.Agents;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Settings;
@@ -29,6 +30,7 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
     private readonly DispatcherQueue _dispatcher;
     private IReadOnlyList<Workstream> _workstreams = [];
     private IReadOnlyList<DeliverableState> _states = [];
+    private IReadOnlyList<GateStatus> _gates = [];
     private IReadOnlyList<RunRecord> _runs = [];
     private string? _requested;
 
@@ -89,6 +91,9 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
     public string RoleKind => SelectedRole?.Code == "PA" ? "Lead role · combines the six teams’ work" : "Team · works side by side with five others";
 
     public decimal DefaultBudget => _settings.Agents.BudgetUsd;
+
+    /// <summary>The first sign-off without a current approval, which a gate argument starts from; null when all are.</summary>
+    public string? NextGate => _gates.FirstOrDefault(g => g.State != "approved")?.Gate;
 
     /// <param name="parameter">The role code to select, such as <c>WS01</c>, as Overview and Sign-offs pass it.</param>
     public override void OnNavigatedTo(object? parameter)
@@ -160,7 +165,8 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         var states = await _sender.Send(new GetDeliverableStatesQuery(), cancellationToken);
         var runs = await _sender.Send(new GetRunsQuery(), cancellationToken);
         Problem = states.IsFailure ? states.Error.Message : null;
-        _states = states.IsSuccess ? states.Value : [];
+        _states = states.IsSuccess ? states.Value.Deliverables : [];
+        _gates = states.IsSuccess ? states.Value.Gates : [];
         _runs = runs.IsSuccess ? runs.Value : [];
         IsOpen = true;
         ShowRoles(_requested ?? SelectedRole?.Code ?? "PA");
@@ -185,9 +191,7 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         }
 
         var ready = Claude is { IsReady: true };
-        Deliverables = [.. role.Workstream.Deliverables.Select(d => new DeliverableRow(
-            d.Title,
-            PillStates.OfDeliverable(_states.FirstOrDefault(s => s.Id == d.Id)?.Status ?? "missing")))];
+        Deliverables = [.. role.Workstream.Deliverables.Select(d => new DeliverableRow(d.Title, PillOf(d.Id, d.Gate)))];
         Tasks = [.. role.Workstream.Recipes.Select(recipe => {
             var blocker = _monitor.Writing(workspace.Root, recipe.Writes);
 
@@ -196,6 +200,15 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         History = [.. _runs
             .Where(r => r.Agent == role.Workstream.Role.Agent)
             .Select(r => new HistoryRow(r))];
+    }
+
+    /// <summary>Approved while the deliverable's sign-off has a current approval, as Deliverables shows it; else its file's status.</summary>
+    private PillState PillOf(string deliverable, string gate)
+    {
+        var status = _states.FirstOrDefault(s => s.Id == deliverable)?.Status ?? "missing";
+        var approved = _gates.Any(g => g.Gate == gate && g.State == "approved");
+
+        return approved && status != "missing" ? PillState.Approved : PillStates.OfDeliverable(status);
     }
 
     private string BlockedReason(LiveRun blocker, Recipe recipe, RoleRow role)

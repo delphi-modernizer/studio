@@ -23,12 +23,19 @@
             TextWrapping="Wrap" />
         <StackPanel x:Name="ArgumentField" Spacing="4">
             <TextBox x:Name="ArgumentBox" />
+            <ComboBox
+                x:Name="GateBox"
+                MinWidth="240"
+                Visibility="Collapsed" />
             <TextBlock
                 x:Name="ArgumentError"
                 Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                 Style="{StaticResource CaptionTextBlockStyle}"
                 Visibility="Collapsed" />
-            <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="One line, for example legacy/Sales or Pricing.pas." />
+            <TextBlock
+                x:Name="ArgumentHelp"
+                Style="{StaticResource SecondaryCaptionTextStyle}"
+                Text="One line, for example legacy/Sales or Pricing.pas." />
         </StackPanel>
         <StackPanel MaxWidth="240" HorizontalAlignment="Left" Spacing="4">
             <NumberBox
