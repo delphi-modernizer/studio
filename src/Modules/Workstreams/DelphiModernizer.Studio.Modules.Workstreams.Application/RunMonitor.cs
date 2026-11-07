@@ -7,11 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using DelphiModernizer.Engine.Agents;
 using DelphiModernizer.Engine.Kit.Spec;
+using DelphiModernizer.Studio.Application.Abstractions.Workstreams;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 
 /// <summary>The runs this studio started since it opened, newest first, each read to its end in the background.</summary>
-public sealed class RunMonitor : IDisposable
+public sealed class RunMonitor : IRunsInProgress, IDisposable
 {
     private readonly Lock _gate = new();
     private readonly List<LiveRun> _runs = [];
@@ -30,6 +31,14 @@ public sealed class RunMonitor : IDisposable
     }
 
     public int InProgress => Runs.Count(r => !r.IsEnded);
+
+    public IReadOnlySet<string> AgentsRunning(string workspaceRoot)
+    {
+        return Runs
+            .Where(r => !r.IsEnded && r.WorkspaceRoot == workspaceRoot)
+            .Select(r => r.Recipe.Agent)
+            .ToHashSet(StringComparer.Ordinal);
+    }
 
     public LiveRun? Find(string runId)
     {
