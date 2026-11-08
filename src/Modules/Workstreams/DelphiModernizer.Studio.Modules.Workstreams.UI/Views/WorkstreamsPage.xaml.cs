@@ -39,19 +39,17 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
     /// </summary>
     private async void OnRun(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: TaskRow task })
+        if (sender is not Button { Tag: TaskRow task })
         {
             return;
         }
 
         var dialog = new RunRecipeDialog(
-            task.Recipe, task.RoleName, null, ViewModel.DefaultBudget, ViewModel.NextGate) {
-            XamlRoot = XamlRoot,
-        };
+            task.Recipe, task.RoleName, null, ViewModel.DefaultBudget, ViewModel.NextGate).Over(XamlRoot);
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            var problem = await ViewModel.StartAsync(task.Recipe, dialog.Argument, dialog.BudgetUsd);
+            string? problem = await ViewModel.StartAsync(task.Recipe, dialog.Argument, dialog.BudgetUsd);
 
             if (problem is null)
             {
@@ -64,7 +62,7 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
 
     private void OnOpenBlockingRun(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: TaskRow { Blocker: { } blocker } })
+        if (sender is FrameworkElement { Tag: TaskRow { Blocker: { } blocker } })
         {
             ViewModel.OpenRun(blocker.RunId);
         }

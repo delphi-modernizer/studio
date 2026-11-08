@@ -13,7 +13,7 @@ internal sealed class GetDeciderQueryHandler : IRequestHandler<GetDeciderQuery, 
 {
     public async Task<string?> Handle(GetDeciderQuery request, CancellationToken cancellationToken)
     {
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var identity = await GitIdentity.ReadAsync(home, cancellationToken);
 
         return identity?.ToString();

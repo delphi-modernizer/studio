@@ -104,7 +104,7 @@ internal sealed class GetOverviewQueryHandler(IWorkspaceSession session)
 
     private static LegacyInventory? ReadInventory(Workspace workspace)
     {
-        var path = Path.Combine(workspace.LatestScanFolder, "inventory.json");
+        string path = Path.Combine(workspace.LatestScanFolder, "inventory.json");
 
         try
         {

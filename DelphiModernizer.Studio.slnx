@@ -80,6 +80,8 @@
   <Folder Name="/tests/">
     <Project Path="tests/DelphiModernizer.Studio.Application.Abstractions.Tests/DelphiModernizer.Studio.Application.Abstractions.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.ArchitectureTests/DelphiModernizer.Studio.ArchitectureTests.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.ClaudeStandIn/DelphiModernizer.Studio.ClaudeStandIn.csproj" />
+    <Project Path="tests/DelphiModernizer.Studio.ClaudeStandIn.Tests/DelphiModernizer.Studio.ClaudeStandIn.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Mediator.Tests/DelphiModernizer.Studio.Mediator.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Modules.Deliverables.Application.Tests/DelphiModernizer.Studio.Modules.Deliverables.Application.Tests.csproj" />
     <Project Path="tests/DelphiModernizer.Studio.Modules.Inventory.Application.Tests/DelphiModernizer.Studio.Modules.Inventory.Application.Tests.csproj" />

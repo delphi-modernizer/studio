@@ -26,7 +26,7 @@ public sealed class InventoryWordsTests
             3,
             1);
 
-        var name = InventoryWords.CodeModule(unit, inCycle: true);
+        string name = InventoryWords.CodeModule(unit, inCycle: true);
 
         Assert.Equal("Pricing, Sales/Pricing.pas, cycle, 23 code lines of 31, fan-in 3, fan-out 1", name);
     }

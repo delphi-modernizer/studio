@@ -8,10 +8,10 @@ public sealed class RunNamesTests
     [Fact]
     public void A_task_another_role_is_writing_reads_as_blocked_with_the_blocking_run()
     {
-        var reason = RunNames.BlockedReason(
+        string reason = RunNames.BlockedReason(
             "functional requirements", "Extract business rules", "Legacy discovery", "10:42");
 
-        var name = RunNames.Task("Functional requirements", "functional requirements", reason);
+        string name = RunNames.Task("Functional requirements", "functional requirements", reason);
 
         Assert.Equal(
             "Functional requirements, writes the functional requirements, Blocked: Extract business rules "
@@ -22,7 +22,7 @@ public sealed class RunNamesTests
     [Fact]
     public void A_task_its_own_role_is_writing_points_at_the_run_below()
     {
-        var reason = RunNames.BlockedReason("functional requirements", "Extract business rules", null, "10:42");
+        string reason = RunNames.BlockedReason("functional requirements", "Extract business rules", null, "10:42");
 
         Assert.Equal("The run below is writing the functional requirements, started 10:42.", reason);
     }
@@ -68,7 +68,7 @@ public sealed class RunNamesTests
     [Fact]
     public void A_collapsed_tool_call_reads_its_tool_its_result_and_its_state()
     {
-        var summary = RunNames.ToolSummary("Grep", "a.pas:1\nb.pas:2", isError: false);
+        string summary = RunNames.ToolSummary("Grep", "a.pas:1\nb.pas:2", isError: false);
 
         Assert.Equal("Tool call Grep, 2 matches, collapsed", RunNames.Tool("Grep", summary, isExpanded: false));
     }
@@ -76,7 +76,7 @@ public sealed class RunNamesTests
     [Fact]
     public void A_refusal_reads_the_call_its_file_and_the_guard_reason()
     {
-        var name = RunNames.Refusal(
+        string name = RunNames.Refusal(
             "Edit",
             "legacy/Sales/Pricing.pas",
             "legacy/ is read-only evidence; record findings in docs/ instead.");

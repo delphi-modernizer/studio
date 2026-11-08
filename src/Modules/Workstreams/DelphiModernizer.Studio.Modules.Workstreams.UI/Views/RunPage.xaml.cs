@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using DelphiModernizer.Studio.Modules.Workstreams.Application;
 using DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
@@ -55,7 +56,7 @@ public sealed partial class RunPage : Page, IHasViewModel
     /// <summary>Open the draft is the accent action once the agent finished; otherwise a plain button.</summary>
     public static Style DraftStyle(RunOutcome outcome)
     {
-        var key = outcome == RunOutcome.Completed ? "AccentButtonStyle" : "DefaultButtonStyle";
+        string key = outcome == RunOutcome.Completed ? "AccentButtonStyle" : "DefaultButtonStyle";
 
         return (Style)Microsoft.UI.Xaml.Application.Current.Resources[key];
     }
@@ -77,12 +78,12 @@ public sealed partial class RunPage : Page, IHasViewModel
 
     private async void OnBudgetReached(object? sender, EventArgs e)
     {
-        var turns = ViewModel.Turns == "1" ? "1 turn" : $"{ViewModel.Turns} turns";
+        string turns = ViewModel.Turns == "1" ? "1 turn" : $"{ViewModel.Turns} turns";
         var dialog = new BudgetDialog(
             $"{ViewModel.Title} stopped at its {RunWords.Dollars(ViewModel.BudgetUsd)} budget after {turns}. "
                 + $"What it wrote so far is in the {ViewModel.Writing} as a Draft.",
             ViewModel.Cost,
-            ViewModel.BudgetUsd * _budgetGrowth) { XamlRoot = XamlRoot };
+            ViewModel.BudgetUsd * _budgetGrowth).Over(XamlRoot);
 
         switch (await dialog.ShowAsync())
         {
@@ -103,13 +104,11 @@ public sealed partial class RunPage : Page, IHasViewModel
         }
 
         var dialog = new RunRecipeDialog(
-            recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null) {
-            XamlRoot = XamlRoot,
-        };
+            recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null).Over(XamlRoot);
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            var problem = await ViewModel.RunAgainAsync(dialog.Argument, dialog.BudgetUsd);
+            string? problem = await ViewModel.RunAgainAsync(dialog.Argument, dialog.BudgetUsd);
 
             if (problem is null)
             {
@@ -155,7 +154,7 @@ public sealed partial class RunPage : Page, IHasViewModel
 
     private async void OnOpenWrite(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: WriteRow row })
+        if (sender is FrameworkElement { Tag: WriteRow row })
         {
             await ViewModel.OpenFileAsync(row.Path);
         }
@@ -163,7 +162,7 @@ public sealed partial class RunPage : Page, IHasViewModel
 
     private async void OnOpenFile(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: FileRow row })
+        if (sender is FrameworkElement { Tag: FileRow row })
         {
             await ViewModel.OpenFileAsync(row.Path);
         }

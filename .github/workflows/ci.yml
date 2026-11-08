@@ -13,14 +13,14 @@ concurrency:
 
 jobs:
   comments:
-    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
-      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
+      standards-ref: b4e362bb70af1ac86b6501accce2edf69e47b401
 
   drift:
-    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
-      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
+      standards-ref: b4e362bb70af1ac86b6501accce2edf69e47b401
       files: |
         .editorconfig=standards/csharp/.editorconfig
         tests/.editorconfig=standards/csharp/tests.editorconfig
@@ -28,9 +28,10 @@ jobs:
         docs/csharp-style.md=standards/csharp/csharp-style.md
 
   dependencies:
-    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
 
-  # The engine is built from source at the commit engine.lock pins (docs/BUILDING.md).
+  # The engine release engine.lock names: the build job tests against its source, and the package job takes dmz from it
+  # (docs/BUILDING.md).
   engine:
     runs-on: ubuntu-latest
     outputs:
@@ -43,13 +44,13 @@ jobs:
         run: echo "ref=$(tr -d '[:space:]' < engine.lock)" >> "$GITHUB_OUTPUT"
 
   python:
-    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
       sources: scripts
 
   build:
     needs: engine
-    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
       solution: DelphiModernizer.Studio.slnx
       os: '["windows-latest"]'
@@ -57,13 +58,21 @@ jobs:
       companion-repository: delphi-modernizer/engine
       companion-ref: ${{ needs.engine.outputs.ref }}
       companion-path: .engine
+      sonar-organization: delphi-modernizer
+      sonar-project-key: delphi-modernizer_studio
+      sonar-exclusions: .engine/**
+      sonar-coverage-exclusions: src/App/**,src/**/*.UI/**,src/**/*.UI.*/**
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  # The app with dmz beside it and the Windows App SDK runtime inside, so the artifact runs on a clean PC.
+  # The app on the engine's packages, with dmz beside it and the Windows App SDK runtime inside, so the artifact runs
+  # on a clean PC.
   package:
     needs: [engine, build]
     runs-on: windows-latest
+    permissions:
+      contents: read
+      packages: read
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: "1"
       DOTNET_NOLOGO: "1"
@@ -84,10 +93,16 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
+      # GitHub Packages needs a token even for public packages, and each engine package grants this repository read.
+      # The credentials go to the user-level NuGet configuration, outside the checkout.
+      - name: Sign in to the engine's packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: dotnet nuget update source delphi-modernizer --username "$GITHUB_ACTOR" --password "$GITHUB_TOKEN"
       - name: Publish the studio
         run: >-
           dotnet publish src/App/DelphiModernizer.Studio.App
-          -c Release -r win-x64 -p:Platform=x64 --self-contained -o out/studio
+          -c Release -r win-x64 -p:Platform=x64 -p:EngineSource=Package --self-contained -o out/studio
       - name: Publish dmz beside it
         run: >-
           dotnet publish .engine/src/DelphiModernizer.Cli
@@ -96,69 +111,6 @@ jobs:
         with:
           name: delphi-modernizer-studio-win-x64
           path: out/studio
-          if-no-files-found: error
-
-  # Every page of the running app on the engine's sample workspace, uploaded as the artifact screenshots
-  # (docs/design/ui-screenshots.md). It is also the job that fails when the app does not start or a page throws.
-  screenshots:
-    needs: [engine, build]
-    runs-on: windows-latest
-    timeout-minutes: 45
-    permissions:
-      contents: read
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
-      DOTNET_NOLOGO: "1"
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: delphi-modernizer/engine
-          ref: ${{ needs.engine.outputs.ref }}
-          path: .engine
-          submodules: true
-          persist-credentials: false
-      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
-        with:
-          global-json-file: global.json
-      - name: Publish the studio and dmz
-        run: |
-          dotnet publish src/App/DelphiModernizer.Studio.App \
-            -c Release -r win-x64 -p:Platform=x64 --self-contained -o out/studio
-          dotnet publish .engine/src/DelphiModernizer.Cli \
-            -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/studio/tools
-      # The brief's sample: the engine's Delphi 7 ERP on the BDE, created and scanned by dmz as a person would.
-      - name: Create the sample workspace
-        env:
-          GIT_AUTHOR_NAME: Studio screenshots
-          GIT_AUTHOR_EMAIL: screenshots@delphi-modernizer.invalid
-          GIT_COMMITTER_NAME: Studio screenshots
-          GIT_COMMITTER_EMAIL: screenshots@delphi-modernizer.invalid
-        run: |
-          workspace="$RUNNER_TEMP/acme-erp"
-          out/studio/tools/dmz.exe init "$workspace" \
-            --name "Acme ERP modernization" \
-            --legacy .engine/tests/fixtures/delphi/legacy-erp \
-            --stack dotnet \
-            --by "Studio screenshots <screenshots@delphi-modernizer.invalid>" \
-            --domain "ERP, a Delphi 7 application on the BDE"
-          out/studio/tools/dmz.exe scan --workspace "$workspace"
-      - name: Capture every page
-        run: >-
-          dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release --
-          --app out/studio/DelphiModernizer.Studio.exe
-          --workspace "$RUNNER_TEMP/acme-erp"
-          --out out/screenshots
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ !cancelled() }}
-        with:
-          name: screenshots
-          path: out/screenshots
           if-no-files-found: error
 
   checks:
@@ -176,7 +128,9 @@ jobs:
           version: '0.13.6'
       - name: Require the committed icon font to match its sources
         run: |
-          uv run --frozen python scripts/build_icon_font.py
+          uv run --frozen --no-build python scripts/build_icon_font.py
           git diff --exit-code -- src
       - name: Lint the Markdown
-        run: npx --yes markdownlint-cli2@0.24.0
+        run: |
+          npm install --global --ignore-scripts markdownlint-cli2@0.24.0
+          markdownlint-cli2

@@ -37,7 +37,7 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
     /// <summary>The brush of a stat's status glyph; x:Bind calls it from the stat template.</summary>
     public static Brush ToneBrush(StatTone tone)
     {
-        var key = tone switch {
+        string key = tone switch {
             StatTone.Success => "SystemFillColorSuccessBrush",
             StatTone.Caution => "SystemFillColorCautionBrush",
             StatTone.Critical => "SystemFillColorCriticalBrush",
@@ -119,7 +119,7 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
     /// <summary>A row names its container, which is what Narrator reads as the arrow keys move.</summary>
     private static void NameRow(ContainerContentChangingEventArgs args)
     {
-        var name = args.Item switch {
+        string? name = args.Item switch {
             ProblemRow row => row.AnnouncedName,
             MatrixRow row => row.AnnouncedName,
             _ => null,

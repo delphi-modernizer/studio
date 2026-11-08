@@ -11,8 +11,8 @@ public static class InventoryWords
     /// <summary>"Pricing, Sales/Pricing.pas, cycle, 23 code lines of 31, fan-in 3, fan-out 1".</summary>
     public static string CodeModule(UnitInfo unit, bool inCycle)
     {
-        var cycle = inCycle ? ", cycle" : string.Empty;
-        var lines = $"{Number(unit.CodeLines)} code lines of {Number(unit.Lines)}";
+        string cycle = inCycle ? ", cycle" : string.Empty;
+        string lines = $"{Number(unit.CodeLines)} code lines of {Number(unit.Lines)}";
 
         return $"{unit.Name}, {unit.Path}{cycle}, {lines}, fan-in {unit.FanIn}, fan-out {unit.FanOut}";
     }
@@ -21,7 +21,7 @@ public static class InventoryWords
     /// <param name="link">A path relative to legacy/, with <c>#L</c> and the line when it has one.</param>
     public static string Evidence(string link)
     {
-        var path = KitBundle.Embedded.Spec.Ids.Evidence.Root + link;
+        string path = KitBundle.Embedded.Spec.Ids.Evidence.Root + link;
 
         return EvidenceReference.TryParse(path, out var reference) ? reference!.Describe() : $"Evidence: {path}";
     }

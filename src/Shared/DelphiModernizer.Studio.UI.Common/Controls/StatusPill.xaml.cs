@@ -52,9 +52,9 @@ public sealed partial class StatusPill : UserControl
     private void Show()
     {
         var look = PillLook.Of(State);
-        var running = State == PillState.Running;
-        var word = string.IsNullOrEmpty(Text) ? look.Word : Text;
-        var changed = Word.Text != word;
+        bool running = State == PillState.Running;
+        string word = string.IsNullOrEmpty(Text) ? look.Word : Text;
+        bool changed = Word.Text != word;
         Word.Text = word;
         Glyph.Glyph = look.Glyph;
         Glyph.Visibility = running ? Visibility.Collapsed : Visibility.Visible;

@@ -39,20 +39,14 @@ public sealed record AgentLineRow(string Text, FactKind? Label)
     public bool HasEvidence => Evidence.Count > 0;
 }
 
-public sealed class AgentRow : TranscriptRow
+public sealed class AgentRow(string who, IReadOnlyList<AgentLine> lines) : TranscriptRow
 {
-    public AgentRow(string who, IReadOnlyList<AgentLine> lines)
-    {
-        Who = who;
-        Lines = [.. lines.Select(l => new AgentLineRow(l.Text, Enum.TryParse(l.Label, out FactKind k) ? k : null))];
-        AnnouncedName = RunNames.Agent(lines);
-    }
+    public string Who { get; } = who;
 
-    public string Who { get; }
+    public IReadOnlyList<AgentLineRow> Lines { get; } =
+        [.. lines.Select(l => new AgentLineRow(l.Text, Enum.TryParse(l.Label, out FactKind k) ? k : null))];
 
-    public IReadOnlyList<AgentLineRow> Lines { get; }
-
-    public override string AnnouncedName { get; }
+    public override string AnnouncedName { get; } = RunNames.Agent(lines);
 }
 
 /// <summary>A tool call, collapsed to its name and input until it is expanded to show its result.</summary>

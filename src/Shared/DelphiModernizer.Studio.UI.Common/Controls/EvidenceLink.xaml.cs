@@ -36,7 +36,7 @@ public sealed partial class EvidenceLink : UserControl
     private static void OnReferenceChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
     {
         var link = (EvidenceLink)sender;
-        var text = (string)args.NewValue;
+        string text = (string)args.NewValue;
         link._parsed = EvidenceReference.TryParse(text, out var parsed) ? parsed : null;
         link.Words.Text = text;
         link.Link.IsEnabled = link._parsed is not null;

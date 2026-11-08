@@ -54,7 +54,7 @@ public sealed class ApprovalTests
 
         var approved = await sender.Send(
             new ApproveGateCommand("G0", "Read the charter."), TestContext.Current.CancellationToken);
-        var log = await GitAsync(workspace, "log", "--format=%s", "--", ".modernizer/approvals.json");
+        string log = await GitAsync(workspace, "log", "--format=%s", "--", ".modernizer/approvals.json");
 
         Assert.Equal("Dana Reviewer <dana@example.com>", approved.Value.By);
         Assert.Equal("Read the charter.", approved.Value.Note);
@@ -111,7 +111,7 @@ public sealed class ApprovalTests
         var sender = Services.Sender(workspace.Session, services => services.AddSignOffsApplication());
         var cancellationToken = TestContext.Current.CancellationToken;
         await sender.Send(new ApproveGateCommand("G0", "Read the charter."), cancellationToken);
-        var questions = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter", "open-questions.md");
+        string questions = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter", "open-questions.md");
         await File.AppendAllTextAsync(questions, "\nOne more question.\n", cancellationToken);
 
         var setup = (await sender.Send(new GetSignOffsQuery(), cancellationToken)).Value[0];
@@ -152,15 +152,15 @@ public sealed class ApprovalTests
     /// </summary>
     private static async Task MakeDiscoveryReadyAsync(TestWorkspace workspace)
     {
-        var root = workspace.Workspace.Root;
-        var inventory = Path.Combine(root, "docs", "01-discovery", "D02-system-inventory.md");
-        var text = await File.ReadAllTextAsync(inventory, CancellationToken.None);
-        var inReview = text.Replace("status: template", "status: in-review");
+        string root = workspace.Workspace.Root;
+        string inventory = Path.Combine(root, "docs", "01-discovery", "D02-system-inventory.md");
+        string text = await File.ReadAllTextAsync(inventory, CancellationToken.None);
+        string inReview = text.Replace("status: template", "status: in-review");
         await File.WriteAllTextAsync(inventory, inReview, CancellationToken.None);
         var scan = LegacyScanner.Scan(workspace.Workspace.LegacyRoot, new ScanOptions(1252), CancellationToken.None);
         Directory.CreateDirectory(workspace.Workspace.LatestScanFolder);
-        var json = JsonSerializer.SerializeToUtf8Bytes(scan, InventoryJsonContext.Default.LegacyInventory);
-        var file = Path.Combine(workspace.Workspace.LatestScanFolder, "inventory.json");
+        byte[] json = JsonSerializer.SerializeToUtf8Bytes(scan, InventoryJsonContext.Default.LegacyInventory);
+        string file = Path.Combine(workspace.Workspace.LatestScanFolder, "inventory.json");
         await File.WriteAllBytesAsync(file, json, CancellationToken.None);
     }
 
@@ -171,13 +171,13 @@ public sealed class ApprovalTests
             RedirectStandardOutput = true,
         };
 
-        foreach (var argument in arguments)
+        foreach (string argument in arguments)
         {
             start.ArgumentList.Add(argument);
         }
 
         using var git = Process.Start(start)!;
-        var output = await git.StandardOutput.ReadToEndAsync(CancellationToken.None);
+        string output = await git.StandardOutput.ReadToEndAsync(CancellationToken.None);
         await git.WaitForExitAsync(CancellationToken.None);
 
         return output;
@@ -197,7 +197,7 @@ public sealed class ApprovalTests
 
         public void Dispose()
         {
-            foreach (var file in Directory.EnumerateFiles(Workspace.Parent, "*", SearchOption.AllDirectories))
+            foreach (string file in Directory.EnumerateFiles(Workspace.Parent, "*", SearchOption.AllDirectories))
             {
                 File.SetAttributes(file, FileAttributes.Normal);
             }

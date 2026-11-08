@@ -30,13 +30,13 @@ public static class OverviewWords
     /// <summary>What a team drafts, or what the Principal Architect does with the drafts.</summary>
     private static string Does(WorkstreamRole role)
     {
-        return _drafts.TryGetValue(role.Code, out var drafts) ? $"Drafts {drafts}." : _combines;
+        return _drafts.TryGetValue(role.Code, out string? drafts) ? $"Drafts {drafts}." : _combines;
     }
 
     /// <param name="approved">Whether every sign-off is approved, so every deliverable counts as approved.</param>
     public static string Progress(WorkstreamProgress? progress, bool approved)
     {
-        var total = progress?.Deliverables.Count ?? 0;
+        int total = progress?.Deliverables.Count ?? 0;
 
         return approved ? $"{total} of {total} approved" : $"{progress?.Started ?? 0} of {total} started";
     }
@@ -45,20 +45,20 @@ public static class OverviewWords
     /// <param name="running">Whether the role's agent has a run in progress, which adds ", agent running".</param>
     public static string TeamName(WorkstreamRole role, WorkstreamProgress? progress, bool approved, bool running)
     {
-        var name = _drafts.ContainsKey(role.Code) ? $"{role.Name} team" : role.Name;
-        var total = progress?.Deliverables.Count ?? 0;
-        var counted = approved
+        string name = _drafts.ContainsKey(role.Code) ? $"{role.Name} team" : role.Name;
+        int total = progress?.Deliverables.Count ?? 0;
+        string counted = approved
             ? $"{total} of {total} deliverables approved"
             : $"{progress?.Started ?? 0} of {total} deliverables started";
 
-        var agent = running ? ", agent running" : string.Empty;
+        string agent = running ? ", agent running" : string.Empty;
 
         return $"{name}, {counted}{agent}. {Does(role)} Opens Workstreams.";
     }
 
     public static string TeamToolTip(WorkstreamRole role)
     {
-        var does = _drafts.TryGetValue(role.Code, out var drafts) ? $"This team drafts {drafts}." : _combines;
+        string does = _drafts.TryGetValue(role.Code, out string? drafts) ? $"This team drafts {drafts}." : _combines;
 
         return $"Opens {role.Name} in Workstreams. {does}";
     }
@@ -77,19 +77,19 @@ public static class OverviewWords
                 "Delphi code, not scanned yet. Opens Inventory.");
         }
 
-        var version = inventory.DelphiVersions.FirstOrDefault() ?? "Delphi version unknown";
-        var screens = Count(inventory.Forms - inventory.DataModules, "screen");
-        var first = Count(inventory.Units, "code module");
-        var second = $"{screens}, {Count(inventory.DataModules, "data module")}";
-        var third = cycles == 0
+        string version = inventory.DelphiVersions.FirstOrDefault() ?? "Delphi version unknown";
+        string screens = Count(inventory.Forms - inventory.DataModules, "screen");
+        string first = Count(inventory.Units, "code module");
+        string second = $"{screens}, {Count(inventory.DataModules, "data module")}";
+        string third = cycles == 0
             ? "No circular dependencies"
             : Count(cycles, "circular dependency", "circular dependencies");
-        var withData = inventory.DataModules switch {
+        string withData = inventory.DataModules switch {
             0 => screens,
             1 => $"{screens} and a data module",
             _ => $"{screens} and {Count(inventory.DataModules, "data module")}",
         };
-        var announced = $"Delphi code, {version}: {Count(inventory.Files, "file")}, {first}, {withData}, {third}. "
+        string announced = $"Delphi code, {version}: {Count(inventory.Files, "file")}, {first}, {withData}, {third}. "
             + "Opens Inventory.";
 
         return new DelphiCodeWords(version, first, second, third, announced);
@@ -97,7 +97,7 @@ public static class OverviewWords
 
     private static string Count(int value, string singular, string? plural = null)
     {
-        var number = value.ToString("N0", CultureInfo.CurrentCulture);
+        string number = value.ToString("N0", CultureInfo.CurrentCulture);
 
         return value == 1 ? $"{number} {singular}" : $"{number} {plural ?? singular + "s"}";
     }

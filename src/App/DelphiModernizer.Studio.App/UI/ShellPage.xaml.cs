@@ -83,7 +83,7 @@ public sealed partial class ShellPage : Page
 
     private void AddItem(NavigationItem item)
     {
-        var key = _navigation.GetPageKey(item.PageType);
+        string key = _navigation.GetPageKey(item.PageType);
         var container = new NavigationViewItem {
             Tag = key,
             Content = item.Title,
@@ -127,7 +127,7 @@ public sealed partial class ShellPage : Page
 
     private void ShowBadge(NavigationViewItem container, NavigationItem item, IBadgeSource source)
     {
-        var count = _session.Current is null ? 0 : source.Count;
+        int count = _session.Current is null ? 0 : source.Count;
 
         if (count == 0)
         {
@@ -137,7 +137,9 @@ public sealed partial class ShellPage : Page
             return;
         }
 
-        var style = source.Tone == BadgeTone.Critical ? "CriticalValueInfoBadgeStyle" : "AttentionValueInfoBadgeStyle";
+        string style = source.Tone == BadgeTone.Critical
+            ? "CriticalValueInfoBadgeStyle"
+            : "AttentionValueInfoBadgeStyle";
         container.InfoBadge = new InfoBadge {
             Value = count,
             Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],
@@ -158,7 +160,7 @@ public sealed partial class ShellPage : Page
     {
         foreach (var item in _items)
         {
-            var key = _navigation.GetPageKey(item.PageType);
+            string key = _navigation.GetPageKey(item.PageType);
 
             if (_containers[key].Icon is FontIcon icon)
             {
@@ -244,7 +246,7 @@ public sealed partial class ShellPage : Page
     {
         UIElement?[] regions = [SearchBox, NavView, NavFrame];
         var focused = FocusManager.GetFocusedElement(XamlRoot) as DependencyObject;
-        var current = Array.FindIndex(regions, region => region is not null && Contains(region, focused));
+        int current = Array.FindIndex(regions, region => region is not null && Contains(region, focused));
         var next = regions[(Math.Max(current, 0) + step + regions.Length) % regions.Length];
 
         return next switch {
@@ -268,7 +270,7 @@ public sealed partial class ShellPage : Page
 
     private static FrameworkElement? Descendant(DependencyObject root, string name)
     {
-        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
         {
             var child = VisualTreeHelper.GetChild(root, i);
 

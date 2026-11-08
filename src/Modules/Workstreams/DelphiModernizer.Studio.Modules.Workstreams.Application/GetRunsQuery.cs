@@ -68,7 +68,7 @@ public sealed record RunRecord(
     {
         foreach (var recipe in KitBundle.Embedded.Spec.Recipes.Recipes.Where(r => r.Agent == agent))
         {
-            var command = $"/{recipe.Skill}";
+            string command = $"/{recipe.Skill}";
 
             if (prompt == command)
             {

@@ -190,7 +190,7 @@ public sealed partial class SettingsViewModel : ViewModel
         }
 
         var saved = _settings.Agents;
-        var budget = double.IsFinite(Budget) && Budget > 0 ? (decimal)Budget : saved.BudgetUsd;
+        decimal budget = double.IsFinite(Budget) && Budget > 0 ? (decimal)Budget : saved.BudgetUsd;
         _settings.SaveAgents(new AgentSettings(
             NullIfEmpty(ClaudePath),
             NullIfEmpty(Model),

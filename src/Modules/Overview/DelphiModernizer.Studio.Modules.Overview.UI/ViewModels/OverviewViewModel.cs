@@ -207,8 +207,8 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         var next = overview.Gates
             .Select((gate, index) => (gate, index))
             .FirstOrDefault(g => g.gate.State != "approved");
-        var nextIndex = next.gate is null ? -1 : next.index;
-        var approved = next.gate is null && overview.Gates.Count > 0;
+        int nextIndex = next.gate is null ? -1 : next.index;
+        bool approved = next.gate is null && overview.Gates.Count > 0;
 
         Purpose = $"How {overview.Name} stands, from the Delphi code to an approved plan.";
         NextStep = NextStepFor(overview, next.gate);
@@ -240,11 +240,11 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
                 null);
         }
 
-        var name = SignOffNames.Of(next.Gate);
+        string name = SignOffNames.Of(next.Gate);
 
         if (next.State == "ready")
         {
-            var scan = overview.Inventory is null
+            string scan = overview.Inventory is null
                 ? " After that, scan the Delphi code to start discovery."
                 : string.Empty;
 
@@ -280,7 +280,7 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
                 next.Gate);
         }
 
-        var passed = next.Checks.Count(c => c.Passed);
+        int passed = next.Checks.Count(c => c.Passed);
 
         return new NextStep(
             NextStepTone.Informational,
@@ -294,12 +294,12 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     /// <param name="approved">Whether every sign-off is approved, so every deliverable counts as approved.</param>
     private static string SummaryOf(WorkspaceOverview overview, bool approved)
     {
-        var deliverables = overview.Workstreams.Sum(w => w.Deliverables.Count);
-        var started = approved
+        int deliverables = overview.Workstreams.Sum(w => w.Deliverables.Count);
+        string started = approved
             ? $"{deliverables} of {deliverables} deliverables approved"
             : $"{overview.Workstreams.Sum(w => w.Started)} of {deliverables} deliverables started";
-        var signedOff = overview.Gates.Count(g => g.State == "approved");
-        var tail = overview switch {
+        int signedOff = overview.Gates.Count(g => g.State == "approved");
+        string tail = overview switch {
             { Inventory: null } => "Delphi code not scanned yet",
             { Trace.Errors: 0 } => "nothing to fix",
             _ => $"{Count(overview.Trace.Errors, "problem")} to fix",
@@ -328,7 +328,7 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     [MemberNotNull(nameof(Teams), nameof(Architect))]
     private void ShowTeams()
     {
-        var approved = _overview is { Gates.Count: > 0 } overview
+        bool approved = _overview is { Gates.Count: > 0 } overview
             && overview.Gates.All(g => g.State == "approved");
         var running = _session.Current is { } workspace
             ? _runs.AgentsRunning(workspace.Root)
@@ -336,7 +336,7 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         TeamNode Team(WorkstreamRole role)
         {
             var progress = _overview?.Workstreams.FirstOrDefault(w => w.Role.Code == role.Code);
-            var isRunning = running.Contains(role.Agent);
+            bool isRunning = running.Contains(role.Agent);
 
             return new TeamNode(
                 role.Code,
@@ -356,9 +356,9 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
 
     private static GateNode GateOf(GateStatus gate, int index, bool isNext, int count)
     {
-        var name = SignOffNames.Of(gate.Gate);
+        string name = SignOffNames.Of(gate.Gate);
         var pill = PillStates.OfGate(gate.State);
-        var next = isNext ? ", next" : string.Empty;
+        string next = isNext ? ", next" : string.Empty;
 
         return new GateNode(
             gate.Gate,
@@ -389,7 +389,9 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     private static RunRow RunOf(RunSummary run)
     {
         var role = WorkstreamRole.All.FirstOrDefault(r => r.Agent == run.Agent);
-        var cost = run.CostUsd is { } usd ? $" · ${usd.ToString("0.00", CultureInfo.InvariantCulture)}" : string.Empty;
+        string cost = run.CostUsd is { } usd
+            ? $" · ${usd.ToString("0.00", CultureInfo.InvariantCulture)}"
+            : string.Empty;
         var pill = run.Outcome switch {
             "success" => PillState.Completed,
             "error_max_budget_usd" => PillState.BudgetReached,
@@ -405,7 +407,7 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
 
     private static string Count(int value, string singular)
     {
-        var number = value.ToString("N0", CultureInfo.CurrentCulture);
+        string number = value.ToString("N0", CultureInfo.CurrentCulture);
 
         return value == 1 ? $"{number} {singular}" : $"{number} {singular}s";
     }

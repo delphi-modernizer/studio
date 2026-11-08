@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -60,7 +61,7 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
 
     private async void OnApprove(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: SignOffRow signOff })
+        if (sender is FrameworkElement { Tag: SignOffRow signOff })
         {
             await ShowDialogAsync(signOff, isRevoke: false);
         }
@@ -68,7 +69,7 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
 
     private async void OnRevoke(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: SignOffRow signOff })
+        if (sender is FrameworkElement { Tag: SignOffRow signOff })
         {
             await ShowDialogAsync(signOff, isRevoke: true);
         }
@@ -78,7 +79,7 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
     private async Task ShowDialogAsync(SignOffRow signOff, bool isRevoke)
     {
         var dialogViewModel = await ViewModel.PrepareDialogAsync(signOff, isRevoke);
-        var dialog = new ApprovalDialog(dialogViewModel) { XamlRoot = XamlRoot };
+        var dialog = new ApprovalDialog(dialogViewModel).Over(XamlRoot);
         var result = await dialog.ShowAsync();
 
         if (dialogViewModel.ShowProblemsAfter)

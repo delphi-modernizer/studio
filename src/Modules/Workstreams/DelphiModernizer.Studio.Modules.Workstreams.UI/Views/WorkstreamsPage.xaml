@@ -323,29 +323,38 @@
                                                     <TextBlock
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
                                                         Text="{x:Bind WritesLine}" />
-                                                    <StackPanel
+                                                    <Grid
                                                         Margin="0,4,0,0"
-                                                        Orientation="Horizontal"
-                                                        Spacing="6"
+                                                        ColumnSpacing="6"
                                                         Visibility="{x:Bind IsBlocked}">
-                                                        <controls:StatusPill State="Blocked" />
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <controls:StatusPill VerticalAlignment="Center" State="Blocked" />
                                                         <TextBlock
+                                                            Grid.Column="1"
                                                             VerticalAlignment="Center"
                                                             Style="{StaticResource CaptionTextBlockStyle}"
                                                             Text="{x:Bind BlockedReason}"
                                                             TextWrapping="Wrap" />
                                                         <HyperlinkButton
+                                                            Grid.Column="2"
                                                             Padding="4,0"
+                                                            VerticalAlignment="Center"
                                                             Click="OnOpenBlockingRun"
                                                             Content="Open run"
+                                                            Tag="{x:Bind}"
                                                             Visibility="{x:Bind CanOpenBlocker}" />
-                                                    </StackPanel>
+                                                    </Grid>
                                                 </StackPanel>
                                                 <Button
                                                     Grid.Column="1"
                                                     VerticalAlignment="Center"
                                                     Click="OnRun"
-                                                    IsEnabled="{x:Bind CanRun}">
+                                                    IsEnabled="{x:Bind CanRun}"
+                                                    Tag="{x:Bind}">
                                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                                         <FontIcon
                                                             Glyph="{x:Bind icons:StudioIcons.Run}"

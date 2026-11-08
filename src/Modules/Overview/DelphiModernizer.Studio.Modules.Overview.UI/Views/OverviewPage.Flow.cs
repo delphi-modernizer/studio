@@ -29,7 +29,7 @@ public sealed partial class OverviewPage
     {
         var gates = new[] { Gate0, Gate1, Gate2, Gate3, Gate4 };
 
-        for (var i = 0; i < gates.Length && i < ViewModel.Gates.Count; i++)
+        for (int i = 0; i < gates.Length && i < ViewModel.Gates.Count; i++)
         {
             gates[i].Style = (Style)Resources[ViewModel.Gates[i].IsNext ? "NextFlowNodeStyle" : "FlowNodeStyle"];
         }
@@ -38,8 +38,8 @@ public sealed partial class OverviewPage
     private void LayOutFlow(double width)
     {
         Decorations.Children.Clear();
-        var available = width - (2 * _pad);
-        var wide = available >= 900;
+        double available = width - (2 * _pad);
+        bool wide = available >= 900;
         var teamTemplate = (DataTemplate)Resources[wide ? "TeamNodeTemplate" : "TeamNodeCompactTemplate"];
         var gateTemplate = (DataTemplate)Resources[wide ? "GateNodeTemplate" : "GateNodeOneLineTemplate"];
 
@@ -76,15 +76,15 @@ public sealed partial class OverviewPage
         const double teamGap = 12;
         const double gateHeight = 56;
         const double gateGap = 10;
-        var columns = legacyWidth + teamWidth + architectWidth + gateWidth;
-        var gap = Math.Min(80, Math.Floor((available - columns) / 3));
-        var x0 = _pad + Math.Floor((available - columns - (3 * gap)) / 2);
-        var x1 = x0 + legacyWidth + gap;
-        var x2 = x1 + teamWidth + gap;
-        var x3 = x2 + architectWidth + gap;
-        var teamsHeight = (6 * _nodeHeight) + (5 * teamGap) + (2 * _groupPadding);
-        var gatesHeight = (5 * gateHeight) + (4 * gateGap) + (2 * _groupPadding);
-        var middle = top + (teamsHeight / 2);
+        double columns = legacyWidth + teamWidth + architectWidth + gateWidth;
+        double gap = Math.Min(80, Math.Floor((available - columns) / 3));
+        double x0 = _pad + Math.Floor((available - columns - (3 * gap)) / 2);
+        double x1 = x0 + legacyWidth + gap;
+        double x2 = x1 + teamWidth + gap;
+        double x3 = x2 + architectWidth + gap;
+        double teamsHeight = (6 * _nodeHeight) + (5 * teamGap) + (2 * _groupPadding);
+        double gatesHeight = (5 * gateHeight) + (4 * gateGap) + (2 * _groupPadding);
+        double middle = top + (teamsHeight / 2);
 
         Phase3Text.Text = "Architect combines";
         Place(Phase1, x0, 18, legacyWidth, 20);
@@ -100,7 +100,7 @@ public sealed partial class OverviewPage
             top + _groupPadding + (i * (_nodeHeight + teamGap)),
             teamWidth - (2 * _groupPadding),
             _nodeHeight));
-        var gateCentre = x3 + (gateWidth / 2);
+        double gateCentre = x3 + (gateWidth / 2);
         PlaceGates(
             i => new Rect(
                 x3 + _groupPadding,
@@ -111,11 +111,11 @@ public sealed partial class OverviewPage
         HorizontalLine(x0 + legacyWidth, x1, middle, "evidence");
         HorizontalLine(x1 + teamWidth, x2, middle, "drafts");
         HorizontalLine(x2 + architectWidth, x3, middle, "review");
-        var buildTop = top + gatesHeight + 32;
+        double buildTop = top + gatesHeight + 32;
         VerticalLine(gateCentre, top + gatesHeight, buildTop, arrow: true);
         Label(gateCentre + 8, top + gatesHeight + 8, 60, "unlocks", TextAlignment.Left);
         Place(BuildBox, x3, buildTop, gateWidth, 60);
-        var height = buildTop + 60 + 20;
+        double height = buildTop + 60 + 20;
         Place(LegendInside, x0, height - 32, x3 - x0 - 40, 20);
 
         return height;
@@ -131,13 +131,13 @@ public sealed partial class OverviewPage
         const double rowGap = 12;
         const double gateHeight = 44;
         const double gateGap = 12;
-        var groupWidth = available - legacyWidth - gap;
-        var x0 = _pad;
-        var x1 = x0 + legacyWidth + gap;
-        var columnWidth = Math.Floor((groupWidth - (2 * _groupPadding) - 12) / 2);
-        var teamsHeight = (3 * _nodeHeight) + (2 * rowGap) + (2 * _groupPadding);
-        var middle = top + (teamsHeight / 2);
-        var groupCentre = x1 + (groupWidth / 2);
+        double groupWidth = available - legacyWidth - gap;
+        double x0 = _pad;
+        double x1 = x0 + legacyWidth + gap;
+        double columnWidth = Math.Floor((groupWidth - (2 * _groupPadding) - 12) / 2);
+        double teamsHeight = (3 * _nodeHeight) + (2 * rowGap) + (2 * _groupPadding);
+        double middle = top + (teamsHeight / 2);
+        double groupCentre = x1 + (groupWidth / 2);
 
         Phase3Text.Text = "Architect";
         Place(Phase1, x0, 18, legacyWidth, 20);
@@ -151,16 +151,16 @@ public sealed partial class OverviewPage
             _nodeHeight));
         HorizontalLine(x0 + legacyWidth, x1, middle, "evidence");
 
-        var elbow = top + teamsHeight + 20;
-        var down = x0 + legacyWidth - 14;
+        double elbow = top + teamsHeight + 20;
+        double down = x0 + legacyWidth - 14;
         VerticalLine(groupCentre, top + teamsHeight, elbow, arrow: false);
         Line(down, elbow, groupCentre - down + 1, 1);
         Label(groupCentre + 8, top + teamsHeight + 2, 50, "drafts", TextAlignment.Left);
 
-        var top2 = elbow + 64;
-        var gatesHeight = (5 * gateHeight) + (4 * gateGap) + (2 * _groupPadding);
-        var middle2 = top2 + (gatesHeight / 2);
-        var architectTop = middle2 - (big / 2);
+        double top2 = elbow + 64;
+        double gatesHeight = (5 * gateHeight) + (4 * gateGap) + (2 * _groupPadding);
+        double middle2 = top2 + (gatesHeight / 2);
+        double architectTop = middle2 - (big / 2);
         Place(Phase3, x0, top2 - 34, legacyWidth - 22, 20);
         Place(Phase4, x1, top2 - 34, groupWidth, 20);
         Place(GatesGroup, x1, top2, groupWidth, gatesHeight);
@@ -175,7 +175,7 @@ public sealed partial class OverviewPage
             groupCentre);
         HorizontalLine(x0 + legacyWidth, x1, middle2, "review");
 
-        var buildTop = top2 + gatesHeight + 32;
+        double buildTop = top2 + gatesHeight + 32;
         VerticalLine(groupCentre, top2 + gatesHeight, buildTop, arrow: true);
         Label(groupCentre + 8, top2 + gatesHeight + 8, 60, "unlocks", TextAlignment.Left);
         Place(BuildBox, x1, buildTop, groupWidth, 52);
@@ -187,7 +187,7 @@ public sealed partial class OverviewPage
     {
         var teams = new[] { Team0, Team1, Team2, Team3, Team4, Team5 };
 
-        for (var i = 0; i < teams.Length; i++)
+        for (int i = 0; i < teams.Length; i++)
         {
             var rect = at(i);
             Place(teams[i], rect.X, rect.Y, rect.Width, rect.Height);
@@ -199,7 +199,7 @@ public sealed partial class OverviewPage
     {
         var gates = new[] { Gate0, Gate1, Gate2, Gate3, Gate4 };
 
-        for (var i = 0; i < gates.Length; i++)
+        for (int i = 0; i < gates.Length; i++)
         {
             var rect = at(i);
             Place(gates[i], rect.X, rect.Y, rect.Width, rect.Height);
@@ -216,7 +216,7 @@ public sealed partial class OverviewPage
     {
         Line(x1, y, x2 - x1 - 6, 1);
         Head(x2 - 7, y - 5, new Point(0, 0), new Point(7, 5), new Point(0, 10));
-        var width = Math.Max(x2 - x1, 60);
+        double width = Math.Max(x2 - x1, 60);
         Label(Math.Round((x1 + x2 - width) / 2), y - 22, width, caption, TextAlignment.Center);
     }
 

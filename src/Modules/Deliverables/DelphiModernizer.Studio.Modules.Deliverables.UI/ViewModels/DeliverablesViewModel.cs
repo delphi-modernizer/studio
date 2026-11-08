@@ -142,7 +142,7 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
 
     private void Show(DeliverablesOverview overview)
     {
-        var count = overview.Gates.Count;
+        int count = overview.Gates.Count;
         _all = [.. overview.Gates.Select((gate, index) => new SignOffGroup(
             SignOffNames.Of(gate.Gate),
             $"Sign-off {index + 1} of {count}",
@@ -177,7 +177,7 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
 
     private static DeliverableRow Heading(SignOffGroup group)
     {
-        var name = $"{group.Name}, {group.Number}, {PillLook.Of(group.Pill).Word}";
+        string name = $"{group.Name}, {group.Number}, {PillLook.Of(group.Pill).Word}";
 
         return new DeliverableRow(
             string.Empty,
@@ -209,8 +209,8 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
         var pill = approved && deliverable.Status != "missing"
             ? PillState.Approved
             : PillStates.OfDeliverable(deliverable.Status);
-        var owner = WorkstreamRole.All.FirstOrDefault(r => r.Code == deliverable.Owner)?.Name ?? deliverable.Owner;
-        var gate = SignOffNames.Of(deliverable.Gate);
+        string owner = WorkstreamRole.All.FirstOrDefault(r => r.Code == deliverable.Owner)?.Name ?? deliverable.Owner;
+        string gate = SignOffNames.Of(deliverable.Gate);
 
         return new DeliverableRow(
             deliverable.Id,

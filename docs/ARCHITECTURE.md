@@ -40,6 +40,11 @@ Traceability, Sign-offs and Settings ([ADR 0001](adr/0001-modular-monolith-on-th
 - Only the App references the module UIs, all of them, and its catalog creates every module.
 - The solution lists every project.
 
+Unit tests cover the Domain and Application layers, the abstractions and the mediator. The WinUI projects, the App and
+every `*.UI` project, are checked by QA with the screenshot harness instead, so SonarQube Cloud leaves them out of the coverage
+figure (`sonar-coverage-exclusions` in [ci.yml](../.github/workflows/ci.yml)); their issues are still analyzed and kept
+at zero.
+
 ## Shell
 
 One window with Mica and the content drawn into a 48 px title bar (Back, pane toggle, search). The navigation pane is

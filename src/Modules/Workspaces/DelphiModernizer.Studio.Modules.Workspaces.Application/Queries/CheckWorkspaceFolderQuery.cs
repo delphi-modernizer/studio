@@ -14,7 +14,7 @@ internal sealed class CheckWorkspaceFolderQueryHandler : IRequestHandler<CheckWo
 {
     public Task<Result> Handle(CheckWorkspaceFolderQuery request, CancellationToken cancellationToken)
     {
-        var usable = !Directory.Exists(request.Folder) || !Directory
+        bool usable = !Directory.Exists(request.Folder) || !Directory
             .EnumerateFileSystemEntries(request.Folder)
             .Any();
 

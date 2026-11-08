@@ -92,7 +92,7 @@ public sealed class LayeringTests
             .Select(p => p.Name)
             .Order(StringComparer.Ordinal)
             .ToList();
-        var catalog = File.ReadAllText(
+        string catalog = File.ReadAllText(
             Path.Combine(Path.GetDirectoryName(app.Path)!, "Composition", "ModuleCatalog.cs"));
 
         Assert.Equal(["DelphiModernizer.Studio.App"], composers);
@@ -111,7 +111,7 @@ public sealed class LayeringTests
     [Fact]
     public void The_solution_lists_every_project()
     {
-        var solution = File.ReadAllText(Path.Combine(ProjectGraph.Root, "DelphiModernizer.Studio.slnx"));
+        string solution = File.ReadAllText(Path.Combine(ProjectGraph.Root, "DelphiModernizer.Studio.slnx"));
         var missing = ProjectGraph.Source
             .Concat(ProjectGraph.Tests)
             .Where(p => !solution.Contains(Relative(p.Path), StringComparison.Ordinal))

@@ -8,14 +8,17 @@ decides how:
 | `EngineSource` | Used when | What it does |
 | --- | --- | --- |
 | `Source` | An engine checkout exists at `.engine/` (CI) or `../engine/` (beside this repository), or `EngineRoot` names one | Project references into the checkout, so a change can span both repositories |
-| `Package` | No checkout is found | Package references to `DelphiModernizer.Engine.*` at `EngineVersion` from GitHub Packages |
+| `Package` | No checkout is found, or `-p:EngineSource=Package` asks for it | Package references to `DelphiModernizer.Engine.*` at `EngineVersion` from GitHub Packages |
 
-The test projects need `Source`: the Workstreams tests run the engine's fake Claude Code CLI
-(`tests/DelphiModernizer.Engine.Agents.FakeClaude`) through `$(EngineRoot)`, so they do not build with
-`EngineSource=Package`.
+The test projects need an engine checkout even with `EngineSource=Package`: the Workstreams tests run the engine's
+fake Claude Code CLI (`tests/DelphiModernizer.Engine.Agents.FakeClaude`) and the stand-in's tests read the engine's
+sample (`tests/fixtures/delphi/legacy-erp`) through `$(EngineRoot)`.
 
-The engine checkout needs its `kit` submodule (`git submodule update --init`). CI checks the engine out at the commit
-[engine.lock](../engine.lock) pins.
+The engine checkout needs its `kit` submodule (`git submodule update --init`). CI checks the engine out at the release
+[engine.lock](../engine.lock) names, the one `EngineVersion` names too. The `build` job tests against that checkout's
+source. The `package` job builds the app on the packages, signed in with the workflow's `GITHUB_TOKEN`, and takes
+`dmz` from the checkout. A change that needs an unreleased engine can point `engine.lock` at that commit to pass
+`build`; `package` passes once that engine is released and `EngineVersion` names it.
 
 For `Package`, GitHub Packages needs a token even for public packages: create a personal access token with
 `read:packages` and add it as the `delphi-modernizer` source's credentials, for example with
@@ -29,19 +32,30 @@ glyph table, app icon and logos from `assets/`; see [icons.md](icons.md).
 
 ## Screenshots
 
-`tests/DelphiModernizer.Studio.Screenshots` captures every page of the built app; the `screenshots` CI job runs it and
-uploads the artifact `screenshots` ([ui-screenshots.md](design/ui-screenshots.md)). It is a console tool, not a test
-project, so `dotnet test` skips it everywhere. It targets `net10.0-windows` with `EnableWindowsTargeting`, so
-`dotnet build` compiles it on Linux too; it runs only on Windows.
+`tests/DelphiModernizer.Studio.Screenshots` captures every state of the built app for QA to compare with the
+artboards ([ui-screenshots.md](design/ui-screenshots.md)). CI does not run it: QA runs it on a Windows PC, or starts
+the `qa-screenshots` workflow by hand (Actions, qa-screenshots, Run workflow), which uploads the artifacts
+`screenshots-<group>`. It is a console tool, not a test project, so `dotnet test` skips it everywhere. It targets
+`net10.0-windows` with `EnableWindowsTargeting`, so `dotnet build` compiles it on Linux too; it runs only on Windows.
 
-To run it on a Windows PC, publish the app and `dmz` as the `screenshots` job does, create a workspace with `dmz init`
-and `dmz scan`, then:
+`tests/DelphiModernizer.Studio.ClaudeStandIn` is the stand-in Claude Code the harness gives the app. It builds as
+`claude`; `tests/DelphiModernizer.Studio.ClaudeStandIn.Tests` runs it through the engine's runner on every platform.
+
+To run the harness on a Windows PC, publish the app, `dmz` and the stand-in, then run it:
 
 ```bash
+dotnet publish src/App/DelphiModernizer.Studio.App -c Release -r win-x64 -p:Platform=x64 --self-contained -o out/studio
+dotnet publish ../engine/src/DelphiModernizer.Cli -c Release -r win-x64 --self-contained -p:PublishSingleFile=true \
+  -o out/studio/tools
+dotnet publish tests/DelphiModernizer.Studio.ClaudeStandIn -c Release -r win-x64 --self-contained \
+  -p:PublishSingleFile=true -o out/claude
 dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release -- \
-  --app out/studio/DelphiModernizer.Studio.exe --workspace <workspace> --out out/screenshots
+  --app out/studio/DelphiModernizer.Studio.exe --dmz out/studio/tools/dmz.exe --claude out/claude/claude.exe \
+  --legacy ../engine/tests/fixtures/delphi/legacy-erp --out out/screenshots [--group start|overview|pages|agents]
 ```
 
-It moves your studio data folder (`%LOCALAPPDATA%\DelphiModernizer\Studio`) aside while it runs and puts it back, may
-switch the display to 1920 × 1080 and briefly turns on high contrast. The app takes no launch argument for it: the tool
-writes the recent workspace and the Theme setting the app already reads.
+It creates its workspaces with `dmz` in a temporary folder and deletes them afterwards. It moves your studio data
+folder (`%LOCALAPPDATA%\DelphiModernizer\Studio`) aside while it runs and puts it back, may switch the display to
+1920 × 1080 and briefly turns on high contrast. The app takes no launch argument for it: the tool writes the recent
+workspaces and the settings the app already reads, and sets the stand-in's variables and `GIT_CONFIG_GLOBAL` on the
+app's process.

@@ -37,7 +37,7 @@ public sealed class EditorLauncher : IEditorLauncher
     public Task<bool> OpenAsync(string relativePath, int? line)
     {
         if (_session.Current is not { } workspace
-            || !WorkspacePaths.TryResolveInside(workspace.Root, workspace.Root, relativePath, out var path)
+            || !WorkspacePaths.TryResolveInside(workspace.Root, workspace.Root, relativePath, out string path)
             || !(File.Exists(path) || Directory.Exists(path)))
         {
             return Task.FromResult(false);

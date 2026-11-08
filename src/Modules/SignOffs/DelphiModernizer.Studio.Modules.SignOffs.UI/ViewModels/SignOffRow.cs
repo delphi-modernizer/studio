@@ -57,10 +57,10 @@ public sealed record HistoryRow(string Text, string Detail, bool IsApproval)
 
     public static HistoryRow Of(ApprovalEntry entry)
     {
-        var when = entry.At.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
-        var commit = entry.Commit is { Length: >= 7 } sha ? $" · commit {sha[..7]}" : string.Empty;
-        var note = entry.Note.Length > 0 ? $" · “{entry.Note}”" : string.Empty;
-        var verb = entry.Action == "revoke" ? "Revoked" : "Approved";
+        string when = entry.At.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
+        string commit = entry.Commit is { Length: >= 7 } sha ? $" · commit {sha[..7]}" : string.Empty;
+        string note = entry.Note.Length > 0 ? $" · “{entry.Note}”" : string.Empty;
+        string verb = entry.Action == "revoke" ? "Revoked" : "Approved";
 
         return new HistoryRow($"{verb} by {PersonName(entry.By)}", $"{when}{commit}{note}", entry.Action != "revoke");
     }
@@ -68,7 +68,7 @@ public sealed record HistoryRow(string Text, string Detail, bool IsApproval)
     /// <summary>The name part of an approver recorded as <c>Name &lt;email&gt;</c>.</summary>
     public static string PersonName(string by)
     {
-        var open = by.IndexOf(" <", StringComparison.Ordinal);
+        int open = by.IndexOf(" <", StringComparison.Ordinal);
 
         return open > 0 ? by[..open] : by;
     }
@@ -86,9 +86,9 @@ public sealed partial class SignOffRow : ObservableObject
         Pill = PillStates.OfGate(signOff.Status.State);
         IsLast = signOff.Number == count;
         Checks = [.. signOff.Checks.Select(c => new CheckRow(c))];
-        var passed = Checks.Count(c => c.Passed);
+        int passed = Checks.Count(c => c.Passed);
         PassCount = $"{passed} of {Checks.Count} pass";
-        var failing = Checks.Count - passed;
+        int failing = Checks.Count - passed;
         NotMet = failing == 1 ? "1 check isn’t met." : $"{failing} checks aren’t met.";
         Fingerprint = signOff.Status.ContentHash;
         var changed = signOff.Changed.ToHashSet(StringComparer.Ordinal);
@@ -104,9 +104,9 @@ public sealed partial class SignOffRow : ObservableObject
 
         if (signOff.Status.Approval is { } approval)
         {
-            var at = approval.At.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
-            var commit = approval.Commit is { Length: >= 7 } sha ? $" · commit {sha[..7]}" : string.Empty;
-            var open = approval.By.IndexOf(" <", StringComparison.Ordinal);
+            string at = approval.At.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
+            string commit = approval.Commit is { Length: >= 7 } sha ? $" · commit {sha[..7]}" : string.Empty;
+            int open = approval.By.IndexOf(" <", StringComparison.Ordinal);
             ApprovedBy = $"Approved by {HistoryRow.PersonName(approval.By)}";
             ApproverEmail = open > 0 ? approval.By[(open + 2)..].TrimEnd('>') : string.Empty;
             ApprovedWhen = $"{at}{commit}";

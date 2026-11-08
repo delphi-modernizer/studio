@@ -67,9 +67,9 @@ public sealed partial class EmptyState : UserControl
     private static void OnIsPageLevelChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
     {
         var state = (EmptyState)sender;
-        var pageLevel = (bool)args.NewValue;
+        bool pageLevel = (bool)args.NewValue;
         state.Icon.FontSize = pageLevel ? 48 : 32;
-        var style = pageLevel ? "SubtitleTextBlockStyle" : "BodyStrongTextBlockStyle";
+        string style = pageLevel ? "SubtitleTextBlockStyle" : "BodyStrongTextBlockStyle";
         state.Heading.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style];
     }
 }

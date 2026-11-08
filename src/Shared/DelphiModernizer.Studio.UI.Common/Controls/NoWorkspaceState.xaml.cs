@@ -45,7 +45,7 @@ public sealed partial class NoWorkspaceState : UserControl
 
     private async void OnOpenFolder(object sender, RoutedEventArgs e)
     {
-        var problem = await _actions.OpenFolderAsync();
+        string? problem = await _actions.OpenFolderAsync();
         Problem.Message = problem ?? string.Empty;
         Problem.IsOpen = problem is not null;
     }
