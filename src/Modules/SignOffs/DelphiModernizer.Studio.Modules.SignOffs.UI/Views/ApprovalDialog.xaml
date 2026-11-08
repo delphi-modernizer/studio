@@ -158,15 +158,16 @@
                     <DataTemplate x:DataType="vm:CoveredFileRow">
                         <TextBlock
                             Padding="0,1"
+                            AutomationProperties.Name="{x:Bind Path}"
                             LineHeight="18"
                             Style="{StaticResource MonoTextStyle}"
-                            Text="{x:Bind Path}"
+                            Text="{x:Bind PathText}"
                             TextTrimming="None"
                             TextWrapping="Wrap" />
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
             </ItemsRepeater>
-            <!--  One line, as drawn; a hash too long for it ends in an ellipsis and shows whole on hover.  -->
+            <!--  Whole, as drawn: the hash wraps anywhere, so it starts beside its label.  -->
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -179,18 +180,16 @@
                     Style="{StaticResource IconStyle}" />
                 <TextBlock
                     Grid.Column="1"
-                    IsTextSelectionEnabled="True"
+                    AutomationProperties.Name="{x:Bind ViewModel.SignOff.FingerprintName}"
                     Style="{StaticResource SecondaryCaptionTextStyle}"
-                    TextTrimming="CharacterEllipsis"
-                    TextWrapping="NoWrap"
-                    ToolTipService.ToolTip="{x:Bind ViewModel.SignOff.Fingerprint}">
+                    TextWrapping="Wrap">
                     <Run Text="Fingerprint of these files:" />
-                    <Run FontFamily="Cascadia Mono,Consolas" Text="{x:Bind ViewModel.SignOff.Fingerprint}" />
+                    <Run FontFamily="Cascadia Mono,Consolas" Text="{x:Bind ViewModel.SignOff.FingerprintText}" />
                 </TextBlock>
             </Grid>
         </StackPanel>
 
-        <!--  The label is its own text, so it keeps its colour while the box is off without an identity.  -->
+        <!--  As drawn: 76 tall, and open without an identity too; Approve stays off until git names who approves.  -->
         <StackPanel Spacing="8">
             <TextBlock>
                 <Run Text="{x:Bind ViewModel.FieldLabel}" />
@@ -198,11 +197,10 @@
             </TextBlock>
             <TextBox
                 x:Name="NoteBox"
-                MinHeight="96"
+                MinHeight="76"
                 AcceptsReturn="True"
                 AutomationProperties.IsRequiredForForm="True"
                 AutomationProperties.Name="{x:Bind ViewModel.FieldName}"
-                IsEnabled="{x:Bind ViewModel.HasIdentity}"
                 PlaceholderText="{x:Bind ViewModel.Placeholder}"
                 Text="{x:Bind ViewModel.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap" />

@@ -53,7 +53,11 @@
                 Style="{StaticResource MonoTextStyle}"
                 Text="error_max_budget_usd" />
         </Grid>
-        <StackPanel MaxWidth="240" HorizontalAlignment="Left" Spacing="8">
+        <!--  Canvas .fld at max-width 240: the field takes it all, not the width of its wrapped help.  -->
+        <StackPanel
+            Width="240"
+            HorizontalAlignment="Left"
+            Spacing="8">
             <TextBlock Text="Budget for a new run" />
             <!--  Canvas .nbx, as Settings draws it: the grey "$" inside the box, before the value.  -->
             <Grid>

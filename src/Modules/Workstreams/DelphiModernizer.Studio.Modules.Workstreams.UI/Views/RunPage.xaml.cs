@@ -7,6 +7,7 @@ using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.UI.Views;
 
@@ -52,6 +53,19 @@ public sealed partial class RunPage : Page, IHasViewModel
     }
 
     /// <summary>Open the draft is the accent action once the agent finished; otherwise a plain button.</summary>
+    public static string NoFilesText(bool live)
+    {
+        return live ? "None yet. The files the run reads or edits appear here." : "The run read and edited no files.";
+    }
+
+    /// <summary>An edited file reads in primary text, as drawn; a file the run only read stays secondary.</summary>
+    public static Brush PathBrush(bool edited)
+    {
+        string key = edited ? "TextFillColorPrimaryBrush" : "TextFillColorSecondaryBrush";
+
+        return (Brush)Microsoft.UI.Xaml.Application.Current.Resources[key];
+    }
+
     public static Style DraftStyle(RunOutcome outcome)
     {
         string key = outcome == RunOutcome.Completed ? "AccentButtonStyle" : "DefaultButtonStyle";

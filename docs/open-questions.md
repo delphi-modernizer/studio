@@ -52,3 +52,5 @@ change.
 | Run history's "[started] – [ended]": the canvas draws no format | The end's time alone when the run ended the day it started, else its date and time | `RunWords.EndTime` |
 | A failed run's end text: the canvas reads "Run it again or write the rules yourself.", drawn for the business-rules task only | "Run it again or write it yourself.", which fits every task's deliverable | `RunViewModel.EndText` |
 | The no-identity commands: the canvas writes `git config user.name "[your name]"` and `[your email]` as placeholders | Git's own example values, "Your Name" and `you@example.com`, so the commands can be copied as they are shown | `ApprovalDialog` |
+| "Open run" beside a Blocked reason: the Blocked artboard puts it in its own column on the right, the History artboard inline after the reason | Inline after the reason, as History draws it, kept whole on one line | `WorkstreamsPage` |
+| Files touched before a run reads or edits a file: the canvas always lists three files | "None yet. The files the run reads or edits appear here." while it runs; "The run read and edited no files." once it ends | `RunPage.NoFilesText` |
