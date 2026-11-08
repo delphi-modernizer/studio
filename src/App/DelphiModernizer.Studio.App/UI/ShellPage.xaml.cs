@@ -201,7 +201,9 @@ public sealed partial class ShellPage : Page
 
     private string State()
     {
-        var selected = _containers.Where(c => c.Value.IsSelected).Select(c => c.Key);
+        var selected = _containers
+            .Where(c => c.Value.IsSelected)
+            .Select(c => c.Key);
         return $"SelectedItem={(NavView.SelectedItem as NavigationViewItem)?.Tag ?? NavView.SelectedItem ?? "null"} "
             + $"IsSelected=[{string.Join(",", selected)}] frame={NavFrame.Content?.GetType().Name}";
     }
