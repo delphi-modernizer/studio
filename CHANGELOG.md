@@ -120,6 +120,7 @@
 
 - The pane keeps Workstreams' selection on Run and back on Workstreams while its badge counts a run.
 - At 960 with a workspace open, the title bar keeps its title and subtitle beside a 240 wide search box.
+- Opening a workspace leaves Back off on a slow PC: the pane's own selection of the shown page navigates nowhere.
 - New workspace's target choices keep the radio inside the card on the title line, and keep the card on pointer-over;
   an Unknown context box reads as a normal box with its placeholder; step 5 leaves the design's gap before the
   checkbox.

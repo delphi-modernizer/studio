@@ -28,7 +28,7 @@ public sealed partial class ShellPage : Page
     private readonly Dictionary<string, NavigationViewItem> _containers = new(StringComparer.Ordinal);
     private readonly List<(NavigationViewItem Container, NavigationItem Item, IBadgeSource Source)> _badges = [];
     private bool _isLoaded;
-    private bool _isSyncingSelection;
+    private NavigationViewItem? _shownOwner;
 
     public ShellPage(
         ShellViewModel viewModel,
@@ -176,9 +176,15 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    /// <summary>Opens the page of an item a person selects; selecting the shown page's own item navigates nowhere.</summary>
+    /// <remarks>
+    /// OnNavigated selects the shown page's item, and NavigationView may raise this after it returns, as under load
+    /// after a fresh navigation; navigating again would put the page on the back stack a second time and turn Back on.
+    /// </remarks>
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (!_isSyncingSelection && args.SelectedItemContainer is NavigationViewItem { Tag: string key })
+        if (args.SelectedItemContainer is NavigationViewItem { Tag: string key } container
+            && !ReferenceEquals(container, _shownOwner))
         {
             _navigation.NavigateTo(key);
         }
@@ -201,16 +207,8 @@ public sealed partial class ShellPage : Page
     private void OnNavigated(object? sender, NavigationEvent e)
     {
         var owner = _containers.GetValueOrDefault(e.PageKey) ?? OwnerOf(e.PageType);
-        _isSyncingSelection = true;
-
-        try
-        {
-            NavView.SelectedItem = owner;
-        }
-        finally
-        {
-            _isSyncingSelection = false;
-        }
+        _shownOwner = owner;
+        NavView.SelectedItem = owner;
 
         ShowSelectedGlyphs(owner?.Tag as string);
     }
