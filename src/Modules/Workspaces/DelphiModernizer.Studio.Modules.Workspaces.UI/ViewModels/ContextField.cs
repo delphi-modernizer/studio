@@ -11,10 +11,8 @@ public sealed partial class ContextField(string label) : ObservableObject
     public partial string Value { get; set; } = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsEditable), nameof(Placeholder))]
+    [NotifyPropertyChangedFor(nameof(Placeholder))]
     public partial bool IsUnknown { get; set; }
-
-    public bool IsEditable => !IsUnknown;
 
     public string Placeholder => IsUnknown ? "Unknown" : string.Empty;
 

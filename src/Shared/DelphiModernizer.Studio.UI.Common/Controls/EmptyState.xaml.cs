@@ -21,7 +21,7 @@ public sealed partial class EmptyState : UserControl
         nameof(Message), typeof(string), typeof(EmptyState), new PropertyMetadata(string.Empty));
 
     public static readonly DependencyProperty ActionsProperty = DependencyProperty.Register(
-        nameof(Actions), typeof(object), typeof(EmptyState), new PropertyMetadata(null));
+        nameof(Actions), typeof(object), typeof(EmptyState), new PropertyMetadata(null, OnActionsChanged));
 
     public static readonly DependencyProperty IsPageLevelProperty = DependencyProperty.Register(
         nameof(IsPageLevel), typeof(bool), typeof(EmptyState), new PropertyMetadata(false, OnIsPageLevelChanged));
@@ -62,6 +62,13 @@ public sealed partial class EmptyState : UserControl
     {
         get => (bool)GetValue(IsPageLevelProperty);
         set => SetValue(IsPageLevelProperty, value);
+    }
+
+    /// <summary>Without actions the state ends at its text, as the canvas's first-run card does.</summary>
+    private static void OnActionsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
+    {
+        var state = (EmptyState)sender;
+        state.ActionsPresenter.Visibility = args.NewValue is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private static void OnIsPageLevelChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)

@@ -3,7 +3,14 @@ using System.Collections.Generic;
 namespace DelphiModernizer.Studio.Application.Abstractions.Settings;
 
 /// <summary>A code page a Delphi tree is commonly saved in, as the wizard and Settings offer it.</summary>
-public sealed record CodePage(int Number, string Label);
+public sealed record CodePage(int Number, string Label)
+{
+    /// <summary>The label, which a list reads aloud for the item.</summary>
+    public override string ToString()
+    {
+        return Label;
+    }
+}
 
 public static class CodePages
 {

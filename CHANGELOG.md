@@ -108,10 +108,25 @@
   checks are divided by hairlines.
 - New workspace opens the workspace it created on Open the Overview, so the Created step shows no subtitle; Create
   lists it in Recent workspaces.
+- New workspace's step list sets the current step in semibold and the steps ahead in secondary text; waiting
+  creation steps read in secondary text, and the records step names "the open question" or "questions" by count.
+- The Claude Code dialog draws its engine message as the canvas's warning bar, with links that wrap whole.
+- StatusPill's word takes the pill's FontWeight, so a semibold row can make its pills semibold.
+- PathText keeps a long path's file name whole and the start of its folders, as "docs/02-…/business-rules.md".
+- DialogMargins keeps a dialog 24 from the window's top and bottom, as the canvas's scrim does; the Claude Code
+  dialog uses it.
 
 ### Fixed
 
 - The pane keeps Workstreams' selection on Run and back on Workstreams while its badge counts a run.
+- At 960 with a workspace open, the title bar keeps its title and subtitle beside a 240 wide search box.
+- Opening a workspace leaves Back off on a slow PC: the pane's own selection of the shown page navigates nowhere.
+- New workspace's target choices keep the radio inside the card on the title line, and keep the card on pointer-over;
+  an Unknown context box reads as a normal box with its placeholder; step 5 leaves the design's gap before the
+  checkbox.
+- Start's Recent workspaces header and the first-run card are the design's height, and an empty state without
+  actions ends at its text.
+- Settings' Default code page ends a long name in an ellipsis.
 - High contrast: busy rings draw in the highlight colour, and text inside the accent, such as the selected pane item
   and Review sign-offs, is no longer drawn white on a black box.
 - New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".
