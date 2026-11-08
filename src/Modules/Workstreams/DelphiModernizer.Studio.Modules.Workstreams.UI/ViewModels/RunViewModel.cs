@@ -62,6 +62,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         _clock = _dispatcher.CreateTimer();
         _clock.Interval = TimeSpan.FromSeconds(1);
         _clock.Tick += (_, _) => ShowTime();
+        Files.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasNoFiles));
     }
 
     /// <summary>Raised on the UI thread when the run ends at its budget while the page shows it.</summary>
@@ -70,6 +71,9 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     public ObservableCollection<TranscriptRow> Items { get; } = [];
 
     public ObservableCollection<FileRow> Files { get; } = [];
+
+    /// <summary>Before the run reads or edits a file, Files touched says so (open questions).</summary>
+    public bool HasNoFiles => Files.Count == 0;
 
     [ObservableProperty]
     public partial IReadOnlyList<WriteRow> Writes { get; set; } = [];

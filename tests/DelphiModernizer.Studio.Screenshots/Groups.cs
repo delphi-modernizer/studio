@@ -121,7 +121,6 @@ internal static class Groups
                 app.Capture("overview", "scrolled", () => app.ScrollTo("Team0", 250), [StudioDriver.Minimum]);
             });
             h.Step(app, theme, "shared", () => {
-                app.CapturePart("shared", "title-bar", pane: false);
                 app.CapturePart("shared", "nav-pane", pane: true);
                 app.TogglePane();
                 app.Capture("overview", "pane-compact", () => app.ScrollTo("Team0", 0));
@@ -129,7 +128,12 @@ internal static class Groups
             });
             h.Step(app, theme, "sign-offs", () => {
                 app.Navigate("SignOffs");
-                app.Expand("Discovery");
+
+                // The canvas draws the title bar with Back on, so it is taken once a page has opened from another.
+                app.CapturePart("shared", "title-bar", pane: false);
+
+                // The canvas opens Project setup only; Discovery shows its header and why it is blocked.
+                app.Expand("Project setup");
                 app.Capture("signoffs", "blocked");
             });
             h.Step(
@@ -148,10 +152,13 @@ internal static class Groups
                     app.FocusWithKeyboard("Gate1");
                 });
             });
+            // Opened again from Start while the run works, so Back is off, as the canvas draws it.
             h.Step(app, theme, "overview running", () => {
                 StartRun(app);
                 app.WaitFor("Working…", _run);
-                app.Navigate("Overview", 4000);
+                app.Navigate("Start");
+                app.ClickItem(_recent, h.Opened[Sample]);
+                app.WaitBackOff();
                 app.Capture("overview", "running");
             });
         });
@@ -178,7 +185,7 @@ internal static class Groups
             });
             h.Step(app, theme, "sign-offs", () => {
                 app.Navigate("SignOffs");
-                app.Expand("Discovery");
+                app.Expand("Project setup");
                 app.Capture("signoffs", "blocked");
             });
         });
@@ -248,18 +255,35 @@ internal static class Groups
                 app.WaitGone("Scanning legacy/…", _run);
                 app.Capture("inventory", "large");
             });
-
-            // Opened again from Start, as the canvas draws it: Back has nowhere to go once the history is cleared.
-            h.Step(app, theme, "overview loading", () => app.CaptureWhileBusy(
-                "overview",
-                "loading",
-                () => {
-                    app.Navigate("Start");
-                    app.ClickItem(_recent, h.Opened[Large], settle: 0);
-                    app.WaitBackOff();
-                },
-                c => c.ByName("Checking sign-offs, deliverables and traceability")));
         });
+
+        // The copy scanned above, whose inventory makes the loading last.
+        var scanned = new Launch([Large], Reuse: true);
+
+        // Opened from Start right after a launch, as the canvas draws it: Back is off before the click and after it.
+        // A Back that turns off as the brief state shows can still be drawn on when the screen is taken.
+        foreach (var size in StudioDriver.Sizes)
+        {
+            h.Run(theme, scanned, app => h.Step(app, theme, $"overview loading {size.Width}", () => {
+                bool again = false;
+                app.CaptureWhileBusy(
+                    "overview",
+                    "loading",
+                    () => {
+                        // A second try starts on Overview, and Start from the pane turns Back on until the click.
+                        if (again)
+                        {
+                            app.Navigate("Start");
+                        }
+
+                        again = true;
+                        app.ClickItem(_recent, h.Opened[Large], settle: 0);
+                        app.WaitBackOff();
+                    },
+                    c => c.ByName("Checking sign-offs, deliverables and traceability"),
+                    [size]);
+            }));
+        }
     }
 
     /// <summary>Workstreams and the Run page, each run played by the stand-in Claude Code.</summary>
@@ -365,7 +389,10 @@ internal static class Groups
         string folder = h.Workspaces.NewFolder();
         app.Invoke("New workspace");
         app.Type("Workspace name", Workspaces.Name);
-        app.Type("Folder", folder);
+
+        // A box takes focus as its text is set, and the canvas draws none focused; with no key pressed yet, Browse…
+        // takes it without a ring.
+        app.Type("Folder", folder, tabOut: true);
 
         // Step 1 comes first: once a folder is refused, the page moves focus to it, which the canvas draws only there.
         app.Capture("newworkspace", "step1", sizes: at);
@@ -398,6 +425,11 @@ internal static class Groups
         app.Select("C#/.NET");
         app.Capture("newworkspace", "step3", sizes: at);
         app.Invoke("Next");
+
+        // Filled at the wide size, where every row shows: at 960 each box brings itself into view as it is set, and
+        // the canvas draws step 4 from the top.
+        app.Resize(StudioDriver.Wide);
+
         foreach (var (field, answer) in _context)
         {
             app.Type(field, answer);

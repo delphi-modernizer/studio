@@ -32,6 +32,8 @@ internal sealed class StudioDriver : IDisposable
     private static readonly TimeSpan _startTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan _findTimeout = TimeSpan.FromSeconds(20);
     private static readonly TimeSpan _poll = TimeSpan.FromMilliseconds(20);
+    private static readonly TimeSpan _stillShowsTimeout = TimeSpan.FromMilliseconds(500);
+    private static readonly TimeSpan _barWatch = TimeSpan.FromSeconds(3);
 
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
     private static readonly Point _origin = new(480, 120);
@@ -41,6 +43,9 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>The title bar's height; the pane's artboard starts below it.</summary>
     private const int _titleBarHeight = 48;
     private const int _paneWidth = 240;
+
+    /// <summary>How long WinUI's scroll indicator stays after a page scrolls, resizes or meets the pointer.</summary>
+    private const int _indicatorFade = 3000;
 
     private readonly UIA3Automation _automation = new();
     private readonly FlaUIApplication _app;
@@ -163,14 +168,48 @@ internal sealed class StudioDriver : IDisposable
     {
         try
         {
-            // A ring offers no value, and a bar keeps the last work's value while it is indeterminate again, so a bar
-            // counts only partway, as the canvas draws it.
-            return _window
-                .FindAllDescendants(shows)
-                .Any(e => Type(e) != ControlType.ProgressBar
-                    || (e.Patterns.RangeValue.TryGetPattern(out var range)
-                        && range.Value.ValueOrDefault > 0
-                        && range.Value.ValueOrDefault < range.Maximum.ValueOrDefault));
+            var found = _window.FindAllDescendants(shows);
+
+            if (found.Any(e => Type(e) != ControlType.ProgressBar))
+            {
+                return true;
+            }
+
+            // A bar keeps the last work's value while it is indeterminate again, so it counts only partway, as the
+            // canvas draws it.
+            var bars = found
+                .Select(e => e.Patterns.RangeValue.PatternOrDefault)
+                .OfType<IRangeValuePattern>()
+                .ToList();
+
+            return bars.Count > 0 && GoesPartway(bars);
+        }
+        catch (COMException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>Whether any of the bars found shows partway within a few seconds.</summary>
+    /// <remarks>
+    /// Their values are read on their own, all together: with the app on one processor, a walk of the window can take
+    /// longer than a bar's partway does once the files are cached, and a spinner beside a bar may offer a value that
+    /// never moves.
+    /// </remarks>
+    private static bool GoesPartway(IReadOnlyList<IRangeValuePattern> bars)
+    {
+        return Retry
+            .WhileFalse(() => bars.Any(IsPartway), _barWatch, _poll)
+            .Result;
+    }
+
+    private static bool IsPartway(IRangeValuePattern bar)
+    {
+        try
+        {
+            double value = bar.Value.ValueOrDefault;
+
+            return value > 0 && value < bar.Maximum.ValueOrDefault;
         }
         catch (COMException)
         {
@@ -205,7 +244,7 @@ internal sealed class StudioDriver : IDisposable
 
         _window.SetForeground();
         MovePointerOff();
-        Settle(3000);
+        Settle(_indicatorFade);
 
         return frame;
     }
@@ -337,8 +376,8 @@ internal sealed class StudioDriver : IDisposable
 
     /// <summary>Types into the text box with this name, or into it and on, as a person tabbing out would.</summary>
     /// <remarks>
-    /// The text is set without focus, which the canvas never draws in a box; the studio's boxes take their value as
-    /// it changes. Tabbing out focuses the box and then the next control without a key: after keyboard input XAML
+    /// The text is set through UI Automation, which gives the box focus as it does; the studio's boxes take their
+    /// value as it changes. Tabbing out moves focus to the next control without a key: after keyboard input XAML
     /// draws a focus ring wherever focus goes next, such as on Browse… or a button the page focuses.
     /// </remarks>
     /// <param name="settle">0 when a brief state follows, such as the preview that tabbing out starts.</param>
@@ -405,7 +444,7 @@ internal sealed class StudioDriver : IDisposable
         var at = offset is { } o ? new Point(bounds.Left + o.X, bounds.Top + o.Y) : bounds.Center();
         Desktop.MovePointer(new Point(at.X - 20, at.Y));
         Desktop.MovePointer(at);
-        Settle(2500);
+        Settle(_indicatorFade + 1000);
     }
 
     /// <summary>Gives keyboard focus as Tab would, so the focus ring shows.</summary>
@@ -430,7 +469,7 @@ internal sealed class StudioDriver : IDisposable
                 double extent = viewport * 100 / scroll.VerticalViewSize.Value;
                 double percent = Math.Clamp(pixels * 100 / (extent - viewport), 0, 100);
                 scroll.SetScrollPercent(ScrollPatternConstants.NoScroll, percent);
-                Settle(1500);
+                Settle(_indicatorFade);
 
                 return;
             }
@@ -694,17 +733,20 @@ internal sealed class StudioDriver : IDisposable
                 .SelectMany(w => w.FindAllDescendants()));
     }
 
-    /// <remarks>Checked after the screen is taken: the state may have moved on, but it must not have ended.</remarks>
+    /// <remarks>
+    /// Checked after the screen is taken: the state may have moved on, but it must not have ended. A brief state does
+    /// not come back once it ends, so one sighting is enough; a walk that meets the page as it changes throws or finds
+    /// nothing, so it is asked again.
+    /// </remarks>
     private bool StillShows(Func<ConditionFactory, ConditionBase> shows)
     {
-        try
-        {
-            return _window.FindFirstDescendant(shows) is not null;
-        }
-        catch (COMException)
-        {
-            return false;
-        }
+        return Retry
+            .WhileFalse(
+                () => _window.FindFirstDescendant(shows) is not null,
+                _stillShowsTimeout,
+                _poll,
+                ignoreException: true)
+            .Result;
     }
 
     private bool Shows(string name)

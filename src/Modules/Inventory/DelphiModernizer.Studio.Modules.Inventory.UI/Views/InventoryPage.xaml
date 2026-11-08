@@ -149,8 +149,11 @@
                         <TextBlock
                             Grid.Column="7"
                             VerticalAlignment="Center"
-                            Style="{StaticResource ValueTextStyle}"
-                            Text="{x:Bind Types}" />
+                            FontFamily="{StaticResource MonoFontFamily}"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind Types}"
+                            TextTrimming="CharacterEllipsis" />
                         <Button
                             Grid.Column="8"
                             Padding="8"
@@ -365,7 +368,7 @@
                         </Grid>
                         <ItemsRepeater ItemsSource="{x:Bind Evidence}">
                             <ItemsRepeater.Layout>
-                                <StackLayout Spacing="6" />
+                                <StackLayout Spacing="10" />
                             </ItemsRepeater.Layout>
                             <ItemsRepeater.ItemTemplate>
                                 <DataTemplate x:DataType="vm:Place">
@@ -523,6 +526,23 @@
                 Externals="{StaticResource ExternalsCardTemplate}"
                 Technology="{StaticResource TechnologyCardTemplate}" />
 
+            <!--  Under 1100 a pair of data cards stacks, as the canvas draws them.  -->
+            <DataTemplate x:Key="DataPairNarrowTemplate" x:DataType="vm:DataCardPair">
+                <StackPanel Spacing="16">
+                    <ContentControl
+                        HorizontalContentAlignment="Stretch"
+                        Content="{x:Bind Left}"
+                        ContentTemplateSelector="{StaticResource DataCardTemplates}"
+                        IsTabStop="False" />
+                    <ContentControl
+                        HorizontalContentAlignment="Stretch"
+                        Content="{x:Bind Right}"
+                        ContentTemplateSelector="{StaticResource DataCardTemplates}"
+                        IsTabStop="False"
+                        Visibility="{x:Bind HasRight}" />
+                </StackPanel>
+            </DataTemplate>
+
             <!--  A summary card (handoff: padding 10 16 12); under 1100 the number drops to 24 / 32.  -->
             <DataTemplate x:Key="StatTemplate" x:DataType="vm:InventoryStat">
                 <Border Padding="16,10,16,12" Style="{StaticResource CardStyle}">
@@ -617,6 +637,7 @@
                         <Setter Target="SqlHeader.Visibility" Value="Collapsed" />
                         <Setter Target="SqlHeaderNarrow.Visibility" Value="Visible" />
                         <Setter Target="SqlList.ItemTemplate" Value="{StaticResource SqlRowNarrowTemplate}" />
+                        <Setter Target="DataList.ItemTemplate" Value="{StaticResource DataPairNarrowTemplate}" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -1251,8 +1272,9 @@
                             </Border>
                         </StackPanel>
 
-                        <!--  Data access, connections, libraries and external routines, two cards to a row.  -->
+                        <!--  Data, connections, libraries and external routines: two to a row, one under 1100.  -->
                         <ItemsRepeater
+                            x:Name="DataList"
                             ItemsSource="{x:Bind ViewModel.DataCards, Mode=OneWay}"
                             Visibility="{x:Bind ViewModel.IsData, Mode=OneWay}">
                             <ItemsRepeater.Layout>

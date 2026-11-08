@@ -122,11 +122,17 @@ public sealed partial class SignOffRow : ObservableObject
                     ? string.Join(", ", signOff.Changed.Select(FileName))
                     : "A file it covers was edited"),
             "ready" => ($"{passed} of {Checks.Count} checks pass", "Waiting for a person"),
-            _ => (
-                $"{passed} of {Checks.Count} checks pass",
-                Checks.FirstOrDefault(c => !c.Passed)?.Name ?? string.Empty),
+            _ => ($"{passed} of {Checks.Count} checks pass", BlockingReason(Checks)),
         };
         AnnouncedName = $"{Name}, sign-off {Number} of {count}, {PillLook.Of(Pill).Word}, {Summary}";
+    }
+
+    /// <summary>
+    /// Why it is blocked, as drawn: the first unmet check's detail up to a colon, such as "It is ready".
+    /// </summary>
+    private static string BlockingReason(IEnumerable<CheckRow> checks)
+    {
+        return checks.FirstOrDefault(c => !c.Passed)?.Detail.Split(':')[0] ?? string.Empty;
     }
 
     public string Gate { get; }
@@ -153,6 +159,7 @@ public sealed partial class SignOffRow : ObservableObject
     public string NotMet { get; }
 
     public string Fingerprint { get; }
+
 
     public IReadOnlyList<CoveredFileRow> Covers { get; }
 
