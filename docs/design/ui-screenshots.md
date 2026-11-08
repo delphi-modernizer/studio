@@ -47,7 +47,7 @@ are the Run board's: the Legacy discovery agent runs the kit's `ws01-business-ru
 `legacy/Sales/Pricing.pas` and is refused, then edits its deliverable. Nothing in a result is invented: a read returns
 the file, a grep returns its matching lines, the guard's answer is the engine's own `Guard.Evaluate`, and an edit the
 guard allows is made, so the run leaves the Functional Requirements Specification as Draft. The refusal is worded as
-Claude Code words a blocking PreToolUse hook, which is the text the studio's `RunTranscript` recognises.
+Claude Code words a blocking PreToolUse hook, which the engine reads as a `GuardRefused` event.
 `tests/DelphiModernizer.Studio.ClaudeStandIn.Tests` runs each scenario through the engine's `AgentRunner` and checks
 the events it parses.
 

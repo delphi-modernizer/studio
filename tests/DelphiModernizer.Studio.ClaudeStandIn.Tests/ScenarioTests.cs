@@ -34,9 +34,8 @@ public sealed class ScenarioTests : IDisposable
         Assert.Equal("stand-in", Assert.IsType<SessionStarted>(events[0]).Model);
         var completed = Assert.IsType<RunCompleted>(events[^1]);
         Assert.Equal(outcome, completed.Outcome);
-        Assert.Contains(
-            events,
-            e => e is ToolResult { IsError: true } r && r.Content.EndsWith(_guardReason, StringComparison.Ordinal));
+        var refused = Assert.Single(events.OfType<GuardRefused>());
+        Assert.Equal(("Edit", "legacy/Sales/Pricing.pas", _guardReason), (refused.Tool, refused.Target, refused.Reason));
         Assert.Contains(
             events,
             e => e is AssistantText t && t.Text.Contains("**[Inferred]**", StringComparison.Ordinal));
