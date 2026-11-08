@@ -23,6 +23,12 @@ public static class RunNames
             : $"{blockerTitle} ({blockerRole}) is writing them, started {started}.";
     }
 
+    /// <summary>Why a task waits: a run the studio did not start, such as <c>dmz run</c>, writes it.</summary>
+    public static string BlockedByOtherRun(string runId, string started)
+    {
+        return $"Run {runId}, which this studio did not start, is writing them, started {started}.";
+    }
+
     /// <summary>"Agent: Gold status seems to follow from the credit limit alone. Inferred."</summary>
     public static string Agent(IEnumerable<AgentLine> lines)
     {

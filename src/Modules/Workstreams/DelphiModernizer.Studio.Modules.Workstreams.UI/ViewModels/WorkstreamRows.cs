@@ -40,8 +40,13 @@ public sealed record RoleRow(Workstream Workstream, int Started, bool IsRunning)
 public sealed record DeliverableRow(string Title, PillState Pill);
 
 /// <summary>One agent task: what it asks for and writes, and whether another run holds what it writes.</summary>
-/// <param name="Blocker">The run in progress that writes the same deliverable, or null.</param>
-public sealed record TaskRow(Recipe Recipe, string RoleName, bool ClaudeReady, LiveRun? Blocker, string BlockedReason)
+/// <param name="Blocker">The run in progress that holds a deliverable it writes, or null.</param>
+public sealed record TaskRow(
+    Recipe Recipe,
+    string RoleName,
+    bool ClaudeReady,
+    RunBlocker? Blocker,
+    string BlockedReason)
 {
     public string Title => Recipe.Title;
 
@@ -50,6 +55,9 @@ public sealed record TaskRow(Recipe Recipe, string RoleName, bool ClaudeReady, L
     public string WritesLine => $"Writes the {RunWords.Writes(Recipe)}";
 
     public bool IsBlocked => Blocker is not null;
+
+    /// <summary>Only the studio's own run has a Run page to open (open questions).</summary>
+    public bool CanOpenBlocker => Blocker?.Run is not null;
 
     public bool CanRun => ClaudeReady && !IsBlocked;
 

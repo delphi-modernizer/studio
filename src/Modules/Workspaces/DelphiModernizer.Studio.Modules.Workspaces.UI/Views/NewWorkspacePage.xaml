@@ -359,9 +359,9 @@
                                                     IsActive="{x:Bind ViewModel.IsPreviewRunning, Mode=OneWay}" />
                                                 <TextBlock
                                                     Style="{StaticResource BodyTextBlockStyle}"
-                                                    Text="Scanning the folder…" />
+                                                    Text="{x:Bind ViewModel.ScanText, Mode=OneWay}" />
                                             </StackPanel>
-                                            <ProgressBar IsIndeterminate="True" />
+                                            <ProgressBar Value="{x:Bind ViewModel.ScanPercent, Mode=OneWay}" />
                                             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
                                                 You can keep going once the preview finishes; it takes a few seconds for
                                                 most trees.
