@@ -223,7 +223,7 @@ internal sealed class StudioDriver : IDisposable
 
         foreach (var item in items)
         {
-            var name = NameOf(item);
+            string name = NameOf(item);
             item.Patterns.SelectionItem.Pattern.Select();
             Settle(1500);
             capture(name);
@@ -329,7 +329,7 @@ internal sealed class StudioDriver : IDisposable
     public void WaitEnabled(string name, TimeSpan timeout)
     {
         EnsureRunning();
-        var enabled = Retry
+        bool enabled = Retry
             .WhileFalse(
                 () => Descendants().Any(e => IsAction(e) && Matches(e, name) && e.Properties.IsEnabled.ValueOrDefault),
                 timeout,
@@ -345,9 +345,9 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Saves the window as it is when a step fails, beside the captures but outside the manifest.</summary>
     public void SaveFailure(string step)
     {
-        var folder = Path.Combine(_output, "failures");
+        string folder = Path.Combine(_output, "failures");
         Directory.CreateDirectory(folder);
-        var file = Path.Combine(folder, $"{_theme}-{Slug(step)}");
+        string file = Path.Combine(folder, $"{_theme}-{Slug(step)}");
         FlaUICapture
             .Rectangle(Desktop.VisibleFrame(Handle))
             .ToFile(file + ".png");
@@ -393,12 +393,12 @@ internal sealed class StudioDriver : IDisposable
     {
         var slug = new StringBuilder();
 
-        foreach (var c in name.ToLowerInvariant())
+        foreach (char c in name.ToLowerInvariant())
         {
             slug.Append(char.IsAsciiLetterOrDigit(c) ? c : '-');
         }
 
-        var text = slug.ToString();
+        string text = slug.ToString();
 
         while (text.Contains("--", StringComparison.Ordinal))
         {
@@ -437,7 +437,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>A name equal to the text, or starting with it and a comma, as names with a count do.</summary>
     private static bool Matches(AutomationElement element, string name)
     {
-        var actual = NameOf(element);
+        string actual = NameOf(element);
 
         return actual == name || actual.StartsWith(name + ",", StringComparison.Ordinal);
     }
@@ -465,7 +465,7 @@ internal sealed class StudioDriver : IDisposable
 
     private void Save(string page, string state, Size size, Rectangle area)
     {
-        var file = Path.Combine(_output, $"{page}-{state}-{size.Width}x{size.Height}-{_theme}.png");
+        string file = Path.Combine(_output, $"{page}-{state}-{size.Width}x{size.Height}-{_theme}.png");
         FlaUICapture
             .Rectangle(area)
             .ToFile(file);

@@ -92,7 +92,7 @@ internal sealed class Workspaces : IDisposable
     /// <summary>A fresh copy of a workspace: <c>sample</c>, <c>clean</c>, <c>unscanned</c> or <c>large</c>.</summary>
     public string Fresh(string template)
     {
-        var copy = Path.Combine(_root, "copies", $"{++_copies}-{template}");
+        string copy = Path.Combine(_root, "copies", $"{++_copies}-{template}");
         Copy(Path.Combine(_root, "templates", template), copy);
 
         return copy;
@@ -103,7 +103,7 @@ internal sealed class Workspaces : IDisposable
         try
         {
             // git writes its objects read-only, and Windows does not delete a read-only file.
-            foreach (var file in Directory.EnumerateFiles(_root, "*", SearchOption.AllDirectories))
+            foreach (string file in Directory.EnumerateFiles(_root, "*", SearchOption.AllDirectories))
             {
                 File.SetAttributes(file, FileAttributes.Normal);
             }
@@ -119,7 +119,7 @@ internal sealed class Workspaces : IDisposable
     /// <summary>The design's two problems: a reference to an undefined ID, and evidence that is not there.</summary>
     private static void AddTwoProblems(string workspace)
     {
-        var inventory = Path.Combine(workspace, "docs", "01-discovery", "D02-system-inventory.md");
+        string inventory = Path.Combine(workspace, "docs", "01-discovery", "D02-system-inventory.md");
         File.AppendAllText(
             inventory,
             "\nThe discount follows FR-999.\n\nThe search screen: legacy/Sales/CustomerSearch.pas#L12\n");
@@ -130,15 +130,15 @@ internal sealed class Workspaces : IDisposable
         var program = new StringBuilder("program BigErp;\n\nuses\n");
         var units = new List<string>();
 
-        for (var area = 1; area <= _largeAreas; area++)
+        for (int area = 1; area <= _largeAreas; area++)
         {
-            var directory = Path.Combine(folder, $"Area{area:D3}");
+            string directory = Path.Combine(folder, $"Area{area:D3}");
             Directory.CreateDirectory(directory);
 
-            for (var index = 1; index <= _largeUnitsPerArea; index++)
+            for (int index = 1; index <= _largeUnitsPerArea; index++)
             {
-                var unit = $"A{area:D3}Unit{index:D3}";
-                var uses = units.Count == 0 ? string.Empty : $"uses\n  {units[^1]};\n\n";
+                string unit = $"A{area:D3}Unit{index:D3}";
+                string uses = units.Count == 0 ? string.Empty : $"uses\n  {units[^1]};\n\n";
                 File.WriteAllText(
                     Path.Combine(directory, unit + ".pas"),
                     $"unit {unit};\n\ninterface\n\n{uses}function Value{index}: Integer;\n\nimplementation\n\n"
@@ -148,7 +148,7 @@ internal sealed class Workspaces : IDisposable
             }
         }
 
-        var projectUses = program
+        string projectUses = program
             .ToString()
             .TrimEnd(',', '\n');
         File.WriteAllText(Path.Combine(folder, "BigErp.dpr"), projectUses + ";\n\nbegin\nend.\n");
@@ -158,14 +158,14 @@ internal sealed class Workspaces : IDisposable
 
     private static void Copy(string from, string to)
     {
-        foreach (var directory in Directory.EnumerateDirectories(from, "*", SearchOption.AllDirectories))
+        foreach (string directory in Directory.EnumerateDirectories(from, "*", SearchOption.AllDirectories))
         {
             Directory.CreateDirectory(directory.Replace(from, to, StringComparison.Ordinal));
         }
 
         Directory.CreateDirectory(to);
 
-        foreach (var file in Directory.EnumerateFiles(from, "*", SearchOption.AllDirectories))
+        foreach (string file in Directory.EnumerateFiles(from, "*", SearchOption.AllDirectories))
         {
             File.Copy(file, file.Replace(from, to, StringComparison.Ordinal));
         }
@@ -194,13 +194,13 @@ internal sealed class Workspaces : IDisposable
         start.Environment["GIT_CONFIG_GLOBAL"] = IdentityConfig;
         start.Environment["GIT_CONFIG_NOSYSTEM"] = "1";
 
-        foreach (var argument in arguments)
+        foreach (string argument in arguments)
         {
             start.ArgumentList.Add(argument);
         }
 
         using var process = Process.Start(start) ?? throw new InvalidOperationException("dmz did not start.");
-        var errors = process.StandardError.ReadToEnd();
+        string errors = process.StandardError.ReadToEnd();
         process.WaitForExit();
 
         if (process.ExitCode != 0)

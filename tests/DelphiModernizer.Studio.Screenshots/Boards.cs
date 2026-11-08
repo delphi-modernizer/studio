@@ -185,7 +185,7 @@ internal static class Boards
     {
         string? stem = null;
 
-        if (_states.TryGetValue((page, state), out var board))
+        if (_states.TryGetValue((page, state), out string? board))
         {
             stem = board;
         }
@@ -194,7 +194,7 @@ internal static class Boards
             stem = First(first.Stem, theme, width);
         }
 
-        return stem is not null && _labels.TryGetValue(stem, out var label)
+        return stem is not null && _labels.TryGetValue(stem, out string? label)
             ? ($"project/{stem}.dc.html", label)
             : (null, null);
     }
@@ -202,7 +202,7 @@ internal static class Boards
     /// <remarks>Overview's light board is Main; the other first-row boards follow the stem.</remarks>
     private static string First(string stem, string theme, int width)
     {
-        var suffix = (theme, width < 1100) switch {
+        string suffix = (theme, width < 1100) switch {
             ("highcontrast", _) => "HC",
             ("dark", true) => "MinDark",
             ("dark", false) => "Dark",

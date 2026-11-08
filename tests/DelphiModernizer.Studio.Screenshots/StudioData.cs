@@ -55,7 +55,7 @@ internal sealed class StudioData : IDisposable
         var recent = new JsonArray();
         var openedAt = DateTimeOffset.UtcNow;
 
-        foreach (var workspace in workspaces)
+        foreach (string workspace in workspaces)
         {
             var manifest = JsonNode.Parse(File.ReadAllText(Path.Combine(workspace, "modernizer.json")))
                 ?? throw new InvalidDataException("modernizer.json is empty.");
@@ -94,7 +94,7 @@ internal sealed class StudioData : IDisposable
 
         Directory.CreateDirectory(destination);
 
-        foreach (var file in Directory.EnumerateFiles(LogDirectory))
+        foreach (string file in Directory.EnumerateFiles(LogDirectory))
         {
             File.Copy(file, Path.Combine(destination, Path.GetFileName(file)), overwrite: true);
         }

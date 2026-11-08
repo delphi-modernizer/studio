@@ -347,7 +347,7 @@ internal static class Groups
 
     private static void Deliverables(Harness h, StudioDriver app)
     {
-        var root = h.Opened[Sample];
+        string root = h.Opened[Sample];
         app.Navigate("Deliverables", 4000);
         app.Capture("deliverables", "all");
         app.Select("Draft");
@@ -361,8 +361,8 @@ internal static class Groups
         app.Invoke("Restore from template", 4000);
 
         // The charter is the one deliverable init drafts; a person sets it back to a template here.
-        var charter = Path.Combine(root, "docs", "00-project-charter", "D01-project-charter.md");
-        var text = File.ReadAllText(charter);
+        string charter = Path.Combine(root, "docs", "00-project-charter", "D01-project-charter.md");
+        string text = File.ReadAllText(charter);
         File.WriteAllText(charter, text.Replace("status: draft", "status: template", StringComparison.Ordinal));
         app.Navigate("Overview");
         app.Navigate("Deliverables", 4000);
@@ -373,14 +373,14 @@ internal static class Groups
     /// <summary>Opens an approval dialog, captures it and cancels; the approval record must not change.</summary>
     private static void ApproveDialog(Harness h, StudioDriver app, string shows, string state)
     {
-        var record = Path.Combine(h.Opened[Sample], _approvals);
-        var before = File.Exists(record) ? File.ReadAllText(record) : null;
+        string record = Path.Combine(h.Opened[Sample], _approvals);
+        string? before = File.Exists(record) ? File.ReadAllText(record) : null;
         app.Expand("Project setup");
         app.Invoke("Approve Project setup");
         app.WaitFor(shows, _brief);
         app.Capture("signoffs", state);
         app.Invoke("Cancel");
-        var after = File.Exists(record) ? File.ReadAllText(record) : null;
+        string? after = File.Exists(record) ? File.ReadAllText(record) : null;
 
         if (before != after)
         {

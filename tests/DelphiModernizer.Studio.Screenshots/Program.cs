@@ -61,7 +61,7 @@ internal static class Program
             var harness = new Harness(
                 Path.GetFullPath(exe), Path.GetFullPath(claude), output, data, workspaces, manifest);
 
-            foreach (var group in groups)
+            foreach (string group in groups)
             {
                 Console.WriteLine($"Group {group}:");
                 _groups[group](harness, "light", _light);
@@ -73,7 +73,7 @@ internal static class Program
                 RunHighContrast(harness);
             }
 
-            foreach (var error in data.Errors())
+            foreach (string error in data.Errors())
             {
                 harness.Fail($"The app logged: {error}");
             }

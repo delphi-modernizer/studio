@@ -99,7 +99,7 @@ internal sealed class StandInRun(
     {
         Say("I’ll read the Sales units first, then record each business rule in the functional requirements with "
             + "its evidence and a fact label.");
-        var source = Path.Combine(workspaceRoot, _read);
+        string source = Path.Combine(workspaceRoot, _read);
         Tool("Read", new JsonObject { ["file_path"] = _read }, () => Numbered(File.ReadAllLines(source)));
         Tool(
             "Grep",
@@ -114,7 +114,7 @@ internal sealed class StandInRun(
             "**[Inferred]** Gold status seems to follow from the credit limit alone, not from a customer flag.",
             "**[Unknown]** Whether the discount also applies to invoices printed with QuickReport."));
         Edit(_read, "  GoldThreshold = 10000;", "  GoldThreshold = 10000; { BR-001 }");
-        var status = File
+        string status = File
             .ReadLines(Path.Combine(workspaceRoot, deliverableFile))
             .First(l => l.StartsWith("status:", StringComparison.Ordinal));
         Edit(deliverableFile, status, "status: draft");
@@ -129,9 +129,9 @@ internal sealed class StandInRun(
 
     private void Tool(string name, JsonObject input, Func<string> run)
     {
-        var id = Assistant(name, input);
+        string id = Assistant(name, input);
         string content;
-        var isError = false;
+        bool isError = false;
 
         try
         {
@@ -160,7 +160,7 @@ internal sealed class StandInRun(
 
         if (!decision.Allowed)
         {
-            var id = Assistant("Edit", input);
+            string id = Assistant("Edit", input);
             _denials.Add(new JsonObject {
                 ["tool_name"] = "Edit",
                 ["tool_use_id"] = id,
@@ -177,8 +177,8 @@ internal sealed class StandInRun(
         }
 
         Tool("Edit", input, () => {
-            var file = Path.Combine(workspaceRoot, path);
-            var text = File.ReadAllText(file);
+            string file = Path.Combine(workspaceRoot, path);
+            string text = File.ReadAllText(file);
             File.WriteAllText(file, text.Replace(oldText, newText, StringComparison.Ordinal));
 
             return $"The file {path} has been updated.";
@@ -188,7 +188,7 @@ internal sealed class StandInRun(
     private string Assistant(string name, JsonObject input)
     {
         _turns++;
-        var id = $"toolu_stand_in_{++_toolIds:D2}";
+        string id = $"toolu_stand_in_{++_toolIds:D2}";
         Assistant(new JsonObject { ["type"] = "tool_use", ["id"] = id, ["name"] = name, ["input"] = input });
 
         return id;

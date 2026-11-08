@@ -23,10 +23,10 @@ internal static class Program
             return 0;
         }
 
-        var prompt = Value(args, "-p");
-        var sessionId = Value(args, "--session-id");
-        var budget = Value(args, "--max-budget-usd");
-        var skill = prompt?.Split(' ', 2)[0].TrimStart('/');
+        string? prompt = Value(args, "-p");
+        string? sessionId = Value(args, "--session-id");
+        string? budget = Value(args, "--max-budget-usd");
+        string? skill = prompt?.Split(' ', 2)[0].TrimStart('/');
         var recipe = KitBundle.Embedded.Spec.Recipes.Recipes.FirstOrDefault(r => r.Skill == skill);
 
         if (sessionId is null || budget is null || recipe is null)
@@ -67,7 +67,7 @@ internal static class Program
 
     private static string? Value(string[] args, string name)
     {
-        var index = Array.IndexOf(args, name);
+        int index = Array.IndexOf(args, name);
 
         return index >= 0 && index + 1 < args.Length ? args[index + 1] : null;
     }

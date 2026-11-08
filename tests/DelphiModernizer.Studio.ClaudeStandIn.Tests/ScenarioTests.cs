@@ -27,7 +27,7 @@ public sealed class ScenarioTests : IDisposable
     [InlineData("failed", "failed")]
     public async Task A_scenario_streams_the_run_board_and_ends_as_it_says(string scenario, string outcome)
     {
-        var root = await WorkspaceAsync();
+        string root = await WorkspaceAsync();
 
         var events = await RunAsync(root, scenario, CancellationToken.None);
 
@@ -45,14 +45,14 @@ public sealed class ScenarioTests : IDisposable
             events,
             e => e is ToolResult r && r.Content.Contains("CustomerForm.pas:35:", StringComparison.Ordinal));
         Assert.Contains("status: draft", await File.ReadAllTextAsync(Path.Combine(root, _draft)));
-        var pricing = await File.ReadAllTextAsync(Path.Combine(root, "legacy", "Sales", "Pricing.pas"));
+        string pricing = await File.ReadAllTextAsync(Path.Combine(root, "legacy", "Sales", "Pricing.pas"));
         Assert.DoesNotContain("BR-001", pricing);
     }
 
     [Fact]
     public async Task A_budget_reached_costs_the_whole_budget_and_records_the_refusal()
     {
-        var root = await WorkspaceAsync();
+        string root = await WorkspaceAsync();
 
         var events = await RunAsync(root, "budget", CancellationToken.None);
         var completed = events
@@ -67,7 +67,7 @@ public sealed class ScenarioTests : IDisposable
     [InlineData("starting", false)]
     public async Task A_waiting_scenario_ends_when_the_run_is_stopped(string scenario, bool started)
     {
-        var root = await WorkspaceAsync();
+        string root = await WorkspaceAsync();
         using var stop = new CancellationTokenSource(TimeSpan.FromSeconds(8));
         var events = new List<AgentEvent>();
         Environment.SetEnvironmentVariable(Program.ScenarioVariable, scenario);
