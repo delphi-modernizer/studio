@@ -14,8 +14,8 @@
 - The New workspace wizard: name and folder, a read-only preview of the legacy source, the target platform, the
   essential context with Unknown as an answer, and creation step by step.
 - Overview's flow from the Delphi code through the teams and the Principal Architect to the sign-offs, with the next
-  step, open questions and recent agent runs; the teams and the sign-offs sit on tinted panels, and Overview names the
-  workspace while it loads.
+  step, open questions and recent agent runs; the teams and the sign-offs sit on tinted panels, a team's tooltip opens
+  under its card, and Overview names the workspace while it loads.
 - Inventory by tab, Deliverables by sign-off, Traceability with its problems and matrix, the sign-offs' checks and
   approvals, and Settings.
 - Approve and revoke sign-offs from a dialog that shows your git identity, requires a note, never approves on Enter,
