@@ -297,6 +297,7 @@ public sealed partial class ShellPage : Page
 
         toggle.FontFamily = (FontFamily)Microsoft.UI.Xaml.Application.Current.Resources["StudioIconsFontFamily"];
         toggle.Content = StudioIcons.Navigation;
+
         return true;
     }
 
