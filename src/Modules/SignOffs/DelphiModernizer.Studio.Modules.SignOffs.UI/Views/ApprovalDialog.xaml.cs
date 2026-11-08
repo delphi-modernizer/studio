@@ -31,12 +31,13 @@ public sealed partial class ApprovalDialog : ContentDialog
     public ApprovalDialogViewModel ViewModel { get; }
 
     /// <summary>Focus starts in the note; without a git identity the note is disabled and Cancel takes it.</summary>
+    /// <remarks>
+    /// No default button, so Enter never approves and Cancel is drawn plain, not accent; Escape cancels.
+    /// </remarks>
     private void OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
     {
-        if (ViewModel.HasIdentity)
-        {
-            NoteBox.Focus(FocusState.Programmatic);
-        }
+        Control target = ViewModel.HasIdentity ? NoteBox : GetTemplateChild("CloseButton") as Control ?? NoteBox;
+        target.Focus(FocusState.Programmatic);
     }
 
     /// <summary>

@@ -25,6 +25,9 @@ namespace DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
 /// </summary>
 public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
 {
+    /// <summary>The role selected when nothing asks for one: Legacy discovery, as every drawn state shows.</summary>
+    private const string _firstRole = "WS01";
+
     private readonly ISender _sender;
     private readonly INavigationService _navigation;
     private readonly IStudioSettings _settings;
@@ -184,7 +187,7 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         _runs = runs.IsSuccess ? runs.Value : [];
         _blockers = blockers.IsSuccess ? blockers.Value : new Dictionary<string, RunBlocker>();
         IsOpen = true;
-        ShowRoles(_requested ?? SelectedRole?.Code ?? "PA");
+        ShowRoles(_requested ?? SelectedRole?.Code ?? _firstRole);
         _requested = null;
     }
 

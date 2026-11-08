@@ -7,6 +7,8 @@ using DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
+using Microsoft.UI.Xaml.Media;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.UI.Views;
 
@@ -45,7 +47,7 @@ public sealed partial class RunRecipeDialog : ContentDialog
         Lead.Text = $"The agent writes the {RunWords.Writes(recipe)} as a draft, "
             + "each claim with a link to its evidence and a fact label. You review the draft afterwards.";
         string name = RunWords.Capitalized(recipe.Argument.Name);
-        ArgumentBox.Header = $"{name} ({(recipe.Argument.Required ? "required" : "optional")})";
+        ArgumentBox.Header = Header(name, recipe.Argument.Required);
         ArgumentBox.PlaceholderText = recipe.Argument.Description;
         ArgumentBox.Text = argument ?? string.Empty;
         AutomationProperties.SetName(ArgumentBox, name);
@@ -91,7 +93,7 @@ public sealed partial class RunRecipeDialog : ContentDialog
             .ToList();
         ArgumentBox.Visibility = Visibility.Collapsed;
         GateBox.Visibility = Visibility.Visible;
-        GateBox.Header = $"Sign-off ({(_recipe.Argument.Required ? "required" : "optional")})";
+        GateBox.Header = Header("Sign-off", _recipe.Argument.Required);
         GateBox.ItemsSource = gates;
         GateBox.SelectedItem = gates.Find(g => g.Gate == selected);
         AutomationProperties.SetName(GateBox, name);
@@ -99,8 +101,24 @@ public sealed partial class RunRecipeDialog : ContentDialog
         GateBox.SelectionChanged += OnGateChanged;
     }
 
+    /// <summary>"Scope (required)", the need in secondary text, as drawn.</summary>
+    private static TextBlock Header(string name, bool required)
+    {
+        var need = new Run {
+            Text = required ? "(required)" : "(optional)",
+            Foreground = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["TextFillColorSecondaryBrush"],
+        };
+
+        return new TextBlock { Inlines = { new Run { Text = $"{name} " }, need } };
+    }
+
     private void OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
     {
+        if (GetTemplateChild("PrimaryButton") is Button run)
+        {
+            run.ContentTemplate = (DataTemplate)Resources["PlayContent"];
+        }
+
         (_choosesGate ? (Control)GateBox : ArgumentBox).Focus(FocusState.Programmatic);
     }
 
