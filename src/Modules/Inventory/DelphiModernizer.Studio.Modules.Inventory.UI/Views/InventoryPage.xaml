@@ -663,8 +663,15 @@
                                     Height="16"
                                     IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" />
                                 <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Scanning legacy/…" />
+                                <TextBlock
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Text="{x:Bind ViewModel.ScanCount, Mode=OneWay}" />
                             </StackPanel>
-                            <ProgressBar IsIndeterminate="True" />
+                            <!--  Indeterminate until the scanner has counted the files, then files read of files found.  -->
+                            <ProgressBar
+                                IsIndeterminate="{x:Bind local:InventoryPage.Not(ViewModel.IsScanCounted), Mode=OneWay}"
+                                Maximum="{x:Bind ViewModel.ScanTotal, Mode=OneWay}"
+                                Value="{x:Bind ViewModel.ScanDone, Mode=OneWay}" />
                             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
                                 The scan only reads legacy/. Results replace the previous inventory when it
                                 finishes.

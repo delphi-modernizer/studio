@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DelphiModernizer.Engine.Delphi;
 using DelphiModernizer.Engine.Delphi.Inventory;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
@@ -27,6 +28,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     private readonly ISender _sender;
     private readonly IEditorLauncher _editor;
     private List<UnitRow> _units = [];
+    private InventoryScan? _scan;
 
     public InventoryViewModel(IWorkspaceSession session, ISender sender, IEditorLauncher editor)
         : base(session)
@@ -52,8 +54,28 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     public partial ScanFacts Facts { get; set; } = new(string.Empty, string.Empty, string.Empty, string.Empty);
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsNotScanned), nameof(CanScan))]
+    [NotifyPropertyChangedFor(nameof(IsNotScanned), nameof(CanScan), nameof(IsScanned))]
+    [NotifyPropertyChangedFor(
+        nameof(IsUnits),
+        nameof(IsScreens),
+        nameof(IsData),
+        nameof(IsRisks),
+        nameof(IsCycles),
+        nameof(IsDiagnostics))]
     public partial bool IsScanning { get; set; }
+
+    /// <summary>"7 of 13 files" while a scan runs; empty until the scanner has counted the files.</summary>
+    [ObservableProperty]
+    public partial string ScanCount { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsScanCounted))]
+    public partial double ScanTotal { get; set; }
+
+    [ObservableProperty]
+    public partial double ScanDone { get; set; }
+
+    public bool IsScanCounted => ScanTotal > 0;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotScanned))]
@@ -65,7 +87,8 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
 
     public bool HasProblem => Problem is not null;
 
-    public bool IsScanned => Inventory is not null;
+    /// <remarks>A scan in progress hides the previous inventory, which it replaces when it finishes.</remarks>
+    public bool IsScanned => Inventory is not null && !IsScanning;
 
     public bool IsNotScanned => IsLoaded && Inventory is null && !IsScanning;
 
@@ -218,18 +241,26 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     [RelayCommand(CanExecute = nameof(CanScan))]
     private async Task ScanAsync(CancellationToken cancellationToken)
     {
+        var previous = _scan;
+        ScanTotal = 0;
+        ScanDone = 0;
+        ScanCount = string.Empty;
         IsScanning = true;
+        Stats = Blank();
         ScanCommand.NotifyCanExecuteChanged();
+
+        // Progress<T> reports on the UI thread it is created on.
+        var progress = new Progress<ScanProgress>(p => {
+            ScanTotal = p.FilesTotal;
+            ScanDone = p.FilesDone;
+            ScanCount = $"{Number(p.FilesDone)} of {Count(p.FilesTotal, "file")}";
+        });
 
         try
         {
-            var scanned = await _sender.Send(new ScanLegacyCommand(), cancellationToken);
+            var scanned = await _sender.Send(new ScanLegacyCommand(progress), cancellationToken);
             Problem = scanned.IsFailure ? scanned.Error.Message : null;
-
-            if (scanned.IsSuccess)
-            {
-                Show(scanned.Value);
-            }
+            Show(scanned.IsSuccess ? scanned.Value : previous);
         }
         finally
         {
@@ -245,6 +276,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
 
     private void Show(InventoryScan? scan)
     {
+        _scan = scan;
         Inventory = scan?.Inventory;
 
         if (scan is null)
@@ -312,7 +344,11 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         string versionNote = version is null
             ? "Delphi version not named"
             : $"{version.DelphiVersion}, from {System.IO.Path.GetFileName(version.Path)}";
-        Facts = new ScanFacts(versionNote, $"Encodings: {encodings}", $"Scanned {Scanned(scannedAt)}", shortFingerprint);
+        Facts = new ScanFacts(
+            versionNote,
+            $"Encodings: {encodings}",
+            $"Scanned {Scanned(scannedAt)}",
+            shortFingerprint);
 
         _units = [.. inventory.Units
             .OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase)

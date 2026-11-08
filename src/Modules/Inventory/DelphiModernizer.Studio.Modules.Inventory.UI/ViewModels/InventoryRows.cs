@@ -48,7 +48,7 @@ public sealed record SortHeader(UnitSort Column, string Label, bool IsSorted, bo
 /// <summary>One of the four summary cards above the tabs.</summary>
 public sealed record InventoryStat(string Label, string Glyph, string Number, string Unit, string Detail);
 
-/// <summary>The line under the summary: the Delphi version, the encodings, when the scan ran and its fingerprint.</summary>
+/// <summary>The line under the summary: Delphi version, encodings, when the scan ran and its fingerprint.</summary>
 public sealed record ScanFacts(string Version, string Encodings, string Scanned, string Fingerprint);
 
 /// <summary>A row of the code modules table; a folder heading when <see cref="IsFolder"/> is set.</summary>
@@ -149,7 +149,7 @@ public sealed record ConnectionCard(
 public sealed record ExternalsCard(IReadOnlyList<ExternalRow> Rows, string ComNote);
 
 /// <summary>Two data cards side by side; a row is as tall as its taller card.</summary>
-/// <param name="Left">A <see cref="TechnologyCard"/>, <see cref="ConnectionCard"/> or <see cref="ExternalsCard"/>.</param>
+/// <param name="Left">A technology, connection or externals card.</param>
 public sealed record DataCardPair(object Left, object? Right)
 {
     public bool HasRight => Right is not null;

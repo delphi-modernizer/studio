@@ -115,11 +115,7 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
         if (report.IsSuccess)
         {
             Show(report.Value, checkedAt);
-
-            if (!Strict)
-            {
-                _badge.Show(report.Value.Trace.Errors);
-            }
+            _badge.Show(report.Value.Trace.Errors);
         }
 
         IsOpen = report.IsSuccess;

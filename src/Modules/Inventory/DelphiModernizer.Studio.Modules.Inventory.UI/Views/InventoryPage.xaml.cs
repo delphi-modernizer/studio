@@ -34,6 +34,12 @@ public sealed partial class InventoryPage : Page, IHasViewModel
 
     DelphiModernizer.Studio.UI.Contracts.ViewModel IHasViewModel.ViewModel => ViewModel;
 
+    /// <summary>The opposite of a flag; x:Bind calls it for the scan's progress bar.</summary>
+    public static bool Not(bool value)
+    {
+        return !value;
+    }
+
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.LoadCommand.ExecuteAsync(parameter: null);
