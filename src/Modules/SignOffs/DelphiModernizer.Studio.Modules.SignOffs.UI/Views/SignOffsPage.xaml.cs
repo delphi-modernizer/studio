@@ -60,7 +60,7 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
 
     private async void OnApprove(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: SignOffRow signOff })
+        if (sender is FrameworkElement { Tag: SignOffRow signOff })
         {
             await ShowDialogAsync(signOff, isRevoke: false);
         }
@@ -68,7 +68,7 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
 
     private async void OnRevoke(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: SignOffRow signOff })
+        if (sender is FrameworkElement { Tag: SignOffRow signOff })
         {
             await ShowDialogAsync(signOff, isRevoke: true);
         }

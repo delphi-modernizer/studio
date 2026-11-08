@@ -155,7 +155,7 @@ public sealed partial class RunPage : Page, IHasViewModel
 
     private async void OnOpenWrite(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: WriteRow row })
+        if (sender is FrameworkElement { Tag: WriteRow row })
         {
             await ViewModel.OpenFileAsync(row.Path);
         }
@@ -163,7 +163,7 @@ public sealed partial class RunPage : Page, IHasViewModel
 
     private async void OnOpenFile(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: FileRow row })
+        if (sender is FrameworkElement { Tag: FileRow row })
         {
             await ViewModel.OpenFileAsync(row.Path);
         }
