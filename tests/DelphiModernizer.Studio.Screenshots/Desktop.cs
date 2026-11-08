@@ -39,7 +39,7 @@ internal static partial class Desktop
     /// <summary>The window as the person sees it: the DWM frame, without the invisible resize borders.</summary>
     public static Rectangle VisibleFrame(nint window)
     {
-        var result = DwmGetWindowAttribute(window, _extendedFrameBounds, out var frame, Marshal.SizeOf<Rect>());
+        int result = DwmGetWindowAttribute(window, _extendedFrameBounds, out var frame, Marshal.SizeOf<Rect>());
         Marshal.ThrowExceptionForHR(result);
 
         return frame.ToRectangle();
@@ -55,10 +55,10 @@ internal static partial class Desktop
 
         var visible = VisibleFrame(window);
         var bounds = outer.ToRectangle();
-        var left = visible.Left - bounds.Left;
-        var top = visible.Top - bounds.Top;
-        var width = size.Width + bounds.Width - visible.Width;
-        var height = size.Height + bounds.Height - visible.Height;
+        int left = visible.Left - bounds.Left;
+        int top = visible.Top - bounds.Top;
+        int width = size.Width + bounds.Width - visible.Width;
+        int height = size.Height + bounds.Height - visible.Height;
 
         if (!SetWindowPos(window, 0, origin.X - left, origin.Y - top, width, height, _noZOrder | _noActivate))
         {

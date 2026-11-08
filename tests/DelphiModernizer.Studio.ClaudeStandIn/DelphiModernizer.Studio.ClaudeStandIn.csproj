@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Stands in for the Claude Code CLI in the screenshots job (docs/design/ui-screenshots.md). The assembly is named
+    claude so that a Windows build is the claude.exe the engine accepts.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <AssemblyName>claude</AssemblyName>
+    <RootNamespace>DelphiModernizer.Studio.ClaudeStandIn</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="DelphiModernizer.Studio.ClaudeStandIn.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EngineReference Include="DelphiModernizer.Engine.Agents" />
+    <EngineReference Include="DelphiModernizer.Engine.Kit" />
+    <EngineReference Include="DelphiModernizer.Engine.Workspaces" />
+  </ItemGroup>
+
+</Project>

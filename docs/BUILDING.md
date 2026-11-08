@@ -11,8 +11,8 @@ decides how:
 | `Package` | No checkout is found | Package references to `DelphiModernizer.Engine.*` at `EngineVersion` from GitHub Packages |
 
 The test projects need `Source`: the Workstreams tests run the engine's fake Claude Code CLI
-(`tests/DelphiModernizer.Engine.Agents.FakeClaude`) through `$(EngineRoot)`, so they do not build with
-`EngineSource=Package`.
+(`tests/DelphiModernizer.Engine.Agents.FakeClaude`) and the stand-in's tests read the engine's sample
+(`tests/fixtures/delphi/legacy-erp`) through `$(EngineRoot)`, so they do not build with `EngineSource=Package`.
 
 The engine checkout needs its `kit` submodule (`git submodule update --init`). CI checks the engine out at the commit
 [engine.lock](../engine.lock) pins.
@@ -29,19 +29,25 @@ glyph table, app icon and logos from `assets/`; see [icons.md](icons.md).
 
 ## Screenshots
 
-`tests/DelphiModernizer.Studio.Screenshots` captures every page of the built app; the `screenshots` CI job runs it and
-uploads the artifact `screenshots` ([ui-screenshots.md](design/ui-screenshots.md)). It is a console tool, not a test
-project, so `dotnet test` skips it everywhere. It targets `net10.0-windows` with `EnableWindowsTargeting`, so
-`dotnet build` compiles it on Linux too; it runs only on Windows.
+`tests/DelphiModernizer.Studio.Screenshots` captures every state of the built app; the `screenshots` CI job runs it,
+one job per screen group, and uploads the artifacts `screenshots-<group>`
+([ui-screenshots.md](design/ui-screenshots.md)).
+It is a console tool, not a test project, so `dotnet test` skips it everywhere. It targets `net10.0-windows` with
+`EnableWindowsTargeting`, so `dotnet build` compiles it on Linux too; it runs only on Windows.
 
-To run it on a Windows PC, publish the app and `dmz` as the `screenshots` job does, create a workspace with `dmz init`
-and `dmz scan`, then:
+`tests/DelphiModernizer.Studio.ClaudeStandIn` is the stand-in Claude Code the job gives the app. It builds as
+`claude`; `tests/DelphiModernizer.Studio.ClaudeStandIn.Tests` runs it through the engine's runner on every platform.
+
+To run the harness on a Windows PC, publish the app, `dmz` and the stand-in as the `screenshots` job does, then:
 
 ```bash
 dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release -- \
-  --app out/studio/DelphiModernizer.Studio.exe --workspace <workspace> --out out/screenshots
+  --app out/studio/DelphiModernizer.Studio.exe --dmz out/studio/tools/dmz.exe --claude out/claude/claude.exe \
+  --legacy ../engine/tests/fixtures/delphi/legacy-erp --out out/screenshots [--group start|overview|pages|agents]
 ```
 
-It moves your studio data folder (`%LOCALAPPDATA%\DelphiModernizer\Studio`) aside while it runs and puts it back, may
-switch the display to 1920 × 1080 and briefly turns on high contrast. The app takes no launch argument for it: the tool
-writes the recent workspace and the Theme setting the app already reads.
+It creates its workspaces with `dmz` in a temporary folder and deletes them afterwards. It moves your studio data
+folder (`%LOCALAPPDATA%\DelphiModernizer\Studio`) aside while it runs and puts it back, may switch the display to
+1920 × 1080 and briefly turns on high contrast. The app takes no launch argument for it: the tool writes the recent
+workspaces and the settings the app already reads, and sets the stand-in's variables and `GIT_CONFIG_GLOBAL` on the
+app's process.

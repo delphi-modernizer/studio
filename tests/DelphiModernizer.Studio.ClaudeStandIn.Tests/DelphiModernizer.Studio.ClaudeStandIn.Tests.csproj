@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DelphiModernizer.Studio.ClaudeStandIn\DelphiModernizer.Studio.ClaudeStandIn.csproj" />
+  </ItemGroup>
+
+  <!-- The brief's sample, whose files the stand-in's scenario reads and cites. -->
+  <ItemGroup>
+    <None
+        Include="$(EngineRoot)tests/fixtures/delphi/legacy-erp/**"
+        LinkBase="legacy-erp"
+        CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

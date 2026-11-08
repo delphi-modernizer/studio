@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using FlaUI.Core;
@@ -13,6 +14,7 @@ using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
 using FlaUI.Core.Patterns;
 using FlaUI.Core.Tools;
+using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
 using FlaUIApplication = FlaUI.Core.Application;
 using FlaUICapture = FlaUI.Core.Capturing.Capture;
@@ -22,27 +24,51 @@ namespace DelphiModernizer.Studio.Screenshots;
 /// <summary>One running app: finds its parts by their automation names and captures the window at each size.</summary>
 internal sealed class StudioDriver : IDisposable
 {
+    public static readonly Size Wide = new(1280, 800);
+    public static readonly Size Minimum = new(960, 576);
+    public static readonly IReadOnlyList<Size> Sizes = [Wide, Minimum];
+
     private static readonly TimeSpan _startTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan _findTimeout = TimeSpan.FromSeconds(20);
+    private static readonly TimeSpan _poll = TimeSpan.FromMilliseconds(20);
+
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
     private static readonly Point _origin = new(480, 120);
+
     private const string _expanderClass = "Microsoft.UI.Xaml.Controls.Expander";
+
+    /// <summary>The title bar's height; the pane's artboard starts below it.</summary>
+    private const int _titleBarHeight = 48;
+    private const int _paneWidth = 240;
 
     private readonly UIA3Automation _automation = new();
     private readonly FlaUIApplication _app;
     private readonly Window _window;
     private readonly string _output;
     private readonly string _theme;
-    private readonly IReadOnlyList<Size> _sizes;
+    private readonly Manifest _manifest;
 
-    public StudioDriver(string exe, string output, string theme, IReadOnlyList<Size> sizes)
+    public StudioDriver(
+        string exe,
+        string output,
+        string theme,
+        Manifest manifest,
+        IReadOnlyDictionary<string, string?> environment)
     {
         _output = output;
         _theme = theme;
-        _sizes = sizes;
-        _app = FlaUIApplication.Launch(new ProcessStartInfo(exe) {
+        _manifest = manifest;
+        var start = new ProcessStartInfo(exe) {
             WorkingDirectory = Path.GetDirectoryName(exe),
-        });
+            UseShellExecute = false,
+        };
+
+        foreach (var (name, value) in environment)
+        {
+            start.Environment[name] = value;
+        }
+
+        _app = FlaUIApplication.Launch(start);
         _window = _app.GetMainWindow(_automation, _startTimeout)
             ?? throw new InvalidOperationException($"No window within {_startTimeout.TotalSeconds} s.");
         _window.SetForeground();
@@ -51,36 +77,53 @@ internal sealed class StudioDriver : IDisposable
 
     public bool HasExited => _app.HasExited;
 
-    /// <summary>Captures the page at each size, named as docs/design/ui-screenshots.md says.</summary>
-    public void Capture(string page, string state)
+    private nint Handle => _window.Properties.NativeWindowHandle.Value;
+
+    /// <summary>Captures the window at each size, named as docs/design/ui-screenshots.md says.</summary>
+    /// <param name="arrange">Runs after each resize, before the capture: a hover, a focus, a trigger.</param>
+    public void Capture(string page, string state, Action? arrange = null, IReadOnlyList<Size>? sizes = null)
     {
-        foreach (var size in _sizes)
+        foreach (var size in sizes ?? Sizes)
         {
-            EnsureRunning();
-            var frame = Desktop.SetVisibleFrame(_window.Properties.NativeWindowHandle.Value, _origin, size);
-
-            if (frame.Size != size)
-            {
-                throw new InvalidOperationException(
-                    $"The window is {frame.Width} x {frame.Height}, not {size.Width} x {size.Height}.");
-            }
-
-            _window.SetForeground();
-            Mouse.MoveTo(new Point(frame.Right + 40, frame.Bottom + 40));
-            Settle(1200);
-
-            var file = Path.Combine(_output, $"{page}-{state}-{size.Width}x{size.Height}-{_theme}.png");
-            FlaUICapture
-                .Rectangle(frame)
-                .ToFile(file);
-            Console.WriteLine($"  {Path.GetFileName(file)}");
+            var frame = Resize(size);
+            arrange?.Invoke();
+            Save(page, state, size, frame);
         }
     }
 
-    /// <summary>Selects a pane item by its automation ID, the page key such as <c>SignOffs</c>.</summary>
-    public void Navigate(string pageKey)
+    /// <summary>Captures one part of the window at 1280 × 800: the title bar or the navigation pane.</summary>
+    public void CapturePart(string page, string state, bool pane)
     {
-        var item = Find(cf => cf.ByAutomationId(pageKey), pageKey);
+        var frame = Resize(Wide);
+        var part = pane
+            ? new Rectangle(frame.Left, frame.Top + _titleBarHeight, _paneWidth, frame.Height - _titleBarHeight)
+            : new Rectangle(frame.Left, frame.Top, frame.Width, _titleBarHeight);
+        Save(page, state, part.Size, part);
+    }
+
+    /// <summary>Sizes the window and moves the pointer off it, so nothing shows hovered.</summary>
+    public Rectangle Resize(Size size)
+    {
+        EnsureRunning();
+        var frame = Desktop.SetVisibleFrame(Handle, _origin, size);
+
+        if (frame.Size != size)
+        {
+            throw new InvalidOperationException(
+                $"The window is {frame.Width} x {frame.Height}, not {size.Width} x {size.Height}.");
+        }
+
+        _window.SetForeground();
+        Mouse.MoveTo(new Point(frame.Right + 40, frame.Bottom + 40));
+        Settle(1200);
+
+        return frame;
+    }
+
+    /// <summary>Selects a pane item by its automation ID, the page key such as <c>SignOffs</c>.</summary>
+    public void Navigate(string pageKey, int settle = 2500)
+    {
+        var item = Find(e => Id(e) == pageKey, pageKey);
 
         if (item.Patterns.SelectionItem.TryGetPattern(out var selection))
         {
@@ -91,34 +134,95 @@ internal sealed class StudioDriver : IDisposable
             item.Patterns.Invoke.Pattern.Invoke();
         }
 
+        Settle(settle);
+    }
+
+    /// <summary>Invokes the button or link with this name, or clicks the text of a button that has no name.</summary>
+    public void Invoke(string name, int settle = 2500)
+    {
+        EnsureRunning();
+        var element = Retry
+            .WhileNull(
+                () => Descendants().FirstOrDefault(e => IsAction(e) && Matches(e, name))
+                    ?? Descendants().FirstOrDefault(e => Type(e) == ControlType.Text && NameOf(e) == name),
+                _findTimeout,
+                TimeSpan.FromMilliseconds(500),
+                ignoreException: true)
+            .Result ?? throw new InvalidOperationException($"No {name} within {_findTimeout.TotalSeconds} s.");
+
+        if (Type(element) == ControlType.Text)
+        {
+            element = ButtonAround(element);
+        }
+
+        if (element.Properties.IsEnabled.ValueOrDefault)
+        {
+            element.Patterns.Invoke.Pattern.Invoke();
+        }
+        else
+        {
+            throw new InvalidOperationException($"{name} is disabled.");
+        }
+
+        Settle(settle);
+    }
+
+    /// <summary>Presses the button showing <paramref name="name"/> beside the text <paramref name="row"/>.</summary>
+    /// <remarks>
+    /// UI Automation exposes no name for a button with a glyph and text, so the button is the one around its own
+    /// text, level with the row's title; it is pressed from the keyboard, focus then Space.
+    /// </remarks>
+    public void ClickBeside(string row, string name)
+    {
+        var title = Find(e => Type(e) == ControlType.Text && NameOf(e) == row, row).BoundingRectangle;
+        var label = Descendants()
+            .Where(e => Type(e) is ControlType.Text or ControlType.Button && NameOf(e) == name)
+            .FirstOrDefault(e => e.BoundingRectangle.Top <= title.Bottom + 40
+                && e.BoundingRectangle.Bottom >= title.Top)
+            ?? throw new InvalidOperationException($"No {name} beside {row}.");
+        var button = Type(label) == ControlType.Text ? ButtonAround(label) : label;
+
+        if (!button.Properties.IsEnabled.ValueOrDefault)
+        {
+            throw new InvalidOperationException($"{name} beside {row} is disabled.");
+        }
+
+        button.Focus();
+        Keyboard.Type(VirtualKeyShort.SPACE);
         Settle(2500);
     }
 
-    public void Invoke(string name)
+    /// <summary>Opens the list row whose name contains <paramref name="text"/>; UIA cannot raise ItemClick.</summary>
+    public void ClickItem(string listName, string text)
     {
-        Find(cf => cf.ByName(name), name).Patterns.Invoke.Pattern.Invoke();
-        Settle(2500);
-    }
-
-    /// <summary>Clicks the first row of a list; UI Automation cannot raise ItemClick.</summary>
-    public void ClickFirstItem(string listName)
-    {
-        var list = Find(
-            cf => cf
-                .ByName(listName)
-                .And(cf.ByControlType(ControlType.List)),
-            listName);
+        var list = Find(e => Type(e) == ControlType.List && NameOf(e) == listName, listName);
         var row = Retry
-            .WhileNull(() => list.FindFirstChild(cf => cf.ByControlType(ControlType.ListItem)), _findTimeout)
-            .Result ?? throw new InvalidOperationException($"{listName} has no rows.");
-        row.Click();
+            .WhileNull(
+                () => list
+                    .FindAllChildren(c => c.ByControlType(ControlType.ListItem))
+                    .FirstOrDefault(r => NameOf(r).Contains(text, StringComparison.Ordinal)),
+                _findTimeout,
+                ignoreException: true)
+            .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
+        // Enter opens a row, as the handoff's keyboard order says; a row below the fold has no point to click.
+        row.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
+        row.Focus();
+        Keyboard.Type(VirtualKeyShort.ENTER);
         Settle(4000);
+    }
+
+    /// <summary>Selects the list, radio or SelectorBar item whose name starts with <paramref name="name"/>.</summary>
+    public void Select(string name)
+    {
+        var item = Find(e => e.Patterns.SelectionItem.IsSupported && Starts(e, name), name);
+        item.Patterns.SelectionItem.Pattern.Select();
+        Settle(2000);
     }
 
     /// <summary>Selects each item of a SelectorBar in turn, calling back with the item's name.</summary>
     public void ForEachSection(string barName, Action<string> capture)
     {
-        var bar = Find(cf => cf.ByName(barName), barName);
+        var bar = Find(e => NameOf(e) == barName, barName);
         var items = bar
             .FindAllDescendants()
             .Where(e => e.Patterns.SelectionItem.IsSupported)
@@ -131,54 +235,190 @@ internal sealed class StudioDriver : IDisposable
 
         foreach (var item in items)
         {
-            var name = item.Name;
+            string name = NameOf(item);
             item.Patterns.SelectionItem.Pattern.Select();
             Settle(1500);
             capture(name);
         }
     }
 
-    /// <summary>Expands the first expander when none is open, so a page shows one expanded.</summary>
-    public void EnsureOneExpanded()
+    public void Toggle(string name)
+    {
+        Find(e => e.Patterns.Toggle.IsSupported && Matches(e, name), name).Patterns.Toggle.Pattern.Toggle();
+        Settle(2500);
+    }
+
+    /// <summary>Types into the text box with this name, then moves focus on as a person tabbing out would.</summary>
+    /// <param name="settle">0 when a brief state follows, such as the preview that tabbing out starts.</param>
+    public void Type(string name, string text, bool tabOut = false, int settle = 800)
+    {
+        var box = Find(e => Type(e) == ControlType.Edit && Matches(e, name), name);
+        box.Focus();
+        box.Patterns.Value.Pattern.SetValue(text);
+
+        if (tabOut)
+        {
+            Keyboard.Type(VirtualKeyShort.TAB);
+        }
+
+        Settle(settle);
+    }
+
+    /// <summary>Expands the expander whose name starts with <paramref name="name"/>, or the first one.</summary>
+    public void Expand(string? name = null)
     {
         var expanders = Retry
-            .WhileEmpty(() => _window.FindAllDescendants(cf => cf.ByClassName(_expanderClass)), _findTimeout)
-            .Result;
+            .WhileEmpty(
+                () => _window.FindAllDescendants(cf => cf.ByClassName(_expanderClass)),
+                _findTimeout,
+                ignoreException: true)
+            .Result ?? [];
+        var expander = expanders.FirstOrDefault(e => name is null || Matches(e, name))
+            ?? throw new InvalidOperationException($"No expander {name}.");
 
-        if (expanders is null || expanders.Length == 0)
+        if (expander.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value is not ExpandCollapseState.Expanded)
         {
-            throw new InvalidOperationException("The page has no expanders.");
-        }
-
-        var patterns = expanders
-            .Select(e => e.Patterns.ExpandCollapse.PatternOrDefault)
-            .OfType<IExpandCollapsePattern>()
-            .ToList();
-
-        if (patterns.TrueForAll(p => p.ExpandCollapseState.Value is not ExpandCollapseState.Expanded))
-        {
-            patterns[0].Expand();
+            expander.Patterns.ExpandCollapse.Pattern.Expand();
             Settle(1500);
         }
+    }
+
+    public void Hover(string automationId)
+    {
+        var element = Find(e => Id(e) == automationId, automationId);
+        element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
+        Mouse.MoveTo(element.BoundingRectangle.Center());
+        Settle(2500);
+    }
+
+    /// <summary>Gives keyboard focus as Tab would, so the focus ring shows.</summary>
+    public void FocusWithKeyboard(string automationId)
+    {
+        var element = Find(e => Id(e) == automationId, automationId);
+        element.Focus();
+        Keyboard.Type(VirtualKeyShort.TAB);
+        Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.TAB);
+        Settle(1500);
+    }
+
+    public void ScrollIntoView(string automationId)
+    {
+        Find(e => Id(e) == automationId, automationId).Patterns.ScrollItem.Pattern.ScrollIntoView();
+        Settle(1500);
+    }
+
+    /// <summary>Waits until an element with this name, or whose name starts with it, shows.</summary>
+    public void WaitFor(string name, TimeSpan timeout)
+    {
+        EnsureRunning();
+        _ = Retry
+                .WhileNull(
+                    () => _window.FindFirstDescendant(c => c.ByName(name))
+                        ?? Descendants().FirstOrDefault(e => Starts(e, name)),
+                    timeout,
+                    TimeSpan.FromMilliseconds(500),
+                    ignoreException: true)
+                .Result
+            ?? throw new TimeoutException($"{name} did not show within {timeout.TotalSeconds} s.");
+    }
+
+    /// <summary>Waits for a state that lasts a second or so, with one native query every few milliseconds.</summary>
+    /// <remarks>A walk of the whole tree takes longer than a short scan, so a brief state is matched exactly.</remarks>
+    public void WaitBriefly(Func<ConditionFactory, ConditionBase> condition, string what, TimeSpan timeout)
+    {
+        EnsureRunning();
+        _ = Retry
+                .WhileNull(() => _window.FindFirstDescendant(condition), timeout, _poll, ignoreException: true)
+                .Result
+            ?? throw new TimeoutException($"{what} did not show within {timeout.TotalSeconds} s.");
+    }
+
+    /// <summary>Waits until the button with this name can be pressed, as a person waits before pressing it.</summary>
+    public void WaitEnabled(string name, TimeSpan timeout)
+    {
+        EnsureRunning();
+        bool enabled = Retry
+            .WhileFalse(
+                () => Descendants().Any(e => IsAction(e) && Matches(e, name) && e.Properties.IsEnabled.ValueOrDefault),
+                timeout,
+                TimeSpan.FromMilliseconds(500),
+                ignoreException: true)
+            .Result;
+
+        if (!enabled)
+        {
+            throw new TimeoutException($"{name} is still disabled after {timeout.TotalSeconds} s.");
+        }
+    }
+
+    /// <summary>Saves the window as it is when a step fails, beside the captures but outside the manifest.</summary>
+    public void SaveFailure(string step)
+    {
+        string folder = Path.Combine(_output, "failures");
+        Directory.CreateDirectory(folder);
+        string file = Path.Combine(folder, $"{_theme}-{Slug(step)}");
+        FlaUICapture
+            .Rectangle(Desktop.VisibleFrame(Handle))
+            .ToFile(file + ".png");
+
+        // What UI Automation saw, so a control the step looked for can be told from one that was not there.
+        var elements = Descendants()
+            .Where(e => Type(e) is not ControlType.Pane and not ControlType.Group || NameOf(e).Length > 0)
+            .Select(e => $"{Type(e)}\t{Id(e)}\t{NameOf(e)}\t{e.Properties.BoundingRectangle.ValueOrDefault}");
+        File.WriteAllLines(file + ".txt", elements);
+    }
+
+    /// <summary>Invokes the title bar's pane toggle, the WinUI TitleBar's template part.</summary>
+    public void TogglePane()
+    {
+        Find(e => Id(e) == "PART_PaneToggleButton", "Toggle Navigation").Patterns.Invoke.Pattern.Invoke();
+        Settle(2500);
+    }
+
+    /// <summary>Waits until no element called <paramref name="name"/> shows.</summary>
+    /// <remarks>A walk that meets an element as the page replaces it throws; that poll counts as showing.</remarks>
+    public void WaitGone(string name, TimeSpan timeout)
+    {
+        EnsureRunning();
+        var clock = Stopwatch.StartNew();
+
+        while (Shows(name))
+        {
+            if (clock.Elapsed > timeout)
+            {
+                throw new TimeoutException($"{name} still shows after {timeout.TotalSeconds} s.");
+            }
+
+            Thread.Sleep(_poll);
+        }
+    }
+
+    /// <summary>Presses a button as a keyboard user does: focus, then Space.</summary>
+    public void PressWithKeyboard(string name)
+    {
+        var element = Find(e => IsAction(e) && Matches(e, name), name);
+        element.Focus();
+        Keyboard.Type(VirtualKeyShort.SPACE);
+        Settle(2500);
     }
 
     public static string Slug(string name)
     {
         var slug = new StringBuilder();
 
-        foreach (var c in name.ToLowerInvariant())
+        foreach (char c in name.ToLowerInvariant())
         {
             slug.Append(char.IsAsciiLetterOrDigit(c) ? c : '-');
         }
 
-        var text = slug.ToString();
+        string text = slug.ToString();
 
         while (text.Contains("--", StringComparison.Ordinal))
         {
             text = text.Replace("--", "-", StringComparison.Ordinal);
         }
 
-        // A section's name ends with its count, as "Code modules 7"; the file name must not change with the data.
+        // A section's name ends with its count, as "Code modules, 7"; the file name must not change with the data.
         return text
             .TrimEnd("0123456789".ToCharArray())
             .Trim('-');
@@ -201,12 +441,97 @@ internal sealed class StudioDriver : IDisposable
         _automation.Dispose();
     }
 
-    private AutomationElement Find(Func<ConditionFactory, ConditionBase> condition, string what)
+    private static bool IsAction(AutomationElement element)
+    {
+        return Type(element) is ControlType.Button or ControlType.Hyperlink or ControlType.SplitButton
+            && element.Patterns.Invoke.IsSupported;
+    }
+
+    /// <summary>A name equal to the text, or starting with it and a comma, as names with a count do.</summary>
+    private static bool Matches(AutomationElement element, string name)
+    {
+        string actual = NameOf(element);
+
+        return actual == name || actual.StartsWith(name + ",", StringComparison.Ordinal);
+    }
+
+    private static bool Starts(AutomationElement element, string text)
+    {
+        return NameOf(element).StartsWith(text, StringComparison.Ordinal);
+    }
+
+    /// <summary>The smallest button whose box holds the text: the button a glyph-and-text label belongs to.</summary>
+    private AutomationElement ButtonAround(AutomationElement text)
+    {
+        var centre = text.BoundingRectangle.Center();
+
+        return Descendants()
+            .Where(e => Type(e) == ControlType.Button && e.BoundingRectangle.Contains(centre))
+            .OrderBy(e => e.BoundingRectangle.Width * e.BoundingRectangle.Height)
+            .FirstOrDefault()
+            ?? throw new InvalidOperationException($"No button around {NameOf(text)}.");
+    }
+
+    /// <remarks>A plain property getter throws where the element lacks the property; these read it as empty.</remarks>
+    private static string NameOf(AutomationElement element)
+    {
+        return element.Properties.Name.ValueOrDefault ?? string.Empty;
+    }
+
+    private static string Id(AutomationElement element)
+    {
+        return element.Properties.AutomationId.ValueOrDefault ?? string.Empty;
+    }
+
+    private static ControlType Type(AutomationElement element)
+    {
+        return element.Properties.ControlType.ValueOrDefault;
+    }
+
+    private void Save(string page, string state, Size size, Rectangle area)
+    {
+        string file = Path.Combine(_output, $"{page}-{state}-{size.Width}x{size.Height}-{_theme}.png");
+        FlaUICapture
+            .Rectangle(area)
+            .ToFile(file);
+        _manifest.Add(Path.GetFileName(file), page, state, _theme, size.Width);
+        Console.WriteLine($"  {Path.GetFileName(file)}");
+    }
+
+    /// <remarks>Dialogs and flyouts can be popups outside the window; the app's other windows are searched.</remarks>
+    private IEnumerable<AutomationElement> Descendants()
+    {
+        return _window
+            .FindAllDescendants()
+            .Concat(_automation
+                .GetDesktop()
+                .FindAllChildren(c => c.ByProcessId(_app.ProcessId))
+                .Where(w => w.Properties.NativeWindowHandle.ValueOrDefault != Handle)
+                .SelectMany(w => w.FindAllDescendants()));
+    }
+
+    private bool Shows(string name)
+    {
+        try
+        {
+            return _window.FindFirstDescendant(c => c.ByName(name)) is not null;
+        }
+        catch (COMException)
+        {
+            return true;
+        }
+    }
+
+    private AutomationElement Find(Func<AutomationElement, bool> predicate, string what)
     {
         EnsureRunning();
 
         return Retry
-            .WhileNull(() => _window.FindFirstDescendant(condition), _findTimeout)
+            .WhileNull(
+                () => Descendants().FirstOrDefault(predicate),
+                _findTimeout,
+                TimeSpan.FromMilliseconds(500),
+                ignoreException: true)
             .Result ?? throw new InvalidOperationException($"No {what} within {_findTimeout.TotalSeconds} s.");
     }
 
