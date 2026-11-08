@@ -166,9 +166,10 @@
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
             </ItemsRepeater>
-            <!--  One line, as drawn; a hash too long for it ends in an ellipsis and shows whole on hover.  -->
+            <!--  The label, then the whole hash wrapping beside it, as drawn.  -->
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -179,18 +180,19 @@
                     Style="{StaticResource IconStyle}" />
                 <TextBlock
                     Grid.Column="1"
+                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                    Text="Fingerprint of these files:" />
+                <TextBlock
+                    Grid.Column="2"
+                    FontFamily="Cascadia Mono,Consolas"
                     IsTextSelectionEnabled="True"
                     Style="{StaticResource SecondaryCaptionTextStyle}"
-                    TextTrimming="CharacterEllipsis"
-                    TextWrapping="NoWrap"
-                    ToolTipService.ToolTip="{x:Bind ViewModel.SignOff.Fingerprint}">
-                    <Run Text="Fingerprint of these files:" />
-                    <Run FontFamily="Cascadia Mono,Consolas" Text="{x:Bind ViewModel.SignOff.Fingerprint}" />
-                </TextBlock>
+                    Text="{x:Bind ViewModel.SignOff.Fingerprint}"
+                    TextWrapping="Wrap" />
             </Grid>
         </StackPanel>
 
-        <!--  The label is its own text, so it keeps its colour while the box is off without an identity.  -->
+        <!--  As drawn: 76 tall, and open without an identity too; Approve stays off until git names who approves.  -->
         <StackPanel Spacing="8">
             <TextBlock>
                 <Run Text="{x:Bind ViewModel.FieldLabel}" />
@@ -198,11 +200,10 @@
             </TextBlock>
             <TextBox
                 x:Name="NoteBox"
-                MinHeight="96"
+                MinHeight="76"
                 AcceptsReturn="True"
                 AutomationProperties.IsRequiredForForm="True"
                 AutomationProperties.Name="{x:Bind ViewModel.FieldName}"
-                IsEnabled="{x:Bind ViewModel.HasIdentity}"
                 PlaceholderText="{x:Bind ViewModel.Placeholder}"
                 Text="{x:Bind ViewModel.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 TextWrapping="Wrap" />

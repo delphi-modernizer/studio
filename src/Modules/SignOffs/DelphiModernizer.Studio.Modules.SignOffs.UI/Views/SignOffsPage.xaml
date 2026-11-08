@@ -98,11 +98,10 @@
         </DataTemplate>
 
         <DataTemplate x:Key="CoveredFileTemplate" x:DataType="vm:CoveredFileRow">
-            <!--  One line per path, trimmed and whole on hover; a changed file adds a caution mark.  -->
+            <!--  Each path whole, wrapping where it must, as drawn; a changed file adds a caution mark.  -->
             <Grid
                 Padding="0,2"
-                ColumnSpacing="8"
-                ToolTipService.ToolTip="{x:Bind Path}">
+                ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -111,8 +110,8 @@
                     LineHeight="18"
                     Style="{StaticResource MonoTextStyle}"
                     Text="{x:Bind Path}"
-                    TextTrimming="CharacterEllipsis"
-                    TextWrapping="NoWrap" />
+                    TextTrimming="None"
+                    TextWrapping="Wrap" />
                 <TextBlock
                     Grid.Column="1"
                     AutomationProperties.Name="changed since approval"
@@ -462,31 +461,33 @@
                                             <ItemsRepeater
                                                 ItemTemplate="{StaticResource CoveredFileTemplate}"
                                                 ItemsSource="{x:Bind Covers}" />
+                                            <!--  The label, then the whole hash wrapping beside it, as drawn.  -->
                                             <Grid ColumnSpacing="8">
                                                 <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <FontIcon
-                                                    VerticalAlignment="Center"
+                                                    VerticalAlignment="Top"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Glyph="{x:Bind icons:StudioIcons.Fingerprint}"
                                                     Style="{StaticResource IconStyle}" />
-                                                <!--  Label and hash on one line as drawn; trimmed, whole on hover.  -->
                                                 <TextBlock
                                                     Grid.Column="1"
-                                                    VerticalAlignment="Center"
+                                                    Style="{StaticResource MonoTextStyle}"
+                                                    Text="Fingerprint" />
+                                                <TextBlock
+                                                    Grid.Column="2"
                                                     IsTextSelectionEnabled="True"
                                                     Style="{StaticResource MonoTextStyle}"
-                                                    TextTrimming="CharacterEllipsis"
-                                                    TextWrapping="NoWrap"
-                                                    ToolTipService.ToolTip="{x:Bind Fingerprint}">
-                                                    <Run Text="Fingerprint" />
-                                                    <Run Text="{x:Bind Fingerprint}" />
-                                                </TextBlock>
+                                                    Text="{x:Bind Fingerprint}"
+                                                    TextTrimming="None"
+                                                    TextWrapping="Wrap" />
                                                 <Button
-                                                    Grid.Column="2"
+                                                    Grid.Column="3"
+                                                    VerticalAlignment="Top"
                                                     AutomationProperties.Name="Copy the fingerprint"
                                                     Click="OnCopyFingerprint"
                                                     Style="{StaticResource SubtleButtonStyle}"

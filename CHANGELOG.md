@@ -106,13 +106,17 @@
 - Run an agent task and the budget dialog show the budget as "2.00" after a grey "$", as Settings does, and Run with
   its play icon; the budget, approve and revoke dialogs have no default button, so Enter never spends money or
   approves, and Cancel and Close are drawn plain.
-- The approve dialog and Sign-offs show the fingerprint on one line, whole on hover; the dialog lists every covered
-  file, and Sign-offs trims covered paths instead of wrapping them and divides its checks by hairlines.
-- The no-identity approve dialog keeps its note label in full colour while the box is off.
-- Workstreams shows a Blocked reason on one line with Open run, and a run's time alone when it started today.
-- Run's Files touched lists the files a folder search matched, not the folder, and puts edited files first; a starting
-  run shows $0.00 spent and 0 turns, and the session strip's model and version read at body size.
-- The screenshot harness's stand-in edits the deliverable on every run, so each run's Files touched shows the draft.
+- The approve dialog and Sign-offs show the whole fingerprint beside its label and every covered path, wrapped; the
+  dialog lists every covered file, and Sign-offs divides its checks by hairlines and gives a blocked sign-off the
+  reason its first unmet check gives, such as "It is ready".
+- The approve dialog's note box is 76 tall and stays open without a git identity; Approve still waits for one.
+- Workstreams shows Open run inline after a Blocked reason, kept whole, and a run's time alone when it started today.
+- Run's Files touched lists the files a folder search matched, not the folder, puts edited files first in primary
+  text and says so while it is empty; a starting run shows $0.00 spent and 0 turns, the session strip's model and
+  version read at body size, and a refusal carries the filled warning pill.
+- The run and budget dialogs' budget field is 240 wide, as drawn.
+- The screenshot harness's stand-in searches the units only and records its rule in business-rules.md on every run,
+  so Files touched lists the canvas's three files.
 - New workspace opens the workspace it created on Open the Overview, so the Created step shows no subtitle; Create
   lists it in Recent workspaces.
 - New workspace's step list sets the current step in semibold and the steps ahead in secondary text; waiting

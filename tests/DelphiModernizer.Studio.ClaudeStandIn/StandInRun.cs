@@ -25,6 +25,12 @@ internal sealed class StandInRun(
     private const string _grepPath = "legacy/Sales";
     private const string _grepPattern = "CREDIT_LIMIT";
 
+    /// <summary>Units only, so the search finds the .pas files the canvas lists and not their .dfm forms.</summary>
+    private const string _grepGlob = "*.pas";
+
+    /// <summary>The supporting file the canvas's run records its rules in; it is part of the deliverable.</summary>
+    private const string _rules = "docs/02-functional-requirements/business-rules.md";
+
     /// <summary>The command the kit's .claude/settings.json gives the hook; Claude Code names it on refusal.</summary>
     private const string _hookCommand = "dmz guard pre-tool-use || exit 2";
 
@@ -106,7 +112,7 @@ internal sealed class StandInRun(
         Tool("Read", new JsonObject { ["file_path"] = _read }, () => Numbered(File.ReadAllLines(source)));
         Tool(
             "Grep",
-            new JsonObject { ["pattern"] = _grepPattern, ["path"] = _grepPath },
+            new JsonObject { ["pattern"] = _grepPattern, ["path"] = _grepPath, ["glob"] = _grepGlob },
             () => Grep(Path.Combine(workspaceRoot, _grepPath)));
         Say(string.Join(
             '\n',
@@ -117,23 +123,30 @@ internal sealed class StandInRun(
             "**[Inferred]** Gold status seems to follow from the credit limit alone, not from a customer flag.",
             "**[Unknown]** Whether the discount also applies to invoices printed with QuickReport."));
         Edit(_read, "  GoldThreshold = 10000;", "  GoldThreshold = 10000; { BR-001 }");
-        string status = File
-            .ReadLines(Path.Combine(workspaceRoot, deliverableFile))
-            .First(l => l.StartsWith("status:", StringComparison.Ordinal));
-
-        if (status != "status: draft")
-        {
-            Edit(deliverableFile, status, "status: draft");
-        }
-        else
-        {
-            // A draft already: the run still writes to it, as every real run on the recipe does.
-            Edit(deliverableFile, $"{status}\n---\n", $"{status}\n---\n\n<!-- Stand-in run {sessionId}. -->\n");
-        }
+        // The canvas's run touches three files: Pricing.pas and CustomerForm.pas, which it reads, and the rules file it
+        // writes. Each run adds its own line there, so a second run in one workspace still edits it.
+        const string heading = "# Business Rules\n";
+        Edit(_rules, heading, $"{heading}\n<!-- BR-001, recorded by stand-in run {sessionId}. -->\n");
+        Draft();
 
         // The runner reads standard error apart from the events, so the note waits until they are read and comes last.
         Thread.Sleep(_beforeNote);
         Console.Error.WriteLine("stand-in: the screenshot harness's Claude Code; no model was called.");
+    }
+
+    /// <summary>
+    /// Sets the deliverable to Draft as the recipe leaves it, without a tool call, so Files touched keeps the canvas's
+    /// three files; the guard allows a docs/ edit, and the rules file above is the run's recorded edit.
+    /// </summary>
+    private void Draft()
+    {
+        string file = Path.Combine(workspaceRoot, deliverableFile);
+        string text = File.ReadAllText(file);
+        string status = text
+            .Split('\n')
+            .First(l => l.StartsWith("status:", StringComparison.Ordinal))
+            .TrimEnd('\r');
+        File.WriteAllText(file, text.Replace(status, "status: draft", StringComparison.Ordinal));
     }
 
     private void Say(string text)
@@ -265,7 +278,7 @@ internal sealed class StandInRun(
     private string Grep(string folder)
     {
         var matches = Directory
-            .EnumerateFiles(folder, "*", SearchOption.AllDirectories)
+            .EnumerateFiles(folder, _grepGlob, SearchOption.AllDirectories)
             .Order(StringComparer.Ordinal)
             .SelectMany(file => File
                 .ReadLines(file)

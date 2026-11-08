@@ -51,6 +51,12 @@ public sealed partial class RunPage : Page, IHasViewModel
         return value ? Visibility.Collapsed : Visibility.Visible;
     }
 
+    /// <summary>What Files touched says while it is empty (open questions).</summary>
+    public static string NoFilesText(bool live)
+    {
+        return live ? "None yet. The files the run reads or edits appear here." : "The run read and edited no files.";
+    }
+
     /// <summary>Open the draft is the accent action once the agent finished; otherwise a plain button.</summary>
     public static Style DraftStyle(RunOutcome outcome)
     {

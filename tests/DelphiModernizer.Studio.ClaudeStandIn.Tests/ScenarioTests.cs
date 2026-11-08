@@ -44,7 +44,10 @@ public sealed class ScenarioTests : IDisposable
         Assert.Contains(
             events,
             e => e is ToolResult r && r.Content.Contains("CustomerForm.pas:35:", StringComparison.Ordinal));
+        Assert.DoesNotContain(events, e => e is ToolResult r && r.Content.Contains(".dfm", StringComparison.Ordinal));
         Assert.Contains("status: draft", await File.ReadAllTextAsync(Path.Combine(root, _draft)));
+        string rules = Path.Combine(root, "docs", "02-functional-requirements", "business-rules.md");
+        Assert.Contains("BR-001", await File.ReadAllTextAsync(rules));
         string pricing = await File.ReadAllTextAsync(Path.Combine(root, "legacy", "Sales", "Pricing.pas"));
         Assert.DoesNotContain("BR-001", pricing);
     }
