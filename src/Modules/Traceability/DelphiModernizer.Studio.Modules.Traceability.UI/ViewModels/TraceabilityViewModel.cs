@@ -146,10 +146,11 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
         string time = checkedAt.LocalDateTime.ToString("t", CultureInfo.CurrentCulture);
         int questions = report.Problems.Count(p => p.Issue.Rule == "open-question");
 
-        // Errors first, as the design lists them; the kit's order stays within each severity.
+        // Errors, then warnings counted as errors, then warnings, as the design lists them; the kit's order
+        // stays within each.
         _all = [.. report.Problems
             .Select(Row)
-            .OrderBy(p => p.IsError ? 0 : 1)];
+            .OrderBy(p => (p.IsError, p.Promoted) switch { (true, false) => 0, (true, true) => 1, _ => 2 })];
         var errors = _all.FindAll(p => p.IsError);
         string errorsDetail = Strict
             ? ProblemWordings.StrictErrors(errors.Count, errors.Count(p => p.Promoted))

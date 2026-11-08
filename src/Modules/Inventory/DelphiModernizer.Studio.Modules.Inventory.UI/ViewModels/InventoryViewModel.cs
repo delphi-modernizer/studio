@@ -440,10 +440,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         Tabs = [
             new(InventoryTab.Units, "Code modules", inventory.Units.Length),
             new(InventoryTab.Screens, "Screens", inventory.Forms.Length),
-            new(
-                InventoryTab.Data,
-                "Data and libraries",
-                inventory.DatabaseAccess.Length + inventory.ThirdParty.Length + connections.Count),
+            new(InventoryTab.Data, "Data and libraries", cards.Length),
             new(InventoryTab.Risks, "SQL and risks", Sql.Count + Risks.Count),
             new(InventoryTab.Cycles, "Cycles", cycles),
             new(InventoryTab.Diagnostics, "Diagnostics", Diagnostics.Count),
