@@ -51,7 +51,10 @@
                             VerticalAlignment="Center"
                             Style="{StaticResource SecondaryCaptionTextStyle}"
                             Text="{x:Bind Path}" />
-                        <controls:StatusPill Grid.Column="2" State="{x:Bind Pill}" />
+                        <controls:StatusPill
+                            Grid.Column="2"
+                            FontWeight="SemiBold"
+                            State="{x:Bind Pill}" />
                     </Grid>
                     <Grid ColumnSpacing="12" Visibility="{x:Bind IsDeliverable}">
                         <Grid.ColumnDefinitions>
@@ -121,7 +124,10 @@
                             VerticalAlignment="Center"
                             Style="{StaticResource SecondaryCaptionTextStyle}"
                             Text="{x:Bind Path}" />
-                        <controls:StatusPill Grid.Column="2" State="{x:Bind Pill}" />
+                        <controls:StatusPill
+                            Grid.Column="2"
+                            FontWeight="SemiBold"
+                            State="{x:Bind Pill}" />
                     </Grid>
                     <Grid ColumnSpacing="12" Visibility="{x:Bind IsDeliverable}">
                         <Grid.ColumnDefinitions>

@@ -34,6 +34,8 @@ internal sealed class StandInRun(
     /// <summary>The harness stops a waiting run within minutes; a stand-in left behind ends on its own.</summary>
     private static readonly TimeSpan _longestWait = TimeSpan.FromMinutes(10);
 
+    private static readonly TimeSpan _beforeNote = TimeSpan.FromMilliseconds(500);
+
     private readonly JsonArray _denials = [];
     private int _turns;
     private int _toolIds;
@@ -128,6 +130,9 @@ internal sealed class StandInRun(
             // A draft already: the run still writes to it, as every real run on the recipe does.
             Edit(deliverableFile, $"{status}\n---\n", $"{status}\n---\n\n<!-- Stand-in run {sessionId}. -->\n");
         }
+
+        // The runner reads standard error apart from the events, so the note waits until they are read and comes last.
+        Thread.Sleep(_beforeNote);
         Console.Error.WriteLine("stand-in: the screenshot harness's Claude Code; no model was called.");
     }
 

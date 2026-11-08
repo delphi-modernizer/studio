@@ -60,7 +60,6 @@ internal sealed class Workspaces : IDisposable
         Scan("clean");
         Init("unscanned", Legacy, "--domain", "ERP, a Delphi 7 application on the BDE");
         Init("large", LargeLegacy, "--domain", "ERP, a Delphi 7 application on the BDE", "--no-git");
-        Scan("large");
     }
 
     /// <summary>The brief's sample, the engine's Delphi 7 ERP on the BDE.</summary>

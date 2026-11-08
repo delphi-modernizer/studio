@@ -682,9 +682,8 @@
                         Visibility="{x:Bind ViewModel.IsScanning, Mode=OneWay}">
                         <StackPanel Spacing="10">
                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                <ProgressRing
-                                    Width="16"
-                                    Height="16"
+                                <controls:Spinner
+                                    VerticalAlignment="Center"
                                     IsActive="{x:Bind ViewModel.IsScanning, Mode=OneWay}" />
                                 <TextBlock Style="{StaticResource BodyTextBlockStyle}" Text="Scanning legacy/…" />
                                 <TextBlock

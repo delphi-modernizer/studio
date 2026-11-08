@@ -48,8 +48,8 @@ internal sealed class StudioData : IDisposable
         WriteRecent(recent);
     }
 
-    /// <summary>The recent workspaces, most recent first; Start reads the list each time it loads.</summary>
-    public void WriteRecent(IReadOnlyList<string> workspaces)
+    /// <summary>The recent workspaces, most recent first.</summary>
+    private void WriteRecent(IReadOnlyList<string> workspaces)
     {
         var recent = new JsonArray();
         var openedAt = DateTimeOffset.UtcNow;

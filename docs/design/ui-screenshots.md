@@ -74,7 +74,8 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
      is defined nowhere, and evidence in a file that does not exist.
    - `clean`: the same sample with all six context answers, scanned; it has no problem at all.
    - `unscanned`: the sample, not scanned.
-   - `large`: 10,000 generated units in 100 folders, scanned, without git so that it is quick to create.
+   - `large`: 10,000 generated units in 100 folders, not scanned, without git so that it is quick to create. Inventory
+     scans it as the canvas's first scan.
 3. It launches the app once per configuration, with a fresh copy of each workspace it lists. It writes the app's own
    settings before each launch, since the app reads them once: the recent workspaces, the Theme setting and the
    Claude Code path. It sets the stand-in's variables and `GIT_CONFIG_GLOBAL` (a file with the screenshots identity,
@@ -82,8 +83,10 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    - Theme follows Windows, as it does until a person chooses, and the canvas's Settings shows it so. The light and
      dark passes set Windows' app mode (`AppsUseLightTheme`) before their launches and put the person's back
      afterwards.
-   - Each size of the wizard has a launch of its own, since Create leaves the new workspace open and the canvas draws
-     the wizard with none.
+   - Each size of the wizard has a launch of its own, so that each starts from Start with no workspace open, as the
+     canvas draws it. Step 1 is captured before a folder is refused, since the page then moves focus to the folder.
+     Start's first run is a launch with no recent workspaces, so Back has nowhere to go; Overview's loading and focus
+     states open the workspace again from Start for the same reason.
    - Workstreams' history is drawn with a live run above a completed, a stopped, a budget-reached and a failed one.
      The launches that make those runs keep one copy of the sample, oldest run first, and the last captures the
      history while its run works.
@@ -92,10 +95,16 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    deliverable, a charter set back to a template). States that last only while something runs (loading, scanning,
    preview running, creating) are triggered once per size and captured as soon as they show; the large tree makes them
    last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
-   processor while scanning and preview running are captured. Creating is captured once the kit is copied, while the
-   tree is, so that a step shows done, one working and the rest waiting.
-   - Controls are clicked with the pointer and text boxes are left without a key, since after keyboard input XAML
-     draws a focus ring wherever focus goes next. Only Overview's focus state presses Tab.
+   processor while scanning and preview running are captured, and a capture is kept only if the state still shows
+   once it is taken; a progress bar counts only partway, as the canvas draws it partly filled. Each size's scan
+   starts from no scan, so the button reads Scan. Overview's loading is captured the same way, once Back is off.
+   Creating is captured once the kit is copied, while the tree is, so that a step shows done, one working and the
+   rest waiting.
+   - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set in a box without
+     focusing it, and tabbing out moves focus without a key, since after keyboard input XAML draws a focus ring
+     wherever focus goes next. Only Overview's focus state presses Tab.
+   - The stand-in writes its standard-error note half a second after its last event, since the app reads the two
+     streams apart and the canvas draws the note last.
 5. It sizes the window with `SetWindowPos` before each capture and writes the PNGs and `manifest.json` to `--out`,
    with the app's log under `logs/` when it wrote one. The workflow uploads that folder as `screenshots-<group>`.
 
