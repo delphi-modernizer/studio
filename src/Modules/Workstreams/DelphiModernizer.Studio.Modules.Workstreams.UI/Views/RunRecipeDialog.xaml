@@ -50,15 +50,27 @@
                 Text="One line, for example legacy/Sales or Pricing.pas." />
         </StackPanel>
         <StackPanel MaxWidth="240" HorizontalAlignment="Left" Spacing="8">
-            <NumberBox
-                x:Name="BudgetBox"
-                AutomationProperties.HelpText="The run stops when it reaches this. The default comes from Settings."
-                Header="Budget for this run"
-                LargeChange="1"
-                Minimum="0.1"
-                NumberFormatter="{StaticResource Dollars}"
-                SmallChange="0.5"
-                SpinButtonPlacementMode="Inline" />
+            <TextBlock Text="Budget for this run" />
+            <!--  Canvas .nbx, as Settings draws it: the grey "$" inside the box, before the value.  -->
+            <Grid>
+                <NumberBox
+                    x:Name="BudgetBox"
+                    Padding="24,5,6,6"
+                    AutomationProperties.HelpText="The run stops when it reaches this. The default comes from Settings."
+                    AutomationProperties.Name="Budget for this run"
+                    LargeChange="1"
+                    Minimum="0.1"
+                    NumberFormatter="{StaticResource Dollars}"
+                    SmallChange="0.5"
+                    SpinButtonPlacementMode="Inline" />
+                <TextBlock
+                    Margin="11,0,0,0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.AccessibilityView="Raw"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    IsHitTestVisible="False"
+                    Text="$" />
+            </Grid>
             <TextBlock
                 Style="{StaticResource SecondaryCaptionTextStyle}"
                 Text="The run stops when it reaches this. The default comes from Settings." />

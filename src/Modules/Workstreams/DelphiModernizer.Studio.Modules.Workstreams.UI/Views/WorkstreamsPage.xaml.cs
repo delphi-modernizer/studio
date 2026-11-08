@@ -4,6 +4,7 @@ using DelphiModernizer.Studio.UI.Common;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.UI.Views;
 
@@ -67,9 +68,10 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
         }
     }
 
-    private void OnOpenBlockingRun(object sender, RoutedEventArgs e)
+    private void OnOpenBlockingRun(Hyperlink sender, HyperlinkClickEventArgs args)
     {
-        if (sender is FrameworkElement { Tag: TaskRow { Blocker: { } blocker } })
+        // Open run is a Hyperlink inside the reason's text, so the row is on that TextBlock's Tag.
+        if (sender is { ElementStart.VisualParent: { Tag: TaskRow { Blocker: { } blocker } } })
         {
             ViewModel.OpenRun(blocker.RunId);
         }

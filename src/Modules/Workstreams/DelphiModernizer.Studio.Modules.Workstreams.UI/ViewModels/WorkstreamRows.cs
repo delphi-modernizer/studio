@@ -59,6 +59,8 @@ public sealed record TaskRow(
     /// <summary>Only the studio's own run has a Run page to open (open questions).</summary>
     public bool CanOpenBlocker => Blocker?.Run is not null;
 
+    public bool IsBlockedElsewhere => IsBlocked && !CanOpenBlocker;
+
     /// <summary>Run… stays on without Claude Code, as drawn; it then opens the Claude Code dialog.</summary>
     public bool CanRun => !IsBlocked;
 
@@ -156,9 +158,12 @@ public static class RunWords
         return amount.ToString("$0.00", CultureInfo.InvariantCulture);
     }
 
+    /// <summary>When something happened: its time alone today, as drawn, else its date and time.</summary>
     public static string Time(DateTimeOffset at)
     {
-        return at.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
+        var local = at.LocalDateTime;
+
+        return local.ToString(local.Date == DateTime.Today ? "t" : "g", CultureInfo.CurrentCulture);
     }
 
     /// <summary>When a run ended: its time alone on the day it started, else its date and time.</summary>

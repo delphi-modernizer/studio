@@ -4,6 +4,7 @@ using DelphiModernizer.Engine.Kit;
 using DelphiModernizer.Engine.Kit.Spec;
 using DelphiModernizer.Studio.Application.Abstractions.SignOffs;
 using DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
@@ -40,6 +41,7 @@ public sealed partial class RunRecipeDialog : ContentDialog
     {
         ArgumentNullException.ThrowIfNull(recipe);
         InitializeComponent();
+        DialogMargins.Apply(this);
         _recipe = recipe;
         _choosesGate = recipe.Argument.Name == _gateArgument;
         RoleText.Text = roleName;

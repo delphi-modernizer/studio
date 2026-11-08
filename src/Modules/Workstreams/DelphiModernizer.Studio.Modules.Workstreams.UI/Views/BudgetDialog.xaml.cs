@@ -1,3 +1,4 @@
+using DelphiModernizer.Studio.UI.Common.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -9,6 +10,7 @@ public sealed partial class BudgetDialog : ContentDialog
     public BudgetDialog(string lead, string spent, decimal newBudgetUsd)
     {
         InitializeComponent();
+        DialogMargins.Apply(this);
         Lead.Text = lead;
         Spent.Text = spent;
         BudgetBox.Value = (double)newBudgetUsd;

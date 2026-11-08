@@ -23,6 +23,9 @@ public sealed record AgentLine(string Text, string? Label);
 /// </summary>
 public static partial class RunTranscript
 {
+    /// <summary>How many lines of a folder search's result Files touched reads.</summary>
+    private const int _filesOfLines = 200;
+
     private static readonly FrozenSet<string> _editingTools =
         new[] { "Edit", "Write", "MultiEdit", "NotebookEdit" }.ToFrozenSet(StringComparer.Ordinal);
 
@@ -119,11 +122,54 @@ public static partial class RunTranscript
             return null;
         }
 
-        if (string.IsNullOrEmpty(path))
+        return string.IsNullOrEmpty(path) ? null : Relative(path, workspaceRoot);
+    }
+
+    /// <summary>
+    /// The workspace files a call that succeeded read or edited: the file it names, or for a folder, such as a
+    /// search's, the files its result names.
+    /// </summary>
+    /// <remarks>
+    /// A result line names a file as <c>path</c> or <c>path:line:text</c>; only files on disk count. Only the first
+    /// <see cref="_filesOfLines"/> lines are read, so a content search with thousands of matches stays cheap on the UI
+    /// thread.
+    /// </remarks>
+    public static IReadOnlyList<string> FilesOf(ToolCall call, string result, string workspaceRoot)
+    {
+        if (PathOf(call, workspaceRoot) is not { } path)
         {
-            return null;
+            return [];
         }
 
+        if (!Directory.Exists(Path.Combine(workspaceRoot, path)))
+        {
+            return [path];
+        }
+
+        return [.. result
+            .Split('\n')
+            .Take(_filesOfLines)
+            .Select(line => FileOfLine(line.TrimEnd('\r'), workspaceRoot))
+            .OfType<string>()
+            .Distinct(StringComparer.Ordinal)];
+    }
+
+    /// <summary>The workspace file a search line names, whole or before a colon, as Grep prints.</summary>
+    private static string? FileOfLine(string line, string workspaceRoot)
+    {
+        var ends = Enumerable
+            .Range(0, line.Length)
+            .Where(i => line[i] == ':')
+            .Append(line.Length);
+
+        return ends
+            .Where(end => end > 0)
+            .Select(end => Relative(line[..end], workspaceRoot))
+            .FirstOrDefault(relative => relative is not null && File.Exists(Path.Combine(workspaceRoot, relative)));
+    }
+
+    private static string? Relative(string path, string workspaceRoot)
+    {
         string relative = Path.IsPathRooted(path) ? Path.GetRelativePath(workspaceRoot, path) : path;
 
         return relative.StartsWith("..", StringComparison.Ordinal) || Path.IsPathRooted(relative)

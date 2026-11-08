@@ -3,13 +3,13 @@ using Windows.Globalization.NumberFormatting;
 
 namespace DelphiModernizer.Studio.Modules.Workstreams.UI.Views;
 
-/// <summary>Shows a budget box's value as "$2.00", as drawn, and reads it back with or without the "$".</summary>
+/// <summary>Shows a budget as "2.00" after the box's grey "$", and reads it back with or without a "$".</summary>
 /// <remarks>Budgets are US dollars, as Claude Code's <c>--max-budget-usd</c> takes them, in any culture.</remarks>
 public sealed partial class DollarFormatter : INumberFormatter2, INumberParser
 {
     public string FormatDouble(double value)
     {
-        return value.ToString("$0.00", CultureInfo.InvariantCulture);
+        return value.ToString("0.00", CultureInfo.InvariantCulture);
     }
 
     public string FormatInt(long value)
