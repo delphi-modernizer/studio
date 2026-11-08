@@ -100,9 +100,9 @@ internal static class Groups
             h.Step(app, theme, "shared", () => {
                 app.CapturePart("shared", "title-bar", pane: false);
                 app.CapturePart("shared", "nav-pane", pane: true);
-                app.InvokeById("PaneToggleButton");
+                app.TogglePane();
                 app.Capture("overview", "pane-compact");
-                app.InvokeById("PaneToggleButton");
+                app.TogglePane();
             });
             h.Step(app, theme, "sign-offs", () => {
                 app.Navigate("SignOffs");
@@ -316,7 +316,7 @@ internal static class Groups
             "newworkspace",
             "preview-running",
             () => {
-                app.Type("Legacy source folder", h.Workspaces.LargeLegacy, tabOut: true);
+                app.Type("Legacy source folder", h.Workspaces.LargeLegacy, tabOut: true, settle: 0);
                 app.WaitBriefly(
                     c => c.ByControlType(FlaUI.Core.Definitions.ControlType.ProgressBar),
                     "The preview's progress bar",

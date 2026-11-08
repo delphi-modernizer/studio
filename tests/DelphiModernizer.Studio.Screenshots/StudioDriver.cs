@@ -136,13 +136,6 @@ internal sealed class StudioDriver : IDisposable
         Settle(settle);
     }
 
-    /// <summary>Invokes the button with this automation ID, such as the title bar's PaneToggleButton.</summary>
-    public void InvokeById(string automationId)
-    {
-        Find(e => Id(e) == automationId, automationId).Patterns.Invoke.Pattern.Invoke();
-        Settle(2500);
-    }
-
     /// <summary>Invokes the button or link with this name, or clicks the text of a button that has no name.</summary>
     public void Invoke(string name, int settle = 2500)
     {
@@ -188,7 +181,7 @@ internal sealed class StudioDriver : IDisposable
         Settle(2500);
     }
 
-    /// <summary>Clicks the list row whose name contains <paramref name="text"/>; UIA cannot raise ItemClick.</summary>
+    /// <summary>Opens the list row whose name contains <paramref name="text"/>; UIA cannot raise ItemClick.</summary>
     public void ClickItem(string listName, string text)
     {
         var list = Find(e => Type(e) == ControlType.List && NameOf(e) == listName, listName);
@@ -199,8 +192,10 @@ internal sealed class StudioDriver : IDisposable
                     .FirstOrDefault(r => NameOf(r).Contains(text, StringComparison.Ordinal)),
                 _findTimeout)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
+        // Enter opens a row, as the handoff's keyboard order says; a row below the fold has no point to click.
         row.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
-        row.Click();
+        row.Focus();
+        Keyboard.Type(VirtualKeyShort.ENTER);
         Settle(4000);
     }
 
@@ -242,7 +237,8 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <summary>Types into the text box with this name, then moves focus on as a person tabbing out would.</summary>
-    public void Type(string name, string text, bool tabOut = false)
+    /// <param name="settle">0 when a brief state follows, such as the preview that tabbing out starts.</param>
+    public void Type(string name, string text, bool tabOut = false, int settle = 800)
     {
         var box = Find(e => Type(e) == ControlType.Edit && Matches(e, name), name);
         box.Focus();
@@ -253,7 +249,7 @@ internal sealed class StudioDriver : IDisposable
             Keyboard.Type(VirtualKeyShort.TAB);
         }
 
-        Settle(800);
+        Settle(settle);
     }
 
     /// <summary>Expands the expander whose name starts with <paramref name="name"/>, or the first one.</summary>
@@ -351,9 +347,33 @@ internal sealed class StudioDriver : IDisposable
     {
         var folder = Path.Combine(_output, "failures");
         Directory.CreateDirectory(folder);
+        var file = Path.Combine(folder, $"{_theme}-{Slug(step)}");
         FlaUICapture
             .Rectangle(Desktop.VisibleFrame(Handle))
-            .ToFile(Path.Combine(folder, $"{_theme}-{Slug(step)}.png"));
+            .ToFile(file + ".png");
+
+        // What UI Automation saw, so a control the step looked for can be told from one that was not there.
+        var elements = Descendants()
+            .Where(e => Type(e) is not ControlType.Pane and not ControlType.Group || NameOf(e).Length > 0)
+            .Select(e => $"{Type(e)}\t{Id(e)}\t{NameOf(e)}\t{e.Properties.BoundingRectangle.ValueOrDefault}");
+        File.WriteAllLines(file + ".txt", elements);
+    }
+
+    /// <summary>Clicks the title bar's pane toggle: the second button from the left, after Back.</summary>
+    /// <remarks>The toggle is a template part of the WinUI TitleBar, which names it for Narrator only.</remarks>
+    public void TogglePane()
+    {
+        var frame = Desktop.VisibleFrame(Handle);
+        var toggle = Descendants()
+            .Where(e => Type(e) == ControlType.Button)
+            .Select(e => (Element: e, Bounds: e.BoundingRectangle))
+            .Where(b => b.Bounds.Top < frame.Top + _titleBarHeight && b.Bounds.Left < frame.Left + _paneWidth)
+            .OrderBy(b => b.Bounds.Left)
+            .Skip(1)
+            .FirstOrDefault()
+            .Element ?? throw new InvalidOperationException("No pane toggle in the title bar.");
+        Mouse.Click(toggle.BoundingRectangle.Center());
+        Settle(2500);
     }
 
     /// <summary>Waits until no element whose name starts with <paramref name="name"/> shows.</summary>
