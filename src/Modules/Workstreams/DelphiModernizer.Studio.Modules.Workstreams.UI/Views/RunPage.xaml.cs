@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using DelphiModernizer.Studio.Modules.Workstreams.Application;
 using DelphiModernizer.Studio.Modules.Workstreams.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
@@ -82,7 +83,7 @@ public sealed partial class RunPage : Page, IHasViewModel
             $"{ViewModel.Title} stopped at its {RunWords.Dollars(ViewModel.BudgetUsd)} budget after {turns}. "
                 + $"What it wrote so far is in the {ViewModel.Writing} as a Draft.",
             ViewModel.Cost,
-            ViewModel.BudgetUsd * _budgetGrowth) { XamlRoot = XamlRoot };
+            ViewModel.BudgetUsd * _budgetGrowth).Over(XamlRoot);
 
         switch (await dialog.ShowAsync())
         {
@@ -103,9 +104,7 @@ public sealed partial class RunPage : Page, IHasViewModel
         }
 
         var dialog = new RunRecipeDialog(
-            recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null) {
-            XamlRoot = XamlRoot,
-        };
+            recipe, ViewModel.RoleName, ViewModel.Argument, ViewModel.NextBudgetUsd, nextGate: null).Over(XamlRoot);
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {

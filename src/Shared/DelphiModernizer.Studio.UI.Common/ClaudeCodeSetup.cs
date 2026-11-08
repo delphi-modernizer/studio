@@ -22,7 +22,7 @@ public static class ClaudeCodeSetup
     public static async Task<ClaudeStatus> ShowAsync(XamlRoot root, ClaudeStatus status)
     {
         var services = ContractServices.Provider;
-        var dialog = new ClaudeCodeDialog(status) { XamlRoot = root };
+        var dialog = new ClaudeCodeDialog(status).Over(root);
         var choice = await dialog.ShowAsync();
 
         switch (choice)
