@@ -57,6 +57,8 @@ jobs:
       companion-repository: delphi-modernizer/engine
       companion-ref: ${{ needs.engine.outputs.ref }}
       companion-path: .engine
+      sonar-organization: delphi-modernizer
+      sonar-project-key: delphi-modernizer_studio
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
