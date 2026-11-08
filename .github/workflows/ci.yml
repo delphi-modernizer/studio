@@ -104,7 +104,8 @@ jobs:
 
   # Every state of the running app, one job per screen group, each uploaded as the artifact screenshots-<group> with
   # its manifest.json (docs/design/ui-screenshots.md). It also fails when the app does not start or a state is missing.
-  screenshots:
+  capture:
+    name: screenshots (${{ matrix.group }})
     needs: [engine, build]
     runs-on: windows-latest
     timeout-minutes: 30
@@ -160,6 +161,18 @@ jobs:
           name: screenshots-${{ matrix.group }}
           path: out/screenshots
           if-no-files-found: error
+
+  # The status check main requires: green only when every group captured, since a skipped job would count as passed.
+  screenshots:
+    needs: capture
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Require every screen group to pass
+        env:
+          RESULT: ${{ needs.capture.result }}
+        run: test "$RESULT" = "success"
 
   checks:
     runs-on: ubuntu-latest
