@@ -31,8 +31,10 @@
             Text="{x:Bind Message, Mode=OneWay}"
             TextAlignment="Center" />
         <ContentPresenter
+            x:Name="ActionsPresenter"
             Margin="0,8,0,0"
             HorizontalAlignment="Center"
-            Content="{x:Bind Actions, Mode=OneWay}" />
+            Content="{x:Bind Actions, Mode=OneWay}"
+            Visibility="Collapsed" />
     </StackPanel>
 </UserControl>

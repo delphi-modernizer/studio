@@ -195,7 +195,8 @@
 
                         <Border VerticalAlignment="Top" Style="{StaticResource FlushCardStyle}">
                             <StackPanel>
-                                <Grid Style="{StaticResource CardHeaderStyle}">
+                                <!--  Canvas .card-h: the header is its padding and one line of text, with no button.  -->
+                                <Grid MinHeight="0" Style="{StaticResource CardHeaderStyle}">
                                     <TextBlock
                                         VerticalAlignment="Center"
                                         AutomationProperties.HeadingLevel="Level2"

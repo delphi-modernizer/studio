@@ -342,9 +342,14 @@
                                     Width="240"
                                     VerticalAlignment="Center"
                                     AutomationProperties.Name="Default code page"
-                                    DisplayMemberPath="Label"
                                     ItemsSource="{x:Bind settings:CodePages.Common}"
                                     SelectedItem="{x:Bind ViewModel.SelectedCodePage, Mode=TwoWay}">
+                                    <!--  The longest names, such as Western European, end in an ellipsis in the 240 box.  -->
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="settings:CodePage">
+                                            <TextBlock Text="{x:Bind Label}" TextTrimming="CharacterEllipsis" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
                                     <AutomationProperties.HelpText>
                                         For files without a byte-order mark. New workspaces start with it; each
                                         workspace keeps its own.

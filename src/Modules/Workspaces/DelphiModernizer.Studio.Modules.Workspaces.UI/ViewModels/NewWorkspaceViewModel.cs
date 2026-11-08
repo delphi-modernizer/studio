@@ -487,6 +487,13 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         Phase = WizardPhase.Creating;
         CreateProblem = null;
 
+        int questions = Context.Count(c => c.Answer is null) + (Target == "deferred" ? 1 : 0);
+        Creation.First(row => row.Step == InitStep.Records).Label = questions switch {
+            0 => "Write the settings and the decision",
+            1 => "Write the settings, the decision and the open question",
+            _ => "Write the settings, the decision and the open questions",
+        };
+
         foreach (var row in Creation)
         {
             row.State = null;
