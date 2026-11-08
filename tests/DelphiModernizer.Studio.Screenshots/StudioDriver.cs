@@ -198,7 +198,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Presses the button showing <paramref name="name"/> beside the text <paramref name="row"/>.</summary>
     /// <remarks>
     /// UI Automation exposes no name for a button with a glyph and text, so the button is the one around its own
-    /// text, level with the row's title; it is pressed from the keyboard, focus then Space.
+    /// text, level with the row's title; it is clicked.
     /// </remarks>
     public void ClickBeside(string row, string name)
     {
@@ -215,8 +215,7 @@ internal sealed class StudioDriver : IDisposable
             throw new InvalidOperationException($"{name} beside {row} is disabled.");
         }
 
-        button.Focus();
-        Keyboard.Type(VirtualKeyShort.SPACE);
+        Desktop.Click(button.BoundingRectangle.Center());
         Settle(2500);
     }
 
@@ -232,10 +231,8 @@ internal sealed class StudioDriver : IDisposable
                 _findTimeout,
                 ignoreException: true)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
-        // Enter opens a row, as the handoff's keyboard order says; a row below the fold has no point to click.
         row.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
-        row.Focus();
-        Keyboard.Type(VirtualKeyShort.ENTER);
+        Desktop.Click(row.BoundingRectangle.Center());
         Settle(4000);
     }
 
@@ -438,12 +435,10 @@ internal sealed class StudioDriver : IDisposable
         }
     }
 
-    /// <summary>Presses a button as a keyboard user does: focus, then Space.</summary>
-    public void PressWithKeyboard(string name)
+    /// <summary>Clicks a button with the pointer, as a person does.</summary>
+    public void Click(string name)
     {
-        var element = Find(e => IsAction(e) && Matches(e, name), name);
-        element.Focus();
-        Keyboard.Type(VirtualKeyShort.SPACE);
+        Desktop.Click(Find(e => IsAction(e) && Matches(e, name), name).BoundingRectangle.Center());
         Settle(2500);
     }
 

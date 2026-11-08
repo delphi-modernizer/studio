@@ -388,7 +388,7 @@ internal static class Groups
         string record = Path.Combine(h.Opened[Sample], _approvals);
         string? before = File.Exists(record) ? File.ReadAllText(record) : null;
         app.Expand("Project setup");
-        app.PressWithKeyboard("Approve Project setup");
+        app.Click("Approve Project setup");
         app.WaitFor(shows, _brief);
         app.Capture("signoffs", state);
         app.Invoke("Cancel");
