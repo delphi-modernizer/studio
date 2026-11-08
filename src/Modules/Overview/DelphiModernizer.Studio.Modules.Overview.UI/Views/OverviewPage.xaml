@@ -75,6 +75,12 @@
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="8" />
             </Style>
+
+            <!--  Canvas .fl-tip: 236 wide, set 12 in from the team card's left edge, padding 6 8 7.  -->
+            <Style x:Key="TeamToolTipStyle" TargetType="ToolTip">
+                <Setter Property="Width" Value="236" />
+                <Setter Property="Padding" Value="8,6,8,7" />
+            </Style>
             <Style x:Key="PhaseNumberStyle" TargetType="Border">
                 <Setter Property="Width" Value="20" />
                 <Setter Property="Height" Value="20" />
@@ -350,7 +356,8 @@
                         IsOpen="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}"
                         Message="{x:Bind ViewModel.LoadProblem, Mode=OneWay}"
                         Severity="Error"
-                        Title="Couldn’t read this workspace.">
+                        Title="Couldn’t read this workspace."
+                        Visibility="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}">
                         <InfoBar.IconSource>
                             <FontIconSource
                                 FontFamily="{StaticResource StudioIconsFontFamily}"
@@ -538,8 +545,14 @@
                                             Content="{x:Bind ViewModel.Teams[0]}"
                                             ContentTemplate="{StaticResource TeamNodeTemplate}"
                                             Style="{StaticResource FlowNodeStyle}"
-                                            ToolTipService.Placement="Bottom"
-                                            ToolTipService.ToolTip="{x:Bind ViewModel.Teams[0].ToolTip}" />
+                                            ToolTipService.Placement="Bottom">
+                                            <ToolTipService.ToolTip>
+                                                <ToolTip
+                                                    Content="{x:Bind ViewModel.Teams[0].ToolTip}"
+                                                    PlacementRect="12,0,236,52"
+                                                    Style="{StaticResource TeamToolTipStyle}" />
+                                            </ToolTipService.ToolTip>
+                                        </Button>
                                         <Button
                                             x:Name="Team1"
 
@@ -550,8 +563,14 @@
                                             Content="{x:Bind ViewModel.Teams[1]}"
                                             ContentTemplate="{StaticResource TeamNodeTemplate}"
                                             Style="{StaticResource FlowNodeStyle}"
-                                            ToolTipService.Placement="Bottom"
-                                            ToolTipService.ToolTip="{x:Bind ViewModel.Teams[1].ToolTip}" />
+                                            ToolTipService.Placement="Bottom">
+                                            <ToolTipService.ToolTip>
+                                                <ToolTip
+                                                    Content="{x:Bind ViewModel.Teams[1].ToolTip}"
+                                                    PlacementRect="12,0,236,52"
+                                                    Style="{StaticResource TeamToolTipStyle}" />
+                                            </ToolTipService.ToolTip>
+                                        </Button>
                                         <Button
                                             x:Name="Team2"
 
@@ -562,8 +581,14 @@
                                             Content="{x:Bind ViewModel.Teams[2]}"
                                             ContentTemplate="{StaticResource TeamNodeTemplate}"
                                             Style="{StaticResource FlowNodeStyle}"
-                                            ToolTipService.Placement="Bottom"
-                                            ToolTipService.ToolTip="{x:Bind ViewModel.Teams[2].ToolTip}" />
+                                            ToolTipService.Placement="Bottom">
+                                            <ToolTipService.ToolTip>
+                                                <ToolTip
+                                                    Content="{x:Bind ViewModel.Teams[2].ToolTip}"
+                                                    PlacementRect="12,0,236,52"
+                                                    Style="{StaticResource TeamToolTipStyle}" />
+                                            </ToolTipService.ToolTip>
+                                        </Button>
                                         <Button
                                             x:Name="Team3"
 
@@ -574,8 +599,14 @@
                                             Content="{x:Bind ViewModel.Teams[3]}"
                                             ContentTemplate="{StaticResource TeamNodeTemplate}"
                                             Style="{StaticResource FlowNodeStyle}"
-                                            ToolTipService.Placement="Bottom"
-                                            ToolTipService.ToolTip="{x:Bind ViewModel.Teams[3].ToolTip}" />
+                                            ToolTipService.Placement="Bottom">
+                                            <ToolTipService.ToolTip>
+                                                <ToolTip
+                                                    Content="{x:Bind ViewModel.Teams[3].ToolTip}"
+                                                    PlacementRect="12,0,236,52"
+                                                    Style="{StaticResource TeamToolTipStyle}" />
+                                            </ToolTipService.ToolTip>
+                                        </Button>
                                         <Button
                                             x:Name="Team4"
 
@@ -586,8 +617,14 @@
                                             Content="{x:Bind ViewModel.Teams[4]}"
                                             ContentTemplate="{StaticResource TeamNodeTemplate}"
                                             Style="{StaticResource FlowNodeStyle}"
-                                            ToolTipService.Placement="Bottom"
-                                            ToolTipService.ToolTip="{x:Bind ViewModel.Teams[4].ToolTip}" />
+                                            ToolTipService.Placement="Bottom">
+                                            <ToolTipService.ToolTip>
+                                                <ToolTip
+                                                    Content="{x:Bind ViewModel.Teams[4].ToolTip}"
+                                                    PlacementRect="12,0,236,52"
+                                                    Style="{StaticResource TeamToolTipStyle}" />
+                                            </ToolTipService.ToolTip>
+                                        </Button>
                                         <Button
                                             x:Name="Team5"
 
@@ -598,8 +635,14 @@
                                             Content="{x:Bind ViewModel.Teams[5]}"
                                             ContentTemplate="{StaticResource TeamNodeTemplate}"
                                             Style="{StaticResource FlowNodeStyle}"
-                                            ToolTipService.Placement="Bottom"
-                                            ToolTipService.ToolTip="{x:Bind ViewModel.Teams[5].ToolTip}" />
+                                            ToolTipService.Placement="Bottom">
+                                            <ToolTipService.ToolTip>
+                                                <ToolTip
+                                                    Content="{x:Bind ViewModel.Teams[5].ToolTip}"
+                                                    PlacementRect="12,0,236,52"
+                                                    Style="{StaticResource TeamToolTipStyle}" />
+                                            </ToolTipService.ToolTip>
+                                        </Button>
 
                                         <Button
                                             x:Name="ArchitectNodeButton"
