@@ -46,6 +46,25 @@ public sealed class MediatorTests
         Assert.Equal(["first", "second"], journal.Entries);
     }
 
+    [Fact]
+    public async Task A_request_sent_after_the_page_scope_ended_still_reaches_its_handler()
+    {
+        var journal = new Journal();
+        var services = new ServiceCollection();
+        services.AddSingleton(journal);
+        services.AddLogging();
+        services.AddMediator(typeof(MediatorTests).Assembly);
+        await using var provider = services.BuildServiceProvider();
+        var page = provider.CreateScope();
+        var sender = page.ServiceProvider.GetRequiredService<ISender>();
+
+        page.Dispose();
+        var answer = await sender.Send(new Echo("after"), TestContext.Current.CancellationToken);
+
+        Assert.Equal("after", answer);
+        Assert.Equal(["handler"], journal.Entries);
+    }
+
     public sealed class Journal
     {
         public List<string> Entries { get; } = [];
