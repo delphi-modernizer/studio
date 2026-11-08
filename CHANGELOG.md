@@ -105,6 +105,7 @@
   creation steps read in secondary text, and the records step names "the open question" or "questions" by count.
 - The Claude Code dialog draws its engine message as the canvas's warning bar, with links that wrap whole.
 - StatusPill's word takes the pill's FontWeight, so a semibold row can make its pills semibold.
+- PathText keeps a long path's file name whole and the start of its folders, as "docs/02-…/business-rules.md".
 - DialogMargins keeps a dialog 24 from the window's top and bottom, as the canvas's scrim does; the Claude Code
   dialog uses it.
 
