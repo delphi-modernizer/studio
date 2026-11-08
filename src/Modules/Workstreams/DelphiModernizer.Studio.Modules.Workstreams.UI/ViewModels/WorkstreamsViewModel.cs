@@ -34,6 +34,7 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
     private IReadOnlyList<DeliverableState> _states = [];
     private IReadOnlyList<GateStatus> _gates = [];
     private IReadOnlyList<RunRecord> _runs = [];
+    private IReadOnlyDictionary<string, RunBlocker> _blockers = new Dictionary<string, RunBlocker>();
     private string? _requested;
 
     public WorkstreamsViewModel(
@@ -176,10 +177,12 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         Claude = await _sender.Send(new GetClaudeStatusQuery(), cancellationToken);
         var states = await _sender.Send(new GetDeliverableStatesQuery(), cancellationToken);
         var runs = await _sender.Send(new GetRunsQuery(), cancellationToken);
+        var blockers = await _sender.Send(new GetRunBlockersQuery(), cancellationToken);
         Problem = states.IsFailure ? states.Error.Message : null;
         _states = states.IsSuccess ? states.Value.Deliverables : [];
         _gates = states.IsSuccess ? states.Value.Gates : [];
         _runs = runs.IsSuccess ? runs.Value : [];
+        _blockers = blockers.IsSuccess ? blockers.Value : new Dictionary<string, RunBlocker>();
         IsOpen = true;
         ShowRoles(_requested ?? SelectedRole?.Code ?? "PA");
         _requested = null;
@@ -197,7 +200,7 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
 
     private void ShowRole()
     {
-        if (SelectedRole is not { } role || _session.Current is not { } workspace)
+        if (SelectedRole is not { } role || !HasWorkspace)
         {
             return;
         }
@@ -205,7 +208,7 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         var ready = Claude is { IsReady: true };
         Deliverables = [.. role.Workstream.Deliverables.Select(d => new DeliverableRow(d.Title, PillOf(d.Id, d.Gate)))];
         Tasks = [.. role.Workstream.Recipes.Select(recipe => {
-            var blocker = _monitor.Writing(workspace.Root, recipe.Writes);
+            var blocker = _blockers.GetValueOrDefault(recipe.Id);
 
             var reason = blocker is null ? string.Empty : BlockedReason(blocker, recipe, role);
 
@@ -228,16 +231,21 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
         return approved && status != "missing" ? PillState.Approved : PillStates.OfDeliverable(status);
     }
 
-    private string BlockedReason(LiveRun blocker, Recipe recipe, RoleRow role)
+    private string BlockedReason(RunBlocker blocker, Recipe recipe, RoleRow role)
     {
-        var agent = blocker.Recipe.Agent;
+        if (blocker.Run is not { } run)
+        {
+            return RunNames.BlockedByOtherRun(blocker.RunId, RunWords.Time(blocker.TakenAt));
+        }
+
+        var agent = run.Recipe.Agent;
         var owner = agent == role.Workstream.Role.Agent
             ? null
             : _workstreams.FirstOrDefault(w => w.Role.Agent == agent)?.Role.Name ?? agent;
 
-        var started = RunWords.Time(blocker.StartedAt);
+        var started = RunWords.Time(run.StartedAt);
 
-        return RunNames.BlockedReason(RunWords.Writes(recipe), blocker.Recipe.Title, owner, started);
+        return RunNames.BlockedReason(RunWords.Writes(recipe), run.Recipe.Title, owner, started);
     }
 
     private void OnRunsChanged(object? sender, EventArgs e)

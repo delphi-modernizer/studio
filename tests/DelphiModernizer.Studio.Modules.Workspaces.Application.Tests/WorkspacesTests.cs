@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using DelphiModernizer.Engine.Delphi;
 using DelphiModernizer.Engine.Workspaces;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
@@ -83,6 +86,21 @@ public sealed class WorkspacesTests : IDisposable
     }
 
     [Fact]
+    public async Task The_preview_reports_the_files_scanned_so_far_up_to_all_it_found()
+    {
+        var reports = new Reports();
+
+        var preview = await _sender.Send(
+            new PreviewLegacyQuery(TestWorkspace.CreateLegacyTree(_folder), 1252, reports),
+            TestContext.Current.CancellationToken);
+
+        Assert.True(preview.IsSuccess, preview.Error.Message);
+        var files = preview.Value.Summary.Files;
+        Assert.Equal(new ScanProgress(0, files), reports.Items[0]);
+        Assert.Equal(new ScanProgress(files, files), reports.Items[^1]);
+    }
+
+    [Fact]
     public async Task A_folder_without_Delphi_source_is_not_previewed()
     {
         var empty = Directory.CreateDirectory(Path.Combine(_folder, "empty")).FullName;
@@ -120,5 +138,30 @@ public sealed class WorkspacesTests : IDisposable
     public void Dispose()
     {
         Directory.Delete(_folder, recursive: true);
+    }
+
+    /// <summary>Keeps each report as it comes, on the scan's thread; the studio's own posts to the UI thread.</summary>
+    private sealed class Reports : IProgress<ScanProgress>
+    {
+        private readonly Lock _gate = new();
+        private readonly List<ScanProgress> _items = [];
+
+        public IReadOnlyList<ScanProgress> Items
+        {
+            get {
+                lock (_gate)
+                {
+                    return [.. _items];
+                }
+            }
+        }
+
+        public void Report(ScanProgress value)
+        {
+            lock (_gate)
+            {
+                _items.Add(value);
+            }
+        }
     }
 }

@@ -556,25 +556,6 @@
                                     Text="{x:Bind local:RunPage.WorkingText(ViewModel.IsStarting, ViewModel.RoleName),
                                           Mode=OneWay}" />
                             </Grid>
-                            <StackPanel
-                                Padding="16,10,16,16"
-                                Spacing="8"
-                                Visibility="{x:Bind ViewModel.IsRecordOnly, Mode=OneWay}">
-                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
-                                    This run ran in an earlier session of the studio. Its full transcript is kept in the
-                                    workspace:
-                                </TextBlock>
-                                <Button Click="OnOpenTranscript">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon
-                                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
-                                            Style="{StaticResource IconStyle}" />
-                                        <TextBlock
-                                            Style="{StaticResource MonoTextStyle}"
-                                            Text="{x:Bind ViewModel.TranscriptFile, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
                         </StackPanel>
                     </Border>
 

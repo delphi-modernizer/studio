@@ -47,18 +47,6 @@ public sealed class RunMonitor : IRunsInProgress, IDisposable
         return Runs.FirstOrDefault(r => r.RunId == runId);
     }
 
-    /// <summary>
-    /// The run in progress in the workspace at <paramref name="workspaceRoot"/> that writes any of <paramref
-    /// name="deliverables"/>.
-    /// </summary>
-    public LiveRun? Writing(string workspaceRoot, IEnumerable<string> deliverables)
-    {
-        var wanted = deliverables.ToHashSet(StringComparer.Ordinal);
-
-        return Runs.FirstOrDefault(r =>
-            !r.IsEnded && r.WorkspaceRoot == workspaceRoot && r.Recipe.Writes.Any(wanted.Contains));
-    }
-
     public void Dispose()
     {
         foreach (var run in Runs)

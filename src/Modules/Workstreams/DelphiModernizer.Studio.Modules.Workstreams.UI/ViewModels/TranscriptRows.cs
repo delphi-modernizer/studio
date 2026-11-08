@@ -88,8 +88,10 @@ public sealed partial class ToolRow(string id, string name, string input) : Tran
 }
 
 /// <summary>A tool call the guard refused: not an error of the run, which carries on.</summary>
-/// <param name="path">The file the call names, which Narrator reads instead of the raw input; null for none.</param>
-public sealed class RefusalRow(string name, string input, string? path, string reason) : TranscriptRow
+/// <param name="target">
+/// The file or command the call names, which Narrator reads instead of the raw input; null for none.
+/// </param>
+public sealed class RefusalRow(string name, string input, string? target, string reason) : TranscriptRow
 {
     public string Name { get; } = name;
 
@@ -97,7 +99,7 @@ public sealed class RefusalRow(string name, string input, string? path, string r
 
     public string Reason { get; } = reason;
 
-    public override string AnnouncedName => RunNames.Refusal(Name, path ?? Input, Reason);
+    public override string AnnouncedName => RunNames.Refusal(Name, target ?? Input, Reason);
 }
 
 public sealed class DiagnosticRow(string source, string text) : TranscriptRow

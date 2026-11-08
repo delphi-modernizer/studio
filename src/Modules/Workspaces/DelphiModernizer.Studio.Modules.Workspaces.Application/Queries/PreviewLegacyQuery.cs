@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,11 @@ namespace DelphiModernizer.Studio.Modules.Workspaces.Application.Queries;
 
 /// <summary>Scans a Delphi tree before it is copied, so the person can see they picked the right folder.</summary>
 /// <remarks>The scan only reads; nothing is written until the workspace is created.</remarks>
-public sealed record PreviewLegacyQuery(string Folder, int CodePage) : IRequest<Result<LegacyPreview>>;
+/// <param name="Progress">
+/// Told the files scanned so far, on a worker thread; a <see cref="Progress{T}"/> made on the UI thread posts there.
+/// </param>
+public sealed record PreviewLegacyQuery(string Folder, int CodePage, IProgress<ScanProgress>? Progress = null)
+    : IRequest<Result<LegacyPreview>>;
 
 /// <param name="ProjectNames">The names the project files give, each once.</param>
 /// <param name="DelphiVersion">
@@ -49,7 +54,7 @@ internal sealed class PreviewLegacyQueryHandler : IRequestHandler<PreviewLegacyQ
 
         var options = new ScanOptions(request.CodePage);
         var inventory = await Task.Run(
-            () => LegacyScanner.Scan(request.Folder, options, cancellationToken),
+            () => LegacyScanner.Scan(request.Folder, options, request.Progress, cancellationToken),
             cancellationToken);
         var versioned = inventory.Projects.FirstOrDefault(p => p.DelphiVersion is not null);
 

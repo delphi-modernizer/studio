@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DelphiModernizer.Engine.Delphi;
 using DelphiModernizer.Engine.Delphi.Inventory;
 using DelphiModernizer.Engine.Workspaces;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
@@ -182,6 +183,19 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     [ObservableProperty]
     public partial string? PreviewProblem { get; set; }
 
+    /// <summary>The files the scan has read so far, of all it found; null until it reports its first count.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ScanText), nameof(ScanPercent))]
+    public partial ScanProgress? Scanned { get; set; }
+
+    public string ScanText => Scanned is { } scanned
+        ? $"Scanning the folder… {Number(scanned.FilesDone)} of {Number(scanned.FilesTotal)} files"
+        : "Scanning the folder…";
+
+    public double ScanPercent => Scanned is { FilesTotal: > 0 } scanned
+        ? 100.0 * scanned.FilesDone / scanned.FilesTotal
+        : 0;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasCredentials))]
     public partial string? CredentialsNote { get; set; }
@@ -340,7 +354,15 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
 
         _previewing = new CancellationTokenSource();
         var token = _previewing.Token;
-        var query = new PreviewLegacyQuery(LegacySource.Trim(), SelectedCodePage.Number);
+        // Made on the UI thread, so the scan's reports post here; a replaced preview's late reports are dropped.
+        var progress = new Progress<ScanProgress>(p => {
+            if (!token.IsCancellationRequested)
+            {
+                Scanned = p;
+            }
+        });
+        var query = new PreviewLegacyQuery(LegacySource.Trim(), SelectedCodePage.Number, progress);
+        Scanned = null;
         Preview = PreviewState.Running;
 
         try

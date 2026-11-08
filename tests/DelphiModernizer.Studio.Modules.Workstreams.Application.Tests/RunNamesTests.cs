@@ -28,6 +28,14 @@ public sealed class RunNamesTests
     }
 
     [Fact]
+    public void A_task_a_run_from_elsewhere_is_writing_names_that_run()
+    {
+        Assert.Equal(
+            "Run 20261108101500-ws02-frs, which this studio did not start, is writing them, started 10:42.",
+            RunNames.BlockedByOtherRun("20261108101500-ws02-frs", "10:42"));
+    }
+
+    [Fact]
     public void A_task_that_can_run_reads_its_title_and_what_it_writes()
     {
         Assert.Equal(
