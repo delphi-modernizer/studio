@@ -108,6 +108,11 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
      wherever focus goes next. Only Overview's focus state presses Tab.
    - The stand-in writes its standard-error note half a second after its last event, since the app reads the two
      streams apart and the canvas draws the note last.
+   - WinUI shows a page's scroll indicator for a moment after the page scrolls, resizes or meets the pointer, and the
+     canvas draws none, so a capture after any of these waits it out. States that last only while something runs
+     cannot wait, so one may still show it.
+   - The title bar part is taken once a page has opened from another, since the canvas draws it with Back on, and
+     Overview's running state opens the workspace again from Start, since the canvas draws it with Back off.
 5. It sizes the window with `SetWindowPos` before each capture and writes the PNGs and `manifest.json` to `--out`,
    with the app's log under `logs/` when it wrote one. The workflow uploads that folder as `screenshots-<group>`.
 

@@ -44,6 +44,9 @@ internal sealed class StudioDriver : IDisposable
     private const int _titleBarHeight = 48;
     private const int _paneWidth = 240;
 
+    /// <summary>How long WinUI's scroll indicator stays after a page scrolls, resizes or meets the pointer.</summary>
+    private const int _indicatorFade = 3000;
+
     private readonly UIA3Automation _automation = new();
     private readonly FlaUIApplication _app;
     private readonly Window _window;
@@ -225,7 +228,7 @@ internal sealed class StudioDriver : IDisposable
 
         _window.SetForeground();
         MovePointerOff();
-        Settle(3000);
+        Settle(_indicatorFade);
 
         return frame;
     }
@@ -425,7 +428,7 @@ internal sealed class StudioDriver : IDisposable
         var at = offset is { } o ? new Point(bounds.Left + o.X, bounds.Top + o.Y) : bounds.Center();
         Desktop.MovePointer(new Point(at.X - 20, at.Y));
         Desktop.MovePointer(at);
-        Settle(2500);
+        Settle(_indicatorFade + 1000);
     }
 
     /// <summary>Gives keyboard focus as Tab would, so the focus ring shows.</summary>
@@ -450,7 +453,7 @@ internal sealed class StudioDriver : IDisposable
                 double extent = viewport * 100 / scroll.VerticalViewSize.Value;
                 double percent = Math.Clamp(pixels * 100 / (extent - viewport), 0, 100);
                 scroll.SetScrollPercent(ScrollPatternConstants.NoScroll, percent);
-                Settle(1500);
+                Settle(_indicatorFade);
 
                 return;
             }

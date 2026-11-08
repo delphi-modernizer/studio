@@ -121,7 +121,6 @@ internal static class Groups
                 app.Capture("overview", "scrolled", () => app.ScrollTo("Team0", 250), [StudioDriver.Minimum]);
             });
             h.Step(app, theme, "shared", () => {
-                app.CapturePart("shared", "title-bar", pane: false);
                 app.CapturePart("shared", "nav-pane", pane: true);
                 app.TogglePane();
                 app.Capture("overview", "pane-compact", () => app.ScrollTo("Team0", 0));
@@ -129,6 +128,9 @@ internal static class Groups
             });
             h.Step(app, theme, "sign-offs", () => {
                 app.Navigate("SignOffs");
+
+                // The canvas draws the title bar with Back on, so it is taken once a page has opened from another.
+                app.CapturePart("shared", "title-bar", pane: false);
                 app.Expand("Discovery");
                 app.Capture("signoffs", "blocked");
             });
@@ -148,10 +150,13 @@ internal static class Groups
                     app.FocusWithKeyboard("Gate1");
                 });
             });
+            // Opened again from Start while the run works, so Back is off, as the canvas draws it.
             h.Step(app, theme, "overview running", () => {
                 StartRun(app);
                 app.WaitFor("Working…", _run);
-                app.Navigate("Overview", 4000);
+                app.Navigate("Start");
+                app.ClickItem(_recent, h.Opened[Sample]);
+                app.WaitBackOff();
                 app.Capture("overview", "running");
             });
         });
