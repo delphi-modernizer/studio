@@ -299,6 +299,33 @@ internal sealed class StudioDriver : IDisposable
         }
     }
 
+    /// <summary>Waits until the button with this name can be pressed, as a person waits before pressing it.</summary>
+    public void WaitEnabled(string name, TimeSpan timeout)
+    {
+        EnsureRunning();
+        var enabled = Retry
+            .WhileFalse(
+                () => Descendants().Any(e => IsAction(e) && Matches(e, name) && e.Properties.IsEnabled.ValueOrDefault),
+                timeout,
+                TimeSpan.FromMilliseconds(500))
+            .Result;
+
+        if (!enabled)
+        {
+            throw new TimeoutException($"{name} is still disabled after {timeout.TotalSeconds} s.");
+        }
+    }
+
+    /// <summary>Saves the window as it is when a step fails, beside the captures but outside the manifest.</summary>
+    public void SaveFailure(string step)
+    {
+        var folder = Path.Combine(_output, "failures");
+        Directory.CreateDirectory(folder);
+        FlaUICapture
+            .Rectangle(Desktop.VisibleFrame(Handle))
+            .ToFile(Path.Combine(folder, $"{_theme}-{Slug(step)}.png"));
+    }
+
     /// <summary>Waits until no element whose name starts with <paramref name="name"/> shows.</summary>
     public void WaitGone(string name, TimeSpan timeout)
     {

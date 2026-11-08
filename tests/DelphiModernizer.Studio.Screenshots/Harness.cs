@@ -89,6 +89,11 @@ internal sealed class Harness(
             or TimeoutException or FlaUIException or UnauthorizedAccessException)
         {
             Fail($"{theme} {name}: {exception.Message}");
+
+            if (!app.HasExited)
+            {
+                app.SaveFailure(name);
+            }
         }
     }
 

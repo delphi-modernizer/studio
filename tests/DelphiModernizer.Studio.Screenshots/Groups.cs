@@ -310,7 +310,7 @@ internal static class Groups
         app.WaitFor("Couldn’t preview this folder.", _brief);
         app.Capture("newworkspace", "preview-failed", sizes: at);
         app.Type("Legacy source folder", h.Workspaces.Legacy, tabOut: true);
-        app.WaitGone("Scanning the folder", _run);
+        app.WaitEnabled("Next", _run);
         app.Capture("newworkspace", "step2", sizes: at);
         app.Capture(
             "newworkspace",
@@ -320,7 +320,7 @@ internal static class Groups
                 app.WaitFor("Scanning the folder", _brief, watch: true);
             },
             at);
-        app.WaitGone("Scanning the folder", _run);
+        app.WaitEnabled("Next", _run);
         app.Invoke("Next");
 
         app.Select("C#/.NET");
