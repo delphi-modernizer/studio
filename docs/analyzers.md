@@ -8,4 +8,5 @@ rules, all as errors. These are the exceptions, each with its reason.
 | CS0612, CS0618 | WinUI libraries and the App | The XAML type generator references a property the Windows App SDK deprecated |
 | CA1416 | App | Platform checks are the Windows App SDK's own; every API used exists on the minimum version |
 | CS8305 | App | The TitleBar control is marked experimental in this SDK line |
+| CsWinRT1028, CsWinRT1030 | WinUI libraries and the App | They ask for partial classes and unsafe code that only a trimmed or AOT build needs, and the app is published neither way; turn them back on before it is |
 | S2326 | `IRequest<TResponse>` | The type parameter is the response type `ISender.Send` infers |

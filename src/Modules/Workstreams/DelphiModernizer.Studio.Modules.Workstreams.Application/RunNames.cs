@@ -55,7 +55,7 @@ public static class RunNames
             return "Done";
         }
 
-        var count = result
+        int count = result
             .TrimEnd('\n')
             .Split('\n')
             .Length;

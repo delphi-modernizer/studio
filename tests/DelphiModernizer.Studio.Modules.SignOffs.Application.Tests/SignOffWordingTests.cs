@@ -69,7 +69,7 @@ public sealed class SignOffWordingTests
 
         var signOffs = (await sender.Send(new GetSignOffsQuery(), TestContext.Current.CancellationToken)).Value;
 
-        var previous = signOffs[1].Checks[0].AnnouncedName;
+        string previous = signOffs[1].Checks[0].AnnouncedName;
 
         Assert.StartsWith("Not met: Project setup approved. It is ", previous, StringComparison.Ordinal);
     }

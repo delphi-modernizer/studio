@@ -51,7 +51,7 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            var problem = await ViewModel.StartAsync(task.Recipe, dialog.Argument, dialog.BudgetUsd);
+            string? problem = await ViewModel.StartAsync(task.Recipe, dialog.Argument, dialog.BudgetUsd);
 
             if (problem is null)
             {

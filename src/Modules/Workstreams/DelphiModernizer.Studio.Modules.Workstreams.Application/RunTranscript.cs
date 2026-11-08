@@ -43,7 +43,7 @@ public static partial class RunTranscript
     private static AgentLine LineOf(string line)
     {
         var label = FactLabel().Match(line);
-        var text = FactLabel().Replace(line, string.Empty);
+        string text = FactLabel().Replace(line, string.Empty);
 
         return new AgentLine(text.Trim(), label.Success ? label.Groups["label"].Value : null);
     }
@@ -95,7 +95,7 @@ public static partial class RunTranscript
             return null;
         }
 
-        var relative = Path.IsPathRooted(path) ? Path.GetRelativePath(workspaceRoot, path) : path;
+        string relative = Path.IsPathRooted(path) ? Path.GetRelativePath(workspaceRoot, path) : path;
 
         return relative.StartsWith("..", StringComparison.Ordinal) || Path.IsPathRooted(relative)
             ? null

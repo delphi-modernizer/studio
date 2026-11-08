@@ -19,7 +19,7 @@ public sealed record StudioVersions(string Studio, string Engine, string Kit)
     /// <remarks>The informational version without the source revision the SDK appends after a plus sign.</remarks>
     private static string VersionOf(Assembly? assembly)
     {
-        var version = assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        string? version = assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
         return version?.Split('+')[0] ?? "unknown";
     }

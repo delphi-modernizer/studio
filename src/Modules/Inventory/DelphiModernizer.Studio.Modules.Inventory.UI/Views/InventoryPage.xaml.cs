@@ -75,7 +75,7 @@ public sealed partial class InventoryPage : Page, IHasViewModel
     /// <summary>A table row names its container, which is what Narrator reads as the arrow keys move.</summary>
     private static void NameRow(ContainerContentChangingEventArgs args)
     {
-        var name = args.Item switch {
+        string? name = args.Item switch {
             UnitRow row => row.AnnouncedName,
             ScreenRow row => row.AnnouncedName,
             SqlRow row => row.AnnouncedName,
@@ -101,7 +101,7 @@ public sealed partial class InventoryPage : Page, IHasViewModel
     /// <summary>Enter or a click on a row opens what it points to, as its own button or link does.</summary>
     private async void OnRowClicked(object sender, ItemClickEventArgs e)
     {
-        var link = e.ClickedItem switch {
+        string? link = e.ClickedItem switch {
             UnitRow { IsUnit: true } row => row.Path,
             ScreenRow row => row.Path,
             SqlRow row => row.Link,

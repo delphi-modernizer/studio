@@ -26,7 +26,7 @@ public sealed class ProblemWordingTests
     {
         var wording = ProblemWordings.Of("TR004");
 
-        var name = ProblemWordings.Announced(
+        string name = ProblemWordings.Announced(
             "Error",
             wording.Description,
             wording.Label,
@@ -38,5 +38,13 @@ public sealed class ProblemWordingTests
             "Error: A business rule points to code that doesn’t exist: a missing file, or lines past its end. "
             + "Broken evidence link, business rule BR-001. business-rules.md, line 12",
             name);
+    }
+
+    [Fact]
+    public void A_problem_with_no_record_or_line_reads_its_label_and_file()
+    {
+        string name = ProblemWordings.Announced("Warning", "It is open.", "Open question", null, "questions.md", 0);
+
+        Assert.Equal("Warning: It is open. Open question. questions.md", name);
     }
 }

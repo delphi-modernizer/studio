@@ -54,7 +54,6 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     private readonly INavigationService _navigation;
     private readonly IPickerService _picker;
     private CancellationTokenSource? _previewing;
-    private string? _commit;
 
     public NewWorkspaceViewModel(
         ISender sender,
@@ -233,9 +232,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     public string ContextSummary
     {
         get {
-            var unknown = Context.Count(c => c.Answer is null);
-            var filled = $"{Context.Count - unknown} fields filled";
-            var questions = unknown == 1 ? "becomes an open question" : "become open questions";
+            int unknown = Context.Count(c => c.Answer is null);
+            string filled = $"{Context.Count - unknown} fields filled";
+            string questions = unknown == 1 ? "becomes an open question" : "become open questions";
 
             return unknown == 0 ? filled : $"{filled} · {unknown} unknown {questions}";
         }
@@ -249,10 +248,12 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
 
     public string CreatedTitle => $"{Name.Trim()} is ready";
 
-    public string CreatedText => _commit is null
+    public string CreatedText => FirstCommit is null
         ? $"Created in {Folder}. Project setup can be signed off once you’ve read the project charter."
-        : $"Created in {Folder} with the first commit {_commit}. "
+        : $"Created in {Folder} with the first commit {FirstCommit}. "
             + "Project setup can be signed off once you’ve read the project charter.";
+
+    public string? FirstCommit { get; private set; }
 
     [RelayCommand]
     private async Task LoadAsync(CancellationToken cancellationToken)
@@ -435,11 +436,11 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         var extensions = summary.FilesByExtension
             .OrderByDescending(e => e.Count)
             .Select(e => e.Count > 1 ? $"{e.Count} {e.Name}" : e.Name);
-        var unreadable = summary.BinaryForms > 0 ? $" · {summary.BinaryForms} can’t be read" : string.Empty;
-        var version = preview.DelphiVersion is { } v
+        string unreadable = summary.BinaryForms > 0 ? $" · {summary.BinaryForms} can’t be read" : string.Empty;
+        string version = preview.DelphiVersion is { } v
             ? $"{v.Version} · from {v.File}"
             : "Not named in the project files";
-        var cycles = preview.Cycles.Count == 0
+        string cycles = preview.Cycles.Count == 0
             ? "None"
             : $"{preview.Cycles.Count} · {string.Join(" ↔ ", preview.Cycles[0])}";
 
@@ -459,8 +460,8 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
             _ => $"{Number(preview.Credentials)} hard-coded credentials found. "
                 + "They appear as *** everywhere in the studio.",
         };
-        var codePage = SelectedCodePage.Label.Split(' ')[0];
-        var delphi = preview.DelphiVersion?.Version ?? "version unknown";
+        string codePage = SelectedCodePage.Label.Split(' ')[0];
+        string delphi = preview.DelphiVersion?.Version ?? "version unknown";
         LegacySummary = $"{Number(summary.Files)} files · {delphi} · code page {codePage}";
     }
 
@@ -527,7 +528,7 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
 
         if (report is { Step: InitStep.FirstCommit, State: InitStepState.Done })
         {
-            _commit = report.Detail;
+            FirstCommit = report.Detail;
         }
     }
 
@@ -552,9 +553,9 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
 
     private static string Slug(string name)
     {
-        var lower = name.ToLowerInvariant();
-        var dashed = NonWord().Replace(lower, "-");
-        var slug = dashed.Trim('-');
+        string lower = name.ToLowerInvariant();
+        string dashed = NonWord().Replace(lower, "-");
+        string slug = dashed.Trim('-');
 
         return slug.Length == 0 ? "modernization" : slug;
     }

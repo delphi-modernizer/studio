@@ -25,7 +25,7 @@ internal sealed class TestWorkspace : IDisposable
 
     public static string CreateLegacyTree(string parent)
     {
-        var legacy = Path.Combine(parent, "AcmeERP");
+        string legacy = Path.Combine(parent, "AcmeERP");
         Directory.CreateDirectory(Path.Combine(legacy, "Sales"));
         File.WriteAllText(Path.Combine(legacy, "ErpApp.dpr"), "program ErpApp;\n\nuses\n  Pricing in 'Sales\\Pricing.pas',\n  Utils in 'Utils.pas';\n\nbegin\nend.\n");
         File.WriteAllText(Path.Combine(legacy, "Sales", "Pricing.pas"), "unit Pricing;\n\ninterface\n\nfunction Discount(const ALimit: Currency): Currency;\n\nimplementation\n\nuses\n  Utils;\n\nfunction Discount(const ALimit: Currency): Currency;\nbegin\n  if ALimit >= 10000 then\n    Result := ALimit * 0.075\n  else\n    Result := ALimit * 0.025;\nend;\n\nend.\n");
@@ -36,7 +36,7 @@ internal sealed class TestWorkspace : IDisposable
 
     public static async Task<TestWorkspace> CreateAsync()
     {
-        var parent = Directory.CreateTempSubdirectory("dmz-studio-").FullName;
+        string parent = Directory.CreateTempSubdirectory("dmz-studio-").FullName;
         var request = new InitRequest(
             Path.Combine(parent, "ws"),
             "Acme ERP",

@@ -23,7 +23,7 @@ internal sealed class FakeClaude : IClaudeLocator
 
     public Result<ClaudeExecutable> Locate(string? configuredPath)
     {
-        var fake = Path.Combine(AppContext.BaseDirectory, "DelphiModernizer.Engine.Agents.FakeClaude.dll");
+        string fake = Path.Combine(AppContext.BaseDirectory, "DelphiModernizer.Engine.Agents.FakeClaude.dll");
 
         return new ClaudeExecutable("dotnet", [fake, _script, _arguments]);
     }

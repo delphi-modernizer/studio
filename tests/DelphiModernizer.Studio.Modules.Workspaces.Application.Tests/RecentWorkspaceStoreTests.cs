@@ -31,7 +31,7 @@ public sealed class RecentWorkspaceStoreTests : IDisposable
     {
         var store = new RecentWorkspaceStore(Path.Combine(_folder, "recent.json"));
 
-        foreach (var index in Enumerable.Range(1, 12))
+        foreach (int index in Enumerable.Range(1, 12))
         {
             store.Remember(Recent($"W{index}", $"/work/{index}"));
         }
@@ -43,7 +43,7 @@ public sealed class RecentWorkspaceStoreTests : IDisposable
     [Fact]
     public void A_damaged_file_reads_as_an_empty_list()
     {
-        var path = Path.Combine(_folder, "recent.json");
+        string path = Path.Combine(_folder, "recent.json");
         File.WriteAllText(path, "{ not json");
 
         Assert.Empty(new RecentWorkspaceStore(path).Load());

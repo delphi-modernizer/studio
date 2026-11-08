@@ -44,7 +44,7 @@ public sealed partial class RunRecipeDialog : ContentDialog
         TitleText.Text = $"Run {recipe.Title}";
         Lead.Text = $"The agent writes the {RunWords.Writes(recipe)} as a draft, "
             + "each claim with a link to its evidence and a fact label. You review the draft afterwards.";
-        var name = RunWords.Capitalized(recipe.Argument.Name);
+        string name = RunWords.Capitalized(recipe.Argument.Name);
         ArgumentBox.Header = $"{name} ({(recipe.Argument.Required ? "required" : "optional")})";
         ArgumentBox.PlaceholderText = recipe.Argument.Description;
         ArgumentBox.Text = argument ?? string.Empty;
@@ -122,11 +122,11 @@ public sealed partial class RunRecipeDialog : ContentDialog
 
     private void Validate()
     {
-        var missing = _recipe.Argument.Required && Argument is null;
+        bool missing = _recipe.Argument.Required && Argument is null;
         ArgumentError.Text = $"This task needs a {_recipe.Argument.Name}.";
         ArgumentError.Visibility = missing && _touched ? Visibility.Visible : Visibility.Collapsed;
         AutomationProperties.SetHelpText(ArgumentBox, missing && _touched ? ArgumentError.Text : string.Empty);
-        var oneLine = _choosesGate || !ArgumentBox.Text.Contains('\n', StringComparison.Ordinal);
+        bool oneLine = _choosesGate || !ArgumentBox.Text.Contains('\n', StringComparison.Ordinal);
         IsPrimaryButtonEnabled = !missing && BudgetUsd > 0 && oneLine;
     }
 }

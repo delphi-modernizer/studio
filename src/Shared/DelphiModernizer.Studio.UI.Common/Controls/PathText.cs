@@ -43,7 +43,7 @@ public sealed partial class PathText : UserControl
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var fitted = Fit(Text ?? string.Empty, availableSize.Width);
+        string fitted = Fit(Text ?? string.Empty, availableSize.Width);
 
         if (_shown.Text != fitted)
         {
@@ -77,12 +77,12 @@ public sealed partial class PathText : UserControl
             return path;
         }
 
-        var kept = 0;
-        var most = path.Length - 1;
+        int kept = 0;
+        int most = path.Length - 1;
 
         while (kept < most)
         {
-            var middle = (kept + most + 1) / 2;
+            int middle = (kept + most + 1) / 2;
 
             if (Fits(_ellipsis + path[^middle..], width))
             {

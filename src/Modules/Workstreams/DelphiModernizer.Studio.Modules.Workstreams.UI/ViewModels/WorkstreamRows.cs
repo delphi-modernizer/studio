@@ -112,7 +112,7 @@ public static class RunWords
     /// <summary>"Scope, required: a unit, form, module or folder under legacy/".</summary>
     public static string ArgumentLine(RecipeArgument argument)
     {
-        var need = argument.Required ? "required" : "optional";
+        string need = argument.Required ? "required" : "optional";
 
         return argument.Name == _gateArgument
             ? $"Sign-off, {need}: the sign-off the Principal Architect prepares"
@@ -168,7 +168,7 @@ public static class RunWords
 
     private static string Sentence(string description)
     {
-        var text = description.TrimEnd('.');
+        string text = description.TrimEnd('.');
 
         return text.Length > 1 && char.IsLower(text[1]) ? string.Concat(text[..1].ToLowerInvariant(), text[1..]) : text;
     }

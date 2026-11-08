@@ -242,7 +242,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
     public void ExpandAll()
     {
-        var expand = !_allExpanded;
+        bool expand = !_allExpanded;
 
         foreach (var row in Items.OfType<ToolRow>())
         {
@@ -369,7 +369,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 IsStarting = false;
                 Model = session.Model ?? "—";
                 CliVersion = session.CliVersion ?? "—";
-                var started = RunWords.Time(_live?.StartedAt ?? _record?.StartedAt ?? DateTimeOffset.Now);
+                string started = RunWords.Time(_live?.StartedAt ?? _record?.StartedAt ?? DateTimeOffset.Now);
                 SessionLine = $"Started {started} · model {Model} · Claude Code {CliVersion}";
                 break;
             case AssistantText text:
@@ -383,7 +383,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 break;
             case ToolCall call:
                 var row = new ToolRow(call.Id, call.Name, call.Input);
-                var path = _session.Current is { } workspace ? RunTranscript.PathOf(call, workspace.Root) : null;
+                string? path = _session.Current is { } workspace ? RunTranscript.PathOf(call, workspace.Root) : null;
                 _calls[call.Id] = (row, path, RunTranscript.Edits(call));
                 Items.Add(row);
                 break;
