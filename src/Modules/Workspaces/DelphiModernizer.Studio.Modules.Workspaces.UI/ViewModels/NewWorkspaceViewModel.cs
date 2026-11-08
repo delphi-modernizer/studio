@@ -54,6 +54,7 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     private readonly INavigationService _navigation;
     private readonly IPickerService _picker;
     private CancellationTokenSource? _previewing;
+    private Workspace? _created;
 
     public NewWorkspaceViewModel(
         ISender sender,
@@ -388,9 +389,15 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
         }
     }
 
+    /// <summary>Opens the new workspace and lands on its Overview, as opening any workspace does.</summary>
     [RelayCommand]
-    private void OpenOverview()
+    private async Task OpenOverviewAsync()
     {
+        if (_created is not null)
+        {
+            await _sender.Send(new OpenWorkspaceCommand(_created.Root), CancellationToken.None);
+        }
+
         _navigation.NavigateFresh("Overview");
     }
 
@@ -514,6 +521,7 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
             return;
         }
 
+        _created = created.Value;
         OnPropertyChanged(nameof(CreatedTitle));
         OnPropertyChanged(nameof(CreatedText));
         Phase = WizardPhase.Created;
