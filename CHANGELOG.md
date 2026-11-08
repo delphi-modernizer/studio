@@ -91,6 +91,7 @@
   before its link, sets connection values in semibold, and lets its tabs scroll sideways when they run past the page.
 - The Traceability badge checks the documents again on every page change, off the UI thread and one check at a time,
   so a deliverable deleted outside the studio counts as soon as another page opens.
+- Deliverables sets the gate pills of its sign-off headings in semibold, as the rest of the heading row.
 - Deliverables names a missing file by its short name ("The testing strategy file is missing."); the deliverables'
   short names are shared, so Sign-offs reads the same words.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
