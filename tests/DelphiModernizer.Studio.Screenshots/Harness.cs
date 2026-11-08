@@ -12,12 +12,14 @@ namespace DelphiModernizer.Studio.Screenshots;
 /// <param name="Recent">Templates of <see cref="Workspaces"/>, copied fresh for this launch, most recent first.</param>
 /// <param name="Claude">Whether Settings names the stand-in; without it no Claude Code is found.</param>
 /// <param name="Scenario">The stand-in's <c>STUDIO_CLAUDE_SCENARIO</c>.</param>
+/// <param name="Reuse">Whether to open the last launch's copies, so that its runs stay in their history.</param>
 internal sealed record Launch(
     IReadOnlyList<string> Recent,
     bool Claude = true,
     string? Scenario = null,
     bool TooOld = false,
-    bool Identity = true);
+    bool Identity = true,
+    bool Reuse = false);
 
 /// <summary>Launches the app for each step list and records every state it could not reach.</summary>
 internal sealed class Harness(
@@ -39,12 +41,11 @@ internal sealed class Harness(
     /// <summary>The fresh copies of this launch's recent workspaces, by template name.</summary>
     public IReadOnlyDictionary<string, string> Opened { get; private set; } = new Dictionary<string, string>();
 
-    /// <param name="themeValue">The app's ElementTheme value: 0 follows Windows, 1 is light, 2 is dark.</param>
-    public void Run(string theme, int themeValue, Launch launch, Action<StudioDriver> steps)
+    public void Run(string theme, Launch launch, Action<StudioDriver> steps)
     {
-        var opened = launch.Recent.ToDictionary(t => t, workspaces.Fresh);
+        var opened = launch.Reuse ? Opened : launch.Recent.ToDictionary(t => t, workspaces.Fresh);
         Opened = opened;
-        data.Prepare(themeValue, launch.Claude ? claude : null, [.. launch.Recent.Select(t => opened[t])]);
+        data.Prepare(launch.Claude ? claude : null, [.. launch.Recent.Select(t => opened[t])]);
 
         if (!launch.Claude && FindOnPath("claude.exe") is { } found)
         {

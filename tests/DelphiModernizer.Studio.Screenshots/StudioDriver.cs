@@ -293,6 +293,10 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <summary>Types into the text box with this name, then moves focus on as a person tabbing out would.</summary>
+    /// <remarks>
+    /// Focus moves without a key: after keyboard input XAML draws a focus ring wherever focus goes next, such as on
+    /// Browse… or a button the page focuses, which the canvas does not draw.
+    /// </remarks>
     /// <param name="settle">0 when a brief state follows, such as the preview that tabbing out starts.</param>
     public void Type(string name, string text, bool tabOut = false, int settle = 800)
     {
@@ -302,10 +306,26 @@ internal sealed class StudioDriver : IDisposable
 
         if (tabOut)
         {
-            Keyboard.Type(VirtualKeyShort.TAB);
+            NextTabStop(box).Focus();
         }
 
         Settle(settle);
+    }
+
+    /// <summary>The next control that takes focus, as Tab finds it in a form laid out in reading order.</summary>
+    private AutomationElement NextTabStop(AutomationElement element)
+    {
+        var walker = _automation.TreeWalkerFactory.GetControlViewWalker();
+
+        for (var next = walker.GetNextSibling(element); next is not null; next = walker.GetNextSibling(next))
+        {
+            if (next.Properties.IsKeyboardFocusable.ValueOrDefault)
+            {
+                return next;
+            }
+        }
+
+        throw new InvalidOperationException($"Nothing takes focus after {NameOf(element)}.");
     }
 
     /// <summary>Expands the expander whose name starts with <paramref name="name"/>, or the first one.</summary>
