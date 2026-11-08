@@ -61,16 +61,22 @@ public sealed partial class RunPage : Page, IHasViewModel
 
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(RunViewModel.Outcome))
+        // Outcome and IsStarting both raise Pill; the end card changes with Outcome alone.
+        var changed = e.PropertyName switch {
+            nameof(RunViewModel.Pill) => (FrameworkElement)Pill,
+            nameof(RunViewModel.Outcome) => EndCard,
+            _ => null,
+        };
+
+        if (changed is null)
         {
             return;
         }
 
-        // The pill takes its new word through its binding first, so the announcement waits a turn.
+        // The element takes its new words through its binding first, so the announcement waits a turn.
         DispatcherQueue.TryEnqueue(() => {
-            FrameworkElementAutomationPeer.FromElement(Pill)?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
-            var endCard = FrameworkElementAutomationPeer.FromElement(EndCard);
-            endCard?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
+            var peer = FrameworkElementAutomationPeer.FromElement(changed);
+            peer?.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
         });
     }
 

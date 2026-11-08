@@ -278,10 +278,7 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <StackPanel
-                x:Name="PageContent"
-                HorizontalAlignment="Stretch"
-                Style="{StaticResource PageContentStyle}">
+            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                 <StackPanel
                     AutomationProperties.Name="Breadcrumb"
                     Orientation="Horizontal"
@@ -562,12 +559,9 @@
                                     <ColumnDefinition Width="20" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <ProgressRing
-                                    Width="16"
-                                    Height="16"
-                                    MinWidth="16"
-                                    MinHeight="16"
-                                    Margin="0,2,0,0"
+                                <controls:Spinner
+                                    Margin="0,4,0,0"
+                                    HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
                                     IsActive="{x:Bind ViewModel.IsLive, Mode=OneWay}" />
                                 <StackPanel
@@ -719,7 +713,7 @@
                         </Border>
                     </Grid>
                 </Grid>
-            </StackPanel>
+            </controls:FullWidthStackPanel>
         </ScrollViewer>
     </Grid>
 </Page>

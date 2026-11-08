@@ -87,6 +87,7 @@
   notice no longer leaves a gap.
 - Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code
   (it then opens the Claude Code dialog), and reads a task's argument as "Scope, required: a unit, form…".
+- A starting run's pill reads Starting, and Workstreams and Run draw the design's 12 px busy ring.
 - Run's transcript starts with the session, divides its items, shows each fact label right after its claim and each
   evidence link only under it, an edit's input as its file, and a starting run's budget; the end card spreads its
   numbers over four columns and shows what the run spent.

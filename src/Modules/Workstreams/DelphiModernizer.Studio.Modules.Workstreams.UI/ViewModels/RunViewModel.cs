@@ -80,13 +80,13 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial string RoleName { get; set; } = string.Empty;
 
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Pill), nameof(IsLive), nameof(IsEnded), nameof(IsFailed), nameof(TimeLabel))]
     [NotifyPropertyChangedFor(nameof(WritesNote), nameof(EndTitle), nameof(EndText), nameof(BackText))]
     public partial RunOutcome Outcome { get; set; }
 
-    public PillState Pill => RunWords.PillOf(Outcome);
+    /// <summary>Starting until the session starts, as drawn; then the run's outcome.</summary>
+    public PillState Pill => IsLive && IsStarting ? PillState.Starting : RunWords.PillOf(Outcome);
 
     public bool IsLive => Outcome == RunOutcome.Running;
 
@@ -95,6 +95,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     public bool IsFailed => Outcome == RunOutcome.Failed;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Pill))]
     public partial bool IsStarting { get; set; } = true;
 
     [ObservableProperty]
