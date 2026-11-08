@@ -73,7 +73,7 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
      is defined nowhere, and evidence in a file that does not exist.
    - `clean`: the same sample with all six context answers, scanned; it has no problem at all.
    - `unscanned`: the sample, not scanned.
-   - `large`: 3,000 generated units in 60 folders, scanned.
+   - `large`: 10,000 generated units in 100 folders, scanned, without git so that it is quick to create.
 3. It launches the app once per configuration, with a fresh copy of each workspace it lists. It writes the app's own
    settings before each launch, since the app reads them once: the recent workspaces, the Theme setting and the
    Claude Code path. It sets the stand-in's variables and `GIT_CONFIG_GLOBAL` (a file with the screenshots identity,

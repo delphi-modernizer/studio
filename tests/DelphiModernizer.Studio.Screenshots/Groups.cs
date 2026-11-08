@@ -198,14 +198,14 @@ internal static class Groups
                 app.Capture("inventory", "scanning", () => {
                     app.WaitGone("Scanning legacy/", _run);
                     app.Invoke("Scan again", 0);
-                    app.WaitFor("Scanning legacy/", _brief, watch: true);
+                    app.WaitBriefly(c => c.ByName("Scanning legacy/…"), "Scanning legacy/…", _brief);
                 });
                 app.WaitGone("Scanning legacy/", _run);
             });
             h.Step(app, theme, "overview loading", () => app.Capture("overview", "loading", () => {
                 app.Navigate("Inventory", 4000);
                 app.Navigate("Overview", 0);
-                app.WaitFor("Reading the workspace", _brief, watch: true);
+                app.WaitBriefly(c => c.ByName("Reading the workspace"), "Reading the workspace", _brief);
             }));
         });
     }
@@ -317,7 +317,10 @@ internal static class Groups
             "preview-running",
             () => {
                 app.Type("Legacy source folder", h.Workspaces.LargeLegacy, tabOut: true);
-                app.WaitFor("Scanning the folder", _brief, watch: true);
+                app.WaitBriefly(
+                    c => c.ByControlType(FlaUI.Core.Definitions.ControlType.ProgressBar),
+                    "The preview's progress bar",
+                    _brief);
             },
             at);
         app.WaitEnabled("Next", _run);
@@ -335,7 +338,7 @@ internal static class Groups
             "creating",
             () => {
                 app.Invoke("Create", 0);
-                app.WaitFor("Creating the workspace", _brief, watch: true);
+                app.WaitBriefly(c => c.ByName("Creating the workspace"), "Creating the workspace", _brief);
             },
             at);
         app.WaitFor("Open the Overview", _run);
@@ -388,9 +391,10 @@ internal static class Groups
     /// <summary>Opens the Run an agent task dialog for the Run board's task, on legacy/Sales.</summary>
     private static void OpenRunDialog(StudioDriver app)
     {
+        app.Resize(StudioDriver.Wide);
         app.Navigate("Workstreams", 4000);
         app.Select("Legacy discovery");
-        app.InvokeIn("Extract business rules", "Run…");
+        app.InvokeBeside("Extract business rules", "Run…");
         app.WaitFor("Run Extract business rules", _brief);
         app.Type("Scope", "legacy/Sales");
     }

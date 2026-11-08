@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Conditions;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
 using FlaUI.Core.Patterns;
@@ -28,7 +29,7 @@ internal sealed class StudioDriver : IDisposable
 
     private static readonly TimeSpan _startTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan _findTimeout = TimeSpan.FromSeconds(20);
-    private static readonly TimeSpan _poll = TimeSpan.FromMilliseconds(50);
+    private static readonly TimeSpan _poll = TimeSpan.FromMilliseconds(20);
 
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
     private static readonly Point _origin = new(480, 120);
@@ -156,17 +157,20 @@ internal sealed class StudioDriver : IDisposable
         Settle(settle);
     }
 
-    /// <summary>Invokes the button inside the element whose name starts with <paramref name="container"/>.</summary>
-    public void InvokeIn(string container, string name)
+    /// <summary>Invokes the button called <paramref name="name"/> level with the text <paramref name="row"/>.</summary>
+    /// <remarks>UI Automation does not expose the row's panel, so the row is found by its title.</remarks>
+    public void InvokeBeside(string row, string name)
     {
-        var parent = Find(e => Matches(e, container), container);
-        var button = Retry
-            .WhileNull(() => parent.FindFirstDescendant(c => c.ByControlType(ControlType.Button)), _findTimeout)
-            .Result ?? throw new InvalidOperationException($"{container} has no {name} button.");
+        var title = Find(e => Type(e) == ControlType.Text && NameOf(e) == row, row).BoundingRectangle;
+        var button = Descendants()
+            .Where(e => IsAction(e) && NameOf(e) == name)
+            .FirstOrDefault(e => e.BoundingRectangle.Top <= title.Bottom + 40
+                && e.BoundingRectangle.Bottom >= title.Top)
+            ?? throw new InvalidOperationException($"No {name} beside {row}.");
 
         if (!button.Properties.IsEnabled.ValueOrDefault)
         {
-            throw new InvalidOperationException($"{name} in {container} is disabled.");
+            throw new InvalidOperationException($"{name} beside {row} is disabled.");
         }
 
         button.Patterns.Invoke.Pattern.Invoke();
@@ -184,6 +188,7 @@ internal sealed class StudioDriver : IDisposable
                     .FirstOrDefault(r => NameOf(r).Contains(text, StringComparison.Ordinal)),
                 _findTimeout)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
+        row.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
         row.Click();
         Settle(4000);
     }
@@ -281,8 +286,7 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <summary>Waits until an element with this name, or whose name starts with it, shows.</summary>
-    /// <param name="watch">Polls fast enough to catch a state that lasts a second or two.</param>
-    public void WaitFor(string name, TimeSpan timeout, bool watch = false)
+    public void WaitFor(string name, TimeSpan timeout)
     {
         EnsureRunning();
         var found = Retry
@@ -290,12 +294,27 @@ internal sealed class StudioDriver : IDisposable
                 () => _window.FindFirstDescendant(c => c.ByName(name))
                     ?? Descendants().FirstOrDefault(e => Starts(e, name)),
                 timeout,
-                watch ? _poll : TimeSpan.FromMilliseconds(500))
+                TimeSpan.FromMilliseconds(500))
             .Result;
 
         if (found is null)
         {
             throw new TimeoutException($"{name} did not show within {timeout.TotalSeconds} s.");
+        }
+    }
+
+    /// <summary>Waits for a state that lasts a second or so, with one native query every few milliseconds.</summary>
+    /// <remarks>A walk of the whole tree takes longer than a short scan, so a brief state is matched exactly.</remarks>
+    public void WaitBriefly(Func<ConditionFactory, ConditionBase> condition, string what, TimeSpan timeout)
+    {
+        EnsureRunning();
+        var found = Retry
+            .WhileNull(() => _window.FindFirstDescendant(condition), timeout, _poll)
+            .Result;
+
+        if (found is null)
+        {
+            throw new TimeoutException($"{what} did not show within {timeout.TotalSeconds} s.");
         }
     }
 

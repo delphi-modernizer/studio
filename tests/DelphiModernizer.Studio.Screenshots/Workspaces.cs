@@ -16,8 +16,8 @@ internal sealed class Workspaces : IDisposable
     public const string Identity = "Studio screenshots <screenshots@delphi-modernizer.invalid>";
 
     /// <summary>Enough units that a scan or a copy lasts long enough to capture it running.</summary>
-    private const int _largeAreas = 60;
-    private const int _largeUnitsPerArea = 50;
+    private const int _largeAreas = 100;
+    private const int _largeUnitsPerArea = 100;
 
     private readonly string _root = Directory.CreateTempSubdirectory("dmz-screenshots-").FullName;
     private readonly string _dmz;
@@ -59,7 +59,7 @@ internal sealed class Workspaces : IDisposable
             "--constraints", "One year, a team of four");
         Scan("clean");
         Init("unscanned", Legacy, "--domain", "ERP, a Delphi 7 application on the BDE");
-        Init("large", LargeLegacy, "--domain", "ERP, a Delphi 7 application on the BDE");
+        Init("large", LargeLegacy, "--domain", "ERP, a Delphi 7 application on the BDE", "--no-git");
         Scan("large");
     }
 
@@ -132,19 +132,19 @@ internal sealed class Workspaces : IDisposable
 
         for (var area = 1; area <= _largeAreas; area++)
         {
-            var directory = Path.Combine(folder, $"Area{area:D2}");
+            var directory = Path.Combine(folder, $"Area{area:D3}");
             Directory.CreateDirectory(directory);
 
             for (var index = 1; index <= _largeUnitsPerArea; index++)
             {
-                var unit = $"A{area:D2}Unit{index:D2}";
+                var unit = $"A{area:D3}Unit{index:D3}";
                 var uses = units.Count == 0 ? string.Empty : $"uses\n  {units[^1]};\n\n";
                 File.WriteAllText(
                     Path.Combine(directory, unit + ".pas"),
                     $"unit {unit};\n\ninterface\n\n{uses}function Value{index}: Integer;\n\nimplementation\n\n"
                         + $"function Value{index}: Integer;\nbegin\n  Result := {index};\nend;\n\nend.\n");
                 units.Add(unit);
-                program.Append(CultureInfo.InvariantCulture, $"  {unit} in 'Area{area:D2}\\{unit}.pas',\n");
+                program.Append(CultureInfo.InvariantCulture, $"  {unit} in 'Area{area:D3}\\{unit}.pas',\n");
             }
         }
 
