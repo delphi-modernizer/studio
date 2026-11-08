@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using DelphiModernizer.Studio.Modules.Traceability.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
@@ -129,29 +130,9 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
 
         foreach (var (label, count, name, value) in choices)
         {
-            var item = new SelectorBarItem { Child = Counted(label, count), Tag = value };
-            AutomationProperties.SetName(item, name);
-            bar.Items.Add(item);
+            bar.Items.Add(CountedSelectorBarItem.Create(label, count, name, value));
         }
 
         bar.SelectedItem = bar.Items.FirstOrDefault(i => Equals(i.Tag, selected));
-    }
-
-    /// <summary>A choice's label, then its count in smaller secondary text, as the design draws it.</summary>
-    private static StackPanel Counted(string label, string count)
-    {
-        var panel = new StackPanel {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Margin = new Thickness(12, 0, 12, 0),
-        };
-        panel.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
-        panel.Children.Add(new TextBlock {
-            Text = count,
-            VerticalAlignment = VerticalAlignment.Center,
-            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["SecondaryCaptionTextStyle"],
-        });
-
-        return panel;
     }
 }

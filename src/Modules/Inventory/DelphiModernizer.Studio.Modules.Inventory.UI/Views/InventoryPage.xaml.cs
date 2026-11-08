@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using DelphiModernizer.Studio.Modules.Inventory.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
@@ -57,30 +58,10 @@ public sealed partial class InventoryPage : Page, IHasViewModel
 
         foreach (var tab in ViewModel.Tabs)
         {
-            var item = new SelectorBarItem { Child = Counted(tab.Label, tab.CountText), Tag = tab.Tab };
-            AutomationProperties.SetName(item, tab.AnnouncedName);
-            TabBar.Items.Add(item);
+            TabBar.Items.Add(CountedSelectorBarItem.Create(tab.Label, tab.CountText, tab.AnnouncedName, tab.Tab));
         }
 
         TabBar.SelectedItem = TabBar.Items.FirstOrDefault(i => (InventoryTab)i.Tag == ViewModel.Tab);
-    }
-
-    /// <summary>A tab's label, then its count in smaller secondary text, as the design draws it.</summary>
-    private static StackPanel Counted(string label, string count)
-    {
-        var panel = new StackPanel {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Margin = new Thickness(12, 0, 12, 0),
-        };
-        panel.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
-        panel.Children.Add(new TextBlock {
-            Text = count,
-            VerticalAlignment = VerticalAlignment.Center,
-            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["SecondaryCaptionTextStyle"],
-        });
-
-        return panel;
     }
 
     private void OnTabChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)

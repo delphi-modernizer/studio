@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using DelphiModernizer.Studio.Modules.Deliverables.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
@@ -42,30 +43,11 @@ public sealed partial class DeliverablesPage : Page, IHasViewModel
 
         foreach (var choice in ViewModel.Filters)
         {
-            var item = new SelectorBarItem { Child = Counted(choice.Label, choice.CountText), Tag = choice.Filter };
-            AutomationProperties.SetName(item, choice.AnnouncedName);
-            FilterBar.Items.Add(item);
+            FilterBar.Items.Add(
+                CountedSelectorBarItem.Create(choice.Label, choice.CountText, choice.AnnouncedName, choice.Filter));
         }
 
         FilterBar.SelectedItem = FilterBar.Items.FirstOrDefault(i => (DeliverableFilter)i.Tag == ViewModel.Filter);
-    }
-
-    /// <summary>A filter's label, then its count in smaller secondary text, as the design draws it.</summary>
-    private static StackPanel Counted(string label, string count)
-    {
-        var panel = new StackPanel {
-            Orientation = Orientation.Horizontal,
-            Spacing = 8,
-            Margin = new Thickness(12, 0, 12, 0),
-        };
-        panel.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
-        panel.Children.Add(new TextBlock {
-            Text = count,
-            VerticalAlignment = VerticalAlignment.Center,
-            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["SecondaryCaptionTextStyle"],
-        });
-
-        return panel;
     }
 
     private void OnFilterChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
