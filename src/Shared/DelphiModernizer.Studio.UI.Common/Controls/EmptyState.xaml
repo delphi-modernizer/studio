@@ -24,7 +24,8 @@
             TextAlignment="Center"
             TextWrapping="Wrap" />
         <TextBlock
-            MaxWidth="360"
+            x:Name="Description"
+            MaxWidth="296"
             HorizontalAlignment="Center"
             Style="{StaticResource SecondaryCaptionTextStyle}"
             Text="{x:Bind Message, Mode=OneWay}"

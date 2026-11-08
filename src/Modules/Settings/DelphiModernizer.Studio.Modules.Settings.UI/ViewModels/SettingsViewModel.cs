@@ -50,7 +50,7 @@ public sealed partial class SettingsViewModel : ViewModel
         var agents = settings.Agents;
         ClaudePath = agents.ClaudePath ?? string.Empty;
         Model = agents.Model ?? string.Empty;
-        EffortIndex = Math.Max(0, Array.IndexOf(Efforts, agents.Effort ?? Efforts[0]));
+        EffortIndex = Array.IndexOf(Efforts, agents.Effort);
         Budget = (double)agents.BudgetUsd;
         SelectedCodePage = CodePages.Common.FirstOrDefault(c => c.Number == settings.DefaultCodePage)
             ?? CodePages.Common[0];
@@ -58,7 +58,7 @@ public sealed partial class SettingsViewModel : ViewModel
         _loaded = true;
     }
 
-    /// <summary>What Effort offers; the first keeps Claude Code's own default.</summary>
+    /// <summary>What Effort offers; the first, like no choice (-1), keeps Claude Code's own default.</summary>
     public static string[] Efforts { get; } = ["Claude Code’s default", "low", "medium", "high", "xhigh", "max"];
 
     public static IReadOnlyList<string> Models { get; } = ["opus", "sonnet", "haiku"];

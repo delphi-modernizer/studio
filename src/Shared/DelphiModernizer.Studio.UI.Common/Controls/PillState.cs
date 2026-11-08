@@ -14,6 +14,7 @@ public enum PillState
     InReview,
     Missing,
     Running,
+    Starting,
     Completed,
     Failed,
     Stopped,
@@ -39,7 +40,7 @@ public enum PillTone
     Attention,
 }
 
-/// <param name="Glyph">A Studio Icons glyph; empty for Running, which shows a progress ring instead.</param>
+/// <param name="Glyph">A Studio Icons glyph; empty for Running and Starting, which show a busy ring instead.</param>
 public sealed record PillLook(string Word, string Glyph, PillTone Tone)
 {
     /// <summary>The look of each state, from the design's component sheet.</summary>
@@ -56,6 +57,7 @@ public sealed record PillLook(string Word, string Glyph, PillTone Tone)
             PillState.InReview => new("In review", StudioIcons.InReview, PillTone.Attention),
             PillState.Missing => new("Missing", StudioIcons.ErrorFilled, PillTone.Critical),
             PillState.Running => new("Running", string.Empty, PillTone.Attention),
+            PillState.Starting => new("Starting", string.Empty, PillTone.Attention),
             PillState.Completed => new("Completed", StudioIcons.Checkmark, PillTone.Neutral),
             PillState.Failed => new("Failed", StudioIcons.ErrorFilled, PillTone.Critical),
             PillState.Stopped => new("Stopped", StudioIcons.Stop, PillTone.Neutral),

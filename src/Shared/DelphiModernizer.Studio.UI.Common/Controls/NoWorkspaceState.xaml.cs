@@ -17,6 +17,9 @@ public sealed partial class NoWorkspaceState : UserControl
     public static readonly DependencyProperty MessageProperty = DependencyProperty.Register(
         nameof(Message), typeof(string), typeof(NoWorkspaceState), new PropertyMetadata(string.Empty));
 
+    public static readonly DependencyProperty ShowsCloneProperty = DependencyProperty.Register(
+        nameof(ShowsClone), typeof(bool), typeof(NoWorkspaceState), new PropertyMetadata(false));
+
     private readonly IWorkspaceActions _actions;
 
     public NoWorkspaceState()
@@ -36,6 +39,13 @@ public sealed partial class NoWorkspaceState : UserControl
     {
         get => (string)GetValue(MessageProperty);
         set => SetValue(MessageProperty, value);
+    }
+
+    /// <summary>Whether the Clone from Git… link follows Open folder…, as the canvas draws it on Overview.</summary>
+    public bool ShowsClone
+    {
+        get => (bool)GetValue(ShowsCloneProperty);
+        set => SetValue(ShowsCloneProperty, value);
     }
 
     private void OnNewWorkspace(object sender, RoutedEventArgs e)

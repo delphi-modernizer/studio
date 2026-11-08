@@ -9,7 +9,7 @@
         Click="OnClick">
         <TextBlock
             x:Name="Words"
-            FontFamily="Cascadia Mono,Consolas"
+            FontFamily="{StaticResource MonoFontFamily}"
             FontSize="12"
             LineHeight="16"
             TextTrimming="CharacterEllipsis" />

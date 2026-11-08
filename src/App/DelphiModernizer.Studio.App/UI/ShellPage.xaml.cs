@@ -54,6 +54,13 @@ public sealed partial class ShellPage : Page
         AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
         AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
         NavView.Loaded += (_, _) => MakePaneOneTabStop();
+        SizeChanged += (_, _) => SizeSearch();
+        ViewModel.PropertyChanged += (_, e) => {
+            if (e.PropertyName == nameof(ShellViewModel.Subtitle))
+            {
+                SizeSearch();
+            }
+        };
     }
 
     public ShellViewModel ViewModel { get; }
@@ -79,6 +86,19 @@ public sealed partial class ShellPage : Page
         }
 
         _navigation.NavigateTo("Start");
+    }
+
+    /// <summary>Search is 360 wide, 240 under 1100 (handoff part 1).</summary>
+    /// <remarks>
+    /// Under 1100 with a subtitle it sizes itself up to 240: a fixed 240 makes WinUI's TitleBar hide the title and
+    /// subtitle (docs/open-questions.md).
+    /// </remarks>
+    private void SizeSearch()
+    {
+        bool wide = ActualWidth >= 1100;
+        bool sizesItself = !wide && ViewModel.Subtitle.Length > 0;
+        SearchBox.MaxWidth = wide ? 360 : 240;
+        SearchBox.Width = sizesItself ? double.NaN : SearchBox.MaxWidth;
     }
 
     private void AddItem(NavigationItem item)
@@ -139,7 +159,7 @@ public sealed partial class ShellPage : Page
 
         string style = source.Tone == BadgeTone.Critical
             ? "CriticalValueInfoBadgeStyle"
-            : "AttentionValueInfoBadgeStyle";
+            : "AccentValueInfoBadgeStyle";
         container.InfoBadge = new InfoBadge {
             Value = count,
             Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],

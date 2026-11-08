@@ -30,6 +30,15 @@ public sealed partial class SettingsPage : Page, IHasViewModel
         ViewModel.PropertyChanged += OnViewModelChanged;
     }
 
+    /// <summary>Claude Code's default shows as the placeholder (canvas Settings), so choosing it clears the choice.</summary>
+    private void OnEffortChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (EffortBox.SelectedIndex == 0)
+        {
+            DispatcherQueue.TryEnqueue(() => EffortBox.SelectedIndex = -1);
+        }
+    }
+
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SettingsViewModel.Claude) && ViewModel.Claude is { } status)
