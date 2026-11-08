@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using FlaUI.Core;
@@ -145,7 +146,8 @@ internal sealed class StudioDriver : IDisposable
                 () => Descendants().FirstOrDefault(e => IsAction(e) && Matches(e, name))
                     ?? Descendants().FirstOrDefault(e => Type(e) == ControlType.Text && NameOf(e) == name),
                 _findTimeout,
-                TimeSpan.FromMilliseconds(500))
+                TimeSpan.FromMilliseconds(500),
+                ignoreException: true)
             .Result ?? throw new InvalidOperationException($"No {name} within {_findTimeout.TotalSeconds} s.");
 
         if (Type(element) == ControlType.Text)
@@ -199,7 +201,8 @@ internal sealed class StudioDriver : IDisposable
                 () => list
                     .FindAllChildren(c => c.ByControlType(ControlType.ListItem))
                     .FirstOrDefault(r => NameOf(r).Contains(text, StringComparison.Ordinal)),
-                _findTimeout)
+                _findTimeout,
+                ignoreException: true)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
         // Enter opens a row, as the handoff's keyboard order says; a row below the fold has no point to click.
         row.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
@@ -265,7 +268,10 @@ internal sealed class StudioDriver : IDisposable
     public void Expand(string? name = null)
     {
         var expanders = Retry
-            .WhileEmpty(() => _window.FindAllDescendants(cf => cf.ByClassName(_expanderClass)), _findTimeout)
+            .WhileEmpty(
+                () => _window.FindAllDescendants(cf => cf.ByClassName(_expanderClass)),
+                _findTimeout,
+                ignoreException: true)
             .Result ?? [];
         var expander = expanders.FirstOrDefault(e => name is null || Matches(e, name))
             ?? throw new InvalidOperationException($"No expander {name}.");
@@ -310,7 +316,8 @@ internal sealed class StudioDriver : IDisposable
                     () => _window.FindFirstDescendant(c => c.ByName(name))
                         ?? Descendants().FirstOrDefault(e => Starts(e, name)),
                     timeout,
-                    TimeSpan.FromMilliseconds(500))
+                    TimeSpan.FromMilliseconds(500),
+                    ignoreException: true)
                 .Result
             ?? throw new TimeoutException($"{name} did not show within {timeout.TotalSeconds} s.");
     }
@@ -321,7 +328,7 @@ internal sealed class StudioDriver : IDisposable
     {
         EnsureRunning();
         _ = Retry
-                .WhileNull(() => _window.FindFirstDescendant(condition), timeout, _poll)
+                .WhileNull(() => _window.FindFirstDescendant(condition), timeout, _poll, ignoreException: true)
                 .Result
             ?? throw new TimeoutException($"{what} did not show within {timeout.TotalSeconds} s.");
     }
@@ -334,7 +341,8 @@ internal sealed class StudioDriver : IDisposable
             .WhileFalse(
                 () => Descendants().Any(e => IsAction(e) && Matches(e, name) && e.Properties.IsEnabled.ValueOrDefault),
                 timeout,
-                TimeSpan.FromMilliseconds(500))
+                TimeSpan.FromMilliseconds(500),
+                ignoreException: true)
             .Result;
 
         if (!enabled)
@@ -368,12 +376,13 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <summary>Waits until no element called <paramref name="name"/> shows.</summary>
+    /// <remarks>A walk that meets an element as the page replaces it throws; that poll counts as showing.</remarks>
     public void WaitGone(string name, TimeSpan timeout)
     {
         EnsureRunning();
         var clock = Stopwatch.StartNew();
 
-        while (_window.FindFirstDescendant(c => c.ByName(name)) is not null)
+        while (Shows(name))
         {
             if (clock.Elapsed > timeout)
             {
@@ -501,12 +510,28 @@ internal sealed class StudioDriver : IDisposable
                 .SelectMany(w => w.FindAllDescendants()));
     }
 
+    private bool Shows(string name)
+    {
+        try
+        {
+            return _window.FindFirstDescendant(c => c.ByName(name)) is not null;
+        }
+        catch (COMException)
+        {
+            return true;
+        }
+    }
+
     private AutomationElement Find(Func<AutomationElement, bool> predicate, string what)
     {
         EnsureRunning();
 
         return Retry
-            .WhileNull(() => Descendants().FirstOrDefault(predicate), _findTimeout, TimeSpan.FromMilliseconds(500))
+            .WhileNull(
+                () => Descendants().FirstOrDefault(predicate),
+                _findTimeout,
+                TimeSpan.FromMilliseconds(500),
+                ignoreException: true)
             .Result ?? throw new InvalidOperationException($"No {what} within {_findTimeout.TotalSeconds} s.");
     }
 
