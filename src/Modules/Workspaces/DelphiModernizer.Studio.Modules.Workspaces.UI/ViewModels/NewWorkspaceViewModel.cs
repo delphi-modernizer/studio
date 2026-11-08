@@ -233,7 +233,8 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     {
         get {
             int unknown = Context.Count(c => c.Answer is null);
-            string filled = $"{Context.Count - unknown} fields filled";
+            int known = Context.Count - unknown;
+            string filled = known == 1 ? "1 field filled" : $"{known} fields filled";
             string questions = unknown == 1 ? "becomes an open question" : "become open questions";
 
             return unknown == 0 ? filled : $"{filled} · {unknown} unknown {questions}";
@@ -391,6 +392,15 @@ public sealed partial class NewWorkspaceViewModel : ViewModel
     private void OpenOverview()
     {
         _navigation.NavigateFresh("Overview");
+    }
+
+    /// <summary>While creating and once created, every step shows done, Create included (canvas WizardCreating).</summary>
+    partial void OnPhaseChanged(WizardPhase value)
+    {
+        foreach (var step in Steps)
+        {
+            step.Show(value == WizardPhase.Editing ? Step : _lastStep + 1);
+        }
     }
 
     partial void OnFolderChanged(string value)

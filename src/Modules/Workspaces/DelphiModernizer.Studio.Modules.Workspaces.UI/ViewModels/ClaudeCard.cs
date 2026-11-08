@@ -60,7 +60,7 @@ public sealed record ClaudeCard(
                 status),
             ClaudeState.TooOld => new(
                 PillState.TooOld,
-                status.Problem ?? string.Empty,
+                $"Claude Code {status.Version} is older than {status.Minimum}; update it to run agents.",
                 status.Path,
                 "Everything else works as it is. Agent runs stay off until it is updated.",
                 "Test again",

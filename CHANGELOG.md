@@ -55,3 +55,20 @@
   budget-reached and starting runs, a guard refusal included.
 - CI builds the app it uploads on the engine 0.1.0 packages from GitHub Packages, and tests against the engine's
   v0.1.0 tag.
+
+### Changed
+
+- Info bars on every page colour their icon by severity and keep their action at the right end, beside the text.
+- Start, New workspace and Settings keep one width from state to state; Start keeps its action tiles under 1100 with
+  16 between the actions and Recent workspaces, and says a too-old Claude Code must be updated to run agents.
+- New workspace: the target choices span the card and the chosen one has an accent border, step 4 has a Field and
+  Value header with rows 16 apart, the summary labels are body size, every step shows done while creating, a step
+  opens at the top of the page, and the folder box underlines in red when the folder can't be used.
+- Settings: controls are 240 wide, "$" sits inside the budget box, Effort shows Claude Code's default as a
+  placeholder, and an unusable claude.exe underlines the path in red with the whole message wrapped below.
+- The Claude Code dialog lists what agents add with round bullets and a hanging indent.
+- Title-bar search is 240 wide under 1100 when no workspace is open.
+
+### Fixed
+
+- New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".

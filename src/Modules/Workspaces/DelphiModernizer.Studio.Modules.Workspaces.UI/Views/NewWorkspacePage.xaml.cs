@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Linq;
 using DelphiModernizer.Studio.Modules.Workspaces.UI.ViewModels;
 using DelphiModernizer.Studio.UI.Common;
 using DelphiModernizer.Studio.UI.Contracts;
@@ -66,9 +67,25 @@ public sealed partial class NewWorkspacePage : Page, IHasViewModel
             _ => null,
         };
 
+        if (e.PropertyName == nameof(NewWorkspaceViewModel.StepHeading))
+        {
+            PageScroller.ChangeView(horizontalOffset: null, verticalOffset: 0, zoomFactor: null, disableAnimation: true);
+        }
+
         if (target is not null)
         {
             DispatcherQueue.TryEnqueue(() => target.Focus(FocusState.Programmatic));
+        }
+    }
+
+    /// <summary>The chosen target card carries the accent border (canvas .choice.on).</summary>
+    private void OnTargetChoicesChanged(object sender, RoutedEventArgs e)
+    {
+        var choices = TargetChoices.Items.OfType<RadioButton>().ToList();
+
+        for (int i = 0; i < choices.Count; i++)
+        {
+            choices[i].Style = (Style)Resources[i == TargetChoices.SelectedIndex ? "ChosenChoiceStyle" : "ChoiceStyle"];
         }
     }
 
