@@ -23,6 +23,10 @@ public sealed partial class App : Microsoft.UI.Xaml.Application
     public App()
     {
         InitializeComponent();
+        HighContrastAdjustment = ApplicationHighContrastAdjustment.None;
+        System.IO.File.AppendAllText(
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "dmz-pane.log"),
+            $"App HighContrastAdjustment={HighContrastAdjustment}{Environment.NewLine}");
         UnhandledException += OnUnhandledException;
 
         // XAML's handler misses faulted fire-and-forget tasks and exceptions off the UI thread.
