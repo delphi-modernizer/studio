@@ -394,7 +394,7 @@ internal static class Groups
         app.Resize(StudioDriver.Wide);
         app.Navigate("Workstreams", 4000);
         app.Select("Legacy discovery");
-        app.InvokeBeside("Extract business rules", "Run…");
+        app.ClickBeside("Extract business rules", "Run…");
         app.WaitFor("Run Extract business rules", _brief);
         app.Type("Scope", "legacy/Sales");
     }

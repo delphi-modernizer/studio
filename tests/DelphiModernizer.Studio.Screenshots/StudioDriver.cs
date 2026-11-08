@@ -143,37 +143,48 @@ internal sealed class StudioDriver : IDisposable
         Settle(2500);
     }
 
-    /// <summary>Invokes the button or link with this name, or whose name starts with it.</summary>
+    /// <summary>Invokes the button or link with this name, or clicks the text of a button that has no name.</summary>
     public void Invoke(string name, int settle = 2500)
     {
-        var element = Find(e => IsAction(e) && Matches(e, name), name);
+        EnsureRunning();
+        var element = Retry
+            .WhileNull(
+                () => Descendants().FirstOrDefault(e => IsAction(e) && Matches(e, name))
+                    ?? Descendants().FirstOrDefault(e => Type(e) == ControlType.Text && NameOf(e) == name),
+                _findTimeout,
+                TimeSpan.FromMilliseconds(500))
+            .Result ?? throw new InvalidOperationException($"No {name} within {_findTimeout.TotalSeconds} s.");
 
-        if (!element.Properties.IsEnabled.ValueOrDefault)
+        if (Type(element) == ControlType.Text)
+        {
+            Mouse.Click(element.BoundingRectangle.Center());
+        }
+        else if (element.Properties.IsEnabled.ValueOrDefault)
+        {
+            element.Patterns.Invoke.Pattern.Invoke();
+        }
+        else
         {
             throw new InvalidOperationException($"{name} is disabled.");
         }
 
-        element.Patterns.Invoke.Pattern.Invoke();
         Settle(settle);
     }
 
-    /// <summary>Invokes the button called <paramref name="name"/> level with the text <paramref name="row"/>.</summary>
-    /// <remarks>UI Automation does not expose the row's panel, so the row is found by its title.</remarks>
-    public void InvokeBeside(string row, string name)
+    /// <summary>Clicks the button showing <paramref name="name"/> level with the text <paramref name="row"/>.</summary>
+    /// <remarks>
+    /// UI Automation exposes neither the row's panel nor a name for a button with a glyph and text, so the button's
+    /// own text is found level with the row's title and clicked, as a person clicks it.
+    /// </remarks>
+    public void ClickBeside(string row, string name)
     {
         var title = Find(e => Type(e) == ControlType.Text && NameOf(e) == row, row).BoundingRectangle;
-        var button = Descendants()
-            .Where(e => IsAction(e) && NameOf(e) == name)
+        var label = Descendants()
+            .Where(e => Type(e) is ControlType.Text or ControlType.Button && NameOf(e) == name)
             .FirstOrDefault(e => e.BoundingRectangle.Top <= title.Bottom + 40
                 && e.BoundingRectangle.Bottom >= title.Top)
             ?? throw new InvalidOperationException($"No {name} beside {row}.");
-
-        if (!button.Properties.IsEnabled.ValueOrDefault)
-        {
-            throw new InvalidOperationException($"{name} beside {row} is disabled.");
-        }
-
-        button.Patterns.Invoke.Pattern.Invoke();
+        Mouse.Click(label.BoundingRectangle.Center());
         Settle(2500);
     }
 
