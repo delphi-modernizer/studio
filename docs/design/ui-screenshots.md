@@ -1,9 +1,10 @@
 # Screenshots of the running app
 
 The handoff's definition of done puts a screenshot of the running app beside every artboard. The app is WinUI 3 and
-runs only on Windows, so QA runs the harness on a Windows PC and compares its screenshots with the artboards. CI does
-not run it: the comparison is a person's, and a capture with nobody looking asserts nothing. The harness fails when
-the app does not start, a page cannot be reached or the app logs an error.
+runs only on Windows, so QA runs the harness on a Windows PC, or on a GitHub Windows runner through the
+[qa-screenshots](../../.github/workflows/qa-screenshots.yml) workflow, which only a person starts, and compares its
+screenshots with the artboards. CI does not run it: the comparison is a person's, and a capture with nobody looking
+asserts nothing. The harness fails when the app does not start, a page cannot be reached or the app logs an error.
 
 ## Options
 
@@ -65,7 +66,7 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
 ## How a run works
 
 1. QA publishes the app, `dmz` and the stand-in as `claude.exe` ([BUILDING.md](../BUILDING.md)), then runs one screen
-   group (`start`, `overview`, `pages`, `agents`) or all of them.
+   group (`start`, `overview`, `pages`, `agents`) or all of them. The workflow does the same, one job per group.
 2. `tests/DelphiModernizer.Studio.Screenshots` creates its workspaces with `dmz init` and `dmz scan` in a temporary
    folder, never committed, all named "Acme ERP modernization" with the target C#/.NET:
    - `sample`: the brief's Delphi 7 ERP on the BDE, the engine's `tests/fixtures/delphi/legacy-erp`, scanned. Two lines
@@ -84,7 +85,7 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    preview running, creating) are triggered once per size and captured as soon as they show; the large tree makes them
    last long enough.
 5. It sizes the window with `SetWindowPos` before each capture and writes the PNGs and `manifest.json` to `--out`,
-   with the app's log under `logs/` when it wrote one.
+   with the app's log under `logs/` when it wrote one. The workflow uploads that folder as `screenshots-<group>`.
 
 No step approves. The approve dialog and the no-identity dialog are opened on Project setup, captured and cancelled,
 and the harness fails if `.modernizer/approvals.json` changed.
@@ -134,5 +135,10 @@ The harness turns high contrast on with `SystemParametersInfo(SPI_SETHIGHCONTRAS
 Theme setting following Windows, and turns it off afterwards; Windows applies its default contrast theme. Where
 Windows refuses, the harness logs "High contrast cannot be turned on here" and skips those screenshots.
 
-Mica takes its tint from the PC's wallpaper, so the backdrop differs between PCs; compare layout, type, colour roles
-and states, not the tint.
+Mica takes its tint from the wallpaper, so the backdrop differs between PCs and is flat on a runner's plain desktop;
+compare layout, type, colour roles and states, not the tint.
+
+## Download
+
+From the workflow run's summary page on GitHub (Artifacts, `screenshots-<group>`), or through the API: list the run's
+artifacts, then download each one named `screenshots-` and its group. Each is a zip of PNGs and its `manifest.json`.

@@ -33,9 +33,10 @@ glyph table, app icon and logos from `assets/`; see [icons.md](icons.md).
 ## Screenshots
 
 `tests/DelphiModernizer.Studio.Screenshots` captures every state of the built app for QA to compare with the
-artboards ([ui-screenshots.md](design/ui-screenshots.md)). CI does not run it. It is a console tool, not a test
-project, so `dotnet test` skips it everywhere. It targets `net10.0-windows` with
-`EnableWindowsTargeting`, so `dotnet build` compiles it on Linux too; it runs only on Windows.
+artboards ([ui-screenshots.md](design/ui-screenshots.md)). CI does not run it: QA runs it on a Windows PC, or starts
+the `qa-screenshots` workflow by hand (Actions, qa-screenshots, Run workflow), which uploads the artifacts
+`screenshots-<group>`. It is a console tool, not a test project, so `dotnet test` skips it everywhere. It targets
+`net10.0-windows` with `EnableWindowsTargeting`, so `dotnet build` compiles it on Linux too; it runs only on Windows.
 
 `tests/DelphiModernizer.Studio.ClaudeStandIn` is the stand-in Claude Code the harness gives the app. It builds as
 `claude`; `tests/DelphiModernizer.Studio.ClaudeStandIn.Tests` runs it through the engine's runner on every platform.
