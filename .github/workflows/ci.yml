@@ -13,14 +13,14 @@ concurrency:
 
 jobs:
   comments:
-    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
     with:
-      standards-ref: 539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
 
   drift:
-    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
     with:
-      standards-ref: 539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
       files: |
         .editorconfig=standards/csharp/.editorconfig
         tests/.editorconfig=standards/csharp/tests.editorconfig
@@ -28,7 +28,7 @@ jobs:
         docs/csharp-style.md=standards/csharp/csharp-style.md
 
   dependencies:
-    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
 
   # The engine is built from source at the commit engine.lock pins (docs/BUILDING.md).
   engine:
@@ -43,13 +43,13 @@ jobs:
         run: echo "ref=$(tr -d '[:space:]' < engine.lock)" >> "$GITHUB_OUTPUT"
 
   python:
-    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
     with:
       sources: scripts
 
   build:
     needs: engine
-    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@539243d668f72d31bbf8ee5c6ee732d0ed76bd95
+    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
     with:
       solution: DelphiModernizer.Studio.slnx
       os: '["windows-latest"]'
