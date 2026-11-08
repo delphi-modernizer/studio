@@ -211,7 +211,8 @@ public sealed partial class ShellPage : Page
 
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        Trace($"SelectionChanged to={(args.SelectedItemContainer as NavigationViewItem)?.Tag} syncing={_isSyncingSelection} {State()}");
+        var to = (args.SelectedItemContainer as NavigationViewItem)?.Tag;
+        Trace($"SelectionChanged to={to} syncing={_isSyncingSelection} {State()}");
 
         if (!_isSyncingSelection && args.SelectedItemContainer is NavigationViewItem { Tag: string key })
         {
