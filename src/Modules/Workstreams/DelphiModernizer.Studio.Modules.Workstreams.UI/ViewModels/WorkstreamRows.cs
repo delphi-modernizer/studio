@@ -59,7 +59,8 @@ public sealed record TaskRow(
     /// <summary>Only the studio's own run has a Run page to open (open questions).</summary>
     public bool CanOpenBlocker => Blocker?.Run is not null;
 
-    public bool CanRun => ClaudeReady && !IsBlocked;
+    /// <summary>Run… stays on without Claude Code, as drawn; it then opens the Claude Code dialog.</summary>
+    public bool CanRun => !IsBlocked;
 
     public string AnnouncedName => RunNames.Task(Title, RunWords.Writes(Recipe), IsBlocked ? BlockedReason : null);
 }
@@ -74,7 +75,7 @@ public sealed record HistoryRow(RunRecord Run)
     public string ArgumentText => RunWords.ArgumentText(Run.Recipe, Run.Argument);
 
     public string When => Run.FinishedAt is { } finished
-        ? $"{RunWords.Time(Run.StartedAt)} – {RunWords.Time(finished)}"
+        ? $"{RunWords.Time(Run.StartedAt)} – {RunWords.EndTime(Run.StartedAt, finished)}"
         : $"{RunWords.Time(Run.StartedAt)} · running";
 
     public PillState Pill => RunWords.PillOf(Run.Outcome);
@@ -135,6 +136,12 @@ public static class RunWords
         return argument is null ? $"no {recipe.Argument.Name}" : $"{recipe.Argument.Name} {argument}";
     }
 
+    /// <summary>The argument as typed, such as <c>legacy/Sales</c>; null for none or a sign-off, shown by name.</summary>
+    public static string? ArgumentValue(Recipe? recipe, string? argument)
+    {
+        return recipe is null || recipe.Argument.Name == _gateArgument ? null : argument;
+    }
+
     /// <summary>The titles of the deliverables a recipe writes, as the kit names them.</summary>
     public static string Writes(Recipe recipe)
     {
@@ -154,6 +161,14 @@ public static class RunWords
         return at.LocalDateTime.ToString("g", CultureInfo.CurrentCulture);
     }
 
+    /// <summary>When a run ended: its time alone on the day it started, else its date and time.</summary>
+    public static string EndTime(DateTimeOffset started, DateTimeOffset ended)
+    {
+        return started.LocalDateTime.Date == ended.LocalDateTime.Date
+            ? ended.LocalDateTime.ToString("t", CultureInfo.CurrentCulture)
+            : Time(ended);
+    }
+
     public static string Duration(TimeSpan span)
     {
         return span.TotalHours >= 1
@@ -166,10 +181,12 @@ public static class RunWords
         return word.Length == 0 ? word : string.Concat(word[..1].ToUpperInvariant(), word[1..]);
     }
 
+    /// <summary>The kit's description after a colon: "A unit, form…" reads "a unit, form…"; "PERF, …" stays.</summary>
     private static string Sentence(string description)
     {
         string text = description.TrimEnd('.');
+        bool acronym = text.Length > 1 && char.IsUpper(text[1]);
 
-        return text.Length > 1 && char.IsLower(text[1]) ? string.Concat(text[..1].ToLowerInvariant(), text[1..]) : text;
+        return text.Length > 0 && !acronym ? string.Concat(text[..1].ToLowerInvariant(), text[1..]) : text;
     }
 }

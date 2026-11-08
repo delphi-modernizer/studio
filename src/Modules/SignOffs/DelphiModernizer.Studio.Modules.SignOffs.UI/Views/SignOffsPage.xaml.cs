@@ -48,6 +48,17 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
         return isNarrow ? 0 : 1;
     }
 
+    /// <summary>Checks are divided by a hairline, as drawn: none above the first, which sits 2 from the title.</summary>
+    public static Thickness TopDivider(bool isFirst)
+    {
+        return new Thickness(0, isFirst ? 0 : 1, 0, 0);
+    }
+
+    public static Thickness CheckPadding(bool isFirst)
+    {
+        return new Thickness(0, isFirst ? 2 : 8, 0, 8);
+    }
+
     private void OnLayoutChanged(object sender, VisualStateChangedEventArgs e)
     {
         ViewModel.IsNarrow = e.NewState?.Name == nameof(Narrow);

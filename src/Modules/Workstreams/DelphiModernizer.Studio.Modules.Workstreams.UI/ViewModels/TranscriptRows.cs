@@ -20,9 +20,12 @@ public abstract class TranscriptRow : ObservableObject
     }
 }
 
-public sealed class SessionRow(string text) : TranscriptRow
+/// <summary>The transcript's first item: waiting for the session, then when it started with which model.</summary>
+public sealed partial class SessionRow : TranscriptRow
 {
-    public string Text { get; } = text;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AnnouncedName))]
+    public partial string Text { get; set; } = "Waiting for the session…";
 
     public override string AnnouncedName => $"Session: {Text}";
 }
@@ -30,6 +33,9 @@ public sealed class SessionRow(string text) : TranscriptRow
 /// <summary>A line of agent text, the fact label after it when it has one, and the evidence links it cites.</summary>
 public sealed record AgentLineRow(string Text, FactKind? Label)
 {
+    /// <summary>The line without its evidence links, which show as links under it.</summary>
+    public string Claim => RunTranscript.Claim(Text);
+
     public bool HasLabel => Label is not null;
 
     public FactKind Kind => Label ?? FactKind.Unknown;
@@ -50,13 +56,15 @@ public sealed class AgentRow(string who, IReadOnlyList<AgentLine> lines) : Trans
 }
 
 /// <summary>A tool call, collapsed to its name and input until it is expanded to show its result.</summary>
-public sealed partial class ToolRow(string id, string name, string input) : TranscriptRow
+public sealed partial class ToolRow(string id, string name, string input, bool edits) : TranscriptRow
 {
     public string Id { get; } = id;
 
     public string Name { get; } = name;
 
     public string Input { get; } = input;
+
+    public bool Edits { get; } = edits;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasResult), nameof(Summary), nameof(AnnouncedName))]
@@ -85,13 +93,16 @@ public sealed partial class ToolRow(string id, string name, string input) : Tran
 /// <param name="target">
 /// The file or command the call names, which Narrator reads instead of the raw input; null for none.
 /// </param>
-public sealed class RefusalRow(string name, string input, string? target, string reason) : TranscriptRow
+public sealed class RefusalRow(string name, string input, string? target, string reason, bool edits)
+    : TranscriptRow
 {
     public string Name { get; } = name;
 
     public string Input { get; } = input;
 
     public string Reason { get; } = reason;
+
+    public string Outcome => edits ? "The edit was not made. The run carries on." : "The call was not made. The run carries on.";
 
     public override string AnnouncedName => RunNames.Refusal(Name, target ?? Input, Reason);
 }

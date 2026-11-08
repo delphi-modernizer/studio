@@ -19,8 +19,10 @@
 
         <DataTemplate x:Key="CheckTemplate" x:DataType="vm:CheckRow">
             <Grid
-                Padding="0,10"
+                Padding="{x:Bind local:SignOffsPage.CheckPadding(IsFirst)}"
                 AutomationProperties.Name="{x:Bind AnnouncedName}"
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                BorderThickness="{x:Bind local:SignOffsPage.TopDivider(IsFirst)}"
                 ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -105,7 +107,12 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <controls:PathText Text="{x:Bind Path}" />
+                <TextBlock
+                    LineHeight="18"
+                    Style="{StaticResource MonoTextStyle}"
+                    Text="{x:Bind Path}"
+                    TextTrimming="None"
+                    TextWrapping="Wrap" />
                 <TextBlock
                     Grid.Column="1"
                     AutomationProperties.Name="changed since approval"
@@ -138,7 +145,10 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+            <StackPanel
+                x:Name="PageContent"
+                HorizontalAlignment="Stretch"
+                Style="{StaticResource PageContentStyle}">
                 <controls:PageHeader Title="Sign-offs">
                     <controls:PageHeader.Purpose>
                         Five sign-offs, in order. Approving one records who you are (from git), your note and a
@@ -172,10 +182,12 @@
                     IsOpen="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}"
                     Message="{x:Bind ViewModel.LoadProblem, Mode=OneWay}"
                     Severity="Error"
-                    Title="Couldn’t check the sign-offs.">
+                    Title="Couldn’t check the sign-offs."
+                    Visibility="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}">
                     <InfoBar.IconSource>
                         <FontIconSource
                             FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Foreground="{ThemeResource SystemFillColorCriticalBrush}"
                             Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                     </InfoBar.IconSource>
                 </InfoBar>
@@ -186,10 +198,12 @@
                         IsOpen="{x:Bind ViewModel.HasStale, Mode=OneWay}"
                         Message="A file it covers was edited. Re-approve or revoke it; later sign-offs wait until then."
                         Severity="Warning"
-                        Title="{x:Bind ViewModel.StaleTitle, Mode=OneWay}">
+                        Title="{x:Bind ViewModel.StaleTitle, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.HasStale, Mode=OneWay}">
                         <InfoBar.IconSource>
                             <FontIconSource
                                 FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Foreground="{ThemeResource SystemFillColorCautionBrush}"
                                 Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                         </InfoBar.IconSource>
                     </InfoBar>
@@ -324,10 +338,12 @@
                                                 IsOpen="{x:Bind IsStale}"
                                                 Message="{x:Bind ChangedSummary}"
                                                 Severity="Warning"
-                                                Title="Changed after approval.">
+                                                Title="Changed after approval."
+                                                Visibility="{x:Bind IsStale}">
                                                 <InfoBar.IconSource>
                                                     <FontIconSource
                                                         FontFamily="{StaticResource StudioIconsFontFamily}"
+                                                        Foreground="{ThemeResource SystemFillColorCautionBrush}"
                                                         Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                                                 </InfoBar.IconSource>
                                             </InfoBar>
@@ -456,7 +472,7 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <FontIcon
-                                                    FontSize="12"
+                                                    VerticalAlignment="Top"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Glyph="{x:Bind icons:StudioIcons.Fingerprint}"
                                                     Style="{StaticResource IconStyle}" />
@@ -465,8 +481,11 @@
                                                     VerticalAlignment="Center"
                                                     IsTextSelectionEnabled="True"
                                                     Style="{StaticResource MonoTextStyle}"
-                                                    Text="{x:Bind Fingerprint}"
-                                                    TextTrimming="CharacterEllipsis" />
+                                                    TextTrimming="None"
+                                                    TextWrapping="Wrap">
+                                                    <Run Text="Fingerprint" />
+                                                    <Run Text="{x:Bind Fingerprint}" />
+                                                </TextBlock>
                                                 <Button
                                                     Grid.Column="2"
                                                     AutomationProperties.Name="Copy the fingerprint"

@@ -230,6 +230,27 @@ public sealed class RunTests
     }
 
     [Fact]
+    public void A_claim_leaves_its_evidence_links_to_the_links_under_it()
+    {
+        const string line = "BR-001 Gold discount, rounded half to even. legacy/Sales/Pricing.pas#L18-L29";
+
+        Assert.Equal("BR-001 Gold discount, rounded half to even.", RunTranscript.Claim(line));
+        Assert.Equal(["legacy/Sales/Pricing.pas#L18-L29"], RunTranscript.Evidence(line));
+        Assert.Equal("The search builds SQL.", RunTranscript.Claim("The search (legacy/Sales/A.pas#L3) builds SQL."));
+    }
+
+    [Fact]
+    public void An_edit_shows_its_file_and_an_ellipsis_and_other_calls_their_whole_input()
+    {
+        var edit = new ToolCall(
+            "t-1", "Edit", """{"file_path":"legacy/Sales/Pricing.pas","old_string":"  Gold","new_string":"x"}""", false);
+        var read = new ToolCall("t-2", "Read", """{"file_path":"legacy/Sales/Pricing.pas"}""", false);
+
+        Assert.Equal("""{"file_path":"legacy/Sales/Pricing.pas", …}""", RunTranscript.ShortInput(edit));
+        Assert.Equal(read.Input, RunTranscript.ShortInput(read));
+    }
+
+    [Fact]
     public void A_tool_call_names_a_workspace_file_relative_to_its_root()
     {
         string root = Path.Combine(Path.GetTempPath(), "ws");
