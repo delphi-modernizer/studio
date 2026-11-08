@@ -978,7 +978,7 @@
                                     TextWrapping="Wrap" />
                                 <!--  Canvas .empty p: secondary text, at most 44 characters wide.  -->
                                 <TextBlock
-                                    MaxWidth="384"
+                                    MaxWidth="368"
                                     HorizontalAlignment="Center"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource BodyTextBlockStyle}"
