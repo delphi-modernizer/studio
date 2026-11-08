@@ -215,7 +215,7 @@ internal sealed class StudioDriver : IDisposable
             throw new InvalidOperationException($"{name} beside {row} is disabled.");
         }
 
-        Desktop.Click(button.BoundingRectangle.Center());
+        ClickOn(button, name);
         Settle(2500);
     }
 
@@ -231,8 +231,7 @@ internal sealed class StudioDriver : IDisposable
                 _findTimeout,
                 ignoreException: true)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
-        row.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
-        Desktop.Click(row.BoundingRectangle.Center());
+        ClickOn(row, text);
         Settle(4000);
     }
 
@@ -438,8 +437,32 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Clicks a button with the pointer, as a person does.</summary>
     public void Click(string name)
     {
-        Desktop.Click(Find(e => IsAction(e) && Matches(e, name), name).BoundingRectangle.Center());
+        ClickOn(Find(e => IsAction(e) && Matches(e, name), name), name);
         Settle(2500);
+    }
+
+    /// <remarks>
+    /// An element below the fold has an empty rectangle until it is brought into view; focus brings into view what
+    /// cannot scroll itself, and after pointer input it draws no focus ring.
+    /// </remarks>
+    private static void ClickOn(AutomationElement element, string what)
+    {
+        element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
+
+        if (element.BoundingRectangle.IsEmpty)
+        {
+            element.Focus();
+            Settle(500);
+        }
+
+        var bounds = element.BoundingRectangle;
+
+        if (bounds.IsEmpty)
+        {
+            throw new InvalidOperationException($"{what} is not on screen to click.");
+        }
+
+        Desktop.Click(bounds.Center());
     }
 
     public static string Slug(string name)
