@@ -25,6 +25,43 @@ against the artboards; it runs in process on a hosted runner with nothing to ins
 harness out of the app. Finding each control by its automation name means a renamed control breaks the job, which is
 the Narrator contract the handoff asks for anyway.
 
+## A stand-in Claude Code
+
+The Run page, the Workstreams states and every Claude Code state need a CLI the engine accepts. The runners have no
+Claude Code, and the engine on Windows takes only a native `claude.exe` that answers `--version` with
+`ClaudeExecutable.MinimumVersion` or later, then runs it with the stream-json flags.
+
+| | The engine's FakeClaude | Real Claude Code | A stand-in `claude.exe` in `tests/` |
+| --- | --- | --- | --- |
+| What it is | Replays an NDJSON file; its first two arguments are that file and a file to record the rest in | The CLI, signed in with an API key from a repository secret | A console tool named `claude`, which answers `--version` and plays a scenario the harness picks through an environment variable |
+| Accepted by the engine | No: `ClaudeExecutable.Locate` passes no leading arguments, so the replay file cannot be named | Yes | Yes: it is a `claude.exe` and answers `--version` |
+| Every state on demand | Only with an engine change to name the script another way | No: a real run cannot be made to fail, stop or reach its budget at a chosen point | Yes: completed, failed, stopped and budget reached, started and held, and a version that is too old |
+| Same pixels every run | Yes | No: the model's text, cost and turns change each run, and each run costs money | Yes |
+| Engine change | Yes, in a security decision (which executables a run starts) | No | No |
+| Code | Engine change and a script per state | A secret and CI setup | About 250 lines in `tests/`, nothing in the app |
+
+Decision: the stand-in, `tests/DelphiModernizer.Studio.ClaudeStandIn`. It writes the stream-json events
+`StreamJsonParser` reads (`system` init, `assistant` text and `tool_use`, `user` `tool_result`, `result`). Its events
+are the Run board's: the Legacy discovery agent runs the kit's `ws01-business-rules` recipe on `legacy/Sales`, reads
+`Pricing.pas`, greps for `CREDIT_LIMIT`, states fact-labelled findings with evidence links, tries to edit
+`legacy/Sales/Pricing.pas` and is refused, then edits its deliverable. Nothing in a result is invented: a read returns
+the file, a grep returns its matching lines, the guard's answer is the engine's own `Guard.Evaluate`, and an edit the
+guard allows is made, so the run leaves the Functional Requirements Specification as Draft. The refusal is worded as
+Claude Code words a blocking PreToolUse hook, which is the text the studio's `RunTranscript` recognises.
+`tests/DelphiModernizer.Studio.ClaudeStandIn.Tests` runs each scenario through the engine's `AgentRunner` and checks
+the events it parses.
+
+| `STUDIO_CLAUDE_SCENARIO` | What the stand-in does after `--version` |
+| --- | --- |
+| `completed` (default) | Streams the run, then a `success` result |
+| `failed` | Streams the run up to the refusal, writes an error to standard error and exits 1 without a result |
+| `stopped` | Streams the run, then waits until the harness presses Stop |
+| `budget` | Streams the run, then an `error_max_budget_usd` result at the run's own budget |
+| `starting` | Waits before the session starts, until the harness presses Stop |
+
+`STUDIO_CLAUDE_VERSION=too-old` makes `--version` answer one patch below the minimum. "Not found" is no `claude.exe`
+on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness writes and chooses in Settings.
+
 ## How the job works
 
 1. It publishes the app and `dmz` as the `package` job does.
