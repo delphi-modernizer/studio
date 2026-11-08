@@ -2,8 +2,11 @@
 <Application
     x:Class="DelphiModernizer.Studio.App.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    HighContrastAdjustment="None">
 
+    <!--  No text backplates in high contrast: every brush is a theme resource with its own high-contrast value, and a
+          backplate draws on-accent text as white on black inside the accent (canvas OverviewHC, GatesHC).  -->
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

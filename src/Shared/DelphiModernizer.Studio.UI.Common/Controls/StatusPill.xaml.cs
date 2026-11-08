@@ -62,7 +62,7 @@ public sealed partial class StatusPill : UserControl
     private void Show()
     {
         var look = PillLook.Of(State);
-        bool running = State == PillState.Running;
+        bool running = State is PillState.Running or PillState.Starting;
         string word = string.IsNullOrEmpty(Text) ? look.Word : Text;
         bool changed = Word.Text != word;
         Word.Text = word;

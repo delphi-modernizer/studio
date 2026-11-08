@@ -71,6 +71,9 @@
 - The no-workspace state sits centred in a 520-tall area with its description at body size, and can show Clone from
   Git… turned off; empty cards keep their caption at 44 characters.
 - Table rows show their dividers, the Workstreams badge is the accent fill, and a status pill can take its own glyph.
+- Busy rings are the design's 12 px half arc, still when Windows turns animations off; a Starting pill joins Running.
+- Fact labels are 18 tall with their whole word visible, and a path can take a colour of its own.
+- High contrast draws no text backplates, so on-accent text reads on the accent.
 
 ### Fixed
 

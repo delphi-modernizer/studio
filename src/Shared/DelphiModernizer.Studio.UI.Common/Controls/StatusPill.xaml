@@ -2,6 +2,7 @@
     x:Class="DelphiModernizer.Studio.UI.Common.Controls.StatusPill"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:DelphiModernizer.Studio.UI.Common.Controls"
     VerticalAlignment="Center"
     IsTabStop="False">
 
@@ -59,13 +60,8 @@
                 FontFamily="{StaticResource StudioIconsFontFamily}"
                 FontSize="12"
                 Foreground="{ThemeResource StatusPillNeutralGlyph}" />
-            <ProgressRing
+            <local:Spinner
                 x:Name="Ring"
-                AutomationProperties.AccessibilityView="Raw"
-                Width="12"
-                Height="12"
-                MinWidth="12"
-                MinHeight="12"
                 VerticalAlignment="Center"
                 IsActive="False"
                 Visibility="Collapsed" />

@@ -374,9 +374,8 @@
                                     <Border Style="{StaticResource CardStyle}">
                                         <StackPanel Spacing="10">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
-                                                <ProgressRing
-                                                    Width="16"
-                                                    Height="16"
+                                                <controls:Spinner
+                                                    VerticalAlignment="Center"
                                                     IsActive="{x:Bind ViewModel.IsPreviewRunning, Mode=OneWay}" />
                                                 <TextBlock
                                                     Style="{StaticResource BodyTextBlockStyle}"
@@ -668,9 +667,7 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <ProgressRing
-                                                Width="16"
-                                                Height="16"
+                                            <controls:Spinner
                                                 IsActive="{x:Bind IsWorking, Mode=OneWay}"
                                                 Visibility="{x:Bind IsWorking, Mode=OneWay}" />
                                             <FontIcon

@@ -6,7 +6,7 @@ using Windows.Foundation;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
 
-/// <summary>A path in Cascadia Mono, secondary, that keeps its end when narrow: "…Sales/Pricing.pas".</summary>
+/// <summary>A path in Cascadia Mono, secondary unless Foreground is set, that keeps its end: "…Sales/Pricing.pas".</summary>
 /// <remarks>WinUI trims text only at the end. Narrator always reads the whole path.</remarks>
 public sealed partial class PathText : UserControl
 {
@@ -28,6 +28,7 @@ public sealed partial class PathText : UserControl
         AutomationProperties.SetAccessibilityView(_shown, AccessibilityView.Raw);
         IsTabStop = false;
         Content = _shown;
+        RegisterPropertyChangedCallback(ForegroundProperty, (_, _) => _shown.Foreground = Foreground);
     }
 
     public string Text

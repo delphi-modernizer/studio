@@ -5,14 +5,16 @@
     IsTabStop="False">
 
     <!--  An outline and no colour, so a fact label never reads as a state.  -->
+    <!--  18 tall (canvas .fact): a full 16 line inside the outline, so no glyph is cut.  -->
     <Border
+        MinHeight="18"
         Padding="6,0"
         BorderBrush="{ThemeResource ControlStrongStrokeColorDefaultBrush}"
         BorderThickness="1"
         CornerRadius="4">
         <TextBlock
             x:Name="Word"
-            Style="{StaticResource CaptionTextBlockStyle}"
-            TextLineBounds="Tight" />
+            VerticalAlignment="Center"
+            Style="{StaticResource CaptionTextBlockStyle}" />
     </Border>
 </UserControl>
