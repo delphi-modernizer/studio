@@ -13,14 +13,14 @@ concurrency:
 
 jobs:
   comments:
-    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@83ae77036ac3584c58a4af4124a398ea24a84b10
     with:
-      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
+      standards-ref: 83ae77036ac3584c58a4af4124a398ea24a84b10
 
   drift:
-    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@83ae77036ac3584c58a4af4124a398ea24a84b10
     with:
-      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
+      standards-ref: 83ae77036ac3584c58a4af4124a398ea24a84b10
       files: |
         .editorconfig=standards/csharp/.editorconfig
         tests/.editorconfig=standards/csharp/tests.editorconfig
@@ -28,7 +28,7 @@ jobs:
         docs/csharp-style.md=standards/csharp/csharp-style.md
 
   dependencies:
-    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@83ae77036ac3584c58a4af4124a398ea24a84b10
 
   # The engine is built from source at the commit engine.lock pins (docs/BUILDING.md).
   engine:
@@ -43,13 +43,13 @@ jobs:
         run: echo "ref=$(tr -d '[:space:]' < engine.lock)" >> "$GITHUB_OUTPUT"
 
   python:
-    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@83ae77036ac3584c58a4af4124a398ea24a84b10
     with:
       sources: scripts
 
   build:
     needs: engine
-    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@83ae77036ac3584c58a4af4124a398ea24a84b10
     with:
       solution: DelphiModernizer.Studio.slnx
       os: '["windows-latest"]'
@@ -57,6 +57,8 @@ jobs:
       companion-repository: delphi-modernizer/engine
       companion-ref: ${{ needs.engine.outputs.ref }}
       companion-path: .engine
+      sonar-organization: delphi-modernizer
+      sonar-project-key: delphi-modernizer_studio
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
