@@ -79,12 +79,23 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    settings before each launch, since the app reads them once: the recent workspaces, the Theme setting and the
    Claude Code path. It sets the stand-in's variables and `GIT_CONFIG_GLOBAL` (a file with the screenshots identity,
    or an empty one) on the app's process. The person's data folder is moved aside for the run and put back afterwards.
+   - Theme follows Windows, as it does until a person chooses, and the canvas's Settings shows it so. The light and
+     dark passes set Windows' app mode (`AppsUseLightTheme`) before their launches and put the person's back
+     afterwards.
+   - Each size of the wizard has a launch of its own, since Create leaves the new workspace open and the canvas draws
+     the wizard with none.
+   - Workstreams' history is drawn with a live run above a completed, a stopped, a budget-reached and a failed one.
+     The launches that make those runs keep one copy of the sample, oldest run first, and the last captures the
+     history while its run works.
 4. Each state is reached as a person reaches it: through the UI (opening a workspace from Start, the pane, buttons,
    SelectorBar items, text boxes, dialogs), through the stand-in's runs, or through the workspace's files (a deleted
    deliverable, a charter set back to a template). States that last only while something runs (loading, scanning,
    preview running, creating) are triggered once per size and captured as soon as they show; the large tree makes them
    last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
-   processor while scanning and preview running are captured.
+   processor while scanning and preview running are captured. Creating is captured once the kit is copied, while the
+   tree is, so that a step shows done, one working and the rest waiting.
+   - Controls are clicked with the pointer and text boxes are left without a key, since after keyboard input XAML
+     draws a focus ring wherever focus goes next. Only Overview's focus state presses Tab.
 5. It sizes the window with `SetWindowPos` before each capture and writes the PNGs and `manifest.json` to `--out`,
    with the app's log under `logs/` when it wrote one. The workflow uploads that folder as `screenshots-<group>`.
 
@@ -132,8 +143,8 @@ High contrast (`highcontrast`) covers Overview `default` and Sign-offs `blocked`
 
 ## High contrast and Mica
 
-The harness turns high contrast on with `SystemParametersInfo(SPI_SETHIGHCONTRAST)` before it starts the app with the
-Theme setting following Windows, and turns it off afterwards; Windows applies its default contrast theme. Where
+The harness turns high contrast on with `SystemParametersInfo(SPI_SETHIGHCONTRAST)` before it starts the app, and turns
+it off afterwards; Windows applies its default contrast theme. Where
 Windows refuses, the harness logs "High contrast cannot be turned on here" and skips those screenshots.
 
 Mica takes its tint from the wallpaper, so the backdrop differs between PCs and is flat on a runner's plain desktop;

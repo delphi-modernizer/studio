@@ -59,6 +59,31 @@
 
 ### Changed
 
+- Info bars on every page colour their icon by severity and keep their action at the right end, beside the text.
+- Start, New workspace and Settings keep one width from state to state; Start keeps its action tiles under 1100 with
+  16 between the actions and Recent workspaces, and says a too-old Claude Code, when its version is known, must be
+  updated to run agents.
+- New workspace: the target choices span the card and the chosen one has an accent border, step 4 has a Field and
+  Value header with rows 16 apart, the summary labels are body size, every step shows done while creating, a step
+  opens at the top of the page, and the folder box underlines in red when the folder can't be used.
+- Settings: controls are 240 wide, "$" sits inside the budget box, Effort shows Claude Code's default as a
+  placeholder, and an unusable claude.exe underlines the path in red with the whole message wrapped below.
+- The Claude Code dialog lists what agents add with round bullets and a hanging indent.
+- Title-bar search is 240 wide under 1100 when no workspace is open.
+- The no-workspace state sits centred in a 520-tall area with its description at body size, and can show Clone from
+  Git… turned off; empty cards keep their caption at 44 characters.
+- Table rows show their dividers, the Workstreams badge is the accent fill, and a status pill can take its own glyph.
+- Busy rings are the design's 12 px half arc, still when Windows turns animations off; a Starting pill joins Running.
+- Fact labels are 18 tall with their whole word visible, and a path can take a colour of its own.
+- Inventory, Traceability and Deliverables match their artboards more closely: the four stat cards stay in one row at
+  960 × 576, closed info bars leave no gap, and section tabs show their count in smaller secondary text.
+- Inventory names risk markers ("Hard-coded credential") and lists credentials first, names screens by class
+  ("TDmMain · data module, not a screen", "Can’t be read"), shows Text and Binary pills, puts the data cards two to a
+  row with `legacy/` links, says when the scan ran and which code modules form a cycle, and labels the scan button
+  Scan or Rescan. While a scan runs the page shows files read of files found and a bar, in place of the previous
+  inventory.
+- Traceability lists errors before warnings, says where the errors are and how strict mode splits them, shows its
+  status glyphs in the page's theme, and sets file links in Cascadia Mono.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
   notice no longer leaves a gap.
 - Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code
@@ -71,3 +96,7 @@
   drawn plain.
 - The approve dialog and Sign-offs show covered paths whole and the fingerprint wrapped with its label; Sign-offs'
   checks are divided by hairlines.
+
+### Fixed
+
+- New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".

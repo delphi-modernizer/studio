@@ -1,0 +1,36 @@
+<UserControl
+    x:Class="DelphiModernizer.Studio.UI.Common.Controls.Spinner"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="12"
+    Height="12"
+    AutomationProperties.AccessibilityView="Raw"
+    Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+    IsTabStop="False">
+
+    <UserControl.Resources>
+        <Storyboard x:Name="Spin" RepeatBehavior="Forever">
+            <DoubleAnimation
+                Storyboard.TargetName="Turn"
+                Storyboard.TargetProperty="Angle"
+                From="0"
+                To="360"
+                Duration="0:0:1" />
+        </Storyboard>
+    </UserControl.Resources>
+
+    <!--  Canvas .ring: half the circle in a 2 stroke, from upper left over the top to lower right.  -->
+    <Viewbox>
+        <Path
+            Width="12"
+            Height="12"
+            Data="M 2.46,2.46 A 5,5 0 0 1 9.54,9.54"
+            Stroke="{x:Bind Foreground, Mode=OneWay}"
+            StrokeEndLineCap="Flat"
+            StrokeThickness="2">
+            <Path.RenderTransform>
+                <RotateTransform x:Name="Turn" CenterX="6" CenterY="6" />
+            </Path.RenderTransform>
+        </Path>
+    </Viewbox>
+</UserControl>

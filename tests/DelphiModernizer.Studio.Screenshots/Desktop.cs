@@ -1,10 +1,13 @@
 using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 namespace DelphiModernizer.Studio.Screenshots;
 
-/// <summary>The Win32 calls the capture needs: window frames, the display mode, high contrast and the pointer.</summary>
+/// <summary>
+/// The Win32 calls the capture needs: window frames, the display mode, Windows' theme, high contrast and the pointer.
+/// </summary>
 internal static partial class Desktop
 {
     private const int _extendedFrameBounds = 9;
@@ -22,6 +25,8 @@ internal static partial class Desktop
     private const uint _leftUp = 0x0004;
     private const int _screenWidth = 0;
     private const int _screenHeight = 1;
+    private const string _personalize = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+    private const string _appsUseLightTheme = "AppsUseLightTheme";
 
     public static string DisplayMode
     {
@@ -39,6 +44,31 @@ internal static partial class Desktop
 
             return SystemParametersInfo(_getHighContrast, (uint)contrast.Size, ref contrast, 0)
                 && (contrast.Flags & _highContrastOn) != 0;
+        }
+    }
+
+    /// <summary>Whether apps that follow Windows draw light, as Settings, Personalization, Colors chooses.</summary>
+    /// <remarks>
+    /// Null where the person never chose, which Windows reads as light. An app reads it as it starts.
+    /// </remarks>
+    public static bool? AppsUseLightTheme
+    {
+        get {
+            using var key = Registry.CurrentUser.OpenSubKey(_personalize);
+
+            return key?.GetValue(_appsUseLightTheme) is int value ? value != 0 : null;
+        }
+        set {
+            using var key = Registry.CurrentUser.CreateSubKey(_personalize);
+
+            if (value is { } light)
+            {
+                key.SetValue(_appsUseLightTheme, light ? 1 : 0, RegistryValueKind.DWord);
+            }
+            else
+            {
+                key.DeleteValue(_appsUseLightTheme, throwOnMissingValue: false);
+            }
         }
     }
 

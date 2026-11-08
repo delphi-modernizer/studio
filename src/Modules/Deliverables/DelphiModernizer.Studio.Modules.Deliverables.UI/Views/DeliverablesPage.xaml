@@ -27,6 +27,145 @@
                         Color="{ThemeResource SystemColorHighlightColor}" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+
+            <DataTemplate x:Key="DeliverableRowTemplate" x:DataType="vm:DeliverableRow">
+                <Grid>
+                    <!--  A sign-off's heading fills its row, padding included.  -->
+                    <Grid
+                        Margin="-16,-6"
+                        Padding="16,6"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsGroup}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Title}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Path}" />
+                        <controls:StatusPill Grid.Column="2" State="{x:Bind Pill}" />
+                    </Grid>
+                    <Grid ColumnSpacing="12" Visibility="{x:Bind IsDeliverable}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="168" />
+                            <ColumnDefinition Width="112" />
+                            <ColumnDefinition Width="32" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}"
+                                Text="{x:Bind Title}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap" />
+                            <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind PathText}" />
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="{x:Bind Owner}"
+                            TextTrimming="CharacterEllipsis" />
+                        <controls:StatusPill
+                            Grid.Column="2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            State="{x:Bind Pill}" />
+                        <Button
+                            Grid.Column="3"
+                            Padding="8"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind OpenName}"
+                            Click="OnOpenDeliverable"
+                            IsEnabled="{x:Bind CanOpen}"
+                            Style="{StaticResource SubtleButtonStyle}"
+                            Tag="{x:Bind}"
+                            ToolTipService.ToolTip="Open in your editor">
+                            <FontIcon
+                                Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                Style="{StaticResource IconStyle}" />
+                        </Button>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
+
+            <!--  Under 1100 Drafted by is 128 wide, as the canvas draws it.  -->
+            <DataTemplate x:Key="DeliverableRowNarrowTemplate" x:DataType="vm:DeliverableRow">
+                <Grid>
+                    <!--  A sign-off's heading fills its row, padding included.  -->
+                    <Grid
+                        Margin="-16,-6"
+                        Padding="16,6"
+                        Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
+                        ColumnSpacing="8"
+                        Visibility="{x:Bind IsGroup}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="{x:Bind Title}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource SecondaryCaptionTextStyle}"
+                            Text="{x:Bind Path}" />
+                        <controls:StatusPill Grid.Column="2" State="{x:Bind Pill}" />
+                    </Grid>
+                    <Grid ColumnSpacing="12" Visibility="{x:Bind IsDeliverable}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="128" />
+                            <ColumnDefinition Width="112" />
+                            <ColumnDefinition Width="32" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock
+                                Style="{StaticResource BodyTextBlockStyle}"
+                                Text="{x:Bind Title}"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap" />
+                            <TextBlock Style="{StaticResource MonoTextStyle}" Text="{x:Bind PathText}" />
+                        </StackPanel>
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Text="{x:Bind Owner}"
+                            TextTrimming="CharacterEllipsis" />
+                        <controls:StatusPill
+                            Grid.Column="2"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            State="{x:Bind Pill}" />
+                        <Button
+                            Grid.Column="3"
+                            Padding="8"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="{x:Bind OpenName}"
+                            Click="OnOpenDeliverable"
+                            IsEnabled="{x:Bind CanOpen}"
+                            Style="{StaticResource SubtleButtonStyle}"
+                            Tag="{x:Bind}"
+                            ToolTipService.ToolTip="Open in your editor">
+                            <FontIcon
+                                Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
+                                Style="{StaticResource IconStyle}" />
+                        </Button>
+                    </Grid>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
 
@@ -42,8 +181,11 @@
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="0" />
                     </VisualState.StateTriggers>
+                    <!--  Under 1100 Drafted by narrows to 128, so a deliverable's title keeps its room.  -->
                     <VisualState.Setters>
                         <Setter Target="PageContent.Spacing" Value="16" />
+                        <Setter Target="OwnerColumn.Width" Value="128" />
+                        <Setter Target="Table.ItemTemplate" Value="{StaticResource DeliverableRowNarrowTemplate}" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -90,7 +232,8 @@
                         IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
                         Message="{x:Bind ViewModel.Problem, Mode=OneWay}"
                         Severity="Error"
-                        Title="Couldn’t read the deliverables.">
+                        Title="Couldn’t read the deliverables."
+                        Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}">
                         <InfoBar.IconSource>
                             <FontIconSource
                                 FontFamily="{StaticResource StudioIconsFontFamily}"
@@ -103,7 +246,8 @@
                             IsClosable="False"
                             IsOpen="{x:Bind ViewModel.AllTemplates, Mode=OneWay}"
                             Severity="Informational"
-                            Title="Every deliverable is still a template.">
+                            Title="Every deliverable is still a template."
+                            Visibility="{x:Bind ViewModel.AllTemplates, Mode=OneWay}">
                             <InfoBar.Message>
                                 Write them yourself, or run a team’s agent task so an agent drafts them for you to
                                 review.
@@ -123,7 +267,8 @@
                             IsOpen="{x:Bind ViewModel.HasMissing, Mode=OneWay}"
                             Message="{x:Bind ViewModel.MissingMessage, Mode=OneWay}"
                             Severity="Error"
-                            Title="{x:Bind ViewModel.MissingTitle, Mode=OneWay}">
+                            Title="{x:Bind ViewModel.MissingTitle, Mode=OneWay}"
+                            Visibility="{x:Bind ViewModel.HasMissing, Mode=OneWay}">
                             <InfoBar.IconSource>
                                 <FontIconSource
                                     FontFamily="{StaticResource StudioIconsFontFamily}"
@@ -144,7 +289,7 @@
                                 <Grid Style="{StaticResource TableHeaderStyle}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="168" />
+                                        <ColumnDefinition x:Name="OwnerColumn" Width="168" />
                                         <ColumnDefinition Width="112" />
                                         <ColumnDefinition Width="32" />
                                     </Grid.ColumnDefinitions>
@@ -166,79 +311,9 @@
                                     IsItemClickEnabled="True"
                                     ItemClick="OnRowClicked"
                                     ItemContainerStyle="{StaticResource TableRowStyle}"
+                                    ItemTemplate="{StaticResource DeliverableRowTemplate}"
                                     ItemsSource="{x:Bind ViewModel.Rows, Mode=OneWay}"
-                                    SelectionMode="None">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:DeliverableRow">
-                                            <Grid>
-                                                <!--  A sign-off's heading fills its row, padding included.  -->
-                                                <Grid
-                                                    Margin="-16,-6"
-                                                    Padding="16,6"
-                                                    Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
-                                                    ColumnSpacing="8"
-                                                    Visibility="{x:Bind IsGroup}">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <TextBlock
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                        Text="{x:Bind Title}" />
-                                                    <TextBlock
-                                                        Grid.Column="1"
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind Path}" />
-                                                    <controls:StatusPill Grid.Column="2" State="{x:Bind Pill}" />
-                                                </Grid>
-                                                <Grid ColumnSpacing="12" Visibility="{x:Bind IsDeliverable}">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="168" />
-                                                        <ColumnDefinition Width="112" />
-                                                        <ColumnDefinition Width="32" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel VerticalAlignment="Center">
-                                                        <TextBlock
-                                                            Style="{StaticResource BodyTextBlockStyle}"
-                                                            Text="{x:Bind Title}"
-                                                            TextTrimming="CharacterEllipsis"
-                                                            TextWrapping="NoWrap" />
-                                                        <controls:PathText Text="{x:Bind PathText}" />
-                                                    </StackPanel>
-                                                    <TextBlock
-                                                        Grid.Column="1"
-                                                        VerticalAlignment="Center"
-                                                        Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="{x:Bind Owner}"
-                                                        TextTrimming="CharacterEllipsis" />
-                                                    <controls:StatusPill
-                                                        Grid.Column="2"
-                                                        HorizontalAlignment="Left"
-                                                        VerticalAlignment="Center"
-                                                        State="{x:Bind Pill}" />
-                                                    <Button
-                                                        Grid.Column="3"
-                                                        Padding="8"
-                                                        VerticalAlignment="Center"
-                                                        AutomationProperties.Name="{x:Bind OpenName}"
-                                                        Click="OnOpenDeliverable"
-                                                        IsEnabled="{x:Bind CanOpen}"
-                                                        Style="{StaticResource SubtleButtonStyle}"
-                                                        Tag="{x:Bind}"
-                                                        ToolTipService.ToolTip="Open in your editor">
-                                                        <FontIcon
-                                                            Glyph="{x:Bind icons:StudioIcons.OpenInEditor}"
-                                                            Style="{StaticResource IconStyle}" />
-                                                    </Button>
-                                                </Grid>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
+                                    SelectionMode="None" />
                             </StackPanel>
                         </Border>
                         <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">

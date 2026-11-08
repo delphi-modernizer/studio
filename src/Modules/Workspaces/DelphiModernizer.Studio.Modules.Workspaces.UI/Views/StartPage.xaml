@@ -17,7 +17,7 @@
                         <AdaptiveTrigger MinWindowWidth="1100" />
                     </VisualState.StateTriggers>
                 </VisualState>
-                <!--  Under 1100 (handoff part 2): one column of compact action cards without tiles,
+                <!--  Under 1100 (canvas StartMin): one column of compact action cards with their tiles,
                       the side cards below, and Recent workspaces without Last opened.  -->
                 <VisualState x:Name="Narrow">
                     <VisualState.StateTriggers>
@@ -36,9 +36,6 @@
                         <Setter Target="NewCard.Padding" Value="12,10" />
                         <Setter Target="OpenCard.Padding" Value="12,10" />
                         <Setter Target="CloneCard.Padding" Value="12,10" />
-                        <Setter Target="NewTile.Visibility" Value="Collapsed" />
-                        <Setter Target="OpenTile.Visibility" Value="Collapsed" />
-                        <Setter Target="CloneTile.Visibility" Value="Collapsed" />
                         <Setter Target="Columns.ColumnSpacing" Value="0" />
                         <Setter Target="Columns.RowSpacing" Value="16" />
                         <Setter Target="SideColumn.Width" Value="0" />
@@ -51,7 +48,7 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                 <controls:PageHeader
                     Purpose="Reopen a workspace, or start one from a Delphi source tree."
                     Title="Start" />
@@ -177,7 +174,8 @@
                         IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
                         Message="{x:Bind ViewModel.Problem, Mode=OneWay}"
                         Severity="Error"
-                        Title="That workspace didn’t open.">
+                        Title="That workspace didn’t open."
+                        Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}">
                         <InfoBar.IconSource>
                             <FontIconSource
                                 FontFamily="{StaticResource StudioIconsFontFamily}"
@@ -398,7 +396,7 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-            </StackPanel>
+            </controls:FullWidthStackPanel>
         </ScrollViewer>
     </Grid>
 </Page>

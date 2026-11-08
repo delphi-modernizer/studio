@@ -10,11 +10,7 @@ namespace DelphiModernizer.Studio.Screenshots;
 /// <remarks>Exits 1 when the app does not start, a state cannot be reached or the app logs an error.</remarks>
 internal static class Program
 {
-    private const int _light = 1;
-    private const int _dark = 2;
-    private const int _followWindows = 0;
-
-    private static readonly Dictionary<string, Action<Harness, string, int>> _groups = new() {
+    private static readonly Dictionary<string, Action<Harness, string>> _groups = new() {
         ["start"] = Groups.Start,
         ["overview"] = Groups.Overview,
         ["pages"] = Groups.Pages,
@@ -54,6 +50,7 @@ internal static class Program
 
         var manifest = new Manifest();
         IReadOnlyList<string> failures;
+        bool? appsUseLightTheme = Desktop.AppsUseLightTheme;
 
         using (var data = new StudioData())
         using (var workspaces = new Workspaces(dmz, legacy))
@@ -61,11 +58,21 @@ internal static class Program
             var harness = new Harness(
                 Path.GetFullPath(exe), Path.GetFullPath(claude), output, data, workspaces, manifest);
 
-            foreach (string group in groups)
+            // The app's Theme follows Windows until a person chooses one, and the canvas's Settings draws it so.
+            try
             {
-                Console.WriteLine($"Group {group}:");
-                _groups[group](harness, "light", _light);
-                _groups[group](harness, "dark", _dark);
+                foreach (string group in groups)
+                {
+                    Console.WriteLine($"Group {group}:");
+                    Desktop.AppsUseLightTheme = true;
+                    _groups[group](harness, "light");
+                    Desktop.AppsUseLightTheme = false;
+                    _groups[group](harness, "dark");
+                }
+            }
+            finally
+            {
+                Desktop.AppsUseLightTheme = appsUseLightTheme;
             }
 
             if (groups.Contains("overview"))
@@ -101,7 +108,7 @@ internal static class Program
         {
             // Windows repaints every window and broadcasts the theme change before apps see high contrast.
             Thread.Sleep(5000);
-            Groups.HighContrast(harness, "highcontrast", _followWindows);
+            Groups.HighContrast(harness, "highcontrast");
         }
         finally
         {

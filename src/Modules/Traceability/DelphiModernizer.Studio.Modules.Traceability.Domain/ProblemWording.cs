@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DelphiModernizer.Studio.Modules.Traceability.Domain;
 
@@ -11,7 +15,7 @@ public sealed record ProblemWording(string Label, string Description);
 /// TR004, TR005 and TR009 are worded on the design canvas; the others follow them and are listed for the product owner
 /// to confirm in docs/open-questions.md. An open question reads as "Still open:" and the question itself.
 /// </remarks>
-public static class ProblemWordings
+public static partial class ProblemWordings
 {
     public const string StillOpen = "Still open: ";
 
@@ -59,4 +63,49 @@ public static class ProblemWordings
     {
         return _byRule.TryGetValue(ruleId, out var wording) ? wording : new ProblemWording(ruleId, ruleId);
     }
+
+    /// <summary>The Errors card's line: where the errors are, such as "In the business rules", and the time.</summary>
+    /// <param name="errorPaths">The workspace-relative file of each error.</param>
+    public static string ErrorsWhere(IReadOnlyCollection<string> errorPaths, string checkedAt)
+    {
+        ArgumentNullException.ThrowIfNull(errorPaths);
+        var files = errorPaths
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        return files.Count switch {
+            0 => $"Last check {checkedAt}",
+            1 => $"In the {Document(files[0])} · last check {checkedAt}",
+            _ => $"In {files.Count} documents · last check {checkedAt}",
+        };
+    }
+
+    /// <summary>The Errors card's line while warnings count: "2 errors + 5 warnings".</summary>
+    /// <param name="promoted">The warnings the kit defines that count as errors in this check.</param>
+    public static string StrictErrors(int errors, int promoted)
+    {
+        return $"{Counted(errors - promoted, "error")} + {Counted(promoted, "warning")}";
+    }
+
+    /// <summary>A count in the Issues and All tabs: "2 + 5" while there are both, else the total.</summary>
+    public static string IssueCount(int errors, int warnings)
+    {
+        return errors > 0 && warnings > 0 ? $"{errors} + {warnings}" : $"{errors + warnings}";
+    }
+
+    /// <summary>A file in words: "business-rules.md" and "D03-business-rules.md" read "business rules".</summary>
+    private static string Document(string path)
+    {
+        string name = DeliverablePrefix().Replace(Path.GetFileNameWithoutExtension(path), string.Empty);
+
+        return name.Replace('-', ' ');
+    }
+
+    private static string Counted(int value, string singular)
+    {
+        return value == 1 ? $"1 {singular}" : $"{value} {singular}s";
+    }
+
+    [GeneratedRegex("^D[0-9]{2}-")]
+    private static partial Regex DeliverablePrefix();
 }

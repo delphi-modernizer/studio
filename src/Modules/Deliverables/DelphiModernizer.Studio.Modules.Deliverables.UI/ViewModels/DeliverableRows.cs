@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using DelphiModernizer.Studio.UI.Common.Controls;
 
 namespace DelphiModernizer.Studio.Modules.Deliverables.UI.ViewModels;
@@ -40,7 +41,7 @@ public sealed record SignOffGroup(string Name, string Number, PillState Pill, IR
 /// <summary>A status the table can be filtered to, with how many deliverables are in it.</summary>
 public sealed record FilterChoice(DeliverableFilter Filter, string Label, int Count)
 {
-    public string Text => $"{Label} {Count}";
+    public string CountText => Count.ToString(CultureInfo.CurrentCulture);
 
-    public string AnnouncedName => $"{Label}, {Count}";
+    public string AnnouncedName => $"{Label}, {CountText}";
 }

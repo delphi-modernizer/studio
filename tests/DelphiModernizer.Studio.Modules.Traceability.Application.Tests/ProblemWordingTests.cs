@@ -47,4 +47,33 @@ public sealed class ProblemWordingTests
 
         Assert.Equal("Warning: It is open. Open question. questions.md", name);
     }
+
+    [Theory]
+    [InlineData(new string[0], "Last check 14:12")]
+    [InlineData(
+        new[] { "docs/02-requirements/business-rules.md", "docs/02-requirements/business-rules.md" },
+        "In the business rules · last check 14:12")]
+    [InlineData(new[] { "docs/a/D03-test-plan.md" }, "In the test plan · last check 14:12")]
+    [InlineData(new[] { "docs/a/one.md", "docs/b/two.md" }, "In 2 documents · last check 14:12")]
+    public void The_errors_card_says_where_the_errors_are(string[] paths, string expected)
+    {
+        Assert.Equal(expected, ProblemWordings.ErrorsWhere(paths, "14:12"));
+    }
+
+    [Fact]
+    public void While_warnings_count_the_errors_card_splits_the_errors_from_the_warnings()
+    {
+        Assert.Equal("2 errors + 5 warnings", ProblemWordings.StrictErrors(7, 5));
+        Assert.Equal("1 error + 1 warning", ProblemWordings.StrictErrors(2, 1));
+    }
+
+    [Theory]
+    [InlineData(2, 5, "2 + 5")]
+    [InlineData(7, 0, "7")]
+    [InlineData(0, 5, "5")]
+    [InlineData(0, 0, "0")]
+    public void An_issue_count_adds_warnings_to_errors_only_when_both(int errors, int warnings, string text)
+    {
+        Assert.Equal(text, ProblemWordings.IssueCount(errors, warnings));
+    }
 }

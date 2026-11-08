@@ -21,29 +21,6 @@
     </Page.KeyboardAccelerators>
 
     <Grid>
-        <VisualStateManager.VisualStateGroups>
-            <!--  Search is at most 360 wide, 240 under 1100 (handoff part 1); the title bar gives it only what it asks.
-                  Under 1100 it sizes itself: at 960 a fixed 240 makes the title bar hide the title and subtitle.  -->
-            <VisualStateGroup>
-                <VisualState x:Name="Wide">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="1100" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="SearchBox.Width" Value="360" />
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="Narrow">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="SearchBox.MaxWidth" Value="240" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
