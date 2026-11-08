@@ -161,10 +161,12 @@ internal sealed class StudioDriver : IDisposable
     {
         try
         {
+            // An indeterminate bar, drawn while the total is still counted, offers no value; only a value counts.
             var element = _window.FindFirstDescendant(shows);
 
             return element is not null
-                && (!element.Patterns.RangeValue.TryGetPattern(out var range) || range.Value.ValueOrDefault > 0);
+                && (Type(element) != ControlType.ProgressBar
+                    || (element.Patterns.RangeValue.TryGetPattern(out var range) && range.Value.ValueOrDefault > 0));
         }
         catch (COMException)
         {
