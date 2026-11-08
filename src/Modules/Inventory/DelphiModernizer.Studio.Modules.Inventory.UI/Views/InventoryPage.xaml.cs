@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using DelphiModernizer.Studio.Modules.Inventory.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
@@ -34,6 +35,12 @@ public sealed partial class InventoryPage : Page, IHasViewModel
 
     DelphiModernizer.Studio.UI.Contracts.ViewModel IHasViewModel.ViewModel => ViewModel;
 
+    /// <summary>The opposite of a flag; x:Bind calls it for the scan's progress bar.</summary>
+    public static bool Not(bool value)
+    {
+        return !value;
+    }
+
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.LoadCommand.ExecuteAsync(parameter: null);
@@ -51,9 +58,7 @@ public sealed partial class InventoryPage : Page, IHasViewModel
 
         foreach (var tab in ViewModel.Tabs)
         {
-            var item = new SelectorBarItem { Text = tab.Text, Tag = tab.Tab };
-            AutomationProperties.SetName(item, tab.AnnouncedName);
-            TabBar.Items.Add(item);
+            TabBar.Items.Add(CountedSelectorBarItem.Create(tab.Label, tab.CountText, tab.AnnouncedName, tab.Tab));
         }
 
         TabBar.SelectedItem = TabBar.Items.FirstOrDefault(i => (InventoryTab)i.Tag == ViewModel.Tab);

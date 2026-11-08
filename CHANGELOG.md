@@ -58,6 +58,15 @@
 
 ### Changed
 
+- Inventory, Traceability and Deliverables match their artboards more closely: the four stat cards stay in one row at
+  960 × 576, closed info bars leave no gap, and section tabs show their count in smaller secondary text.
+- Inventory names risk markers ("Hard-coded credential") and lists credentials first, names screens by class
+  ("TDmMain · data module, not a screen", "Can’t be read"), shows Text and Binary pills, puts the data cards two to a
+  row with `legacy/` links, says when the scan ran and which code modules form a cycle, and labels the scan button
+  Scan or Rescan. While a scan runs the page shows files read of files found and a bar, in place of the previous
+  inventory.
+- Traceability lists errors before warnings, says where the errors are and how strict mode splits them, shows its
+  status glyphs in the page's theme, and sets file links in Cascadia Mono.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
   notice no longer leaves a gap.
 - Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code

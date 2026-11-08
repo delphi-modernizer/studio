@@ -35,10 +35,15 @@ public sealed record StatCard(
     string StatusGlyph,
     StatTone Tone)
 {
-    public bool HasStatus => Tone != StatTone.None;
+    public bool IsSuccess => Tone == StatTone.Success;
+
+    public bool IsCaution => Tone == StatTone.Caution;
+
+    public bool IsCritical => Tone == StatTone.Critical;
 }
 
 /// <summary>One problem in the documents: how serious, what it is, and the file and line it is at.</summary>
+/// <param name="Promoted">A warning the kit defines that counts as an error because warnings count.</param>
 public sealed record ProblemRow(
     PillState Pill,
     string Description,
@@ -47,7 +52,8 @@ public sealed record ProblemRow(
     int Line,
     string FileLink,
     string Folder,
-    string AnnouncedName)
+    string AnnouncedName,
+    bool Promoted)
 {
     public bool IsError => Pill == PillState.Error;
 }
@@ -76,10 +82,8 @@ public sealed record MatrixRow(
         + $"work packages {WorkPackages}, tests {(HasTests ? Tests : "none")}";
 }
 
-/// <summary>A choice in one of the page's selector bars, with its count.</summary>
-public sealed record Choice<T>(T Value, string Label, int Count)
+/// <summary>A choice in one of the page's selector bars, with its count, such as "2 + 5".</summary>
+public sealed record Choice<T>(T Value, string Label, string Count)
 {
-    public string Text => $"{Label} {Count}";
-
     public string AnnouncedName => $"{Label}, {Count}";
 }
