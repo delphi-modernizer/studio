@@ -267,6 +267,38 @@ public sealed class RunTests
         Assert.False(RunTranscript.Edits(read));
     }
 
+    [Fact]
+    public void A_grep_of_a_folder_touches_the_files_its_matches_name()
+    {
+        string root = Directory.CreateTempSubdirectory("ws").FullName;
+
+        try
+        {
+            string sales = Path.Combine(root, "legacy", "Sales");
+            Directory.CreateDirectory(Path.Combine(sales, "Reports"));
+            File.WriteAllText(Path.Combine(sales, "Pricing.pas"), "CREDIT_LIMIT");
+            File.WriteAllText(Path.Combine(sales, "CustomerForm.pas"), "CREDIT_LIMIT");
+            var grep = new ToolCall("t-1", "Grep", """{"pattern":"CREDIT_LIMIT","path":"legacy/Sales"}""", false);
+            var read = new ToolCall("t-2", "Read", """{"file_path":"legacy/Sales/Pricing.pas"}""", false);
+            string result = string.Join(
+                '\n',
+                "legacy/Sales/Pricing.pas:18:  if CREDIT_LIMIT >= GoldThreshold then",
+                "legacy/Sales/Pricing.pas:29:  CREDIT_LIMIT := 0;",
+                $"{Path.Combine(sales, "CustomerForm.pas")}:7:CREDIT_LIMIT",
+                "legacy/Sales/Reports",
+                "Found 3 matches");
+
+            Assert.Equal(
+                ["legacy/Sales/Pricing.pas", "legacy/Sales/CustomerForm.pas"],
+                RunTranscript.FilesOf(grep, result, root));
+            Assert.Equal(["legacy/Sales/Pricing.pas"], RunTranscript.FilesOf(read, "whatever it read", root));
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
     private static (ISender Sender, RunMonitor Monitor) Build(IWorkspaceSession session, FakeClaude fake)
     {
         var services = new ServiceCollection();

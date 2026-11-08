@@ -118,7 +118,16 @@ internal sealed class StandInRun(
         string status = File
             .ReadLines(Path.Combine(workspaceRoot, deliverableFile))
             .First(l => l.StartsWith("status:", StringComparison.Ordinal));
-        Edit(deliverableFile, status, "status: draft");
+
+        if (status != "status: draft")
+        {
+            Edit(deliverableFile, status, "status: draft");
+        }
+        else
+        {
+            // A draft already: the run still writes to it, as every real run on the recipe does.
+            Edit(deliverableFile, $"{status}\n---\n", $"{status}\n---\n\n<!-- Stand-in run {sessionId}. -->\n");
+        }
         Console.Error.WriteLine("stand-in: the screenshot harness's Claude Code; no model was called.");
     }
 

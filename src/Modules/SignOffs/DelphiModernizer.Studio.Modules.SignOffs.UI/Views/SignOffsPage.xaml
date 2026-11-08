@@ -98,7 +98,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="CoveredFileTemplate" x:DataType="vm:CoveredFileRow">
-            <!--  The path keeps its file name when trimmed; a changed file adds a caution mark.  -->
+            <!--  One line per path, trimmed and whole on hover; a changed file adds a caution mark.  -->
             <Grid
                 Padding="0,2"
                 ColumnSpacing="8"
@@ -111,8 +111,8 @@
                     LineHeight="18"
                     Style="{StaticResource MonoTextStyle}"
                     Text="{x:Bind Path}"
-                    TextTrimming="None"
-                    TextWrapping="Wrap" />
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap" />
                 <TextBlock
                     Grid.Column="1"
                     AutomationProperties.Name="changed since approval"

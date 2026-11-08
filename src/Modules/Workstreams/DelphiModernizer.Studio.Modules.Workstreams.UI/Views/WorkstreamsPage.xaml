@@ -341,24 +341,19 @@
                                                             Text="{x:Bind WritesLine}"
                                                             TextWrapping="Wrap" />
                                                     </controls:WrapPanel>
-                                                    <Grid
+                                                    <!--  One line as drawn: pill, reason, Open run; it wraps only when narrow.  -->
+                                                    <controls:WrapPanel
                                                         Margin="0,4,0,0"
-                                                        ColumnSpacing="6"
+                                                        HorizontalSpacing="6"
+                                                        VerticalSpacing="4"
                                                         Visibility="{x:Bind IsBlocked}">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="Auto" />
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
                                                         <controls:StatusPill VerticalAlignment="Center" State="Blocked" />
                                                         <TextBlock
-                                                            Grid.Column="1"
                                                             VerticalAlignment="Center"
                                                             Style="{StaticResource CaptionTextBlockStyle}"
                                                             Text="{x:Bind BlockedReason}"
                                                             TextWrapping="Wrap" />
                                                         <HyperlinkButton
-                                                            Grid.Column="2"
                                                             MinHeight="0"
                                                             Padding="0"
                                                             VerticalAlignment="Center"
@@ -367,7 +362,7 @@
                                                             Content="Open run"
                                                             Tag="{x:Bind}"
                                                             Visibility="{x:Bind CanOpenBlocker}" />
-                                                    </Grid>
+                                                    </controls:WrapPanel>
                                                 </StackPanel>
                                                 <Button
                                                     Grid.Column="1"

@@ -152,21 +152,21 @@
 
         <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.IsApprove}">
             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Covers" />
-            <ScrollViewer MaxHeight="120">
-                <ItemsRepeater ItemsSource="{x:Bind ViewModel.SignOff.Covers}">
-                    <ItemsRepeater.ItemTemplate>
-                        <DataTemplate x:DataType="vm:CoveredFileRow">
-                            <TextBlock
-                                Padding="0,1"
-                                LineHeight="18"
-                                Style="{StaticResource MonoTextStyle}"
-                                Text="{x:Bind Path}"
-                                TextTrimming="None"
-                                TextWrapping="Wrap" />
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
-            </ScrollViewer>
+            <!--  Every covered file, as drawn: the list is short, and the dialog scrolls as a whole.  -->
+            <ItemsRepeater ItemsSource="{x:Bind ViewModel.SignOff.Covers}">
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CoveredFileRow">
+                        <TextBlock
+                            Padding="0,1"
+                            LineHeight="18"
+                            Style="{StaticResource MonoTextStyle}"
+                            Text="{x:Bind Path}"
+                            TextTrimming="None"
+                            TextWrapping="Wrap" />
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+            <!--  One line, as drawn; a hash too long for it ends in an ellipsis and shows whole on hover.  -->
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -181,30 +181,32 @@
                     Grid.Column="1"
                     IsTextSelectionEnabled="True"
                     Style="{StaticResource SecondaryCaptionTextStyle}"
-                    TextWrapping="Wrap">
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap"
+                    ToolTipService.ToolTip="{x:Bind ViewModel.SignOff.Fingerprint}">
                     <Run Text="Fingerprint of these files:" />
                     <Run FontFamily="Cascadia Mono,Consolas" Text="{x:Bind ViewModel.SignOff.Fingerprint}" />
                 </TextBlock>
             </Grid>
         </StackPanel>
 
-        <TextBox
-            x:Name="NoteBox"
-            MinHeight="96"
-            AcceptsReturn="True"
-            AutomationProperties.IsRequiredForForm="True"
-            AutomationProperties.Name="{x:Bind ViewModel.FieldName}"
-            IsEnabled="{x:Bind ViewModel.HasIdentity}"
-            PlaceholderText="{x:Bind ViewModel.Placeholder}"
-            Text="{x:Bind ViewModel.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            TextWrapping="Wrap">
-            <TextBox.Header>
-                <TextBlock>
-                    <Run Text="{x:Bind ViewModel.FieldLabel}" />
-                    <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="(required)" />
-                </TextBlock>
-            </TextBox.Header>
-        </TextBox>
+        <!--  The label is its own text, so it keeps its colour while the box is off without an identity.  -->
+        <StackPanel Spacing="8">
+            <TextBlock>
+                <Run Text="{x:Bind ViewModel.FieldLabel}" />
+                <Run Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="(required)" />
+            </TextBlock>
+            <TextBox
+                x:Name="NoteBox"
+                MinHeight="96"
+                AcceptsReturn="True"
+                AutomationProperties.IsRequiredForForm="True"
+                AutomationProperties.Name="{x:Bind ViewModel.FieldName}"
+                IsEnabled="{x:Bind ViewModel.HasIdentity}"
+                PlaceholderText="{x:Bind ViewModel.Placeholder}"
+                Text="{x:Bind ViewModel.Note, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                TextWrapping="Wrap" />
+        </StackPanel>
 
         <TextBlock
             Style="{StaticResource SecondaryCaptionTextStyle}"
