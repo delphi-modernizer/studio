@@ -21,6 +21,27 @@
     </Page.KeyboardAccelerators>
 
     <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <!--  Search is 360 wide, 240 under 1100 (handoff part 1). An adaptive state sets the width before the next
+                  layout pass: a width set after it, from SizeChanged, lets the title bar measure the old width once and
+                  stay in its compact state, which hides the title and subtitle.  -->
+            <VisualStateGroup>
+                <VisualState x:Name="Wide">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1100" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="Narrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SearchBox.Width" Value="240" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -39,7 +60,7 @@
             </TitleBar.IconSource>
             <AutoSuggestBox
                 x:Name="SearchBox"
-                MaxWidth="360"
+                Width="360"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Center"
                 AutomationProperties.Name="Search"
