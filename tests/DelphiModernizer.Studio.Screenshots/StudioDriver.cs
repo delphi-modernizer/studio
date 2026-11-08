@@ -128,7 +128,9 @@ internal sealed class StudioDriver : IDisposable
                     Settle(150);
                     var image = FlaUICapture.Rectangle(frame);
 
-                    return IsBusy(shows) ? image : throw new TimeoutException($"{page} {state} ended as it was taken.");
+                    return StillShows(shows)
+                        ? image
+                        : throw new TimeoutException($"{page} {state} ended as it was taken.");
                 });
                 Save(page, state, size, shot);
             }
@@ -690,6 +692,19 @@ internal sealed class StudioDriver : IDisposable
                 .FindAllChildren(c => c.ByProcessId(_app.ProcessId))
                 .Where(w => w.Properties.NativeWindowHandle.ValueOrDefault != Handle)
                 .SelectMany(w => w.FindAllDescendants()));
+    }
+
+    /// <remarks>Checked after the screen is taken: the state may have moved on, but it must not have ended.</remarks>
+    private bool StillShows(Func<ConditionFactory, ConditionBase> shows)
+    {
+        try
+        {
+            return _window.FindFirstDescendant(shows) is not null;
+        }
+        catch (COMException)
+        {
+            return false;
+        }
     }
 
     private bool Shows(string name)
