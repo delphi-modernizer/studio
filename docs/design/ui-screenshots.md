@@ -64,17 +64,30 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
 
 ## How the job works
 
-1. It publishes the app and `dmz` as the `package` job does.
-2. It creates the brief's sample workspace, a Delphi 7 ERP on the BDE named "Acme ERP modernization" with the target
-   C#/.NET, from the engine's `tests/fixtures/delphi/legacy-erp`, with `dmz init` and `dmz scan`. The workspace lives in
-   the runner's temporary folder and is never committed. Only a person approves, so no sign-off is approved and every
-   deliverable is a template; the brief's "G0 approved" and "D01 approved" states do not appear.
-3. `tests/DelphiModernizer.Studio.Screenshots` writes the app's own local settings: the workspace as the one recent
-   workspace and the Theme setting. The app needs no launch argument. The person's data folder is moved aside for the
-   run and put back afterwards.
-4. It starts the app once per theme, opens the workspace from Start, visits each page through the pane, and sizes the
-   window with `SetWindowPos` before each capture.
-5. It uploads `out/screenshots` as the artifact `screenshots`, with the app's log under `logs/` when it wrote one.
+1. One job per screen group (`start`, `overview`, `pages`, `agents`) publishes the app and `dmz` as the `package` job
+   does, and the stand-in as `claude.exe`.
+2. `tests/DelphiModernizer.Studio.Screenshots` creates its workspaces with `dmz init` and `dmz scan` in a temporary
+   folder, never committed, all named "Acme ERP modernization" with the target C#/.NET:
+   - `sample`: the brief's Delphi 7 ERP on the BDE, the engine's `tests/fixtures/delphi/legacy-erp`, scanned. Two lines
+     added to the system inventory give it the design's two problems in the documents: a reference to `FR-999`, which
+     is defined nowhere, and evidence in a file that does not exist.
+   - `clean`: the same sample with all six context answers, scanned; it has no problem at all.
+   - `unscanned`: the sample, not scanned.
+   - `large`: 3,000 generated units in 60 folders, scanned.
+3. It launches the app once per configuration, with a fresh copy of each workspace it lists. It writes the app's own
+   settings before each launch, since the app reads them once: the recent workspaces, the Theme setting and the
+   Claude Code path. It sets the stand-in's variables and `GIT_CONFIG_GLOBAL` (a file with the screenshots identity,
+   or an empty one) on the app's process. The person's data folder is moved aside for the run and put back afterwards.
+4. Each state is reached as a person reaches it: through the UI (opening a workspace from Start, the pane, buttons,
+   SelectorBar items, text boxes, dialogs), through the stand-in's runs, or through the workspace's files (a deleted
+   deliverable, a charter set back to a template). States that last only while something runs (loading, scanning,
+   preview running, creating) are triggered once per size and captured as soon as they show; the large tree makes them
+   last long enough.
+5. It sizes the window with `SetWindowPos` before each capture and writes `manifest.json`. Each job uploads
+   `out/screenshots` as the artifact `screenshots-<group>`, with the app's log under `logs/` when it wrote one.
+
+No step approves. The approve dialog and the no-identity dialog are opened on Project setup, captured and cancelled,
+and the harness fails if `.modernizer/approvals.json` changed.
 
 The window size is the size of its visible frame, title bar included, without the invisible resize borders: a
 1280 × 800 capture is a 1280 × 800 PNG. Hosted runners start at 1024 × 768, so the harness sets the display to
@@ -82,23 +95,37 @@ The window size is the size of its visible frame, title bar included, without th
 
 ## Files
 
-`<page>-<state>-<width>x<height>-<theme>.png`, for example `signoffs-expanded-960x576-dark.png`.
+`<page>-<state>-<width>x<height>-<theme>.png`, for example `signoffs-blocked-960x576-dark.png`, at 1280 × 800 and
+960 × 576 in `light` and `dark`. `manifest.json` lists every PNG with its page, state and theme, the canvas board it
+pairs with (`project/<Board>.dc.html`) and that artboard's label as the canvas names it; a page's default state pairs
+with its light, dark, minimum-window and high-contrast boards. A state no artboard draws has `null` for both.
 
-| Page | States |
+| Group | Page | States |
+| --- | --- | --- |
+| `start` | `start` | `default`, `first-run`, `claude-missing`, `claude-missing-dialog`, `claude-too-old` |
+| `start` | `newworkspace` | `step1`, `folder-not-empty`, `step2` (preview done), `preview-failed`, `preview-running`, `step3`, `step4`, `step5`, `creating`, `created` |
+| `start` | `settings` | `found`, `not-found`, `script-shim` |
+| `start` | `workstreams` | `claude-update-dialog`: the dialog for a Claude Code that is too old |
+| `overview` | `overview` | `no-workspace`, `no-scan`, `default`, `hover`, `focus`, `scrolled` (960 × 576 only), `pane-compact`, `running`, `no-claude` |
+| `overview` | `shared` | `title-bar` (1280 × 48) and `nav-pane` (240 × 752), cut from a 1280 × 800 Overview |
+| `overview` | `signoffs` | `blocked` (Discovery expanded), `approve-dialog`, `no-identity` |
+| `pages` | `inventory` | `no-workspace`, one per section (`code-modules`, `screens`, `data-and-libraries`, `sql-and-risks`, `cycles`, `diagnostics`), `not-scanned`, `large`, `scanning` |
+| `pages` | `traceability` | `issues`, `errors-only`, `strict`, `matrix`, `clean` |
+| `pages` | `deliverables` | `all`, `draft`, `missing`, `templates` |
+| `pages` | `overview` | `loading`, on the large workspace |
+| `agents` | `workstreams` | `default`, `run-dialog`, `blocked`, `history`, `no-claude`, `claude-dialog` |
+| `agents` | `run` | `running`, `stopped`, `starting`, `completed`, `failed`, `budget-dialog` |
+
+High contrast (`highcontrast`) covers Overview `default` and Sign-offs `blocked`, in the `overview` job.
+
+### Not captured
+
+| Artboard | Why |
 | --- | --- |
-| `start` | `default`: the one recent workspace |
-| `newworkspace` | `step1` |
-| `overview` | `default` |
-| `inventory` | One per SelectorBar section, named after it without its count: `code-modules`, `screens`, `data-and-libraries`, `sql-and-risks`, `cycles`, `diagnostics` |
-| `workstreams` | `default`: Claude Code is not installed on the runner |
-| `deliverables` | `default` |
-| `traceability` | One per SelectorBar view: `issues`, `matrix` |
-| `signoffs` | `expanded`: one sign-off open |
-| `settings` | `default` |
-
-Themes are `light`, `dark` and `highcontrast`; high contrast covers Overview and Sign-offs. Run is not captured: it
-opens only for an agent run, and a fresh workspace has none; starting one needs Claude Code, which the runner does not
-have.
+| Sign-offs · Discovery ready, Approval refused, Discovery approved, Revoke dialog, Project setup stale, Approve the final plan; Overview · Everything approved | Each needs a recorded approval, and Discovery ready needs Project setup approved first. Only a person approves; the job records none |
+| Sign-offs · High contrast · Discovery approved | The same; high contrast captures Discovery blocked |
+| Overview · Workspace can't be read | The app shows it only when the session loses its workspace while the page is open, which no person's action causes (open questions) |
+| Start · Claude Code too old dialog | Start offers Test again when Claude Code is too old and opens no dialog; the same dialog is captured from Workstreams |
 
 ## High contrast and Mica
 
@@ -112,6 +139,5 @@ show layout, type, colour roles and states, not the tint a person's wallpaper gi
 
 ## Download
 
-From the run's summary page on GitHub (Artifacts, `screenshots`), or through the API: list the run's artifacts, then
-download the one named `screenshots`. It is a zip of 64 PNGs: 30 per theme for light and dark, and 4 for high contrast.
-The job takes about 4 minutes after the app is published.
+From the run's summary page on GitHub (Artifacts, `screenshots-<group>`), or through the API: list the run's
+artifacts, then download each one named `screenshots-` and its group. Each is a zip of PNGs and its `manifest.json`.
