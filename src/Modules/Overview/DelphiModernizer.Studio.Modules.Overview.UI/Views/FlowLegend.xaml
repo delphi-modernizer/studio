@@ -33,19 +33,8 @@
             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Blocked" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="6">
-            <!--
-                A still half ring, the drawn key: an inactive ProgressRing draws nothing, and a turning one can be caught
-                as a dot.
-            -->
-            <ProgressRing
-                Width="12"
-                Height="12"
-                MinWidth="12"
-                MinHeight="12"
-                AutomationProperties.AccessibilityView="Raw"
-                IsActive="True"
-                IsIndeterminate="False"
-                Value="50" />
+            <!--  The drawn key holds still: an inactive Spinner shows its half arc without turning.  -->
+            <controls:Spinner IsActive="False" />
             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Agent running" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="6">

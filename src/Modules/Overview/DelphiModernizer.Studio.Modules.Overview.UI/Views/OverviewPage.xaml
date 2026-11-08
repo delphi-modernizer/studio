@@ -127,12 +127,7 @@
                             Orientation="Horizontal"
                             Spacing="6"
                             Visibility="{x:Bind IsRunning}">
-                            <ProgressRing
-                                Width="12"
-                                Height="12"
-                                MinWidth="12"
-                                MinHeight="12"
-                                IsActive="{x:Bind IsRunning}" />
+                            <controls:Spinner IsActive="{x:Bind IsRunning}" />
                             <TextBlock
                                 Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}"
@@ -171,12 +166,7 @@
                             Orientation="Horizontal"
                             Spacing="6"
                             Visibility="{x:Bind IsRunning}">
-                            <ProgressRing
-                                Width="12"
-                                Height="12"
-                                MinWidth="12"
-                                MinHeight="12"
-                                IsActive="{x:Bind IsRunning}" />
+                            <controls:Spinner IsActive="{x:Bind IsRunning}" />
                             <TextBlock
                                 Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}"
@@ -289,10 +279,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" MaxWidth="{StaticResource PageMaxWidth}" />
                 </Grid.ColumnDefinitions>
-                <StackPanel
-                    x:Name="PageContent"
-                    HorizontalAlignment="Stretch"
-                    Style="{StaticResource PageContentStyle}">
+                <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                     <controls:PageHeader Purpose="{x:Bind ViewModel.Purpose, Mode=OneWay}" Title="Overview">
                         <controls:PageHeader.Actions>
                             <StackPanel
@@ -326,6 +313,7 @@
 
                     <controls:NoWorkspaceState
                         Glyph="{x:Bind icons:StudioIcons.Overview}"
+                        ShowsClone="True"
                         Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
                         <controls:NoWorkspaceState.Message>
                             Open a workspace, or start one from a Delphi source tree, to see how its modernization
@@ -340,7 +328,7 @@
                             VerticalAlignment="Center"
                             AutomationProperties.LiveSetting="Polite"
                             Spacing="8">
-                            <ProgressRing
+                            <controls:Spinner
                                 Width="32"
                                 Height="32"
                                 Margin="0,0,0,12"
@@ -943,7 +931,7 @@
                             </Border>
                         </Grid>
                     </StackPanel>
-                </StackPanel>
+                </controls:FullWidthStackPanel>
             </Grid>
         </ScrollViewer>
     </Grid>
