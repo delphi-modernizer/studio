@@ -50,6 +50,7 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         _runs = runs;
         _dispatcher = DispatcherQueue.GetForCurrentThread();
         _runs.Changed += OnRunsChanged;
+        ShowName();
         ShowTeams();
         Gates = [.. SignOffNames.Gates
             .Order(StringComparer.Ordinal)
@@ -57,7 +58,11 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
     }
 
     [ObservableProperty]
-    public partial string Purpose { get; set; } = "How a workspace stands, from the Delphi code to an approved plan.";
+    public partial string Purpose { get; set; } = string.Empty;
+
+    /// <summary>"Reading Acme ERP modernization" while the overview loads.</summary>
+    [ObservableProperty]
+    public partial string LoadingTitle { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsOpen), nameof(IsLoading))]
@@ -173,6 +178,7 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
 
     protected override void OnWorkspaceChanged()
     {
+        ShowName();
         IsLoaded = false;
         OnPropertyChanged(nameof(IsOpen));
 
@@ -210,7 +216,6 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         int nextIndex = next.gate is null ? -1 : next.index;
         bool approved = next.gate is null && overview.Gates.Count > 0;
 
-        Purpose = $"How {overview.Name} stands, from the Delphi code to an approved plan.";
         NextStep = NextStepFor(overview, next.gate);
         Summary = SummaryOf(overview, approved);
         Legacy = OverviewWords.DelphiCode(overview.Inventory, overview.Cycles);
@@ -306,6 +311,14 @@ public sealed partial class OverviewViewModel : WorkspacePageViewModel
         };
 
         return $"{started} · {signedOff} of {overview.Gates.Count} sign-offs approved · {tail}";
+    }
+
+    /// <summary>Names the open workspace in the purpose line and the loading state, before the overview loads.</summary>
+    private void ShowName()
+    {
+        string? name = _session.Current?.Manifest.Name;
+        Purpose = $"How {name ?? "a workspace"} stands, from the Delphi code to an approved plan.";
+        LoadingTitle = $"Reading {name ?? "the workspace"}";
     }
 
     protected override void Dispose(bool disposing)
