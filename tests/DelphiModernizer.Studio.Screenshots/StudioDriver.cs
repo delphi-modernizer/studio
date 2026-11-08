@@ -32,6 +32,7 @@ internal sealed class StudioDriver : IDisposable
     private static readonly TimeSpan _startTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan _findTimeout = TimeSpan.FromSeconds(20);
     private static readonly TimeSpan _poll = TimeSpan.FromMilliseconds(20);
+    private static readonly TimeSpan _stillShowsTimeout = TimeSpan.FromMilliseconds(500);
 
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
     private static readonly Point _origin = new(480, 120);
@@ -694,17 +695,20 @@ internal sealed class StudioDriver : IDisposable
                 .SelectMany(w => w.FindAllDescendants()));
     }
 
-    /// <remarks>Checked after the screen is taken: the state may have moved on, but it must not have ended.</remarks>
+    /// <remarks>
+    /// Checked after the screen is taken: the state may have moved on, but it must not have ended. A brief state does
+    /// not come back once it ends, so one sighting is enough; a walk that meets the page as it changes throws or finds
+    /// nothing, so it is asked again.
+    /// </remarks>
     private bool StillShows(Func<ConditionFactory, ConditionBase> shows)
     {
-        try
-        {
-            return _window.FindFirstDescendant(shows) is not null;
-        }
-        catch (COMException)
-        {
-            return false;
-        }
+        return Retry
+            .WhileFalse(
+                () => _window.FindFirstDescendant(shows) is not null,
+                _stillShowsTimeout,
+                _poll,
+                ignoreException: true)
+            .Result;
     }
 
     private bool Shows(string name)
