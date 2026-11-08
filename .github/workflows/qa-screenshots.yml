@@ -1,0 +1,84 @@
+name: qa-screenshots
+
+# QA starts it by hand; it never runs on a push or a pull request and is no check. Each screen group is uploaded as
+# the artifact screenshots-<group> with its manifest.json (docs/design/ui-screenshots.md).
+on:
+  workflow_dispatch:
+    inputs:
+      group:
+        description: Screen group to capture
+        type: choice
+        options: [all, start, overview, pages, agents]
+        default: all
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    name: screenshots (${{ matrix.group }})
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        group: >-
+          ${{ fromJSON(inputs.group == 'all' && '["start", "overview", "pages", "agents"]'
+          || format('["{0}"]', inputs.group)) }}
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: lock
+        run: echo "ref=$(tr -d '[:space:]' < engine.lock)" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: delphi-modernizer/engine
+          ref: ${{ steps.lock.outputs.ref }}
+          path: .engine
+          submodules: true
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+      # GitHub Packages needs a token even for public packages, and each engine package grants this repository read.
+      # The credentials go to the user-level NuGet configuration, outside the checkout.
+      - name: Sign in to the engine's packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: dotnet nuget update source delphi-modernizer --username "$GITHUB_ACTOR" --password "$GITHUB_TOKEN"
+      - name: Publish the studio, dmz and the stand-in Claude Code
+        run: |
+          dotnet publish src/App/DelphiModernizer.Studio.App \
+            -c Release -r win-x64 -p:Platform=x64 -p:EngineSource=Package --self-contained -o out/studio
+          dotnet publish .engine/src/DelphiModernizer.Cli \
+            -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/studio/tools
+          dotnet publish tests/DelphiModernizer.Studio.ClaudeStandIn \
+            -c Release -r win-x64 -p:EngineSource=Package --self-contained -p:PublishSingleFile=true -o out/claude
+      # The harness creates its throwaway workspaces with dmz, from the brief's sample and a generated large tree.
+      - name: Capture every state
+        env:
+          GROUP: ${{ matrix.group }}
+        run: >-
+          dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release -p:EngineSource=Package --
+          --app out/studio/DelphiModernizer.Studio.exe
+          --dmz out/studio/tools/dmz.exe
+          --claude out/claude/claude.exe
+          --legacy .engine/tests/fixtures/delphi/legacy-erp
+          --out out/screenshots
+          --group "$GROUP"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: screenshots-${{ matrix.group }}
+          path: out/screenshots
+          if-no-files-found: error
