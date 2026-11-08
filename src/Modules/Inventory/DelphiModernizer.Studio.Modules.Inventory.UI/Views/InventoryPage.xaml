@@ -1272,7 +1272,7 @@
                             </Border>
                         </StackPanel>
 
-                        <!--  Data, connections, libraries and external routines: two cards to a row, one under 1100.  -->
+                        <!--  Data, connections, libraries and external routines: two to a row, one under 1100.  -->
                         <ItemsRepeater
                             x:Name="DataList"
                             ItemsSource="{x:Bind ViewModel.DataCards, Mode=OneWay}"
