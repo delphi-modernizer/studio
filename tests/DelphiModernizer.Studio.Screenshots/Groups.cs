@@ -248,18 +248,32 @@ internal static class Groups
                 app.WaitGone("Scanning legacy/…", _run);
                 app.Capture("inventory", "large");
             });
-
-            // Opened again from Start, as the canvas draws it: Back has nowhere to go once the history is cleared.
-            h.Step(app, theme, "overview loading", () => app.CaptureWhileBusy(
-                "overview",
-                "loading",
-                () => {
-                    app.Navigate("Start");
-                    app.ClickItem(_recent, h.Opened[Large], settle: 0);
-                    app.WaitBackOff();
-                },
-                c => c.ByName("Checking sign-offs, deliverables and traceability")));
         });
+
+        // Opened from Start right after a launch, as the canvas draws it: Back is off before the click and after it.
+        // A Back that turns off as the brief state shows can still be drawn on when the screen is taken.
+        foreach (var size in StudioDriver.Sizes)
+        {
+            h.Run(theme, new Launch([Large]), app => h.Step(app, theme, $"overview loading {size.Width}", () => {
+                bool again = false;
+                app.CaptureWhileBusy(
+                    "overview",
+                    "loading",
+                    () => {
+                        // A second try starts on Overview, and Start from the pane turns Back on until the click.
+                        if (again)
+                        {
+                            app.Navigate("Start");
+                        }
+
+                        again = true;
+                        app.ClickItem(_recent, h.Opened[Large], settle: 0);
+                        app.WaitBackOff();
+                    },
+                    c => c.ByName("Checking sign-offs, deliverables and traceability"),
+                    [size]);
+            }));
+        }
     }
 
     /// <summary>Workstreams and the Run page, each run played by the stand-in Claude Code.</summary>

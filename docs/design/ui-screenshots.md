@@ -85,8 +85,10 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
      afterwards.
    - Each size of the wizard has a launch of its own, so that each starts from Start with no workspace open, as the
      canvas draws it. Step 1 is captured before a folder is refused, since the page then moves focus to the folder.
-     Start's first run is a launch with no recent workspaces, so Back has nowhere to go; Overview's loading and focus
-     states open the workspace again from Start for the same reason.
+     Start's first run is a launch with no recent workspaces, so Back has nowhere to go; Overview's focus state opens
+     the workspace again from Start for the same reason. Overview's loading has a launch for each size and opens the
+     workspace from Start before Back is ever on: a Back that turns off as the brief state shows can still be drawn on
+     when the screen is taken.
    - Workstreams' history is drawn with a live run above a completed, a stopped, a budget-reached and a failed one.
      The launches that make those runs keep one copy of the sample, oldest run first, and the last captures the
      history while its run works.
@@ -97,7 +99,7 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
    processor while scanning and preview running are captured, and a capture is kept only if the state still shows
    once it is taken; a progress bar counts only partway, as the canvas draws it partly filled. Each size's scan
-   starts from no scan, so the button reads Scan. Overview's loading is captured the same way, once Back is off.
+   starts from no scan, so the button reads Scan. Overview's loading is captured the same way.
    Creating is captured once the kit is copied, while the tree is, so that a step shows done, one working and the
    rest waiting.
    - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set in a box without
