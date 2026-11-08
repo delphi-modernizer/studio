@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--  A NumberBox's inline spin buttons as the canvas draws them (.nbx .spin): subtle, in secondary text.  -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Default">
+            <StaticResource x:Key="RepeatButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="RepeatButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+            <StaticResource x:Key="RepeatButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+            <StaticResource x:Key="RepeatButtonForeground" ResourceKey="TextFillColorSecondaryBrush" />
+            <StaticResource x:Key="RepeatButtonForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+            <StaticResource x:Key="RepeatButtonBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="RepeatButtonBorderBrushPointerOver" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="RepeatButtonBorderBrushPressed" ResourceKey="SubtleFillColorTransparentBrush" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <StaticResource x:Key="RepeatButtonBackground" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="RepeatButtonBackgroundPointerOver" ResourceKey="SubtleFillColorSecondaryBrush" />
+            <StaticResource x:Key="RepeatButtonBackgroundPressed" ResourceKey="SubtleFillColorTertiaryBrush" />
+            <StaticResource x:Key="RepeatButtonForeground" ResourceKey="TextFillColorSecondaryBrush" />
+            <StaticResource x:Key="RepeatButtonForegroundPointerOver" ResourceKey="TextFillColorSecondaryBrush" />
+            <StaticResource x:Key="RepeatButtonBorderBrush" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="RepeatButtonBorderBrushPointerOver" ResourceKey="SubtleFillColorTransparentBrush" />
+            <StaticResource x:Key="RepeatButtonBorderBrushPressed" ResourceKey="SubtleFillColorTransparentBrush" />
+        </ResourceDictionary>
+        <!--  High contrast keeps WinUI's spin buttons, drawn in the system colours.  -->
+        <ResourceDictionary x:Key="HighContrast" />
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

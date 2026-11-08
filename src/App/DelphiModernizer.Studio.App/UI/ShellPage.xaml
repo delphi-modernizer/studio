@@ -55,6 +55,26 @@
             IsBackButtonVisible="True"
             IsPaneToggleButtonVisible="True"
             Subtitle="{x:Bind ViewModel.Subtitle, Mode=OneWay}">
+            <TitleBar.Resources>
+                <ResourceDictionary>
+                    <ResourceDictionary.ThemeDictionaries>
+                        <ResourceDictionary x:Key="Default">
+                            <StaticResource x:Key="TitleBarSubtitleForegroundBrush" ResourceKey="TextFillColorSecondaryBrush" />
+                        </ResourceDictionary>
+                        <ResourceDictionary x:Key="Light">
+                            <StaticResource x:Key="TitleBarSubtitleForegroundBrush" ResourceKey="TextFillColorSecondaryBrush" />
+                        </ResourceDictionary>
+                        <!--  WinUI's high-contrast subtitle brush is an accent colour, unreadable on the window.  -->
+                        <ResourceDictionary x:Key="HighContrast">
+                            <StaticResource x:Key="TitleBarSubtitleForegroundBrush" ResourceKey="SystemColorWindowTextColorBrush" />
+                        </ResourceDictionary>
+                    </ResourceDictionary.ThemeDictionaries>
+                    <!--  The TitleBar board: the icon 12 after the pane toggle, 12 to the title, 12 to the subtitle.  -->
+                    <x:Double x:Key="TitleBarLeftHeaderPaddingWidth">7</x:Double>
+                    <Thickness x:Key="TitleBarIconMargin">0,0,12,0</Thickness>
+                    <Thickness x:Key="TitleBarTitleMargin">0,0,12,0</Thickness>
+                </ResourceDictionary>
+            </TitleBar.Resources>
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="ms-appx:///Assets/Square44x44Logo.targetsize-16_altform-unplated.png" />
             </TitleBar.IconSource>
@@ -91,6 +111,10 @@
                 <StaticResource
                     x:Key="NavigationViewSelectionIndicatorForeground"
                     ResourceKey="SubtleFillColorTransparentBrush" />
+                <!--  The NavPane board: the first item starts 4 below the title bar; the rule above Settings is inset 16.  -->
+                <Thickness x:Key="NavigationViewPaneContentGridMargin">-1,0,-1,3</Thickness>
+                <Thickness x:Key="NavigationViewItemSeparatorMargin">16,3,16,4</Thickness>
+                <Thickness x:Key="NavigationViewCompactItemSeparatorMargin">16,3,16,4</Thickness>
             </NavigationView.Resources>
 
             <Frame x:Name="NavFrame" IsNavigationStackEnabled="False" />

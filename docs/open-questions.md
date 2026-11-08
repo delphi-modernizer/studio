@@ -52,3 +52,5 @@ change.
 | Run history's "[started] – [ended]": the canvas draws no format | The end's time alone when the run ended the day it started, else its date and time | `RunWords.EndTime` |
 | A failed run's end text: the canvas reads "Run it again or write the rules yourself.", drawn for the business-rules task only | "Run it again or write it yourself.", which fits every task's deliverable | `RunViewModel.EndText` |
 | The no-identity commands: the canvas writes `git config user.name "[your name]"` and `[your email]` as placeholders | Git's own example values, "Your Name" and `you@example.com`, so the commands can be copied as they are shown | `ApprovalDialog` |
+| The space between a page's header and its content at 1100 and wider: the handoff says 20 (16 under 1100), while the boards draw the page with a 16 gap, so on Start the action cards sit 4 lower than drawn | 20, as the handoff says; 16 under 1100 | `PageHeaderSpacing` |
+| A Claude Code path longer than Settings' box at 960: the canvas draws only a short path | The box shows the path's start, cut at its right edge, as any text box does; the full path is in the box and in the error below it | `SettingsPage` |

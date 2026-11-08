@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
+using DelphiModernizer.Studio.UI.Common.Icons;
 using DelphiModernizer.Studio.UI.Contracts;
 using DelphiModernizer.Studio.UI.Contracts.Services;
 using Microsoft.UI.Xaml;
@@ -54,6 +55,7 @@ public sealed partial class ShellPage : Page
         AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
         AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
         NavView.Loaded += (_, _) => MakePaneOneTabStop();
+        AppTitleBar.Loaded += (_, _) => DrawPaneToggleGlyph();
     }
 
     public ShellViewModel ViewModel { get; }
@@ -270,6 +272,17 @@ public sealed partial class ShellPage : Page
         {
             pane.TabFocusNavigation = KeyboardNavigationMode.Once;
             pane.XYFocusKeyboardNavigation = XYFocusKeyboardNavigationMode.Enabled;
+        }
+    }
+
+    /// <summary>Draws the pane toggle's glyph from Studio Icons, 12 wide as the TitleBar board has it.</summary>
+    /// <remarks>WinUI's toggle draws Segoe Fluent's 16 wide glyph and exposes no property for it.</remarks>
+    private void DrawPaneToggleGlyph()
+    {
+        if (Descendant(AppTitleBar, "PART_PaneToggleButton") is Button toggle)
+        {
+            toggle.FontFamily = (FontFamily)Microsoft.UI.Xaml.Application.Current.Resources["StudioIconsFontFamily"];
+            toggle.Content = StudioIcons.Navigation;
         }
     }
 
