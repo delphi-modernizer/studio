@@ -239,20 +239,21 @@ internal static class Groups
                         app.Navigate("Inventory", 4000);
                         app.Invoke("Scan", 0);
                     },
-                    c => c.ByName("Scanning legacy/…"));
+                    c => c.ByControlType(FlaUI.Core.Definitions.ControlType.ProgressBar));
                 app.WaitGone("Scanning legacy/…", _run);
                 app.Capture("inventory", "large");
             });
 
-            // Opened again from Start, as the canvas draws it: Back has nowhere to go.
-            h.Step(app, theme, "overview loading", () => app.Capture("overview", "loading", () => {
-                app.Navigate("Start");
-                app.ClickItem(_recent, h.Opened[Large], settle: 0);
-                app.WaitBriefly(
-                    c => c.ByName("Checking sign-offs, deliverables and traceability"),
-                    "Overview's loading state",
-                    _brief);
-            }));
+            // Opened again from Start, as the canvas draws it: Back has nowhere to go once the history is cleared.
+            h.Step(app, theme, "overview loading", () => app.CaptureWhileBusy(
+                "overview",
+                "loading",
+                () => {
+                    app.Navigate("Start");
+                    app.ClickItem(_recent, h.Opened[Large], settle: 0);
+                    app.WaitBackOff();
+                },
+                c => c.ByName("Checking sign-offs, deliverables and traceability")));
         });
     }
 
@@ -356,14 +357,18 @@ internal static class Groups
     private static void Wizard(Harness h, StudioDriver app, System.Drawing.Size size)
     {
         var at = new[] { size };
+        string folder = h.Workspaces.NewFolder();
         app.Invoke("New workspace");
         app.Type("Workspace name", Workspaces.Name);
+        app.Type("Folder", folder);
+
+        // Step 1 comes first: once a folder is refused, the page moves focus to it, which the canvas draws only there.
+        app.Capture("newworkspace", "step1", sizes: at);
         app.Type("Folder", h.Workspaces.NotEmpty);
         app.Invoke("Next");
         app.WaitFor("This folder isn’t empty.", _brief);
         app.Capture("newworkspace", "folder-not-empty", sizes: at);
-        app.Type("Folder", h.Workspaces.NewFolder());
-        app.Capture("newworkspace", "step1", sizes: at);
+        app.Type("Folder", folder);
         app.Invoke("Next");
 
         app.Type("Legacy source folder", h.Workspaces.NoDelphi, tabOut: true);

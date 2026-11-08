@@ -457,6 +457,24 @@ internal sealed class StudioDriver : IDisposable
             ?? throw new TimeoutException($"{what} did not show within {timeout.TotalSeconds} s.");
     }
 
+    /// <summary>Waits until the title bar's Back is off, as once a page opened fresh has cleared the history.</summary>
+    public void WaitBackOff()
+    {
+        bool off = Retry
+            .WhileFalse(
+                () => _window.FindFirstDescendant(c => c.ByAutomationId("PART_BackButton")) is { } back
+                    && !back.Properties.IsEnabled.ValueOrDefault,
+                _findTimeout,
+                _poll,
+                ignoreException: true)
+            .Result;
+
+        if (!off)
+        {
+            throw new TimeoutException($"Back is still on after {_findTimeout.TotalSeconds} s.");
+        }
+    }
+
     /// <summary>Waits until the button with this name can be pressed, as a person waits before pressing it.</summary>
     public void WaitEnabled(string name, TimeSpan timeout)
     {
