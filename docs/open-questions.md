@@ -13,7 +13,7 @@ change.
 | Clone from Git has an action card and a link but no drawn flow | The card is shown, turned off | Start, Overview |
 | The target tag for a workspace that decided to choose after discovery | "Undecided" | `TargetStackNames` |
 | Browse… for the workspace folder when the folder picked already holds files | A new folder named after the workspace inside it, shown in the box before Next | `NewWorkspaceViewModel.BrowseFolder` |
-| Short names for deliverables in sign-off checks: the canvas names D01 to D09 ("System inventory", "Technology evaluation"); D10 to D20 are new | "Data migration strategy", "Testing strategy" and the like, one place to change | `SignOffWordings` |
+| Short names for deliverables in sign-off checks: the canvas names D01 to D09 ("System inventory", "Technology evaluation"); D10 to D20 are new | "Data migration strategy", "Testing strategy" and the like, one place to change | `DeliverableNames` |
 | The refusal's words for a check other than problems in the documents: the canvas words only "1 problem in the documents" | The check's name with its detail, as "System inventory in review (it is a draft)", one place to change | `SignOffRefusal` |
 | The Traceability badge while warnings count as errors: the canvas draws the strict count on the badge (TraceabilityStrict), but the badge stands for problems in the documents everywhere else | The badge follows the page's last check, strict included, as the canvas draws it | `TraceabilityViewModel.CheckAsync` |
 | The file being read during a scan: the canvas draws "Sales/CustomerForm.pas" beside "[n] of 13 files", but the engine's `ScanProgress` carries only counts | The counts and the bar, no file name, until the engine reports the file | `InventoryPage.xaml` |

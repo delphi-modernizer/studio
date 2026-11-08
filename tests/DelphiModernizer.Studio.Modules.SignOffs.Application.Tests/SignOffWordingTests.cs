@@ -10,15 +10,11 @@ namespace DelphiModernizer.Studio.Modules.SignOffs.Application.Tests;
 public sealed class SignOffWordingTests
 {
     [Fact]
-    public void Every_gate_and_deliverable_in_the_kit_has_words()
+    public void Every_gate_in_the_kit_has_words()
     {
-        var spec = KitBundle.Embedded.Spec;
-
-        var gates = spec.Gates.Gates.Select(g => g.Id);
-        var deliverables = spec.Deliverables.Deliverables.Select(d => d.Id);
+        var gates = KitBundle.Embedded.Spec.Gates.Gates.Select(g => g.Id);
 
         Assert.Equal(gates.Order(), SignOffWordings.Gates.Order());
-        Assert.Equal(deliverables.Order(), SignOffWordings.Deliverables.Order());
     }
 
     [Fact]

@@ -86,6 +86,13 @@
   status glyphs in the page's theme, and sets file links in Cascadia Mono.
 - Inventory's Cycle, Text and Embedded password pills show the canvas's cycle, document and key glyphs, and the
   sign-off and folder headings of Deliverables and Inventory keep the row divider above them.
+- Inventory counts hard-coded credentials from its risk markers, keeps the code module columns where the canvas
+  draws them, trims the data cards' text at 960 × 576 instead of cutting it, follows a connection's class with " · "
+  before its link, sets connection values in semibold, and lets its tabs scroll sideways when they run past the page.
+- The Traceability badge checks the documents again on every page change, off the UI thread and one check at a time,
+  so a deliverable deleted outside the studio counts as soon as another page opens.
+- Deliverables names a missing file by its short name ("The testing strategy file is missing."); the deliverables'
+  short names are shared, so Sign-offs reads the same words.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
   notice no longer leaves a gap.
 - Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code
