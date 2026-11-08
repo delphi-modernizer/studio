@@ -284,19 +284,23 @@ public sealed partial class ShellPage : Page
 
     /// <summary>Draws the pane toggle's glyph from Studio Icons, 12 wide as the TitleBar board has it.</summary>
     /// <remarks>
-    /// WinUI's toggle draws Segoe Fluent's 16 wide glyph and exposes no property for it. The template loads the toggle
-    /// lazily, after the title bar's Loaded, so the constructor calls this on each layout until it has drawn it.
+    /// WinUI's toggle plays a 16 wide animated icon and falls back to a glyph from its own font, size and content only
+    /// without one; clearing the animation draws that fallback. The template loads the toggle lazily, after the title
+    /// bar's Loaded, so the constructor calls this on each layout until it has drawn it.
     /// </remarks>
     /// <returns>Whether the toggle was there to draw.</returns>
     private bool DrawPaneToggleGlyph()
     {
-        if (Descendant(AppTitleBar, "PART_PaneToggleButton") is not Button toggle)
+        if (Descendant(AppTitleBar, "PART_PaneToggleButton") is not Button toggle
+            || Descendant(toggle, "Content") is not AnimatedIcon icon)
         {
             return false;
         }
 
         toggle.FontFamily = (FontFamily)Microsoft.UI.Xaml.Application.Current.Resources["StudioIconsFontFamily"];
+        toggle.FontSize = 12;
         toggle.Content = StudioIcons.Navigation;
+        icon.Source = null;
 
         return true;
     }
