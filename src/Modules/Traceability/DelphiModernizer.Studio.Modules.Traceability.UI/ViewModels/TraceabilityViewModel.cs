@@ -24,6 +24,15 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
 {
     private const string _dash = "—";
 
+    private static readonly StatCard _blank = new(
+        string.Empty,
+        string.Empty,
+        _dash,
+        string.Empty,
+        string.Empty,
+        string.Empty,
+        StatTone.None);
+
     private readonly ISender _sender;
     private readonly IEditorLauncher _editor;
     private readonly ProblemsBadge _badge;
@@ -53,9 +62,9 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
 
     public bool HasLoadProblem => LoadProblem is not null;
 
-    /// <remarks>An <c>IList</c> because the page binds each of the four cards by index.</remarks>
+    /// <remarks>An <c>IList</c> of always four cards, because the page binds each by index.</remarks>
     [ObservableProperty]
-    public partial IList<StatCard> Stats { get; set; } = [];
+    public partial IList<StatCard> Stats { get; set; } = [.. Enumerable.Repeat(_blank, 4)];
 
     [ObservableProperty]
     public partial IReadOnlyList<Choice<TraceView>> Views { get; set; } = [];
