@@ -204,6 +204,7 @@ public sealed partial class ShellPage : Page
         var selected = _containers
             .Where(c => c.Value.IsSelected)
             .Select(c => c.Key);
+
         return $"SelectedItem={(NavView.SelectedItem as NavigationViewItem)?.Tag ?? NavView.SelectedItem ?? "null"} "
             + $"IsSelected=[{string.Join(",", selected)}] frame={NavFrame.Content?.GetType().Name}";
     }
@@ -211,6 +212,7 @@ public sealed partial class ShellPage : Page
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         Trace($"SelectionChanged to={(args.SelectedItemContainer as NavigationViewItem)?.Tag} syncing={_isSyncingSelection} {State()}");
+
         if (!_isSyncingSelection && args.SelectedItemContainer is NavigationViewItem { Tag: string key })
         {
             _navigation.NavigateTo(key);
@@ -223,6 +225,7 @@ public sealed partial class ShellPage : Page
     private void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         Trace($"ItemInvoked {(args.InvokedItemContainer as NavigationViewItem)?.Tag} {State()}");
+
         if (args.InvokedItemContainer is NavigationViewItem { Tag: string key } container
             && ReferenceEquals(container, NavView.SelectedItem)
             && NavFrame.Content?.GetType().Name != key + "Page")
