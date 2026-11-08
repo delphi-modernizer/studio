@@ -338,6 +338,7 @@
                                                             Padding="4,0"
                                                             Click="OnOpenBlockingRun"
                                                             Content="Open run"
+                                                            Tag="{x:Bind}"
                                                             Visibility="{x:Bind CanOpenBlocker}" />
                                                     </StackPanel>
                                                 </StackPanel>
@@ -345,7 +346,8 @@
                                                     Grid.Column="1"
                                                     VerticalAlignment="Center"
                                                     Click="OnRun"
-                                                    IsEnabled="{x:Bind CanRun}">
+                                                    IsEnabled="{x:Bind CanRun}"
+                                                    Tag="{x:Bind}">
                                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                                         <FontIcon
                                                             Glyph="{x:Bind icons:StudioIcons.Run}"
