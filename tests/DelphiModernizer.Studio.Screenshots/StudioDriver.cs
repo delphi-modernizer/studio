@@ -442,27 +442,33 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <remarks>
-    /// An element below the fold has an empty rectangle until it is brought into view; focus brings into view what
-    /// cannot scroll itself, and after pointer input it draws no focus ring.
+    /// A list's ScrollIntoView scrolls the list but not the page around it, and an element below the fold has an
+    /// empty rectangle; focus scrolls every scroll viewer around it, and after pointer input it draws no focus ring.
     /// </remarks>
-    private static void ClickOn(AutomationElement element, string what)
+    private void ClickOn(AutomationElement element, string what)
     {
         element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
 
-        if (element.BoundingRectangle.IsEmpty)
+        if (!InWindow(element))
         {
             element.Focus();
             Settle(500);
         }
 
-        var bounds = element.BoundingRectangle;
-
-        if (bounds.IsEmpty)
+        if (!InWindow(element))
         {
-            throw new InvalidOperationException($"{what} is not on screen to click.");
+            throw new InvalidOperationException($"{what} is not in the window to click.");
         }
 
-        Desktop.Click(bounds.Center());
+        Desktop.Click(element.BoundingRectangle.Center());
+    }
+
+    private bool InWindow(AutomationElement element)
+    {
+        var bounds = element.BoundingRectangle;
+        var window = Desktop.VisibleFrame(Handle);
+
+        return !bounds.IsEmpty && window.Contains(bounds.Center());
     }
 
     public static string Slug(string name)
