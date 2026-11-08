@@ -97,14 +97,13 @@ internal static class Groups
                 app.ClickItem(_recent, h.Opened[Sample]);
                 app.Capture("overview", "default");
                 app.Capture("overview", "hover", () => app.Hover("Team0"));
-                app.Capture("overview", "focus", () => app.FocusWithKeyboard("Team1"));
-                app.Capture("overview", "scrolled", () => app.ScrollIntoView("Gate4"), [StudioDriver.Minimum]);
+                app.Capture("overview", "scrolled", () => app.ScrollTo("Team0", 250), [StudioDriver.Minimum]);
             });
             h.Step(app, theme, "shared", () => {
                 app.CapturePart("shared", "title-bar", pane: false);
                 app.CapturePart("shared", "nav-pane", pane: true);
                 app.TogglePane();
-                app.Capture("overview", "pane-compact", () => app.ScrollToTop("Team0"));
+                app.Capture("overview", "pane-compact", () => app.ScrollTo("Team0", 0));
                 app.TogglePane();
             });
             h.Step(app, theme, "sign-offs", () => {
@@ -117,6 +116,16 @@ internal static class Groups
                 theme,
                 "approve dialog",
                 () => ApproveDialog(h, app, "Approve the Project setup sign-off?", "approve-dialog"));
+
+            // A keyboard focus ring stays on whatever holds focus, so this comes after the Overview, title bar, pane and
+            // Sign-offs states, which the canvas draws without one.
+            h.Step(app, theme, "overview focus", () => {
+                app.Navigate("Overview");
+                app.Capture("overview", "focus", () => {
+                    app.ScrollTo("Team0", 0);
+                    app.FocusWithKeyboard("Gate1");
+                });
+            });
             h.Step(app, theme, "overview running", () => {
                 StartRun(app);
                 app.WaitFor("Working…", _run);

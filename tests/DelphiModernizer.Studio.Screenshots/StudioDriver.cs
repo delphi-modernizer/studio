@@ -331,14 +331,18 @@ internal sealed class StudioDriver : IDisposable
         Settle(1500);
     }
 
-    /// <summary>Scrolls the scroll viewer that holds this element back to its top.</summary>
-    public void ScrollToTop(string automationId)
+    /// <summary>Scrolls the scroll viewer that holds this element to an offset from its top.</summary>
+    /// <remarks>UI Automation scrolls by percent; the viewport's share of the extent turns pixels into one.</remarks>
+    public void ScrollTo(string automationId, double pixels)
     {
         for (var element = Find(e => Id(e) == automationId, automationId); element is not null; element = element.Parent)
         {
             if (element.Patterns.Scroll.TryGetPattern(out var scroll) && scroll.VerticallyScrollable.Value)
             {
-                scroll.SetScrollPercent(ScrollPatternConstants.NoScroll, 0);
+                double viewport = element.BoundingRectangle.Height;
+                double extent = viewport * 100 / scroll.VerticalViewSize.Value;
+                double percent = Math.Clamp(pixels * 100 / (extent - viewport), 0, 100);
+                scroll.SetScrollPercent(ScrollPatternConstants.NoScroll, percent);
                 Settle(1500);
 
                 return;
@@ -346,12 +350,6 @@ internal sealed class StudioDriver : IDisposable
         }
 
         throw new InvalidOperationException($"Nothing scrolls {automationId}.");
-    }
-
-    public void ScrollIntoView(string automationId)
-    {
-        Find(e => Id(e) == automationId, automationId).Patterns.ScrollItem.Pattern.ScrollIntoView();
-        Settle(1500);
     }
 
     /// <summary>Waits until an element with this name, or whose name starts with it, shows.</summary>
