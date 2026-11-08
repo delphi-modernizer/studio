@@ -183,6 +183,9 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <summary>Sizes the window and moves the pointer off it, so nothing shows hovered.</summary>
+    /// <remarks>
+    /// A page shows its scroll bar for a moment after its height changes, as a resize does, so the wait outlasts it.
+    /// </remarks>
     public Rectangle Resize(Size size)
     {
         EnsureRunning();
@@ -196,7 +199,7 @@ internal sealed class StudioDriver : IDisposable
 
         _window.SetForeground();
         MovePointerOff();
-        Settle(1200);
+        Settle(3000);
 
         return frame;
     }
