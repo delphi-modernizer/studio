@@ -14,13 +14,25 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Default">
                     <StaticResource x:Key="FlowNextStroke" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="FlowNextText" ResourceKey="AccentTextFillColorPrimaryBrush" />
+                    <StaticResource x:Key="FlowGroupStroke" ResourceKey="SubtleFillColorTransparentBrush" />
+                    <StaticResource x:Key="FlowGroupFill" ResourceKey="SubtleFillColorSecondaryBrush" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <StaticResource x:Key="FlowNextStroke" ResourceKey="AccentFillColorDefaultBrush" />
+                    <StaticResource x:Key="FlowNextText" ResourceKey="AccentTextFillColorPrimaryBrush" />
+                    <StaticResource x:Key="FlowGroupStroke" ResourceKey="SubtleFillColorTransparentBrush" />
+                    <StaticResource x:Key="FlowGroupFill" ResourceKey="SubtleFillColorSecondaryBrush" />
                 </ResourceDictionary>
-                <!--  In high contrast the accent fill is the window colour, so the border uses Highlight.  -->
+                <!--
+                    In high contrast the accent fill is the window colour, so the border uses Highlight; Next is drawn
+                    in the hyperlink colour, and the groups lose their fill, so they take an outline.
+                -->
                 <ResourceDictionary x:Key="HighContrast">
                     <SolidColorBrush x:Key="FlowNextStroke" Color="{ThemeResource SystemColorHighlightColor}" />
+                    <SolidColorBrush x:Key="FlowNextText" Color="{ThemeResource SystemColorHotlightColor}" />
+                    <StaticResource x:Key="FlowGroupStroke" ResourceKey="CardStrokeColorDefaultBrush" />
+                    <StaticResource x:Key="FlowGroupFill" ResourceKey="SubtleFillColorTransparentBrush" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
@@ -57,7 +69,9 @@
                 <Setter Property="TextAlignment" Value="Center" />
             </Style>
             <Style x:Key="FlowGroupStyle" TargetType="Border">
-                <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                <Setter Property="Background" Value="{ThemeResource FlowGroupFill}" />
+                <Setter Property="BackgroundSizing" Value="OuterBorderEdge" />
+                <Setter Property="BorderBrush" Value="{ThemeResource FlowGroupStroke}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="CornerRadius" Value="8" />
             </Style>
@@ -116,6 +130,8 @@
                             <ProgressRing
                                 Width="12"
                                 Height="12"
+                                MinWidth="12"
+                                MinHeight="12"
                                 IsActive="{x:Bind IsRunning}" />
                             <TextBlock
                                 Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
@@ -158,6 +174,8 @@
                             <ProgressRing
                                 Width="12"
                                 Height="12"
+                                MinWidth="12"
+                                MinHeight="12"
                                 IsActive="{x:Bind IsRunning}" />
                             <TextBlock
                                 Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
@@ -195,11 +213,13 @@
                     </Grid>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <controls:StatusPill State="{x:Bind Pill}" />
+                        <!--  Trimmed like the pill's word, so the two share a baseline.  -->
                         <TextBlock
                             VerticalAlignment="Center"
-                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                            Foreground="{ThemeResource FlowNextText}"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="Next"
+                            TextLineBounds="TrimToCapHeight"
                             Visibility="{x:Bind IsNext}" />
                     </StackPanel>
                 </StackPanel>
@@ -221,7 +241,7 @@
                             TextWrapping="NoWrap" />
                         <TextBlock
                             VerticalAlignment="Center"
-                            Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                            Foreground="{ThemeResource FlowNextText}"
                             Style="{StaticResource CaptionTextBlockStyle}"
                             Text="Next sign-off"
                             Visibility="{x:Bind IsNext}" />
@@ -313,21 +333,28 @@
                         </controls:NoWorkspaceState.Message>
                     </controls:NoWorkspaceState>
 
-                    <StackPanel
-                        AutomationProperties.LiveSetting="Polite"
-                        Spacing="8"
-                        Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
+                    <!--  Centred in the page's first 520, as drawn.  -->
+                    <Grid MinHeight="520" Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            AutomationProperties.LiveSetting="Polite"
+                            Spacing="8">
                             <ProgressRing
-                                Width="16"
-                                Height="16"
+                                Width="32"
+                                Height="32"
+                                Margin="0,0,0,12"
                                 IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-                            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="Reading the workspace" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="{x:Bind ViewModel.LoadingTitle, Mode=OneWay}" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource SecondaryCaptionTextStyle}"
+                                Text="Checking sign-offs, deliverables and traceability" />
                         </StackPanel>
-                        <TextBlock
-                            Style="{StaticResource SecondaryCaptionTextStyle}"
-                            Text="Checking sign-offs, deliverables and traceability" />
-                    </StackPanel>
+                    </Grid>
 
                     <InfoBar
                         AutomationProperties.LiveSetting="Assertive"
@@ -490,7 +517,8 @@
                                                         Text="Delphi code" />
                                                     <TextBlock
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind ViewModel.Legacy.Subtitle}" />
+                                                        Text="{x:Bind ViewModel.Legacy.Subtitle}"
+                                                        Visibility="{x:Bind local:OverviewPage.ShownIf(ViewModel.Legacy.Subtitle)}" />
                                                 </StackPanel>
                                                 <!--  One fact a line, as drawn, so all three fit the node.  -->
                                                 <StackPanel>
@@ -516,7 +544,7 @@
                                         <Button
                                             x:Name="Team0"
                                             x:DefaultBindMode="OneWay"
-                                            Padding="10,9"
+                                            Padding="10,9,10,5"
                                             AutomationProperties.Name="{x:Bind ViewModel.Teams[0].AnnouncedName}"
                                             Click="OnTeamClicked"
                                             Content="{x:Bind ViewModel.Teams[0]}"
@@ -527,7 +555,7 @@
                                             x:Name="Team1"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="10,9"
+                                            Padding="10,9,10,5"
                                             AutomationProperties.Name="{x:Bind ViewModel.Teams[1].AnnouncedName}"
                                             Click="OnTeamClicked"
                                             Content="{x:Bind ViewModel.Teams[1]}"
@@ -538,7 +566,7 @@
                                             x:Name="Team2"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="10,9"
+                                            Padding="10,9,10,5"
                                             AutomationProperties.Name="{x:Bind ViewModel.Teams[2].AnnouncedName}"
                                             Click="OnTeamClicked"
                                             Content="{x:Bind ViewModel.Teams[2]}"
@@ -549,7 +577,7 @@
                                             x:Name="Team3"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="10,9"
+                                            Padding="10,9,10,5"
                                             AutomationProperties.Name="{x:Bind ViewModel.Teams[3].AnnouncedName}"
                                             Click="OnTeamClicked"
                                             Content="{x:Bind ViewModel.Teams[3]}"
@@ -560,7 +588,7 @@
                                             x:Name="Team4"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="10,9"
+                                            Padding="10,9,10,5"
                                             AutomationProperties.Name="{x:Bind ViewModel.Teams[4].AnnouncedName}"
                                             Click="OnTeamClicked"
                                             Content="{x:Bind ViewModel.Teams[4]}"
@@ -571,7 +599,7 @@
                                             x:Name="Team5"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="10,9"
+                                            Padding="10,9,10,5"
                                             AutomationProperties.Name="{x:Bind ViewModel.Teams[5].AnnouncedName}"
                                             Click="OnTeamClicked"
                                             Content="{x:Bind ViewModel.Teams[5]}"
@@ -624,7 +652,6 @@
                                         <Button
                                             x:Name="Gate0"
                                             x:DefaultBindMode="OneWay"
-                                            Padding="12,7"
                                             AutomationProperties.Name="{x:Bind ViewModel.Gates[0].AnnouncedName}"
                                             Click="OnGateClicked"
                                             Content="{x:Bind ViewModel.Gates[0]}"
@@ -635,7 +662,6 @@
                                             x:Name="Gate1"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="12,7"
                                             AutomationProperties.Name="{x:Bind ViewModel.Gates[1].AnnouncedName}"
                                             Click="OnGateClicked"
                                             Content="{x:Bind ViewModel.Gates[1]}"
@@ -646,7 +672,6 @@
                                             x:Name="Gate2"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="12,7"
                                             AutomationProperties.Name="{x:Bind ViewModel.Gates[2].AnnouncedName}"
                                             Click="OnGateClicked"
                                             Content="{x:Bind ViewModel.Gates[2]}"
@@ -657,7 +682,6 @@
                                             x:Name="Gate3"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="12,7"
                                             AutomationProperties.Name="{x:Bind ViewModel.Gates[3].AnnouncedName}"
                                             Click="OnGateClicked"
                                             Content="{x:Bind ViewModel.Gates[3]}"
@@ -668,7 +692,6 @@
                                             x:Name="Gate4"
 
                                             x:DefaultBindMode="OneWay"
-                                            Padding="12,7"
                                             AutomationProperties.Name="{x:Bind ViewModel.Gates[4].AnnouncedName}"
                                             Click="OnGateClicked"
                                             Content="{x:Bind ViewModel.Gates[4]}"

@@ -34,6 +34,12 @@ public sealed partial class OverviewPage : Page, IHasViewModel
         };
     }
 
+    /// <summary>Collapses a line with nothing to say, such as the Delphi code's subtitle before a scan.</summary>
+    public static Visibility ShownIf(string text)
+    {
+        return string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
+    }
+
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.LoadCommand.ExecuteAsync(parameter: null);

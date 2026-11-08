@@ -33,11 +33,14 @@
             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Blocked" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="6">
+            <!--  Turning, like the ring it explains; an inactive ProgressRing draws nothing.  -->
             <ProgressRing
                 Width="12"
                 Height="12"
-                IsActive="False"
-                Value="75" />
+                MinWidth="12"
+                MinHeight="12"
+                AutomationProperties.AccessibilityView="Raw"
+                IsActive="True" />
             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Agent running" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="6">
