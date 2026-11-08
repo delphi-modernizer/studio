@@ -33,14 +33,19 @@
             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Blocked" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="6">
-            <!--  Turning, like the ring it explains; an inactive ProgressRing draws nothing.  -->
+            <!--
+                A still half ring, the drawn key: an inactive ProgressRing draws nothing, and a turning one can be caught
+                as a dot.
+            -->
             <ProgressRing
                 Width="12"
                 Height="12"
                 MinWidth="12"
                 MinHeight="12"
                 AutomationProperties.AccessibilityView="Raw"
-                IsActive="True" />
+                IsActive="True"
+                IsIndeterminate="False"
+                Value="50" />
             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Agent running" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="6">
