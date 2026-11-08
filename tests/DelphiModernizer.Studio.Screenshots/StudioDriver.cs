@@ -392,13 +392,13 @@ internal sealed class StudioDriver : IDisposable
         }
     }
 
-    /// <param name="fromLeft">Where across the element to rest, from its left edge; its centre when null.</param>
-    public void Hover(string automationId, int? fromLeft = null)
+    /// <param name="offset">Where to rest, from the element's top-left corner; its centre when null.</param>
+    public void Hover(string automationId, Point? offset = null)
     {
         var element = Find(e => Id(e) == automationId, automationId);
         element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
         var bounds = element.BoundingRectangle;
-        var at = new Point(fromLeft is { } x ? bounds.Left + x : bounds.Center().X, bounds.Center().Y);
+        var at = offset is { } o ? new Point(bounds.Left + o.X, bounds.Top + o.Y) : bounds.Center();
         Desktop.MovePointer(new Point(at.X - 20, at.Y));
         Desktop.MovePointer(at);
         Settle(2500);
