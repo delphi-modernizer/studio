@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DelphiModernizer.Studio.Application.Abstractions.Deliverables;
 
@@ -39,5 +40,17 @@ public static class DeliverableNames
     public static string ShortName(string id, string fallback)
     {
         return _byId.GetValueOrDefault(id, fallback);
+    }
+
+    /// <summary>The short name inside a sentence: "testing strategy", but "DevOps and deployment" as it is.</summary>
+    /// <param name="fallback">The kit's title, used for a deliverable a newer kit adds.</param>
+    public static string InSentence(string id, string fallback)
+    {
+        string name = ShortName(id, fallback);
+        string firstWord = name.Split(' ')[0];
+
+        return firstWord.Length == 0 || firstWord[1..].Any(char.IsUpper)
+            ? name
+            : char.ToLowerInvariant(name[0]) + name[1..];
     }
 }

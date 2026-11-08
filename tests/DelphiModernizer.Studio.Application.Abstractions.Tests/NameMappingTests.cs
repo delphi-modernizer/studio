@@ -37,6 +37,15 @@ public sealed class NameMappingTests
         Assert.Equal("Kit title", DeliverableNames.ShortName("D99", "Kit title"));
     }
 
+    [Theory]
+    [InlineData("D14", "testing strategy")]
+    [InlineData("D15", "DevOps and deployment")]
+    [InlineData("D99", "kit title")]
+    public void A_short_name_in_a_sentence_drops_only_a_plain_first_capital(string id, string expected)
+    {
+        Assert.Equal(expected, DeliverableNames.InSentence(id, "Kit title"));
+    }
+
     [Fact]
     public void Every_owner_in_the_kit_is_a_role_with_a_name_and_an_agent()
     {

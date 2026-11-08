@@ -66,7 +66,7 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
 
     public string MissingTitle => Missing is null
         ? string.Empty
-        : $"The {DeliverableNames.ShortName(Missing.Id, Missing.Title).ToLowerInvariant()} file is missing.";
+        : $"The {DeliverableNames.InSentence(Missing.Id, Missing.Title)} file is missing.";
 
     public string MissingMessage => Missing is null
         ? string.Empty
