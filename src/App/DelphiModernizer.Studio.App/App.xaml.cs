@@ -23,6 +23,10 @@ public sealed partial class App : Microsoft.UI.Xaml.Application
     public App()
     {
         InitializeComponent();
+
+        // No text backplates in high contrast: every brush has its own high-contrast value, and a backplate draws
+        // on-accent text white on black. Set in code: the same value as an App.xaml attribute left the backplates.
+        HighContrastAdjustment = ApplicationHighContrastAdjustment.None;
         UnhandledException += OnUnhandledException;
 
         // XAML's handler misses faulted fire-and-forget tasks and exceptions off the UI thread.

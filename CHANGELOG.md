@@ -100,4 +100,7 @@
 
 ### Fixed
 
+- The pane keeps Workstreams' selection on Run and back on Workstreams while its badge counts a run.
+- High contrast: busy rings draw in the highlight colour, and text inside the accent, such as the selected pane item
+  and Review sign-offs, is no longer drawn white on a black box.
 - New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".
