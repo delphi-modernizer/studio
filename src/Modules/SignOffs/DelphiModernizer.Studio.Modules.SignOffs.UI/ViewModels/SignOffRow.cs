@@ -160,7 +160,6 @@ public sealed partial class SignOffRow : ObservableObject
 
     public string Fingerprint { get; }
 
-
     public IReadOnlyList<CoveredFileRow> Covers { get; }
 
     public string CoversCount { get; }
