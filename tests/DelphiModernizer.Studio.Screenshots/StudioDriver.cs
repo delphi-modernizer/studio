@@ -91,6 +91,34 @@ internal sealed class StudioDriver : IDisposable
         }
     }
 
+    /// <summary>Captures a state that shows only while the app works, with the app held to one processor.</summary>
+    /// <remarks>
+    /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
+    /// </remarks>
+    /// <param name="trigger">Starts the work and waits until the state shows.</param>
+    public void CaptureWhileBusy(string page, string state, Action trigger, IReadOnlyList<Size>? sizes = null)
+    {
+        var process = Process.GetProcessById(_app.ProcessId);
+        nint every = process.ProcessorAffinity;
+
+        foreach (var size in sizes ?? Sizes)
+        {
+            var frame = Resize(size);
+            process.ProcessorAffinity = 1;
+
+            try
+            {
+                trigger();
+                Settle(300);
+                Save(page, state, size, frame);
+            }
+            finally
+            {
+                process.ProcessorAffinity = every;
+            }
+        }
+    }
+
     /// <summary>Captures one part of the window at 1280 × 800: the title bar or the navigation pane.</summary>
     public void CapturePart(string page, string state, bool pane)
     {
@@ -287,7 +315,9 @@ internal sealed class StudioDriver : IDisposable
     {
         var element = Find(e => Id(e) == automationId, automationId);
         element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
-        Mouse.MoveTo(element.BoundingRectangle.Center());
+        var center = element.BoundingRectangle.Center();
+        Desktop.MovePointer(new Point(center.X - 20, center.Y));
+        Desktop.MovePointer(center);
         Settle(2500);
     }
 
@@ -299,6 +329,23 @@ internal sealed class StudioDriver : IDisposable
         Keyboard.Type(VirtualKeyShort.TAB);
         Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.TAB);
         Settle(1500);
+    }
+
+    /// <summary>Scrolls the scroll viewer that holds this element back to its top.</summary>
+    public void ScrollToTop(string automationId)
+    {
+        for (var element = Find(e => Id(e) == automationId, automationId); element is not null; element = element.Parent)
+        {
+            if (element.Patterns.Scroll.TryGetPattern(out var scroll) && scroll.VerticallyScrollable.Value)
+            {
+                scroll.SetScrollPercent(ScrollPatternConstants.NoScroll, 0);
+                Settle(1500);
+
+                return;
+            }
+        }
+
+        throw new InvalidOperationException($"Nothing scrolls {automationId}.");
     }
 
     public void ScrollIntoView(string automationId)

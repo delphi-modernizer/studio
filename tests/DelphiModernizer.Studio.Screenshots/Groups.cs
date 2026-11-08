@@ -104,7 +104,7 @@ internal static class Groups
                 app.CapturePart("shared", "title-bar", pane: false);
                 app.CapturePart("shared", "nav-pane", pane: true);
                 app.TogglePane();
-                app.Capture("overview", "pane-compact");
+                app.Capture("overview", "pane-compact", () => app.ScrollToTop("Team0"));
                 app.TogglePane();
             });
             h.Step(app, theme, "sign-offs", () => {
@@ -198,7 +198,7 @@ internal static class Groups
                 app.ClickItem(_recent, h.Opened[Large]);
                 app.Navigate("Inventory", 6000);
                 app.Capture("inventory", "large");
-                app.Capture("inventory", "scanning", () => {
+                app.CaptureWhileBusy("inventory", "scanning", () => {
                     app.WaitGone("Scanning legacy/…", _run);
                     app.Invoke("Scan again", 0);
                     app.WaitBriefly(c => c.ByName("Scanning legacy/…"), "Scanning legacy/…", _brief);
@@ -315,7 +315,7 @@ internal static class Groups
         app.Type("Legacy source folder", h.Workspaces.Legacy, tabOut: true);
         app.WaitEnabled("Next", _run);
         app.Capture("newworkspace", "step2", sizes: at);
-        app.Capture(
+        app.CaptureWhileBusy(
             "newworkspace",
             "preview-running",
             () => {

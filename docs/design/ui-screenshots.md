@@ -83,7 +83,8 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    SelectorBar items, text boxes, dialogs), through the stand-in's runs, or through the workspace's files (a deleted
    deliverable, a charter set back to a template). States that last only while something runs (loading, scanning,
    preview running, creating) are triggered once per size and captured as soon as they show; the large tree makes them
-   last long enough.
+   last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
+   processor while scanning and preview running are captured.
 5. It sizes the window with `SetWindowPos` before each capture and writes the PNGs and `manifest.json` to `--out`,
    with the app's log under `logs/` when it wrote one. The workflow uploads that folder as `screenshots-<group>`.
 
