@@ -94,9 +94,9 @@
 - Run's transcript starts with the session, divides its items, shows each fact label right after its claim and each
   evidence link only under it, an edit's input as its file, and a starting run's budget; the end card spreads its
   numbers over four columns and shows what the run spent.
-- Run an agent task and the budget dialog show the budget as "$2.00" and Run with its play icon; the budget,
-  approve and revoke dialogs have no default button, so Enter never spends money or approves, and Cancel and Close are
-  drawn plain.
+- Run an agent task and the budget dialog show the budget as "2.00" after a grey "$", as Settings does, and Run with
+  its play icon; the budget, approve and revoke dialogs have no default button, so Enter never spends money or
+  approves, and Cancel and Close are drawn plain.
 - The approve dialog lists every covered file and its fingerprint on one line; Sign-offs trims covered paths instead
   of wrapping them, and its checks are divided by hairlines.
 - The no-identity approve dialog keeps its note label in full colour while the box is off.
