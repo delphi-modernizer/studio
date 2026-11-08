@@ -342,7 +342,7 @@
                                                             TextWrapping="Wrap" />
                                                     </controls:WrapPanel>
                                                     <!--  Pill, then the reason with Open run inline, as drawn.  -->
-                                                    <!--  A no-break space keeps Open run whole; its name stays "Open run".  -->
+                                                    <!--  No-break space keeps the link whole; its name stays "Open run".  -->
                                                     <Grid
                                                         Margin="0,4,0,0"
                                                         ColumnSpacing="6"
