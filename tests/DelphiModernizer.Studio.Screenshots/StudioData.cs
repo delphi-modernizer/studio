@@ -30,14 +30,13 @@ internal sealed class StudioData : IDisposable
 
     public string LogDirectory => Path.Combine(_directory, "logs");
 
-    /// <param name="theme">The app's ElementTheme value: 0 follows Windows, 1 is light, 2 is dark.</param>
     /// <param name="claudePath">The Claude Code executable set in Settings; null looks on PATH.</param>
-    /// <remarks>The app reads settings.json once, at launch.</remarks>
-    public void Prepare(int theme, string? claudePath, IReadOnlyList<string> recent)
+    /// <remarks>The app reads settings.json once, at launch. Its Theme, 0, follows Windows.</remarks>
+    public void Prepare(string? claudePath, IReadOnlyList<string> recent)
     {
         Directory.CreateDirectory(_directory);
         var settings = new JsonObject {
-            ["Theme"] = theme,
+            ["Theme"] = 0,
             ["Agents"] = new JsonObject {
                 ["ClaudePath"] = claudePath,
                 ["Model"] = null,

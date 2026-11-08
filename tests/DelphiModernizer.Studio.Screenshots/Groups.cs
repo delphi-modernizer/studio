@@ -24,10 +24,20 @@ internal static class Groups
     /// <summary>Creating from the large tree copies 10,000 files and commits them.</summary>
     private static readonly TimeSpan _create = TimeSpan.FromMinutes(5);
 
+    /// <summary>Step 4 as the canvas fills it: every answer but Constraints, which is left Unknown.</summary>
+    private static readonly (string Field, string Answer)[] _context = [
+        ("Domain", "ERP, a Delphi 7 application on the BDE"),
+        ("Objectives", "Move to C#/.NET with the same business rules"),
+        ("Users", "40 sales and accounting staff"),
+        ("Geography", "One office in Lyon, France"),
+        ("Criticality", "Invoicing must not stop for more than a day"),
+    ];
+
     /// <summary>Start, New workspace and Settings.</summary>
-    public static void Start(Harness h, string theme, int themeValue)
+    /// <remarks>Settings is drawn with a workspace open and the wizard without one, which Create leaves open.</remarks>
+    public static void Start(Harness h, string theme)
     {
-        h.Run(theme, themeValue, new Launch([Sample]), app => {
+        h.Run(theme, new Launch([Sample]), app => {
             h.Step(app, theme, "start", () => app.Capture("start", "default"));
             h.Step(app, theme, "start first run", () => {
                 h.Data.WriteRecent([]);
@@ -37,17 +47,23 @@ internal static class Groups
                 h.Data.WriteRecent([h.Opened[Sample]]);
             });
             h.Step(app, theme, "settings", () => {
+                app.Navigate("Settings");
+                app.Navigate("Start");
+                app.ClickItem(_recent, h.Opened[Sample]);
                 app.Navigate("Settings", 5000);
                 app.Capture("settings", "found");
             });
-
-            foreach (var size in StudioDriver.Sizes)
-            {
-                h.Step(app, theme, $"new workspace {size.Width}", () => Wizard(h, app, size));
-            }
         });
 
-        h.Run(theme, themeValue, new Launch([Sample], Claude: false), app => {
+        foreach (var size in StudioDriver.Sizes)
+        {
+            h.Run(
+                theme,
+                new Launch([Sample]),
+                app => h.Step(app, theme, $"new workspace {size.Width}", () => Wizard(h, app, size)));
+        }
+
+        h.Run(theme, new Launch([Sample], Claude: false), app => {
             h.Step(app, theme, "start claude missing", () => {
                 app.Capture("start", "claude-missing");
                 app.Invoke("Set up Claude Code");
@@ -56,6 +72,7 @@ internal static class Groups
                 app.Invoke("Not now");
             });
             h.Step(app, theme, "settings not found", () => {
+                app.ClickItem(_recent, h.Opened[Sample]);
                 app.Navigate("Settings", 5000);
                 app.Capture("settings", "not-found");
             });
@@ -66,7 +83,7 @@ internal static class Groups
             });
         });
 
-        h.Run(theme, themeValue, new Launch([Sample], TooOld: true), app => {
+        h.Run(theme, new Launch([Sample], TooOld: true), app => {
             h.Step(app, theme, "start claude too old", () => app.Capture("start", "claude-too-old"));
             h.Step(app, theme, "claude update dialog", () => {
                 app.ClickItem(_recent, h.Opened[Sample]);
@@ -80,9 +97,9 @@ internal static class Groups
     }
 
     /// <summary>Overview, Sign-offs and the shared title bar and pane.</summary>
-    public static void Overview(Harness h, string theme, int themeValue)
+    public static void Overview(Harness h, string theme)
     {
-        h.Run(theme, themeValue, new Launch([Sample, Unscanned], Scenario: "stopped"), app => {
+        h.Run(theme, new Launch([Sample, Unscanned], Scenario: "stopped"), app => {
             h.Step(app, theme, "overview no workspace", () => {
                 app.Navigate("Overview");
                 app.Capture("overview", "no-workspace");
@@ -134,7 +151,7 @@ internal static class Groups
             });
         });
 
-        h.Run(theme, themeValue, new Launch([Sample], Claude: false, Identity: false), app => {
+        h.Run(theme, new Launch([Sample], Claude: false, Identity: false), app => {
             h.Step(app, theme, "overview no claude", () => {
                 app.ClickItem(_recent, h.Opened[Sample]);
                 app.Capture("overview", "no-claude");
@@ -147,9 +164,9 @@ internal static class Groups
     }
 
     /// <summary>Overview and Sign-offs as Windows' high contrast draws them.</summary>
-    public static void HighContrast(Harness h, string theme, int themeValue)
+    public static void HighContrast(Harness h, string theme)
     {
-        h.Run(theme, themeValue, new Launch([Sample]), app => {
+        h.Run(theme, new Launch([Sample]), app => {
             h.Step(app, theme, "overview", () => {
                 app.ClickItem(_recent, h.Opened[Sample]);
                 app.Capture("overview", "default");
@@ -163,9 +180,9 @@ internal static class Groups
     }
 
     /// <summary>Inventory, Deliverables, Traceability and Overview's loading state.</summary>
-    public static void Pages(Harness h, string theme, int themeValue)
+    public static void Pages(Harness h, string theme)
     {
-        h.Run(theme, themeValue, new Launch([Sample, Clean, Unscanned, Large]), app => {
+        h.Run(theme, new Launch([Sample, Clean, Unscanned, Large]), app => {
             h.Step(app, theme, "inventory no workspace", () => {
                 app.Navigate("Inventory");
                 app.Capture("inventory", "no-workspace");
@@ -226,9 +243,9 @@ internal static class Groups
     }
 
     /// <summary>Workstreams and the Run page, each run played by the stand-in Claude Code.</summary>
-    public static void Agents(Harness h, string theme, int themeValue)
+    public static void Agents(Harness h, string theme)
     {
-        h.Run(theme, themeValue, new Launch([Sample], Scenario: "stopped"), app => {
+        h.Run(theme, new Launch([Sample], Scenario: "stopped"), app => {
             h.Step(app, theme, "workstreams", () => {
                 app.ClickItem(_recent, h.Opened[Sample]);
                 app.Navigate("Workstreams", 4000);
@@ -249,13 +266,12 @@ internal static class Groups
             });
             h.Step(app, theme, "stopped", () => {
                 app.Invoke("Open run", 4000);
-                app.Invoke("Stop");
-                app.WaitFor("You stopped the run.", _run);
+                Stop(app);
                 app.Capture("run", "stopped");
             });
         });
 
-        h.Run(theme, themeValue, new Launch([Sample], Scenario: "starting"), app => {
+        h.Run(theme, new Launch([Sample], Scenario: "starting"), app => {
             h.Step(app, theme, "starting", () => {
                 app.ClickItem(_recent, h.Opened[Sample]);
                 StartRun(app);
@@ -265,27 +281,17 @@ internal static class Groups
             });
         });
 
-        h.Run(theme, themeValue, new Launch([Sample], Scenario: "completed"), app => {
-            h.Step(app, theme, "completed", () => {
-                app.ClickItem(_recent, h.Opened[Sample]);
-                StartRun(app);
-                app.WaitFor("The agent finished.", _run);
-                app.Capture("run", "completed");
-            });
-            h.Step(app, theme, "history", () => {
-                app.Invoke("Back to Legacy discovery", 4000);
-                app.Capture("workstreams", "history");
-            });
-        });
-
-        h.Run(theme, themeValue, new Launch([Sample], Scenario: "failed"), app => h.Step(app, theme, "failed", () => {
+        // The history artboard lists a live run above a completed, a stopped, a budget-reached and a failed one, so
+        // these launches share one workspace and run in that order, oldest first.
+        var history = new Launch([Sample], Reuse: true);
+        h.Run(theme, new Launch([Sample], Scenario: "failed"), app => h.Step(app, theme, "failed", () => {
             app.ClickItem(_recent, h.Opened[Sample]);
             StartRun(app);
             app.WaitFor("The run failed.", _run);
             app.Capture("run", "failed");
         }));
 
-        h.Run(theme, themeValue, new Launch([Sample], Scenario: "budget"), app => h.Step(app, theme, "budget", () => {
+        h.Run(theme, history with { Scenario = "budget" }, app => h.Step(app, theme, "budget", () => {
             app.ClickItem(_recent, h.Opened[Sample]);
             StartRun(app);
             app.WaitFor("This run reached its budget", _run);
@@ -293,7 +299,31 @@ internal static class Groups
             app.Invoke("Close");
         }));
 
-        h.Run(theme, themeValue, new Launch([Sample], Claude: false), app => h.Step(app, theme, "no claude", () => {
+        h.Run(theme, history with { Scenario = "stopped" }, app => h.Step(app, theme, "stop", () => {
+            app.ClickItem(_recent, h.Opened[Sample]);
+            StartRun(app);
+            Stop(app);
+        }));
+
+        h.Run(theme, history with { Scenario = "completed" }, app => h.Step(app, theme, "completed", () => {
+            app.ClickItem(_recent, h.Opened[Sample]);
+            StartRun(app);
+            app.WaitFor("The agent finished.", _run);
+            app.Capture("run", "completed");
+        }));
+
+        h.Run(theme, history with { Scenario = "stopped" }, app => h.Step(app, theme, "history", () => {
+            app.ClickItem(_recent, h.Opened[Sample]);
+            StartRun(app);
+            app.WaitFor("Working…", _run);
+            app.Navigate("Workstreams", 4000);
+            app.Select("Legacy discovery");
+            app.Capture("workstreams", "history");
+            app.Invoke("Open run", 4000);
+            Stop(app);
+        }));
+
+        h.Run(theme, new Launch([Sample], Claude: false), app => h.Step(app, theme, "no claude", () => {
             app.ClickItem(_recent, h.Opened[Sample]);
             app.Navigate("Workstreams", 4000);
             app.Capture("workstreams", "no-claude");
@@ -304,13 +334,14 @@ internal static class Groups
         }));
     }
 
-    /// <summary>The wizard from Start to Created at one size; Create runs once per size.</summary>
-    /// <remarks>The large tree is the source, so its preview and its copy last long enough to capture.</remarks>
+    /// <summary>The wizard from Start to Created at one size.</summary>
+    /// <remarks>
+    /// The large tree is the source, so its preview and its copy last long enough to capture. Creating is captured
+    /// while the tree is copied, after the kit, so that the list shows a step done, one working and others waiting.
+    /// </remarks>
     private static void Wizard(Harness h, StudioDriver app, System.Drawing.Size size)
     {
         var at = new[] { size };
-        app.Navigate("Settings");
-        app.Navigate("Start");
         app.Invoke("New workspace");
         app.Type("Workspace name", Workspaces.Name);
         app.Type("Folder", h.Workspaces.NotEmpty);
@@ -344,7 +375,15 @@ internal static class Groups
         app.Select("C#/.NET");
         app.Capture("newworkspace", "step3", sizes: at);
         app.Invoke("Next");
-        app.Type("Domain", "ERP, a Delphi 7 application on the BDE");
+        // At 1280 × 800 every field shows, so focusing one scrolls nothing; focus ends on an Unknown box, unmarked.
+        app.Resize(StudioDriver.Wide);
+
+        foreach (var (field, answer) in _context)
+        {
+            app.Type(field, answer, tabOut: true);
+        }
+
+        app.Toggle("Constraints unknown. Adds an open question.");
         app.Capture("newworkspace", "step4", sizes: at);
         app.Invoke("Next");
         app.Capture("newworkspace", "step5", sizes: at);
@@ -353,7 +392,7 @@ internal static class Groups
             "creating",
             () => {
                 app.Invoke("Create", 0);
-                app.WaitBriefly(c => c.ByName("Copy the kit into the folder"), "The creating steps", _brief);
+                app.WaitBriefly(c => c.ByName("Done"), "The kit's copy done", _brief);
             },
             at);
         app.WaitFor("Open the Overview", _create);
@@ -418,5 +457,13 @@ internal static class Groups
     {
         OpenRunDialog(app);
         app.Invoke("Run");
+    }
+
+    /// <summary>Stops the run the Run page shows once it is working.</summary>
+    private static void Stop(StudioDriver app)
+    {
+        app.WaitFor("Working…", _run);
+        app.Invoke("Stop");
+        app.WaitFor("You stopped the run.", _run);
     }
 }
