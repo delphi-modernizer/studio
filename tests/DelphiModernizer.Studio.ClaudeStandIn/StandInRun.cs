@@ -26,7 +26,7 @@ internal sealed class StandInRun(
     private const string _grepPath = "legacy/Sales";
     private const string _grepPattern = "CREDIT_LIMIT";
 
-    /// <summary>The command the kit's .claude/settings.json gives the hook; Claude Code names it in a refusal.</summary>
+    /// <summary>The command the kit's .claude/settings.json gives the hook; Claude Code names it on refusal.</summary>
     private const string _hookCommand = "dmz guard pre-tool-use || exit 2";
 
     /// <summary>The harness stops a waiting run within minutes; a stand-in left behind ends on its own.</summary>
@@ -145,7 +145,7 @@ internal sealed class StandInRun(
         ToolResult(id, content, isError);
     }
 
-    /// <summary>Asks the guard as the hook would, then makes the edit or reports the refusal as Claude Code does.</summary>
+    /// <summary>Asks the guard as the hook does, then edits or reports the refusal in Claude Code's words.</summary>
     /// <remarks>An edit that changes nothing is skipped, so a second run in one workspace still succeeds.</remarks>
     private void Edit(string path, string oldText, string newText)
     {
@@ -161,7 +161,11 @@ internal sealed class StandInRun(
         if (!decision.Allowed)
         {
             var id = Assistant("Edit", input);
-            _denials.Add(new JsonObject { ["tool_name"] = "Edit", ["tool_use_id"] = id, ["tool_input"] = input.DeepClone() });
+            _denials.Add(new JsonObject {
+                ["tool_name"] = "Edit",
+                ["tool_use_id"] = id,
+                ["tool_input"] = input.DeepClone(),
+            });
             ToolResult(id, $"PreToolUse:Edit hook error: [{_hookCommand}]: {decision.Reason}", isError: true);
 
             return;

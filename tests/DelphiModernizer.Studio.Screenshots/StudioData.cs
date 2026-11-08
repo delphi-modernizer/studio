@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace DelphiModernizer.Studio.Screenshots;
 
-/// <summary>The studio's data folder, filled the way the app leaves it: one recent workspace and a theme.</summary>
+/// <summary>The studio's data folder, filled the way the app leaves it: recent workspaces and settings.</summary>
 /// <remarks>
 /// The file names and keys are the app's own (LocalSettingsService, RecentWorkspaceStore); the person's folder is moved
 /// aside for the run and put back afterwards.
@@ -32,22 +31,43 @@ internal sealed class StudioData : IDisposable
     public string LogDirectory => Path.Combine(_directory, "logs");
 
     /// <param name="theme">The app's ElementTheme value: 0 follows Windows, 1 is light, 2 is dark.</param>
-    public void Prepare(string workspace, int theme)
+    /// <param name="claudePath">The Claude Code executable set in Settings; null looks on PATH.</param>
+    /// <remarks>The app reads settings.json once, at launch.</remarks>
+    public void Prepare(int theme, string? claudePath, IReadOnlyList<string> recent)
     {
-        var manifest = JsonNode.Parse(File.ReadAllText(Path.Combine(workspace, "modernizer.json")))
-            ?? throw new InvalidDataException("modernizer.json is empty.");
         Directory.CreateDirectory(_directory);
-        File.Delete(Path.Combine(_directory, "recent-workspaces.json"));
-        File.WriteAllText(Path.Combine(_directory, "settings.json"), JsonSerializer.Serialize(new { Theme = theme }));
+        var settings = new JsonObject {
+            ["Theme"] = theme,
+            ["Agents"] = new JsonObject {
+                ["ClaudePath"] = claudePath,
+                ["Model"] = null,
+                ["Effort"] = null,
+                ["BudgetUsd"] = 2,
+            },
+        };
+        File.WriteAllText(Path.Combine(_directory, "settings.json"), settings.ToJsonString());
+        WriteRecent(recent);
+    }
 
-        var recent = new JsonArray {
-            new JsonObject {
+    /// <summary>The recent workspaces, most recent first; Start reads the list each time it loads.</summary>
+    public void WriteRecent(IReadOnlyList<string> workspaces)
+    {
+        var recent = new JsonArray();
+        var openedAt = DateTimeOffset.UtcNow;
+
+        foreach (var workspace in workspaces)
+        {
+            var manifest = JsonNode.Parse(File.ReadAllText(Path.Combine(workspace, "modernizer.json")))
+                ?? throw new InvalidDataException("modernizer.json is empty.");
+            recent.Add(new JsonObject {
                 ["name"] = manifest["name"]?.GetValue<string>(),
                 ["root"] = Path.GetFullPath(workspace),
                 ["targetStack"] = manifest["targetStack"]?.GetValue<string>(),
-                ["openedAt"] = DateTimeOffset.UtcNow,
-            },
-        };
+                ["openedAt"] = openedAt,
+            });
+            openedAt = openedAt.AddMinutes(-5);
+        }
+
         File.WriteAllText(Path.Combine(_directory, "recent-workspaces.json"), recent.ToJsonString());
     }
 

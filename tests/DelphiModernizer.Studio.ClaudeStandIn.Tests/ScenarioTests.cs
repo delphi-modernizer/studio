@@ -10,8 +10,8 @@ using Xunit;
 
 namespace DelphiModernizer.Studio.ClaudeStandIn.Tests;
 
-/// <summary>Each scenario, run by the engine's runner as the studio runs it, read back as the engine's events.</summary>
-/// <remarks>The scenario is a process-wide variable, so the tests stay in this one class, which runs them in turn.</remarks>
+/// <summary>Each scenario, run by the engine's runner as the studio runs it, read as the engine's events.</summary>
+/// <remarks>The scenario is a process-wide variable, so the tests stay in one class, which runs them in turn.</remarks>
 public sealed class ScenarioTests : IDisposable
 {
     private const string _guardReason = "legacy/ is read-only evidence; record findings in docs/ instead.";
@@ -34,11 +34,18 @@ public sealed class ScenarioTests : IDisposable
         Assert.Equal("stand-in", Assert.IsType<SessionStarted>(events[0]).Model);
         var completed = Assert.IsType<RunCompleted>(events[^1]);
         Assert.Equal(outcome, completed.Outcome);
-        Assert.Contains(events, e => e is ToolResult { IsError: true } r && r.Content.EndsWith(_guardReason, StringComparison.Ordinal));
-        Assert.Contains(events, e => e is AssistantText t && t.Text.Contains("**[Inferred]**", StringComparison.Ordinal));
-        Assert.Contains(events, e => e is ToolResult r && r.Content.Contains("CustomerForm.pas:35:", StringComparison.Ordinal));
+        Assert.Contains(
+            events,
+            e => e is ToolResult { IsError: true } r && r.Content.EndsWith(_guardReason, StringComparison.Ordinal));
+        Assert.Contains(
+            events,
+            e => e is AssistantText t && t.Text.Contains("**[Inferred]**", StringComparison.Ordinal));
+        Assert.Contains(
+            events,
+            e => e is ToolResult r && r.Content.Contains("CustomerForm.pas:35:", StringComparison.Ordinal));
         Assert.Contains("status: draft", await File.ReadAllTextAsync(Path.Combine(root, _draft)));
-        Assert.DoesNotContain("BR-001", await File.ReadAllTextAsync(Path.Combine(root, "legacy", "Sales", "Pricing.pas")));
+        var pricing = await File.ReadAllTextAsync(Path.Combine(root, "legacy", "Sales", "Pricing.pas"));
+        Assert.DoesNotContain("BR-001", pricing);
     }
 
     [Fact]
@@ -109,7 +116,10 @@ public sealed class ScenarioTests : IDisposable
             null);
     }
 
-    private static async Task<List<AgentEvent>> RunAsync(string root, string scenario, CancellationToken cancellationToken)
+    private static async Task<List<AgentEvent>> RunAsync(
+        string root,
+        string scenario,
+        CancellationToken cancellationToken)
     {
         Environment.SetEnvironmentVariable(Program.ScenarioVariable, scenario);
         var events = new List<AgentEvent>();

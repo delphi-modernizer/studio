@@ -8,7 +8,7 @@ using DelphiModernizer.Engine.Kit;
 namespace DelphiModernizer.Studio.ClaudeStandIn;
 
 /// <summary>Answers <c>--version</c> and plays the scenario <c>STUDIO_CLAUDE_SCENARIO</c> names.</summary>
-/// <remarks>The scenarios and variables are in docs/design/ui-screenshots.md; the harness sets them on the app.</remarks>
+/// <remarks>docs/design/ui-screenshots.md lists the scenarios; the harness sets the variables on the app.</remarks>
 internal static class Program
 {
     public const string ScenarioVariable = "STUDIO_CLAUDE_SCENARIO";
@@ -31,7 +31,7 @@ internal static class Program
 
         if (sessionId is null || budget is null || recipe is null)
         {
-            Console.Error.WriteLine("The stand-in takes the arguments AgentRunner passes: -p /<skill> …, --session-id, …");
+            Console.Error.WriteLine("The stand-in takes AgentRunner's arguments: -p /<skill>, --session-id, …");
 
             return 2;
         }
