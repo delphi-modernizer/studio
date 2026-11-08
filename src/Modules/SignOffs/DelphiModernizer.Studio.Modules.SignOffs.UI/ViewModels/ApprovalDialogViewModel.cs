@@ -80,7 +80,6 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
 
     public string PrimaryText => IsRevoke ? "Revoke approval" : "Approve";
 
-    public string Fingerprint => $"Fingerprint of these files: {SignOff.Fingerprint}";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanConfirm))]

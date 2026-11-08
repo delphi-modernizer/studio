@@ -56,9 +56,38 @@ public static partial class RunTranscript
             .Select(m => m.Value)];
     }
 
+    /// <summary>A line of agent text without the evidence links it cites, which the Run page shows under it.</summary>
+    public static string Claim(string text)
+    {
+        string claim = _evidence.Value
+            .Replace(text, string.Empty)
+            .Replace("()", string.Empty, StringComparison.Ordinal);
+
+        return Spaces()
+            .Replace(claim, " ")
+            .Trim();
+    }
+
+    /// <summary>
+    /// The input an editing call shows: its file and an ellipsis, as <c>{"file_path":"docs/a.md", …}</c>; others whole.
+    /// </summary>
+    public static string ShortInput(ToolCall call)
+    {
+        var path = PathProperty().Match(call.Input);
+
+        return Edits(call) && path.Success && call.Input.Trim() != $"{{{path.Value}}}"
+            ? $"{{{path.Value}, …}}"
+            : call.Input;
+    }
+
     public static bool Edits(ToolCall call)
     {
-        return _editingTools.Contains(call.Name);
+        return IsEditing(call.Name);
+    }
+
+    public static bool IsEditing(string tool)
+    {
+        return _editingTools.Contains(tool);
     }
 
     /// <summary>
@@ -101,6 +130,9 @@ public static partial class RunTranscript
             ? null
             : relative.Replace('\\', '/');
     }
+
+    [GeneratedRegex(@"\s{2,}")]
+    private static partial Regex Spaces();
 
     [GeneratedRegex(@"\*{0,2}\[(?<label>Confirmed|Inferred|Assumption|Unknown)\]\*{0,2}")]
     private static partial Regex FactLabel();

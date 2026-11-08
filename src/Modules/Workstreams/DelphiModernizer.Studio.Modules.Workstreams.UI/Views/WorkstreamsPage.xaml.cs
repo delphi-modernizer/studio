@@ -44,6 +44,13 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
             return;
         }
 
+        if (!task.ClaudeReady)
+        {
+            OnSetUpClaude(sender, e);
+
+            return;
+        }
+
         var dialog = new RunRecipeDialog(
             task.Recipe, task.RoleName, null, ViewModel.DefaultBudget, ViewModel.NextGate).Over(XamlRoot);
 
