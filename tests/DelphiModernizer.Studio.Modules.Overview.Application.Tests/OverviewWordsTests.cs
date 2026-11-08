@@ -73,6 +73,32 @@ public sealed class OverviewWordsTests
     }
 
     [Fact]
+    public void The_delphi_code_node_counts_several_data_modules_and_cycles()
+    {
+        var words = OverviewWords.DelphiCode(Summary(files: 20, units: 9, forms: 5, dataModules: 2), cycles: 2);
+
+        Assert.Equal(
+            "Delphi code, Delphi 7: 20 files, 9 code modules, 3 screens and 2 data modules, 2 circular dependencies. "
+            + "Opens Inventory.",
+            words.AnnouncedName);
+    }
+
+    [Fact]
+    public void The_delphi_code_node_says_what_the_scan_could_not_name()
+    {
+        var summary = Summary(files: 2, units: 1, forms: 1, dataModules: 0) with { DelphiVersions = [] };
+
+        var words = OverviewWords.DelphiCode(summary, cycles: 0);
+
+        Assert.Equal(
+            ["Delphi version unknown", "1 code module", "1 screen, 0 data modules", "No circular dependencies"],
+            [words.Subtitle, words.First, words.Second, words.Third]);
+        Assert.StartsWith(
+            "Delphi code, Delphi version unknown: 2 files, 1 code module, 1 screen, ",
+            words.AnnouncedName);
+    }
+
+    [Fact]
     public void Before_a_scan_the_delphi_code_node_says_so()
     {
         var words = OverviewWords.DelphiCode(inventory: null, cycles: 0);
@@ -83,6 +109,27 @@ public sealed class OverviewWordsTests
     private static InventorySummary Summary(int files, int units, int forms, int dataModules)
     {
         return new InventorySummary(files, 3, units, forms, dataModules, 1, 205, 153, [], [], ["Delphi 7"], []);
+    }
+
+    [Fact]
+    public void A_role_with_no_deliverables_counts_none()
+    {
+        Assert.Equal("0 of 0 started", OverviewWords.Progress(progress: null, approved: false));
+        Assert.StartsWith(
+            "Legacy discovery team, 0 of 0 deliverables started.",
+            OverviewWords.TeamName(_discovery, progress: null, approved: false, running: false));
+    }
+
+    [Fact]
+    public void A_team_tool_tip_says_what_the_team_drafts()
+    {
+        Assert.Equal(
+            "Opens Legacy discovery in Workstreams. "
+            + "This team drafts the system inventory and the technical debt and risk assessment.",
+            OverviewWords.TeamToolTip(_discovery));
+        Assert.Equal(
+            "Opens Principal Architect in Workstreams. Combines the teams’ drafts.",
+            OverviewWords.TeamToolTip(_architect));
     }
 
     [Fact]

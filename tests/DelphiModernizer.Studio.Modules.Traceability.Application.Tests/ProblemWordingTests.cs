@@ -39,4 +39,12 @@ public sealed class ProblemWordingTests
             + "Broken evidence link, business rule BR-001. business-rules.md, line 12",
             name);
     }
+
+    [Fact]
+    public void A_problem_with_no_record_or_line_reads_its_label_and_file()
+    {
+        string name = ProblemWordings.Announced("Warning", "It is open.", "Open question", null, "questions.md", 0);
+
+        Assert.Equal("Warning: It is open. Open question. questions.md", name);
+    }
 }
