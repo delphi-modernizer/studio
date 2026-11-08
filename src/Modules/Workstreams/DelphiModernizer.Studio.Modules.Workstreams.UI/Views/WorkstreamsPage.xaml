@@ -342,6 +342,7 @@
                                                             TextWrapping="Wrap" />
                                                     </controls:WrapPanel>
                                                     <!--  Pill, then the reason with Open run inline, as drawn.  -->
+                                                    <!--  A no-break space keeps Open run whole; its name stays "Open run".  -->
                                                     <Grid
                                                         Margin="0,4,0,0"
                                                         ColumnSpacing="6"
@@ -359,7 +360,10 @@
                                                             TextWrapping="Wrap"
                                                             Visibility="{x:Bind CanOpenBlocker}">
                                                             <Run Text="{x:Bind BlockedReason}" />
-                                                            <Hyperlink Click="OnOpenBlockingRun" UnderlineStyle="None">
+                                                            <Hyperlink
+                                                                AutomationProperties.Name="Open run"
+                                                                Click="OnOpenBlockingRun"
+                                                                UnderlineStyle="None">
                                                                 <Run Text="Open&#160;run" />
                                                             </Hyperlink>
                                                         </TextBlock>
