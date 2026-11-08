@@ -527,7 +527,7 @@
                 Technology="{StaticResource TechnologyCardTemplate}" />
 
             <!--  Under 1100 a pair of data cards stacks, as the canvas draws them.  -->
-            <DataTemplate x:Key="DataCardPairNarrowTemplate" x:DataType="vm:DataCardPair">
+            <DataTemplate x:Key="DataPairNarrowTemplate" x:DataType="vm:DataCardPair">
                 <StackPanel Spacing="16">
                     <ContentControl
                         HorizontalContentAlignment="Stretch"
@@ -637,7 +637,7 @@
                         <Setter Target="SqlHeader.Visibility" Value="Collapsed" />
                         <Setter Target="SqlHeaderNarrow.Visibility" Value="Visible" />
                         <Setter Target="SqlList.ItemTemplate" Value="{StaticResource SqlRowNarrowTemplate}" />
-                        <Setter Target="DataCardsList.ItemTemplate" Value="{StaticResource DataCardPairNarrowTemplate}" />
+                        <Setter Target="DataList.ItemTemplate" Value="{StaticResource DataPairNarrowTemplate}" />
                     </VisualState.Setters>
                 </VisualState>
             </VisualStateGroup>
@@ -1272,9 +1272,9 @@
                             </Border>
                         </StackPanel>
 
-                        <!--  Data access, connections, libraries and external routines, two cards to a row; one under 1100.  -->
+                        <!--  Data, connections, libraries and external routines: two cards to a row, one under 1100.  -->
                         <ItemsRepeater
-                            x:Name="DataCardsList"
+                            x:Name="DataList"
                             ItemsSource="{x:Bind ViewModel.DataCards, Mode=OneWay}"
                             Visibility="{x:Bind ViewModel.IsData, Mode=OneWay}">
                             <ItemsRepeater.Layout>
