@@ -6,11 +6,12 @@ namespace DelphiModernizer.Studio.Screenshots;
 /// <summary>The canvas artboard each capture is paired with, and its label as the canvas names it.</summary>
 /// <remarks>
 /// Labels are the board titles in the canvas's project/canvas.json. A page's default state pairs with its light, dark,
-/// minimum-window and high-contrast boards; any other state with the one board that draws it.
+/// minimum-window and high-contrast boards, as does a state no artboard of its own draws; any other state pairs with
+/// the one board that draws it.
 /// </remarks>
 internal static class Boards
 {
-    /// <summary>Each page's default state and the stem of its first-row boards.</summary>
+    /// <summary>Each page's default state and the stem of its first-row boards, its main boards.</summary>
     private static readonly FrozenDictionary<string, (string State, string Stem)> _defaults =
         new Dictionary<string, (string, string)> {
             ["start"] = ("default", "Start"),
@@ -179,7 +180,7 @@ internal static class Boards
         ["WorkstreamsRunDialog"] = "Workstreams · Run an agent task (scope and budget)",
     }.ToFrozenDictionary();
 
-    /// <returns>The board's path in the canvas artifact and its label; nulls for a state no artboard draws.</returns>
+    /// <returns>The board's path in the canvas artifact and its label.</returns>
     public static (string? Board, string? Label) For(string page, string state, string theme, int width)
     {
         string? stem = null;
@@ -188,7 +189,7 @@ internal static class Boards
         {
             stem = board;
         }
-        else if (_defaults.TryGetValue(page, out var first) && first.State == state)
+        else if (_defaults.TryGetValue(page, out var first))
         {
             stem = First(first.Stem, theme, width);
         }

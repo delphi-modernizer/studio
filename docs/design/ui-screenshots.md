@@ -97,8 +97,9 @@ The window size is the size of its visible frame, title bar included, without th
 
 `<page>-<state>-<width>x<height>-<theme>.png`, for example `signoffs-blocked-960x576-dark.png`, at 1280 × 800 and
 960 × 576 in `light` and `dark`. `manifest.json` lists every PNG with its page, state and theme, the canvas board it
-pairs with (`project/<Board>.dc.html`) and that artboard's label as the canvas names it; a page's default state pairs
-with its light, dark, minimum-window and high-contrast boards. A state no artboard draws has `null` for both.
+pairs with (`project/<Board>.dc.html`) and that artboard's label as the canvas names it. A state with an artboard of its
+own pairs with that file at every size and theme; a page's default state, and a state no artboard draws (Inventory's
+Cycles and Diagnostics), pair with the page's main boards: light, dark, `Min`, `MinDark` and `HC`.
 
 | Group | Page | States |
 | --- | --- | --- |
