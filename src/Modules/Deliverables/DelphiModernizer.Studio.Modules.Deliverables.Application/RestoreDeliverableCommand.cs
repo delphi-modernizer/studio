@@ -31,7 +31,7 @@ internal sealed class RestoreDeliverableCommandHandler(IWorkspaceSession session
             return Result.Failure(new Error("Deliverables.NoTemplate", $"The kit has no template for {request.Id}."));
         }
 
-        var path = Path.Combine(workspace.Root, deliverable.File);
+        string path = Path.Combine(workspace.Root, deliverable.File);
 
         if (File.Exists(path))
         {

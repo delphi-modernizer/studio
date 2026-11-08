@@ -47,8 +47,8 @@ public static class ProblemWordings
         string file,
         int line)
     {
-        var about = subject is null ? label : $"{label}, {subject}";
-        var where = line > 0 ? $"{file}, line {line}" : file;
+        string about = subject is null ? label : $"{label}, {subject}";
+        string where = line > 0 ? $"{file}, line {line}" : file;
 
         return $"{severity}: {description} {about}. {where}";
     }

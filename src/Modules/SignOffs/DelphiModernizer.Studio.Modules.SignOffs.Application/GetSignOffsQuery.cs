@@ -113,11 +113,11 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session)
     {
         var checks = new List<SignOffCheck>();
         var engine = status.Checks.ToList();
-        var offset = 0;
+        int offset = 0;
 
         if (previous is not null)
         {
-            var passed = engine[0].Passed;
+            bool passed = engine[0].Passed;
             checks.Add(new SignOffCheck(
                 $"{SignOffNames.Of(previous.Gate)} approved",
                 passed ? "Approved" : $"It is {previous.State}",
@@ -131,8 +131,8 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session)
 
         if (required.Length > _listedDeliverables)
         {
-            var met = deliverableChecks.Count(c => c.Passed);
-            var word = StatusWord(required[0].MinStatus);
+            int met = deliverableChecks.Count(c => c.Passed);
+            string word = StatusWord(required[0].MinStatus);
             checks.Add(new SignOffCheck(
                 $"All {required.Length} deliverables {word}",
                 $"{met} of {required.Length} {word}",
@@ -152,11 +152,11 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session)
 
     private static SignOffCheck Deliverable(DeliverableRequirement requirement, bool passed, Context context)
     {
-        var title = KitBundle.Embedded.Spec.Deliverables.Deliverables
+        string title = KitBundle.Embedded.Spec.Deliverables.Deliverables
             .FirstOrDefault(d => d.Id == requirement.Id)?.Title ?? requirement.Id;
-        var name = $"{SignOffWordings.Deliverable(requirement.Id, title)} {StatusWord(requirement.MinStatus)}";
-        var actual = context.Statuses.GetValueOrDefault(requirement.Id, "missing");
-        var detail = passed ? Capitalized(StatusWord(actual)) : actual switch {
+        string name = $"{SignOffWordings.Deliverable(requirement.Id, title)} {StatusWord(requirement.MinStatus)}";
+        string actual = context.Statuses.GetValueOrDefault(requirement.Id, "missing");
+        string detail = passed ? Capitalized(StatusWord(actual)) : actual switch {
             "template" => "It is still the empty template",
             "draft" => "It is a draft",
             "missing" => "Its file is missing",
@@ -168,7 +168,7 @@ internal sealed class GetSignOffsQueryHandler(IWorkspaceSession session)
 
     private static SignOffCheck Condition(string condition, GateCheck check, Context context)
     {
-        var target = TargetStackNames.Of(context.Workspace.Manifest.TargetStack);
+        string target = TargetStackNames.Of(context.Workspace.Manifest.TargetStack);
 
         return condition switch {
             "legacy-attached" => new(

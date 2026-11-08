@@ -28,8 +28,8 @@ public sealed class StudioSettings : IStudioSettings
     public string? ToolDirectory
     {
         get {
-            var tools = Path.Combine(AppContext.BaseDirectory, "tools");
-            var dmz = OperatingSystem.IsWindows() ? "dmz.exe" : "dmz";
+            string tools = Path.Combine(AppContext.BaseDirectory, "tools");
+            string dmz = OperatingSystem.IsWindows() ? "dmz.exe" : "dmz";
 
             return File.Exists(Path.Combine(tools, dmz)) ? tools : null;
         }

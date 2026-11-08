@@ -78,7 +78,7 @@ internal sealed class StartRunCommandHandler(
             return Result.Failure<LiveRun>(leased.Error);
         }
 
-        var tracked = false;
+        bool tracked = false;
 
         // The leases come first, so a task another run blocks is refused without waiting for the CLI.
         try
@@ -90,7 +90,7 @@ internal sealed class StartRunCommandHandler(
                 return Result.Failure<LiveRun>(version.Error);
             }
 
-            var argument = string.IsNullOrWhiteSpace(request.Argument) ? null : request.Argument.Trim();
+            string? argument = string.IsNullOrWhiteSpace(request.Argument) ? null : request.Argument.Trim();
             var runner = new AgentRunner(executable.Value);
             var events = Leased(runner, run, workspace, recipe.Writes, CancellationToken.None);
             tracked = true;

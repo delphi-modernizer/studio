@@ -140,7 +140,7 @@ public sealed partial class SignOffsViewModel : WorkspacePageViewModel
         var rows = signOffs
             .Select(s => new SignOffRow(s, signOffs.Count))
             .ToList();
-        var open = _requested ?? (expanded.Count > 0 ? null : next?.Status.Gate);
+        string? open = _requested ?? (expanded.Count > 0 ? null : next?.Status.Gate);
         _requested = null;
 
         foreach (var row in rows)

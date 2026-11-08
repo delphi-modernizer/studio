@@ -26,7 +26,7 @@ public sealed class OverviewWordsTests
     {
         var progress = new WorkstreamProgress(_discovery, ["D02", "D06"], 2);
 
-        var name = OverviewWords.TeamName(_discovery, progress, approved: false, running: false);
+        string name = OverviewWords.TeamName(_discovery, progress, approved: false, running: false);
 
         Assert.Equal(
             "Legacy discovery team, 2 of 2 deliverables started. "
@@ -40,7 +40,7 @@ public sealed class OverviewWordsTests
     {
         var progress = new WorkstreamProgress(_architect, ["D01", "D16"], 1);
 
-        var name = OverviewWords.TeamName(_architect, progress, approved: false, running: false);
+        string name = OverviewWords.TeamName(_architect, progress, approved: false, running: false);
 
         Assert.Equal(
             "Principal Architect, 1 of 2 deliverables started. Combines the teams’ drafts. Opens Workstreams.",
@@ -90,7 +90,7 @@ public sealed class OverviewWordsTests
     {
         var progress = new WorkstreamProgress(_discovery, ["D02", "D06"], 2);
 
-        var name = OverviewWords.TeamName(_discovery, progress, approved: false, running: true);
+        string name = OverviewWords.TeamName(_discovery, progress, approved: false, running: true);
 
         Assert.StartsWith("Legacy discovery team, 2 of 2 deliverables started, agent running. Drafts ", name);
     }

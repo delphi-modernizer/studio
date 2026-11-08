@@ -174,19 +174,18 @@ public sealed class RunTests
         using var workspace = await TestWorkspace.CreateAsync();
         var fake = new FakeClaude(workspace.Parent, _init, "#sleep 5000");
         var (sender, monitor) = Build(workspace.Session, fake);
-        IRunsInProgress runs = monitor;
 
         var run = await sender.Send(
             new StartRunCommand("ws01-business-rules", "legacy/Sales", 1m),
             TestContext.Current.CancellationToken);
-        var running = runs.AgentsRunning(workspace.Workspace.Root);
-        var elsewhere = runs.AgentsRunning(workspace.Parent);
+        var running = monitor.AgentsRunning(workspace.Workspace.Root);
+        var elsewhere = monitor.AgentsRunning(workspace.Parent);
         run.Value.Stop();
         await run.Value.Ended;
 
         Assert.Equal("ws01-legacy-discovery", Assert.Single(running));
         Assert.Empty(elsewhere);
-        Assert.Empty(runs.AgentsRunning(workspace.Workspace.Root));
+        Assert.Empty(monitor.AgentsRunning(workspace.Workspace.Root));
     }
 
     [Fact]
@@ -233,12 +232,12 @@ public sealed class RunTests
     [Fact]
     public void A_tool_call_names_a_workspace_file_relative_to_its_root()
     {
-        var root = Path.Combine(Path.GetTempPath(), "ws");
-        var absolute = Path.Combine(root, "legacy", "Sales", "Pricing.pas");
-        var inside = System.Text.Json.JsonSerializer.Serialize(absolute);
+        string root = Path.Combine(Path.GetTempPath(), "ws");
+        string absolute = Path.Combine(root, "legacy", "Sales", "Pricing.pas");
+        string inside = System.Text.Json.JsonSerializer.Serialize(absolute);
         var read = new ToolCall("t-1", "Read", $$"""{"file_path":{{inside}}}""", false);
         var grep = new ToolCall("t-2", "Grep", """{"pattern":"CREDIT_LIMIT","path":"legacy/Sales"}""", false);
-        var temp = System.Text.Json.JsonSerializer.Serialize(Path.GetTempPath());
+        string temp = System.Text.Json.JsonSerializer.Serialize(Path.GetTempPath());
         var outside = new ToolCall("t-3", "Read", $$"""{"file_path":{{temp}}}""", false);
 
         Assert.Equal("legacy/Sales/Pricing.pas", RunTranscript.PathOf(read, root));

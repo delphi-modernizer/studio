@@ -16,7 +16,7 @@ internal sealed class GetClaudeStatusQueryHandler(IStudioSettings settings)
 
     public async Task<ClaudeStatus> Handle(GetClaudeStatusQuery request, CancellationToken cancellationToken)
     {
-        var configured = settings.Agents.ClaudePath;
+        string? configured = settings.Agents.ClaudePath;
         var located = ClaudeExecutable.Locate(configured);
 
         if (located.IsFailure)

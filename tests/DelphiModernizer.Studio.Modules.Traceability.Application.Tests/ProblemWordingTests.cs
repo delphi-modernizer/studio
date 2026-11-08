@@ -26,7 +26,7 @@ public sealed class ProblemWordingTests
     {
         var wording = ProblemWordings.Of("TR004");
 
-        var name = ProblemWordings.Announced(
+        string name = ProblemWordings.Announced(
             "Error",
             wording.Description,
             wording.Label,

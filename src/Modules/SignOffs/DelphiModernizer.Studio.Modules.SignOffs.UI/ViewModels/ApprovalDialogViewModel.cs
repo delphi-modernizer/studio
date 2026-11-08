@@ -28,7 +28,7 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
         ApproverDetail = approver?.Email is { } email
             ? $"{email} · from git config in this workspace"
             : "From git config in this workspace";
-        var announced = approver?.Email is { } address ? $"{approver.Name}, {address}" : ApproverName;
+        string announced = approver?.Email is { } address ? $"{approver.Name}, {address}" : ApproverName;
         AnnouncedApprover = $"{AsLabel} {announced}";
     }
 
@@ -119,7 +119,7 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
         }
 
         IsRecording = true;
-        var note = Note.Trim();
+        string note = Note.Trim();
         var recorded = IsRevoke
             ? await _sender.Send(new RevokeGateCommand(SignOff.Gate, note), cancellationToken)
             : await _sender.Send(new ApproveGateCommand(SignOff.Gate, note), cancellationToken);
@@ -147,7 +147,7 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
 
         var signOffs = await _sender.Send(new GetSignOffsQuery(), cancellationToken);
         var now = signOffs.IsSuccess ? signOffs.Value.FirstOrDefault(s => s.Status.Gate == SignOff.Gate) : null;
-        var reason = now is null ? "a check fails now" : SignOffRefusal.Reason(now);
+        string reason = now is null ? "a check fails now" : SignOffRefusal.Reason(now);
         Refusal = $"{SignOff.Name} can’t be approved yet: {reason}. "
             + "A check changed after this dialog opened. Your note is kept.";
         RefusalShowsProblems = now?.Checks.Any(c => c is { Passed: false, ShowsProblems: true }) == true;

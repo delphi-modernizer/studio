@@ -29,8 +29,8 @@ public sealed class OverviewTests
     public async Task An_open_question_reads_as_the_question_its_register_asks()
     {
         using var workspace = await TestWorkspace.CreateAsync();
-        var register = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter", "open-questions.md");
-        var row = "| Q-001 | Which regulations apply to invoices? | Tax rules shape the invoice module. "
+        string register = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter", "open-questions.md");
+        string row = "| Q-001 | Which regulations apply to invoices? | Tax rules shape the invoice module. "
             + "| Test Person | Open |  |\n";
         await File.AppendAllTextAsync(register, row, TestContext.Current.CancellationToken);
         var sender = Services.Sender(workspace.Session, services => services.AddOverviewApplication());

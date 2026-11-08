@@ -25,7 +25,7 @@ public sealed class TraceabilityTests
     public async Task An_open_question_reads_as_the_question_and_a_broken_reference_names_its_record()
     {
         using var workspace = await TestWorkspace.CreateAsync();
-        var charter = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter");
+        string charter = Path.Combine(workspace.Workspace.Root, "docs", "00-project-charter");
         var cancellationToken = TestContext.Current.CancellationToken;
         await File.AppendAllTextAsync(
             Path.Combine(charter, "open-questions.md"),

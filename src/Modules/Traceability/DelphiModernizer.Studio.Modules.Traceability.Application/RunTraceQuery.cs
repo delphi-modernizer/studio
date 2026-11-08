@@ -46,7 +46,7 @@ internal sealed class RunTraceQueryHandler(IWorkspaceSession session)
     {
         var spec = KitBundle.Embedded.Spec;
         var trace = new TraceChecker(spec).Check(workspace.Root, strict);
-        var heldUp = new GateEvaluator(workspace)
+        int heldUp = new GateEvaluator(workspace)
             .Evaluate()
             .Count(g => g.State != "approved"
                 && g.Checks.Any(c => !c.Passed && c.Name.StartsWith("trace", StringComparison.Ordinal)));
@@ -64,8 +64,8 @@ internal sealed class RunTraceQueryHandler(IWorkspaceSession session)
 
         if (issue.Rule == _openQuestion)
         {
-            var question = RegisterRows.Cell(workspace.Root, issue.Path, issue.Line, 0);
-            var description = question is { Length: > 0 }
+            string? question = RegisterRows.Cell(workspace.Root, issue.Path, issue.Line, 0);
+            string description = question is { Length: > 0 }
                 ? ProblemWordings.StillOpen + char.ToLowerInvariant(question[0]) + question[1..]
                 : wording.Description;
 
@@ -76,7 +76,7 @@ internal sealed class RunTraceQueryHandler(IWorkspaceSession session)
             ? null
             : KitBundle.Embedded.Spec.Ids.Kinds.FirstOrDefault(
                 k => issue.RecordId.StartsWith(k.Prefix + "-", StringComparison.Ordinal));
-        var subject = kind is null ? issue.RecordId : $"{kind.Name.ToLowerInvariant()} {issue.RecordId}";
+        string? subject = kind is null ? issue.RecordId : $"{kind.Name.ToLowerInvariant()} {issue.RecordId}";
 
         return new Problem(issue, wording, wording.Description, subject);
     }

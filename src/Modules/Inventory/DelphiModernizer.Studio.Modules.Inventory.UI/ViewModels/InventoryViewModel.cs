@@ -169,9 +169,9 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     public Task<bool> OpenAsync(string link)
     {
         ArgumentNullException.ThrowIfNull(link);
-        var hash = link.IndexOf("#L", StringComparison.Ordinal);
-        var path = hash < 0 ? link : link[..hash];
-        int? line = hash >= 0 && int.TryParse(link[(hash + 2)..], CultureInfo.InvariantCulture, out var number)
+        int hash = link.IndexOf("#L", StringComparison.Ordinal);
+        string path = hash < 0 ? link : link[..hash];
+        int? line = hash >= 0 && int.TryParse(link[(hash + 2)..], CultureInfo.InvariantCulture, out int number)
             ? number
             : null;
 
@@ -183,7 +183,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     public void SortBy(UnitSort column)
     {
         var current = Headers.First(h => h.IsSorted);
-        var descending = current.Column == column ? !current.Descending : column != UnitSort.Name;
+        bool descending = current.Column == column ? !current.Descending : column != UnitSort.Name;
         Headers = HeadersFor(column, descending);
         Units = FilteredUnits();
     }
@@ -213,7 +213,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         }
 
         var loaded = await _sender.Send(new GetInventoryQuery(), cancellationToken);
-        var notScanned = loaded.IsFailure && loaded.Error == InventoryErrors.NotScanned;
+        bool notScanned = loaded.IsFailure && loaded.Error == InventoryErrors.NotScanned;
         Problem = loaded.IsFailure && !notScanned ? loaded.Error.Message : null;
         Show(loaded.IsSuccess ? loaded.Value : null);
         IsLoaded = true;
@@ -263,13 +263,15 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         var cycleUnits = inventory.Dependencies.Cycles
             .SelectMany(c => c)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var secrets = inventory.Connections.Count(c => c.HasEmbeddedPassword);
-        var cycles = inventory.Dependencies.Cycles.Length;
+        int secrets = inventory.Connections.Count(c => c.HasEmbeddedPassword);
+        int cycles = inventory.Dependencies.Cycles.Length;
         var extensions = summary.FilesByExtension
             .OrderByDescending(e => e.Count)
             .Take(2)
             .Select(e => $"{Number(e.Count)} {e.Name}");
-        var unreadable = summary.BinaryForms > 0 ? $" · {Number(summary.BinaryForms)} can’t be read" : string.Empty;
+        string unreadable = summary.BinaryForms > 0
+            ? $" · {Number(summary.BinaryForms)} can’t be read"
+            : string.Empty;
 
         Stats = [
             new(
@@ -299,11 +301,11 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
                 $"{Count(secrets, "hard-coded credential")} · {Count(cycles, "cycle")}"),
         ];
         var version = inventory.Projects.FirstOrDefault(p => p.DelphiVersion is not null);
-        var encodings = string.Join(", ", summary.Encodings.Select(e => $"{e.Name} {Number(e.Count)}"));
-        var shortFingerprint = inventory.SourceFingerprint.Length > 19
+        string encodings = string.Join(", ", summary.Encodings.Select(e => $"{e.Name} {Number(e.Count)}"));
+        string shortFingerprint = inventory.SourceFingerprint.Length > 19
             ? inventory.SourceFingerprint[..19] + "…"
             : inventory.SourceFingerprint;
-        var versionNote = version is null
+        string versionNote = version is null
             ? "Delphi version not named"
             : $"{version.DelphiVersion}, from {System.IO.Path.GetFileName(version.Path)}";
         Facts = $"{versionNote}   ·   Encodings: {encodings}   ·   {shortFingerprint}";
@@ -418,8 +420,8 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
 
     private static UnitRow Folder(string folder, int count)
     {
-        var name = folder.Length == 0 ? "legacy/" : folder.Replace('\\', '/') + "/";
-        var modules = Count(count, "code module");
+        string name = folder.Length == 0 ? "legacy/" : folder.Replace('\\', '/') + "/";
+        string modules = Count(count, "code module");
 
         return new UnitRow(
             name,
@@ -473,7 +475,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
 
     private static string Owner(SqlStatement statement)
     {
-        var where = statement.Source == "form" ? "form" : "code";
+        string where = statement.Source == "form" ? "form" : "code";
 
         return statement.Owner is null ? $"In the {where}" : $"{statement.Owner}, in the {where}";
     }
@@ -485,7 +487,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
             .Select(pair => pair.Split('=', 2))
             .SelectMany(kv => kv.Length > 1 ? Settings(kv[0], kv[1]) : [new Setting(kv[0], string.Empty)])
             .ToList();
-        var meta = connection.Technology is null
+        string meta = connection.Technology is null
             ? connection.ClassName
             : $"{connection.ClassName} · {connection.Technology}";
 
@@ -501,7 +503,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     /// <remarks>A list's secret then reads alone, as "PASSWORD, redacted", never inside the list's text.</remarks>
     private static IEnumerable<Setting> Settings(string key, string value)
     {
-        var parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        string[] parts = value.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length == 0 || !parts.All(p => p.Contains('=', StringComparison.Ordinal)))
         {

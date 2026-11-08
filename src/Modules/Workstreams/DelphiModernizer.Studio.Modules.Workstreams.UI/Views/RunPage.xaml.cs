@@ -55,7 +55,7 @@ public sealed partial class RunPage : Page, IHasViewModel
     /// <summary>Open the draft is the accent action once the agent finished; otherwise a plain button.</summary>
     public static Style DraftStyle(RunOutcome outcome)
     {
-        var key = outcome == RunOutcome.Completed ? "AccentButtonStyle" : "DefaultButtonStyle";
+        string key = outcome == RunOutcome.Completed ? "AccentButtonStyle" : "DefaultButtonStyle";
 
         return (Style)Microsoft.UI.Xaml.Application.Current.Resources[key];
     }
@@ -77,7 +77,7 @@ public sealed partial class RunPage : Page, IHasViewModel
 
     private async void OnBudgetReached(object? sender, EventArgs e)
     {
-        var turns = ViewModel.Turns == "1" ? "1 turn" : $"{ViewModel.Turns} turns";
+        string turns = ViewModel.Turns == "1" ? "1 turn" : $"{ViewModel.Turns} turns";
         var dialog = new BudgetDialog(
             $"{ViewModel.Title} stopped at its {RunWords.Dollars(ViewModel.BudgetUsd)} budget after {turns}. "
                 + $"What it wrote so far is in the {ViewModel.Writing} as a Draft.",
@@ -109,7 +109,7 @@ public sealed partial class RunPage : Page, IHasViewModel
 
         while (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            var problem = await ViewModel.RunAgainAsync(dialog.Argument, dialog.BudgetUsd);
+            string? problem = await ViewModel.RunAgainAsync(dialog.Argument, dialog.BudgetUsd);
 
             if (problem is null)
             {

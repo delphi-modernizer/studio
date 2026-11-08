@@ -38,7 +38,7 @@ public sealed class FileLoggerProvider : ILoggerProvider
             try
             {
                 Directory.CreateDirectory(_directory);
-                var file = Path.Combine(_directory, $"studio-{DateTime.UtcNow:yyyyMMdd}.log");
+                string file = Path.Combine(_directory, $"studio-{DateTime.UtcNow:yyyyMMdd}.log");
                 File.AppendAllText(file, line + "\n");
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
@@ -75,8 +75,8 @@ public sealed class FileLoggerProvider : ILoggerProvider
                 return;
             }
 
-            var time = DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture);
-            var detail = exception is null ? string.Empty : $"\n{exception}";
+            string time = DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture);
+            string detail = exception is null ? string.Empty : $"\n{exception}";
             provider.Write($"{time} {logLevel} {category}: {formatter(state, exception)}{detail}");
         }
     }
