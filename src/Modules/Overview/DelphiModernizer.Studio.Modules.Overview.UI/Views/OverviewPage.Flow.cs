@@ -197,8 +197,9 @@ public sealed partial class OverviewPage
     }
 
     /// <remarks>
-    /// WinUI centres a tooltip under its target, 20 below it. The canvas draws a team's tooltip 236 wide, 12 in from the
-    /// card's left edge and 6 below it, so each card's tooltip is placed against an empty anchor drawn that way.
+    /// The canvas draws a team's tooltip 236 wide, 12 in from the card's left edge and 6 below it, so each card's
+    /// tooltip is placed against an empty anchor that wide and as tall as the card. Opened by the pointer, WinUI still
+    /// centres it on the pointer across.
     /// </remarks>
     private void PlaceTeams(Func<int, Rect> at)
     {
@@ -209,7 +210,7 @@ public sealed partial class OverviewPage
             var rect = at(i);
             Place(teams[i], rect.X, rect.Y, rect.Width, rect.Height);
 
-            var anchor = new Rectangle { Width = 236, Height = rect.Height - 14, IsHitTestVisible = false };
+            var anchor = new Rectangle { Width = 236, Height = rect.Height, IsHitTestVisible = false };
             Decorate(anchor, rect.X + 12, rect.Y);
             ToolTipService.SetPlacementTarget(teams[i], anchor);
         }
