@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -27,6 +28,11 @@ internal sealed class Manifest
     public void Write(string path)
     {
         var captures = new JsonArray([.. _captures]);
-        File.WriteAllText(path, captures.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+        // The labels hold "·" and "×"; the relaxed encoder writes them as they are, which is still valid JSON.
+        var options = new JsonSerializerOptions {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        };
+        File.WriteAllText(path, captures.ToJsonString(options));
     }
 }
