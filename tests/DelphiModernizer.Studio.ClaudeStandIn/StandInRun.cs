@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -29,10 +28,12 @@ internal sealed class StandInRun(
     /// <summary>The command the kit's .claude/settings.json gives the hook; Claude Code names it on refusal.</summary>
     private const string _hookCommand = "dmz guard pre-tool-use || exit 2";
 
+    /// <summary>The duration the result reports, a scripted run's length rather than the milliseconds it takes.</summary>
+    private const long _durationMs = 252_000;
+
     /// <summary>The harness stops a waiting run within minutes; a stand-in left behind ends on its own.</summary>
     private static readonly TimeSpan _longestWait = TimeSpan.FromMinutes(10);
 
-    private readonly Stopwatch _clock = Stopwatch.StartNew();
     private readonly JsonArray _denials = [];
     private int _turns;
     private int _toolIds;
@@ -228,7 +229,7 @@ internal sealed class StandInRun(
             ["is_error"] = isError,
             ["result"] = text,
             ["session_id"] = sessionId,
-            ["duration_ms"] = _clock.ElapsedMilliseconds,
+            ["duration_ms"] = _durationMs,
             ["num_turns"] = _turns,
             ["total_cost_usd"] = costUsd,
             ["permission_denials"] = _denials.DeepClone(),
