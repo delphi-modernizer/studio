@@ -3,7 +3,7 @@
   <!--
     Drives the built app through UI Automation and captures every page (docs/design/ui-screenshots.md). It is a
     console tool, not a test project, so dotnet test skips it; EnableWindowsTargeting lets Linux build it. Sonar
-    counts it as test code: only the screenshots job runs it, against the app, so it has no coverage to report.
+    counts it as test code: QA runs it, against the app, so it has no coverage to report.
   -->
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>

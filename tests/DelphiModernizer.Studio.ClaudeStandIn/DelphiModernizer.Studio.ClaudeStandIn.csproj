@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Stands in for the Claude Code CLI in the screenshots job (docs/design/ui-screenshots.md). The assembly is named
+    Stands in for the Claude Code CLI in the screenshot harness (docs/design/ui-screenshots.md). The assembly is named
     claude so that a Windows build is the claude.exe the engine accepts.
   -->
   <PropertyGroup>
