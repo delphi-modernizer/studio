@@ -341,7 +341,7 @@
                                                             Text="{x:Bind WritesLine}"
                                                             TextWrapping="Wrap" />
                                                     </controls:WrapPanel>
-                                                    <!--  Pill, then the reason with Open run inline and unbroken, as drawn.  -->
+                                                    <!--  Pill, then the reason with Open run inline, as drawn.  -->
                                                     <Grid
                                                         Margin="0,4,0,0"
                                                         ColumnSpacing="6"
