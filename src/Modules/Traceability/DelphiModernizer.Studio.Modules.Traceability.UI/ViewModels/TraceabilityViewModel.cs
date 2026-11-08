@@ -53,8 +53,9 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
 
     public bool HasLoadProblem => LoadProblem is not null;
 
+    /// <remarks>An <c>IList</c> because the page binds each of the four cards by index.</remarks>
     [ObservableProperty]
-    public partial IReadOnlyList<StatCard> Stats { get; set; } = [];
+    public partial IList<StatCard> Stats { get; set; } = [];
 
     [ObservableProperty]
     public partial IReadOnlyList<Choice<TraceView>> Views { get; set; } = [];
@@ -139,14 +140,22 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
         var trace = report.Trace;
         string time = checkedAt.LocalDateTime.ToString("t", CultureInfo.CurrentCulture);
         int questions = report.Problems.Count(p => p.Issue.Rule == "open-question");
-        _all = [.. report.Problems.Select(Row)];
+
+        // Errors first, as the design lists them; the kit's order stays within each severity.
+        _all = [.. report.Problems
+            .Select(Row)
+            .OrderBy(p => p.IsError ? 0 : 1)];
+        var errors = _all.FindAll(p => p.IsError);
+        string errorsDetail = Strict
+            ? ProblemWordings.StrictErrors(errors.Count, errors.Count(p => p.Promoted))
+            : ProblemWordings.ErrorsWhere([.. errors.Select(p => p.Path)], time);
         Stats = [
             new StatCard(
                 "Errors",
                 StudioIcons.Error,
                 Number(trace.Errors),
                 "errors",
-                Strict ? $"Warnings included · last check {time}" : $"Last check {time}",
+                errorsDetail,
                 trace.Errors == 0 ? StudioIcons.CheckPassed : StudioIcons.ErrorFilled,
                 trace.Errors == 0 ? StatTone.Success : StatTone.Critical),
             new StatCard(
@@ -162,7 +171,9 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
                 StudioIcons.SignOffs,
                 Number(report.HeldUp),
                 "held up",
-                "by problems in the documents",
+                report.HeldUp == 0
+                    ? "by problems in the documents"
+                    : "Discovery to Architecture need no errors; the final plan, no warnings either",
                 string.Empty,
                 StatTone.None),
             new StatCard(
@@ -174,11 +185,16 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
                 string.Empty,
                 StatTone.None),
         ];
-        Views = [new(TraceView.Issues, "Issues", _all.Count), new(TraceView.Matrix, "Matrix", trace.Matrix.Length)];
+        int warnings = _all.Count - errors.Count;
+        string issues = ProblemWordings.IssueCount(errors.Count, warnings);
+        Views = [
+            new(TraceView.Issues, "Issues", issues),
+            new(TraceView.Matrix, "Matrix", Number(trace.Matrix.Length)),
+        ];
         Severities = [
-            new(SeverityFilter.All, "All", _all.Count),
-            new(SeverityFilter.Errors, "Errors", _all.Count(p => p.IsError)),
-            new(SeverityFilter.Warnings, "Warnings", _all.Count(p => !p.IsError)),
+            new(SeverityFilter.All, "All", issues),
+            new(SeverityFilter.Errors, "Errors", Number(errors.Count)),
+            new(SeverityFilter.Warnings, "Warnings", Number(warnings)),
         ];
         Matrix = [.. trace.Matrix.Select(m => new MatrixRow(
             m.Id,
@@ -242,7 +258,16 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
             file,
             issue.Line);
 
-        return new ProblemRow(pill, problem.Description, rule, issue.Path, issue.Line, link, folder, announced);
+        return new ProblemRow(
+            pill,
+            problem.Description,
+            rule,
+            issue.Path,
+            issue.Line,
+            link,
+            folder,
+            announced,
+            promoted);
     }
 
     private static string Joined(IReadOnlyCollection<string> ids)

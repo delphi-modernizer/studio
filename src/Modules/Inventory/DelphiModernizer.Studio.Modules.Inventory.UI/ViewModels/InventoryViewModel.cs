@@ -49,6 +49,9 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     public partial LegacyInventory? Inventory { get; set; }
 
     [ObservableProperty]
+    public partial ScanFacts Facts { get; set; } = new(string.Empty, string.Empty, string.Empty, string.Empty);
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsNotScanned), nameof(CanScan))]
     public partial bool IsScanning { get; set; }
 
@@ -68,13 +71,11 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
 
     public bool CanScan => !IsScanning;
 
-    public string ScanLabel => Inventory is null ? "Scan legacy/" : "Scan again";
+    public string ScanLabel => Inventory is null ? "Scan" : "Rescan";
 
+    /// <remarks>An <c>IList</c> because the page binds each of the four cards by index.</remarks>
     [ObservableProperty]
-    public partial IReadOnlyList<InventoryStat> Stats { get; set; } = Blank();
-
-    [ObservableProperty]
-    public partial string Facts { get; set; } = string.Empty;
+    public partial IList<InventoryStat> Stats { get; set; } = Blank();
 
     [ObservableProperty]
     public partial IReadOnlyList<InventoryTabChoice> Tabs { get; set; } = [];
@@ -111,6 +112,10 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial IReadOnlyList<UnitRow> Units { get; set; } = [];
 
+    /// <summary>"10,001 code modules in 101 folders. Rows load as you scroll."</summary>
+    [ObservableProperty]
+    public partial string LargeNote { get; set; } = string.Empty;
+
     /// <summary>The sortable column headers in table order.</summary>
     /// <remarks>An <c>IList</c> because the header binds each by index.</remarks>
     [ObservableProperty]
@@ -126,38 +131,29 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
     [NotifyPropertyChangedFor(nameof(HasUnreadable))]
     public partial string? Unreadable { get; set; }
 
+    [ObservableProperty]
+    public partial string UnreadableTitle { get; set; } = string.Empty;
+
     public bool HasUnreadable => Unreadable is not null;
 
     [ObservableProperty]
     public partial IReadOnlyList<ControlRow> Controls { get; set; } = [];
 
+    /// <summary>The data cards two to a row: database access, connections, libraries, then external routines.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(TechnologyRows))]
-    public partial IReadOnlyList<TechnologyCard> Technologies { get; set; } = [];
-
-    public IReadOnlyList<TechnologyPair> TechnologyRows => [.. Technologies
-        .Chunk(2)
-        .Select(p => new TechnologyPair(p[0], p.Length > 1 ? p[1] : null))];
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ConnectionRows))]
-    public partial IReadOnlyList<ConnectionCard> Connections { get; set; } = [];
-
-    public IReadOnlyList<ConnectionPair> ConnectionRows => [.. Connections
-        .Chunk(2)
-        .Select(p => new ConnectionPair(p[0], p.Length > 1 ? p[1] : null))];
-
-    [ObservableProperty]
-    public partial IReadOnlyList<ExternalRow> Externals { get; set; } = [];
-
-    [ObservableProperty]
-    public partial string ComNote { get; set; } = string.Empty;
+    public partial IReadOnlyList<DataCardPair> DataCards { get; set; } = [];
 
     [ObservableProperty]
     public partial IReadOnlyList<SqlRow> Sql { get; set; } = [];
 
     [ObservableProperty]
     public partial IReadOnlyList<RiskRow> Risks { get; set; } = [];
+
+    [ObservableProperty]
+    public partial string SqlCount { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string RiskCount { get; set; } = string.Empty;
 
     [ObservableProperty]
     public partial IReadOnlyList<CycleRow> Cycles { get; set; } = [];
@@ -247,11 +243,11 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         Units = FilteredUnits();
     }
 
-    private void Show(LegacyInventory? inventory)
+    private void Show(InventoryScan? scan)
     {
-        Inventory = inventory;
+        Inventory = scan?.Inventory;
 
-        if (inventory is null)
+        if (scan is null)
         {
             Stats = Blank();
             Tabs = [];
@@ -259,7 +255,15 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
             return;
         }
 
+        var (inventory, scannedAt) = scan;
+
         var summary = inventory.Summary;
+        int programs = inventory.Units.Count(u => u.Kind == "program");
+        string withPrograms = programs switch {
+            0 => string.Empty,
+            1 => " · plus the main program",
+            _ => $" · plus {Number(programs)} programs",
+        };
         var cycleUnits = inventory.Dependencies.Cycles
             .SelectMany(c => c)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -285,7 +289,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
                 StudioIcons.DelphiCode,
                 Number(summary.Units),
                 "modules",
-                $"{Number(summary.CodeLines)} code lines of {Number(summary.Lines)}"),
+                $"{Number(summary.CodeLines)} code lines of {Number(summary.Lines)}{withPrograms}"),
             new(
                 "Screens",
                 StudioIcons.Screens,
@@ -308,7 +312,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         string versionNote = version is null
             ? "Delphi version not named"
             : $"{version.DelphiVersion}, from {System.IO.Path.GetFileName(version.Path)}";
-        Facts = $"{versionNote}   ·   Encodings: {encodings}   ·   {shortFingerprint}";
+        Facts = new ScanFacts(versionNote, $"Encodings: {encodings}", $"Scanned {Scanned(scannedAt)}", shortFingerprint);
 
         _units = [.. inventory.Units
             .OrderBy(u => u.Name, StringComparer.OrdinalIgnoreCase)
@@ -329,38 +333,58 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
                 InventoryWords.CodeModule(u, cycleUnits.Contains(u.Name))))];
         IsLarge = _units.Count > _groupAbove;
         Units = FilteredUnits();
-        UnitsNote = inventory.UnresolvedUnits.Length == 0
+        int folders = _units
+            .Select(u => System.IO.Path.GetDirectoryName(u.Path) ?? string.Empty)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Count();
+        LargeNote = $"{Count(_units.Count, "code module")} in {Count(folders, "folder")}. Rows load as you scroll.";
+        string missing = inventory.UnresolvedUnits.Length == 0
             ? "Code modules that are used but missing: none."
             : $"Code modules that are used but missing: {string.Join(", ", inventory.UnresolvedUnits)}.";
+        UnitsNote = string.Join(
+            " ",
+            inventory.Dependencies.Cycles
+                .Select(c => InventoryWords.Cycle(c))
+                .Append(missing));
 
+        var dataModules = inventory.Units
+            .SelectMany(u => u.Types)
+            .Where(t => t.Ancestors.Any(a => a.Equals("TDataModule", StringComparison.OrdinalIgnoreCase)))
+            .Select(t => t.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         Screens = [.. inventory.Forms.Select(f => new ScreenRow(
-            f.RootName ?? System.IO.Path.GetFileNameWithoutExtension(f.Path),
+            InventoryWords.Screen(f, dataModules),
             f.Path,
             f.IsBinary,
             f.Components.Length,
             f.Events.Length))];
         Unreadable = UnreadableNote(inventory.Forms);
+        UnreadableTitle = summary.BinaryForms == 1
+            ? "1 screen can’t be read."
+            : $"{Number(summary.BinaryForms)} screens can’t be read.";
         Controls = [.. inventory.Components.Select(c => new ControlRow(
             c.ClassName,
             c.Count,
             c.Vendor ?? "Not reported",
             c.Category))];
 
-        Technologies = [.. inventory.DatabaseAccess
-            .Concat(inventory.ThirdParty)
-            .Select(t => new TechnologyCard(
-                t.Name,
-                t.Category,
-                Count(t.Occurrences, "place"),
-                [.. t.Evidence.Select(e => new Place(Link(e.Path, e.Line), e.Detail))]))];
-        Connections = [.. inventory.Connections.Select(Connection)];
-        Externals = [.. inventory.ExternalRoutines.Select(e => new ExternalRow(
-            e.Routine,
-            e.Library,
-            Link(e.Path, e.Line)))];
-        ComNote = inventory.ComObjects.Length == 0
-            ? "COM objects: none found."
-            : $"COM objects: {string.Join(", ", inventory.ComObjects.Select(c => c.ProgId))}.";
+        var connections = inventory.Connections
+            .Select(Connection)
+            .ToList();
+        var externals = new ExternalsCard(
+            [.. inventory.ExternalRoutines.Select(e => new ExternalRow(e.Routine, e.Library, Link(e.Path, e.Line)))],
+            inventory.ComObjects.Length == 0
+                ? "COM objects: none found."
+                : $"COM objects: {string.Join(", ", inventory.ComObjects.Select(c => c.ProgId))}.");
+        object[] cards = [
+            .. inventory.DatabaseAccess.Select(Technology),
+            .. connections,
+            .. inventory.ThirdParty.Select(Technology),
+            externals,
+        ];
+        DataCards = [.. cards
+            .Chunk(2)
+            .Select(p => new DataCardPair(p[0], p.Length > 1 ? p[1] : null))];
 
         Sql = [.. inventory.Sql.Select(s => new SqlRow(
             Link(s.Path, s.Line),
@@ -368,14 +392,22 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
             s.Text,
             Owner(s),
             s.BuiltByConcatenation))];
-        Risks = [.. inventory.RiskMarkers.Select(r => new RiskRow(r.Kind, Link(r.Path, r.Line), r.Count, r.Detail))];
+        Risks = [.. inventory.RiskMarkers
+            .OrderBy(r => InventoryWords.RiskRank(r.Kind))
+            .ThenByDescending(r => r.Count)
+            .Select(r => new RiskRow(InventoryWords.RiskKind(r.Kind), Link(r.Path, r.Line), r.Count, r.Detail))];
+        SqlCount = Number(Sql.Count);
+        RiskCount = Number(Risks.Count);
         Cycles = [.. inventory.Dependencies.Cycles.Select(c => new CycleRow(string.Join(" ↔ ", c), [.. c]))];
         Diagnostics = [.. inventory.Diagnostics.Select(d => new DiagnosticRow(Link(d.Path, d.Line), d.Message))];
 
         Tabs = [
             new(InventoryTab.Units, "Code modules", inventory.Units.Length),
             new(InventoryTab.Screens, "Screens", inventory.Forms.Length),
-            new(InventoryTab.Data, "Data and libraries", Technologies.Count + Connections.Count),
+            new(
+                InventoryTab.Data,
+                "Data and libraries",
+                inventory.DatabaseAccess.Length + inventory.ThirdParty.Length + connections.Count),
             new(InventoryTab.Risks, "SQL and risks", Sql.Count + Risks.Count),
             new(InventoryTab.Cycles, "Cycles", cycles),
             new(InventoryTab.Diagnostics, "Diagnostics", Diagnostics.Count),
@@ -480,6 +512,25 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         return statement.Owner is null ? $"In the {where}" : $"{statement.Owner}, in the {where}";
     }
 
+    private static TechnologyCard Technology(TechnologyUse technology)
+    {
+        return new TechnologyCard(
+            technology.Name,
+            technology.Category,
+            technology.Category == "database" ? StudioIcons.Database : StudioIcons.Components,
+            Count(technology.Occurrences, "place"),
+            [.. technology.Evidence.Select(e => new Place(Link(e.Path, e.Line), e.Detail))]);
+    }
+
+    /// <summary>The scan's time, with its date when it was not today.</summary>
+    private static string Scanned(DateTimeOffset scannedAt)
+    {
+        var local = scannedAt.LocalDateTime;
+        string format = local.Date == DateTime.Today ? "t" : "g";
+
+        return local.ToString(format, CultureInfo.CurrentCulture);
+    }
+
     private static ConnectionCard Connection(DatabaseConnection connection)
     {
         var settings = connection.Details
@@ -520,7 +571,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         return line > 0 ? $"{path}#L{line}" : path;
     }
 
-    private static IReadOnlyList<InventoryStat> Blank()
+    private static List<InventoryStat> Blank()
     {
         return [
             new("Files", StudioIcons.Deliverables, "—", string.Empty, "Not scanned yet"),

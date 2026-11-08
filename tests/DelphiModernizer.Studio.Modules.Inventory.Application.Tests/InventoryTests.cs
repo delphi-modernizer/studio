@@ -19,8 +19,9 @@ public sealed class InventoryTests
 
         Assert.True(scanned.IsSuccess, scanned.Error.Message);
         Assert.True(File.Exists(Path.Combine(workspace.Workspace.LatestScanFolder, "inventory.md")));
-        Assert.Equal(scanned.Value.SourceFingerprint, read.Value.SourceFingerprint);
-        Assert.Equal(2, read.Value.Summary.Units);
+        Assert.Equal(scanned.Value.Inventory.SourceFingerprint, read.Value.Inventory.SourceFingerprint);
+        Assert.Equal(2, read.Value.Inventory.Summary.Units);
+        Assert.Equal(scanned.Value.ScannedAt, read.Value.ScannedAt);
     }
 
     [Fact]

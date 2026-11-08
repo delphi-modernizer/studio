@@ -42,12 +42,26 @@ public sealed partial class DeliverablesPage : Page, IHasViewModel
 
         foreach (var choice in ViewModel.Filters)
         {
-            var item = new SelectorBarItem { Text = choice.Text, Tag = choice.Filter };
+            var item = new SelectorBarItem { Child = Counted(choice.Label, choice.CountText), Tag = choice.Filter };
             AutomationProperties.SetName(item, choice.AnnouncedName);
             FilterBar.Items.Add(item);
         }
 
         FilterBar.SelectedItem = FilterBar.Items.FirstOrDefault(i => (DeliverableFilter)i.Tag == ViewModel.Filter);
+    }
+
+    /// <summary>A filter's label, then its count in smaller secondary text, as the design draws it.</summary>
+    private static StackPanel Counted(string label, string count)
+    {
+        var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        panel.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
+        panel.Children.Add(new TextBlock {
+            Text = count,
+            VerticalAlignment = VerticalAlignment.Center,
+            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["SecondaryCaptionTextStyle"],
+        });
+
+        return panel;
     }
 
     private void OnFilterChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)

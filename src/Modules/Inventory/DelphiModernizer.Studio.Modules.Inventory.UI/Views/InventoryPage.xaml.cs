@@ -51,12 +51,26 @@ public sealed partial class InventoryPage : Page, IHasViewModel
 
         foreach (var tab in ViewModel.Tabs)
         {
-            var item = new SelectorBarItem { Text = tab.Text, Tag = tab.Tab };
+            var item = new SelectorBarItem { Child = Counted(tab.Label, tab.CountText), Tag = tab.Tab };
             AutomationProperties.SetName(item, tab.AnnouncedName);
             TabBar.Items.Add(item);
         }
 
         TabBar.SelectedItem = TabBar.Items.FirstOrDefault(i => (InventoryTab)i.Tag == ViewModel.Tab);
+    }
+
+    /// <summary>A tab's label, then its count in smaller secondary text, as the design draws it.</summary>
+    private static StackPanel Counted(string label, string count)
+    {
+        var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        panel.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
+        panel.Children.Add(new TextBlock {
+            Text = count,
+            VerticalAlignment = VerticalAlignment.Center,
+            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["SecondaryCaptionTextStyle"],
+        });
+
+        return panel;
     }
 
     private void OnTabChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)

@@ -15,6 +15,8 @@ change.
 | Browse… for the workspace folder when the folder picked already holds files | A new folder named after the workspace inside it, shown in the box before Next | `NewWorkspaceViewModel.BrowseFolder` |
 | Short names for deliverables in sign-off checks: the canvas names D01 to D09 ("System inventory", "Technology evaluation"); D10 to D20 are new | "Data migration strategy", "Testing strategy" and the like, one place to change | `SignOffWordings` |
 | The refusal's words for a check other than problems in the documents: the canvas words only "1 problem in the documents" | The check's name with its detail, as "System inventory in review (it is a draft)", one place to change | `SignOffRefusal` |
+| Risk marker names and order: the canvas names twelve of the scanner's 25 codes ("Hard-coded credential" first, "Global state" last); the other thirteen are new | Names in the same style ("Process launch", "INI file"), placed by kind among the drawn ones, one place to change | `InventoryWords.RiskKind` |
+| The scan's time beside the scan details: the canvas draws "Scanned [time]" | The time `inventory.json` was written, with its date when not today | `InventoryViewModel.Scanned` |
 | Problem wording: the canvas words three trace rules (broken evidence, missing evidence, open question); the other eleven are new | Labels and sentences in the same style, one place to change | `ProblemWordings` |
 | Default window height | 760, as the brief says | `MainWindow.xaml` |
 | When does the pane collapse on its own? | Never; only from the title-bar toggle | `ShellPage` |

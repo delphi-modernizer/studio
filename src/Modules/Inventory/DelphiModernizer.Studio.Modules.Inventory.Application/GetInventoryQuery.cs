@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -10,23 +11,26 @@ using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
 namespace DelphiModernizer.Studio.Modules.Inventory.Application;
 
 /// <summary>Reads the open workspace's latest inventory without scanning again.</summary>
-public sealed record GetInventoryQuery : IRequest<Result<LegacyInventory>>;
+public sealed record GetInventoryQuery : IRequest<Result<InventoryScan>>;
+
+/// <summary>The latest inventory and when its file was written.</summary>
+public sealed record InventoryScan(LegacyInventory Inventory, DateTimeOffset ScannedAt);
 
 internal sealed class GetInventoryQueryHandler(IWorkspaceSession session)
-    : IRequestHandler<GetInventoryQuery, Result<LegacyInventory>>
+    : IRequestHandler<GetInventoryQuery, Result<InventoryScan>>
 {
-    public async Task<Result<LegacyInventory>> Handle(GetInventoryQuery request, CancellationToken cancellationToken)
+    public async Task<Result<InventoryScan>> Handle(GetInventoryQuery request, CancellationToken cancellationToken)
     {
         if (session.Current is not { } workspace)
         {
-            return Result.Failure<LegacyInventory>(WorkspaceRequired.Error);
+            return Result.Failure<InventoryScan>(WorkspaceRequired.Error);
         }
 
         string path = InventoryFiles.JsonPath(workspace);
 
         if (!File.Exists(path))
         {
-            return Result.Failure<LegacyInventory>(InventoryErrors.NotScanned);
+            return Result.Failure<InventoryScan>(InventoryErrors.NotScanned);
         }
 
         try
@@ -38,12 +42,12 @@ internal sealed class GetInventoryQueryHandler(IWorkspaceSession session)
                 cancellationToken);
 
             return inventory is null
-                ? Result.Failure<LegacyInventory>(InventoryErrors.Unreadable("the file is empty"))
-                : inventory;
+                ? Result.Failure<InventoryScan>(InventoryErrors.Unreadable("the file is empty"))
+                : new InventoryScan(inventory, InventoryFiles.WrittenAt(workspace));
         }
         catch (JsonException exception)
         {
-            return Result.Failure<LegacyInventory>(InventoryErrors.Unreadable(exception.Message));
+            return Result.Failure<InventoryScan>(InventoryErrors.Unreadable(exception.Message));
         }
     }
 }
