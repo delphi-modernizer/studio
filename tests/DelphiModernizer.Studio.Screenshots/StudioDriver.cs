@@ -150,9 +150,10 @@ internal sealed class StudioDriver : IDisposable
 
         if (Type(element) == ControlType.Text)
         {
-            Mouse.Click(element.BoundingRectangle.Center());
+            element = ButtonAround(element);
         }
-        else if (element.Properties.IsEnabled.ValueOrDefault)
+
+        if (element.Properties.IsEnabled.ValueOrDefault)
         {
             element.Patterns.Invoke.Pattern.Invoke();
         }
@@ -166,8 +167,8 @@ internal sealed class StudioDriver : IDisposable
 
     /// <summary>Clicks the button showing <paramref name="name"/> level with the text <paramref name="row"/>.</summary>
     /// <remarks>
-    /// UI Automation exposes neither the row's panel nor a name for a button with a glyph and text, so the button's
-    /// own text is found level with the row's title and clicked, as a person clicks it.
+    /// UI Automation exposes neither the row's panel nor a name for a button with a glyph and text, so the button is
+    /// the one around its own text, level with the row's title.
     /// </remarks>
     public void ClickBeside(string row, string name)
     {
@@ -177,7 +178,14 @@ internal sealed class StudioDriver : IDisposable
             .FirstOrDefault(e => e.BoundingRectangle.Top <= title.Bottom + 40
                 && e.BoundingRectangle.Bottom >= title.Top)
             ?? throw new InvalidOperationException($"No {name} beside {row}.");
-        Mouse.Click(label.BoundingRectangle.Center());
+        var button = Type(label) == ControlType.Text ? ButtonAround(label) : label;
+
+        if (!button.Properties.IsEnabled.ValueOrDefault)
+        {
+            throw new InvalidOperationException($"{name} beside {row} is disabled.");
+        }
+
+        button.Patterns.Invoke.Pattern.Invoke();
         Settle(2500);
     }
 
@@ -359,20 +367,10 @@ internal sealed class StudioDriver : IDisposable
         File.WriteAllLines(file + ".txt", elements);
     }
 
-    /// <summary>Clicks the title bar's pane toggle: the second button from the left, after Back.</summary>
-    /// <remarks>The toggle is a template part of the WinUI TitleBar, which names it for Narrator only.</remarks>
+    /// <summary>Invokes the title bar's pane toggle, the WinUI TitleBar's template part.</summary>
     public void TogglePane()
     {
-        var frame = Desktop.VisibleFrame(Handle);
-        var toggle = Descendants()
-            .Where(e => Type(e) == ControlType.Button)
-            .Select(e => (Element: e, Bounds: e.BoundingRectangle))
-            .Where(b => b.Bounds.Top < frame.Top + _titleBarHeight && b.Bounds.Left < frame.Left + _paneWidth)
-            .OrderBy(b => b.Bounds.Left)
-            .Skip(1)
-            .FirstOrDefault()
-            .Element ?? throw new InvalidOperationException("No pane toggle in the title bar.");
-        Mouse.Click(toggle.BoundingRectangle.Center());
+        Find(e => Id(e) == "PART_PaneToggleButton", "Toggle Navigation").Patterns.Invoke.Pattern.Invoke();
         Settle(2500);
     }
 
@@ -445,6 +443,18 @@ internal sealed class StudioDriver : IDisposable
     private static bool Starts(AutomationElement element, string text)
     {
         return NameOf(element).StartsWith(text, StringComparison.Ordinal);
+    }
+
+    /// <summary>The smallest button whose box holds the text: the button a glyph-and-text label belongs to.</summary>
+    private AutomationElement ButtonAround(AutomationElement text)
+    {
+        var centre = text.BoundingRectangle.Center();
+
+        return Descendants()
+            .Where(e => Type(e) == ControlType.Button && e.BoundingRectangle.Contains(centre))
+            .OrderBy(e => e.BoundingRectangle.Width * e.BoundingRectangle.Height)
+            .FirstOrDefault()
+            ?? throw new InvalidOperationException($"No button around {NameOf(text)}.");
     }
 
     /// <remarks>A plain property getter throws where the element lacks the property; these read it as empty.</remarks>
