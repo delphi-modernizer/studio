@@ -52,3 +52,5 @@
   screenshot with its canvas board, and the job fails when the app does not start or a state cannot be reached.
 - A stand-in Claude Code for CI that replays the engine's stream-json for completed, failed, stopped, budget-reached and
   starting runs, a guard refusal included.
+- CI builds the app it uploads and the one it captures on the engine 0.1.0 packages from GitHub Packages, and tests
+  against the engine's v0.1.0 tag.

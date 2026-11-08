@@ -30,7 +30,8 @@ jobs:
   dependencies:
     uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
 
-  # The engine is built from source at the commit engine.lock pins (docs/BUILDING.md).
+  # The engine release engine.lock names: the build job tests against its source, and the package and screenshots jobs
+  # take dmz and the sample from it (docs/BUILDING.md).
   engine:
     runs-on: ubuntu-latest
     outputs:
@@ -64,10 +65,14 @@ jobs:
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  # The app with dmz beside it and the Windows App SDK runtime inside, so the artifact runs on a clean PC.
+  # The app on the engine's packages, with dmz beside it and the Windows App SDK runtime inside, so the artifact runs
+  # on a clean PC.
   package:
     needs: [engine, build]
     runs-on: windows-latest
+    permissions:
+      contents: read
+      packages: read
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: "1"
       DOTNET_NOLOGO: "1"
@@ -88,10 +93,16 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
+      # GitHub Packages needs a token even for public packages, and each engine package grants this repository read.
+      # The credentials go to the user-level NuGet configuration, outside the checkout.
+      - name: Sign in to the engine's packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: dotnet nuget update source delphi-modernizer --username "$GITHUB_ACTOR" --password "$GITHUB_TOKEN"
       - name: Publish the studio
         run: >-
           dotnet publish src/App/DelphiModernizer.Studio.App
-          -c Release -r win-x64 -p:Platform=x64 --self-contained -o out/studio
+          -c Release -r win-x64 -p:Platform=x64 -p:EngineSource=Package --self-contained -o out/studio
       - name: Publish dmz beside it
         run: >-
           dotnet publish .engine/src/DelphiModernizer.Cli
@@ -111,6 +122,7 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
+      packages: read
     strategy:
       fail-fast: false
       matrix:
@@ -135,20 +147,26 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
+      # GitHub Packages needs a token even for public packages, and each engine package grants this repository read.
+      # The credentials go to the user-level NuGet configuration, outside the checkout.
+      - name: Sign in to the engine's packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: dotnet nuget update source delphi-modernizer --username "$GITHUB_ACTOR" --password "$GITHUB_TOKEN"
       - name: Publish the studio, dmz and the stand-in Claude Code
         run: |
           dotnet publish src/App/DelphiModernizer.Studio.App \
-            -c Release -r win-x64 -p:Platform=x64 --self-contained -o out/studio
+            -c Release -r win-x64 -p:Platform=x64 -p:EngineSource=Package --self-contained -o out/studio
           dotnet publish .engine/src/DelphiModernizer.Cli \
             -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/studio/tools
           dotnet publish tests/DelphiModernizer.Studio.ClaudeStandIn \
-            -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o out/claude
+            -c Release -r win-x64 -p:EngineSource=Package --self-contained -p:PublishSingleFile=true -o out/claude
       # The harness creates its throwaway workspaces with dmz, from the brief's sample and a generated large tree.
       - name: Capture every state
         env:
           GROUP: ${{ matrix.group }}
         run: >-
-          dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release --
+          dotnet run --project tests/DelphiModernizer.Studio.Screenshots -c Release -p:EngineSource=Package --
           --app out/studio/DelphiModernizer.Studio.exe
           --dmz out/studio/tools/dmz.exe
           --claude out/claude/claude.exe
