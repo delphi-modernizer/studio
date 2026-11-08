@@ -16,7 +16,6 @@
             BasedOn="{StaticResource DefaultRadioButtonStyle}"
             TargetType="RadioButton">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="Margin" Value="0,0,0,8" />
             <!--  The card's padding, 12 and 16; the template moves the content 6 down so the radio centres on its title.  -->
             <Setter Property="Padding" Value="16,6,16,12" />
             <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
@@ -255,7 +254,7 @@
 
     <Grid>
         <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
+            <VisualStateGroup x:Name="WidthStates" CurrentStateChanged="OnWidthStateChanged">
                 <VisualState x:Name="Wide">
                     <VisualState.StateTriggers>
                         <AdaptiveTrigger MinWindowWidth="1100" />
@@ -299,8 +298,10 @@
 
                     <!--  Not a tab stop: the step heading inside the card says where the person is.  -->
                     <ItemsRepeater
+                        x:Name="StepsRepeater"
                         VerticalAlignment="Top"
                         AutomationProperties.AccessibilityView="Raw"
+                        ElementPrepared="OnStepPrepared"
                         ItemsSource="{x:Bind ViewModel.Steps}">
                         <ItemsRepeater.Layout>
                             <UniformGridLayout
@@ -793,7 +794,11 @@
 
                             <!--  Step 5: what will be written, then Create.  -->
                             <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsStep5, Mode=OneWay}">
-                                <Grid ColumnSpacing="16" RowSpacing="8">
+                                <!--  The Wizard board leaves 32 between the step's title and its summary.  -->
+                                <Grid
+                                    Margin="0,16,0,0"
+                                    ColumnSpacing="16"
+                                    RowSpacing="8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
@@ -971,9 +976,11 @@
                                     Text="{x:Bind ViewModel.CreatedTitle, Mode=OneWay}"
                                     TextAlignment="Center"
                                     TextWrapping="Wrap" />
+                                <!--  Canvas .empty p: secondary text, at most 44 characters wide.  -->
                                 <TextBlock
-                                    MaxWidth="480"
+                                    MaxWidth="368"
                                     HorizontalAlignment="Center"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource BodyTextBlockStyle}"
                                     Text="{x:Bind ViewModel.CreatedText, Mode=OneWay}"
                                     TextAlignment="Center"

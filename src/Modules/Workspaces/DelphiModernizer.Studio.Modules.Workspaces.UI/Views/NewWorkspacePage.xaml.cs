@@ -91,6 +91,48 @@ public sealed partial class NewWorkspacePage : Page, IHasViewModel
         }
     }
 
+    private void OnStepPrepared(ItemsRepeater sender, ItemsRepeaterElementPreparedEventArgs args)
+    {
+        FitStep(args.Element);
+    }
+
+    private void OnWidthStateChanged(object sender, VisualStateChangedEventArgs e)
+    {
+        for (int i = 0; i < ViewModel.Steps.Count; i++)
+        {
+            if (StepsRepeater.TryGetElement(i) is { } step)
+            {
+                FitStep(step);
+            }
+        }
+    }
+
+    /// <summary>Sets a step row as the WizardMin board draws it under 1100: 4 around, its label at 12.</summary>
+    /// <remarks>A visual state cannot reach into the repeater's template, so the rows are set here.</remarks>
+    private void FitStep(UIElement element)
+    {
+        if (element is not Grid step)
+        {
+            return;
+        }
+
+        bool narrow = WidthStates.CurrentState?.Name == "Narrow";
+        var padding = narrow ? new Thickness(4) : new Thickness(8, 4, 8, 4);
+        step.Padding = padding;
+
+        foreach (var child in step.Children)
+        {
+            if (child is TextBlock label)
+            {
+                label.FontSize = narrow ? 12 : 14;
+            }
+            else if (child is Border { Child: null } backplate)
+            {
+                backplate.Margin = new Thickness(-padding.Left, -padding.Top, -padding.Right, -padding.Bottom);
+            }
+        }
+    }
+
     private void OnCreationStepChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is CreationStepRow { State: not null } row && e.PropertyName == nameof(CreationStepRow.State))

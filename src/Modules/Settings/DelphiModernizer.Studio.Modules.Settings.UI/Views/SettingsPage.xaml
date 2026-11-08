@@ -11,7 +11,7 @@
     Loaded="OnLoaded">
 
     <Page.Resources>
-        <!--  Settings cards (handoff part 2): 68 tall at least, glyph 20 with 16 to the text, control right.  -->
+        <!--  Settings cards (handoff part 2): 68 tall at least, glyph 20 with 16 to the text, control right, 4 apart.  -->
         <Style
             x:Key="SettingCardStyle"
             BasedOn="{StaticResource CardStyle}"
@@ -159,10 +159,11 @@
                                     IsClosable="False"
                                     IsOpen="{x:Bind ViewModel.IsMissing, Mode=OneWay}"
                                     Severity="Warning">
+                                    <!--  Word joiners (U+2060) after the link's slashes and hyphen keep it on one line.  -->
                                     <InfoBar.Message>
                                         The Claude Code CLI is not on PATH. Install it from
-                                        https://claude.com/claude-code, or browse to claude.exe. Everything except agent
-                                        runs works without it.
+                                        https:/&#x2060;/&#x2060;claude.com/&#x2060;claude-&#x2060;code, or browse to
+                                        claude.exe. Everything except agent runs works without it.
                                     </InfoBar.Message>
                                     <InfoBar.IconSource>
                                         <FontIconSource
@@ -180,7 +181,7 @@
                         AutomationProperties.HeadingLevel="Level2"
                         Style="{StaticResource GroupHeadingStyle}"
                         Text="Agent runs" />
-                    <StackPanel Spacing="8">
+                    <StackPanel Spacing="4">
                         <Border
                             AutomationProperties.Name="Model"
                             Style="{StaticResource SettingCardStyle}">
@@ -283,6 +284,7 @@
                                     <NumberBox
                                         Width="240"
                                         Padding="24,5,6,6"
+                                        controls:SpinButtons.IsCanvas="True"
                                         AutomationProperties.Name="Budget per run"
                                         LargeChange="1"
                                         Minimum="0.1"
@@ -312,7 +314,7 @@
                         AutomationProperties.HeadingLevel="Level2"
                         Style="{StaticResource GroupHeadingStyle}"
                         Text="Legacy source and appearance" />
-                    <StackPanel Spacing="8">
+                    <StackPanel Spacing="4">
                         <Border
                             AutomationProperties.Name="Default code page"
                             Style="{StaticResource SettingCardStyle}">

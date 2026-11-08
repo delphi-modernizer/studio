@@ -36,6 +36,7 @@
                     Grid.Column="1"
                     Margin="0,14"
                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                    LineHeight="20"
                     Style="{StaticResource MonoTextStyle}"
                     TextTrimming="None"
                     TextWrapping="Wrap" />

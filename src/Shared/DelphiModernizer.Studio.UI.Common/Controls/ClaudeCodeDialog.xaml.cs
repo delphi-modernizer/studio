@@ -29,12 +29,14 @@ public sealed partial class ClaudeCodeDialog : ContentDialog
         DialogMargins.Apply(this);
     }
 
-    /// <summary>Joins each slash of a link to what follows it, so a link wraps whole and never after "https://".</summary>
+    /// <summary>Joins each slash and hyphen of a link to what follows it, so a link wraps whole.</summary>
     /// <remarks>U+2060, the word joiner, is invisible; the engine's words are shown as written.</remarks>
     private static string KeepLinksWhole(string text)
     {
         return Links()
-            .Replace(text, link => link.Value.Replace("/", "/\u2060", StringComparison.Ordinal));
+            .Replace(text, link => link.Value
+                .Replace("/", "/\u2060", StringComparison.Ordinal)
+                .Replace("-", "-\u2060", StringComparison.Ordinal));
     }
 
     [GeneratedRegex(@"https?://\S+")]
