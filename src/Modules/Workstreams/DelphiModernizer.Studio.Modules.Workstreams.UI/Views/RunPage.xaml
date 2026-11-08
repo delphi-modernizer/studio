@@ -334,10 +334,13 @@
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             Style="{StaticResource BodyTextBlockStyle}"
                             TextWrapping="Wrap">
-                            <Run Text="{x:Bind ViewModel.SubtitleStart, Mode=OneWay}" /><Run
+                            <!--  XAML puts one space between these runs.  -->
+                            <Run Text="{x:Bind ViewModel.SubtitleStart, Mode=OneWay}" />
+                            <Run
                                 FontFamily="Cascadia Mono,Consolas"
                                 FontSize="13"
-                                Text="{x:Bind ViewModel.SubtitleCode, Mode=OneWay}" /><Run Text="{x:Bind ViewModel.SubtitleEnd, Mode=OneWay}" />
+                                Text="{x:Bind ViewModel.SubtitleCode, Mode=OneWay}" />
+                            <Run Text="{x:Bind ViewModel.SubtitleEnd, Mode=OneWay}" />
                         </TextBlock>
                     </StackPanel>
                     <StackPanel

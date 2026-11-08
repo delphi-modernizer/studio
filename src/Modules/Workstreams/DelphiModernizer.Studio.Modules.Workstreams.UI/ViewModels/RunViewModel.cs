@@ -363,18 +363,23 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         string? value = RunWords.ArgumentValue(recipe, argument);
         SubtitleCode = value ?? string.Empty;
 
+        // The page puts one space between the three parts, so a subtitle without a value is one part.
         if (recipe is null)
         {
             SubtitleStart = RoleName;
+            SubtitleEnd = string.Empty;
+        }
+        else if (value is null)
+        {
+            SubtitleStart = $"{RoleName} · {RunWords.ArgumentText(recipe, argument)} · writes the "
+                + $"{RunWords.Writes(recipe)} as a draft";
+            SubtitleEnd = string.Empty;
         }
         else
         {
-            SubtitleStart = value is null
-                ? $"{RoleName} · {RunWords.ArgumentText(recipe, argument)}"
-                : $"{RoleName} · {recipe.Argument.Name} ";
+            SubtitleStart = $"{RoleName} · {recipe.Argument.Name}";
+            SubtitleEnd = $"· writes the {RunWords.Writes(recipe)} as a draft";
         }
-
-        SubtitleEnd = recipe is null ? string.Empty : $" · writes the {RunWords.Writes(recipe)} as a draft";
         var deliverables = KitBundle.Embedded.Spec.Deliverables.Deliverables;
         Writes = recipe is null
             ? []
