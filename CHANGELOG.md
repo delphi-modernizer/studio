@@ -14,7 +14,8 @@
 - The New workspace wizard: name and folder, a read-only preview of the legacy source, the target platform, the
   essential context with Unknown as an answer, and creation step by step.
 - Overview's flow from the Delphi code through the teams and the Principal Architect to the sign-offs, with the next
-  step, open questions and recent agent runs.
+  step, open questions and recent agent runs; the teams and the sign-offs sit on tinted panels, and Overview names the
+  workspace while it loads.
 - Inventory by tab, Deliverables by sign-off, Traceability with its problems and matrix, the sign-offs' checks and
   approvals, and Settings.
 - Approve and revoke sign-offs from a dialog that shows your git identity, requires a note, never approves on Enter,
@@ -83,10 +84,13 @@
   inventory.
 - Traceability lists errors before warnings, says where the errors are and how strict mode splits them, shows its
   status glyphs in the page's theme, and sets file links in Cascadia Mono.
+- Inventory's Cycle, Text and Embedded password pills show the canvas's cycle, document and key glyphs, and the
+  sign-off and folder headings of Deliverables and Inventory keep the row divider above them.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
   notice no longer leaves a gap.
 - Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code
   (it then opens the Claude Code dialog), and reads a task's argument as "Scope, required: a unit, form…".
+- A starting run's pill reads Starting, and Workstreams and Run draw the design's 12 px busy ring.
 - Run's transcript starts with the session, divides its items, shows each fact label right after its claim and each
   evidence link only under it, an edit's input as its file, and a starting run's budget; the end card spreads its
   numbers over four columns and shows what the run spent.

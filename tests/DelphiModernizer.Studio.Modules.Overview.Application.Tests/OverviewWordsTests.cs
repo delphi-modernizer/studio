@@ -103,6 +103,9 @@ public sealed class OverviewWordsTests
     {
         var words = OverviewWords.DelphiCode(inventory: null, cycles: 0);
 
+        Assert.Equal(
+            [string.Empty, "Not scanned yet", "Scan it from Inventory", string.Empty],
+            [words.Subtitle, words.First, words.Second, words.Third]);
         Assert.Equal("Delphi code, not scanned yet. Opens Inventory.", words.AnnouncedName);
     }
 

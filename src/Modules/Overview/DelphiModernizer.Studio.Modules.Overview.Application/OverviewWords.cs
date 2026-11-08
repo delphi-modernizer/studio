@@ -63,6 +63,7 @@ public static class OverviewWords
         return $"Opens {role.Name} in Workstreams. {does}";
     }
 
+    /// <remarks>Before a scan the subtitle is empty: the version is not known yet, and the first fact says why.</remarks>
     /// <param name="inventory">The latest scan's summary, or null before the first scan.</param>
     /// <param name="cycles">How many circular dependencies the scan found.</param>
     public static DelphiCodeWords DelphiCode(InventorySummary? inventory, int cycles)
@@ -70,7 +71,7 @@ public static class OverviewWords
         if (inventory is null)
         {
             return new DelphiCodeWords(
-                "Not scanned yet",
+                string.Empty,
                 "Not scanned yet",
                 "Scan it from Inventory",
                 string.Empty,

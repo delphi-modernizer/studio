@@ -16,6 +16,7 @@ public sealed partial class OverviewPage
     private const double _pad = 24;
     private const double _nodeHeight = 52;
     private const double _groupPadding = 8;
+    private bool _wide;
 
     private void OnFlowSizeChanged(object sender, SizeChangedEventArgs e)
     {
@@ -25,13 +26,24 @@ public sealed partial class OverviewPage
         }
     }
 
+    /// <remarks>
+    /// The canvas draws a sign-off's name and pill 44 high in a 56 node, 8 from its top, and the next sign-off's second
+    /// pixel of border as an inset shadow; the padding keeps both where they are drawn, whatever the border.
+    /// </remarks>
     private void ShowNextGate()
     {
         var gates = new[] { Gate0, Gate1, Gate2, Gate3, Gate4 };
 
         for (int i = 0; i < gates.Length && i < ViewModel.Gates.Count; i++)
         {
-            gates[i].Style = (Style)Resources[ViewModel.Gates[i].IsNext ? "NextFlowNodeStyle" : "FlowNodeStyle"];
+            bool next = ViewModel.Gates[i].IsNext;
+            gates[i].Style = (Style)Resources[next ? "NextFlowNodeStyle" : "FlowNodeStyle"];
+            gates[i].Padding = (next, _wide) switch {
+                (true, true) => new Thickness(11, 6, 11, 2),
+                (true, false) => new Thickness(11, 6, 11, 6),
+                (false, true) => new Thickness(12, 7, 12, 3),
+                _ => new Thickness(12, 7, 12, 7),
+            };
         }
     }
 
@@ -40,6 +52,7 @@ public sealed partial class OverviewPage
         Decorations.Children.Clear();
         double available = width - (2 * _pad);
         bool wide = available >= 900;
+        _wide = wide;
         var teamTemplate = (DataTemplate)Resources[wide ? "TeamNodeTemplate" : "TeamNodeCompactTemplate"];
         var gateTemplate = (DataTemplate)Resources[wide ? "GateNodeTemplate" : "GateNodeOneLineTemplate"];
 
