@@ -250,11 +250,11 @@ internal static class Groups
             });
         });
 
-        // Opened from Start right after a launch, as the canvas draws it: Back is off before the click and after it.
-        // A Back that turns off as the brief state shows can still be drawn on when the screen is taken. The copy is
-        // the one scanned above, whose inventory makes the loading last.
+        // The copy scanned above, whose inventory makes the loading last.
         var scanned = new Launch([Large], Reuse: true);
 
+        // Opened from Start right after a launch, as the canvas draws it: Back is off before the click and after it.
+        // A Back that turns off as the brief state shows can still be drawn on when the screen is taken.
         foreach (var size in StudioDriver.Sizes)
         {
             h.Run(theme, scanned, app => h.Step(app, theme, $"overview loading {size.Width}", () => {
