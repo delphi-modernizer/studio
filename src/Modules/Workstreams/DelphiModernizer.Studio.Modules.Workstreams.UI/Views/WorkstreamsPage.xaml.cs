@@ -39,7 +39,7 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
     /// </summary>
     private async void OnRun(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: TaskRow task })
+        if (sender is not Button { Tag: TaskRow task })
         {
             return;
         }
@@ -64,7 +64,7 @@ public sealed partial class WorkstreamsPage : Page, IHasViewModel
 
     private void OnOpenBlockingRun(object sender, RoutedEventArgs e)
     {
-        if (sender is FrameworkElement { DataContext: TaskRow { Blocker: { } blocker } })
+        if (sender is FrameworkElement { Tag: TaskRow { Blocker: { } blocker } })
         {
             ViewModel.OpenRun(blocker.RunId);
         }
