@@ -85,8 +85,10 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
      afterwards.
    - Each size of the wizard has a launch of its own, so that each starts from Start with no workspace open, as the
      canvas draws it. Step 1 is captured before a folder is refused, since the page then moves focus to the folder.
-     Start's first run is a launch with no recent workspaces, so Back has nowhere to go; Overview's loading and focus
-     states open the workspace again from Start for the same reason.
+     Start's first run is a launch with no recent workspaces, so Back has nowhere to go; Overview's focus state opens
+     the workspace again from Start for the same reason. Overview's loading has a launch for each size and opens the
+     scanned large workspace from Start before Back is ever on: a Back that turns off as the brief state shows can
+     still be drawn on when the screen is taken.
    - Workstreams' history is drawn with a live run above a completed, a stopped, a budget-reached and a failed one.
      The launches that make those runs keep one copy of the sample, oldest run first, and the last captures the
      history while its run works.
@@ -95,16 +97,24 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    deliverable, a charter set back to a template). States that last only while something runs (loading, scanning,
    preview running, creating) are triggered once per size and captured as soon as they show; the large tree makes them
    last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
-   processor while scanning and preview running are captured, and a capture is kept only if the state still shows
-   once it is taken; a progress bar counts only partway, as the canvas draws it partly filled. Each size's scan
-   starts from no scan, so the button reads Scan. Overview's loading is captured the same way, once Back is off.
-   Creating is captured once the kit is copied, while the tree is, so that a step shows done, one working and the
-   rest waiting.
-   - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set in a box without
-     focusing it, and tabbing out moves focus without a key, since after keyboard input XAML draws a focus ring
-     wherever focus goes next. Only Overview's focus state presses Tab.
+   processor while scanning and preview running are captured, and a capture is kept only if the state still shows once
+   it is taken, asked again for half a second, since a walk can meet the page as it changes; a progress bar counts only
+   partway, as the canvas draws it partly filled, and once found its value is read on its own, since a walk of the
+   window is slow on one processor. Each size's scan starts from no scan, so the button reads Scan. Overview's loading
+   is captured the same way. Creating is captured once the kit is copied, while the tree is, so that a step shows done,
+   one working and the rest waiting.
+   - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set through UI
+     Automation, which focuses the box, and tabbing out moves focus without a key, since after keyboard input XAML
+     draws a focus ring wherever focus goes next. Only Overview's focus state presses Tab. The wizard's step 1 tabs
+     out of Folder, since the canvas draws no box focused, and step 4 is filled at 1280, where every row shows, so
+     that at 960 it is captured from the top.
    - The stand-in writes its standard-error note half a second after its last event, since the app reads the two
      streams apart and the canvas draws the note last.
+   - WinUI shows a page's scroll indicator for a moment after the page scrolls, resizes or meets the pointer, and the
+     canvas draws none, so a capture after any of these waits it out. States that last only while something runs
+     cannot wait, so one may still show it.
+   - The title bar part is taken once a page has opened from another, since the canvas draws it with Back on, and
+     Overview's running state opens the workspace again from Start, since the canvas draws it with Back off.
 5. It sizes the window with `SetWindowPos` before each capture and writes the PNGs and `manifest.json` to `--out`,
    with the app's log under `logs/` when it wrote one. The workflow uploads that folder as `screenshots-<group>`.
 
@@ -131,7 +141,7 @@ Cycles and Diagnostics), pair with the page's main boards: light, dark, `Min`, `
 | `start` | `workstreams` | `claude-update-dialog`: the dialog for a Claude Code that is too old |
 | `overview` | `overview` | `no-workspace`, `no-scan`, `default`, `hover`, `focus`, `scrolled` (960 × 576 only), `pane-compact`, `running`, `no-claude` |
 | `overview` | `shared` | `title-bar` (1280 × 48) and `nav-pane` (240 × 752), cut from a 1280 × 800 Overview |
-| `overview` | `signoffs` | `blocked` (Discovery expanded), `approve-dialog`, `no-identity` |
+| `overview` | `signoffs` | `blocked` (Project setup expanded), `approve-dialog`, `no-identity` |
 | `pages` | `inventory` | `no-workspace`, one per section (`code-modules`, `screens`, `data-and-libraries`, `sql-and-risks`, `cycles`, `diagnostics`), `not-scanned`, `large`, `scanning` |
 | `pages` | `traceability` | `issues`, `errors-only`, `strict`, `matrix`, `clean` |
 | `pages` | `deliverables` | `all`, `draft`, `missing`, `templates` |
