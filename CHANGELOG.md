@@ -56,3 +56,18 @@
   budget-reached and starting runs, a guard refusal included.
 - CI builds the app it uploads on the engine 0.1.0 packages from GitHub Packages, and tests against the engine's
   v0.1.0 tag.
+
+### Changed
+
+- Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
+  notice no longer leaves a gap.
+- Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code
+  (it then opens the Claude Code dialog), and reads a task's argument as "Scope, required: a unit, form…".
+- Run's transcript starts with the session, divides its items, shows each fact label right after its claim and each
+  evidence link only under it, an edit's input as its file, and a starting run's budget; the end card spreads its
+  numbers over four columns and shows what the run spent.
+- Run an agent task and the budget dialog show the budget as "$2.00" and Run with its play icon; the budget,
+  approve and revoke dialogs have no default button, so Enter never spends money or approves, and Cancel and Close are
+  drawn plain.
+- The approve dialog and Sign-offs show covered paths whole and the fingerprint wrapped with its label; Sign-offs'
+  checks are divided by hairlines.

@@ -46,11 +46,9 @@ public sealed partial class RunPage : Page, IHasViewModel
         return $"Open {name} in your editor";
     }
 
-    public static string WorkingText(bool isStarting, string roleName)
+    public static Visibility Not(bool value)
     {
-        return isStarting
-            ? $"Starting Claude Code… Loading the {roleName} agent, the guard that keeps it in docs/, and the budget."
-            : "Working…";
+        return value ? Visibility.Collapsed : Visibility.Visible;
     }
 
     /// <summary>Open the draft is the accent action once the agent finished; otherwise a plain button.</summary>
@@ -149,14 +147,6 @@ public sealed partial class RunPage : Page, IHasViewModel
         if (e.ClickedItem is ToolRow row)
         {
             ViewModel.Toggle(row);
-        }
-    }
-
-    private async void OnOpenWrite(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement { Tag: WriteRow row })
-        {
-            await ViewModel.OpenFileAsync(row.Path);
         }
     }
 

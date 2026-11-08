@@ -80,8 +80,6 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial string RoleName { get; set; } = string.Empty;
 
-    [ObservableProperty]
-    public partial string Subtitle { get; set; } = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Pill), nameof(IsLive), nameof(IsEnded), nameof(IsFailed), nameof(TimeLabel))]
@@ -119,8 +117,25 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
     public string TimeLabel => IsLive ? "Elapsed" : "Duration";
 
+    /// <summary>The transcript's first item, which the session's start fills in.</summary>
+    public SessionRow Session { get; } = new();
+
+    /// <summary>What the end card says the run spent: the amount alone, or "—" without a result.</summary>
     [ObservableProperty]
-    public partial string SessionLine { get; set; } = "Waiting for the session…";
+    public partial string Spent { get; set; } = "—";
+
+    [ObservableProperty]
+    public partial string SubtitleStart { get; set; } = string.Empty;
+
+    /// <summary>The argument's value, such as <c>legacy/Sales</c>, set in the code font; empty for none.</summary>
+    [ObservableProperty]
+    public partial string SubtitleCode { get; set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string SubtitleEnd { get; set; } = string.Empty;
+
+    public string StartingText => $"Loading the {RoleName} agent, the guard that keeps it in docs/, "
+        + $"and the {RunWords.Dollars(BudgetUsd)} budget.";
 
     [ObservableProperty]
     public partial string Denials { get; set; } = "0";
@@ -289,6 +304,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     private void Follow(LiveRun run)
     {
         _live = run;
+        Items.Add(Session);
         Describe(run.Recipe, run.Argument, run.BudgetUsd);
         Outcome = RunOutcome.Running;
         Cost = $"— of {RunWords.Dollars(run.BudgetUsd)}";
@@ -316,8 +332,9 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         var transcript = await _sender.Send(new GetRunTranscriptQuery(runId), CancellationToken.None);
         _record = record;
         IsStarting = false;
+        Items.Add(Session);
         Describe(record.Recipe, record.Argument, budgetUsd: 0);
-        SessionLine = $"Started {RunWords.Time(record.StartedAt)}";
+        Session.Text = $"Started {RunWords.Time(record.StartedAt)}";
         Problem = transcript.IsFailure ? transcript.Error.Message : null;
         IReadOnlyList<AgentEvent> events = transcript.IsSuccess ? transcript.Value : [];
 
@@ -329,6 +346,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         // The summary's numbers, as Workstreams lists them; a recorded run has no budget to measure the cost against.
         Outcome = record.Outcome;
         Cost = record.CostUsd is { } cost ? RunWords.Dollars(cost) : "—";
+        Spent = Cost;
         Turns = record.Turns?.ToString(CultureInfo.CurrentCulture) ?? "—";
         Time = record.FinishedAt is { } finished ? RunWords.Duration(finished - record.StartedAt) : "—";
     }
@@ -342,10 +360,26 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         _roleCode = role?.Code ?? string.Empty;
         RoleName = role?.Name ?? "Workstreams";
         Title = recipe?.Title ?? "Agent run";
-        Subtitle = recipe is null
-            ? RoleName
-            : $"{RoleName} · {RunWords.ArgumentText(recipe, argument)} · "
-                + $"writes the {RunWords.Writes(recipe)} as a draft";
+        string? value = RunWords.ArgumentValue(recipe, argument);
+        SubtitleCode = value ?? string.Empty;
+
+        // The page puts one space between the three parts, so a subtitle without a value is one part.
+        if (recipe is null)
+        {
+            SubtitleStart = RoleName;
+            SubtitleEnd = string.Empty;
+        }
+        else if (value is null)
+        {
+            SubtitleStart = $"{RoleName} · {RunWords.ArgumentText(recipe, argument)} · writes the "
+                + $"{RunWords.Writes(recipe)} as a draft";
+            SubtitleEnd = string.Empty;
+        }
+        else
+        {
+            SubtitleStart = $"{RoleName} · {recipe.Argument.Name}";
+            SubtitleEnd = $"· writes the {RunWords.Writes(recipe)} as a draft";
+        }
         var deliverables = KitBundle.Embedded.Spec.Deliverables.Deliverables;
         Writes = recipe is null
             ? []
@@ -354,6 +388,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 .OfType<Deliverable>()
                 .Select(d => new WriteRow(d.Title, d.File))];
         OnPropertyChanged(nameof(BackText));
+        OnPropertyChanged(nameof(StartingText));
     }
 
     private void OnEvent(object? sender, AgentEvent item)
@@ -370,7 +405,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 Model = session.Model ?? "—";
                 CliVersion = session.CliVersion ?? "—";
                 string started = RunWords.Time(_live?.StartedAt ?? _record?.StartedAt ?? DateTimeOffset.Now);
-                SessionLine = $"Started {started} · model {Model} · Claude Code {CliVersion}";
+                Session.Text = $"Started {started} · model {Model} · Claude Code {CliVersion}";
                 break;
             case AssistantText text:
                 var lines = RunTranscript.Lines(text.Text);
@@ -382,7 +417,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
                 break;
             case ToolCall call:
-                var row = new ToolRow(call.Id, call.Name, call.Input);
+                var row = new ToolRow(call.Id, call.Name, RunTranscript.ShortInput(call), RunTranscript.Edits(call));
                 string? path = _session.Current is { } workspace ? RunTranscript.PathOf(call, workspace.Root) : null;
                 _calls[call.Id] = (row, path, RunTranscript.Edits(call));
                 Items.Add(row);
@@ -422,7 +457,12 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 Files.Add(file);
             }
 
-            file.IsEdited |= call.Edits;
+            // Files touched lists what the run edited first, as drawn.
+            if (call.Edits && !file.IsEdited)
+            {
+                file.IsEdited = true;
+                Files.Move(Files.IndexOf(file), 0);
+            }
         }
     }
 
@@ -431,12 +471,17 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     {
         if (_calls.TryGetValue(refused.ToolCallId, out var call))
         {
-            var row = new RefusalRow(refused.Tool, call.Row.Input, refused.Target, refused.Reason);
+            var row = new RefusalRow(refused.Tool, call.Row.Input, refused.Target, refused.Reason, call.Edits);
             Items[Items.IndexOf(call.Row)] = row;
         }
         else
         {
-            Items.Add(new RefusalRow(refused.Tool, refused.Target ?? string.Empty, refused.Target, refused.Reason));
+            Items.Add(new RefusalRow(
+                refused.Tool,
+                refused.Target ?? string.Empty,
+                refused.Target,
+                refused.Reason,
+                RunTranscript.IsEditing(refused.Tool)));
         }
 
         Refusals++;
@@ -445,12 +490,14 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
     private void End(RunCompleted completed, bool live)
     {
+        ShowTime();
         _clock.Stop();
         IsStarting = false;
         Outcome = RunOutcomes.Of(completed.Outcome);
         Cost = completed.CostUsd is { } cost
             ? $"{RunWords.Dollars(cost)} of {RunWords.Dollars(BudgetUsd)}"
             : $"— of {RunWords.Dollars(BudgetUsd)}";
+        Spent = completed.CostUsd is { } amount ? RunWords.Dollars(amount) : "—";
         CostPercent = completed.CostUsd is { } spent && BudgetUsd > 0
             ? (double)Math.Min(1m, spent / BudgetUsd) * 100
             : 0;
