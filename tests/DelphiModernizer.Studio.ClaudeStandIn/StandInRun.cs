@@ -34,6 +34,8 @@ internal sealed class StandInRun(
     /// <summary>The harness stops a waiting run within minutes; a stand-in left behind ends on its own.</summary>
     private static readonly TimeSpan _longestWait = TimeSpan.FromMinutes(10);
 
+    private static readonly TimeSpan _beforeNote = TimeSpan.FromMilliseconds(500);
+
     private readonly JsonArray _denials = [];
     private int _turns;
     private int _toolIds;
@@ -119,6 +121,9 @@ internal sealed class StandInRun(
             .ReadLines(Path.Combine(workspaceRoot, deliverableFile))
             .First(l => l.StartsWith("status:", StringComparison.Ordinal));
         Edit(deliverableFile, status, "status: draft");
+
+        // The runner reads standard error apart from the events, so the note waits until they are read and comes last.
+        Thread.Sleep(_beforeNote);
         Console.Error.WriteLine("stand-in: the screenshot harness's Claude Code; no model was called.");
     }
 

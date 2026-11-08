@@ -16,6 +16,7 @@ using FlaUI.Core.Patterns;
 using FlaUI.Core.Tools;
 using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
+using CaptureImage = FlaUI.Core.Capturing.CaptureImage;
 using FlaUIApplication = FlaUI.Core.Application;
 using FlaUICapture = FlaUI.Core.Capturing.Capture;
 
@@ -87,16 +88,24 @@ internal sealed class StudioDriver : IDisposable
         {
             var frame = Resize(size);
             arrange?.Invoke();
-            Save(page, state, size, frame);
+            Save(page, state, size, FlaUICapture.Rectangle(frame));
         }
     }
 
     /// <summary>Captures a state that shows only while the app works, with the app held to one processor.</summary>
     /// <remarks>
     /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
+    /// The screen is kept only if the state still shows once it is taken; a progress bar counts once it has moved,
+    /// since the canvas draws one partly filled.
     /// </remarks>
-    /// <param name="trigger">Starts the work and waits until the state shows.</param>
-    public void CaptureWhileBusy(string page, string state, Action trigger, IReadOnlyList<Size>? sizes = null)
+    /// <param name="start">Starts the work.</param>
+    /// <param name="shows">The element that shows only while the app works.</param>
+    public void CaptureWhileBusy(
+        string page,
+        string state,
+        Action start,
+        Func<ConditionFactory, ConditionBase> shows,
+        IReadOnlyList<Size>? sizes = null)
     {
         var process = Process.GetProcessById(_app.ProcessId);
         nint every = process.ProcessorAffinity;
@@ -108,9 +117,20 @@ internal sealed class StudioDriver : IDisposable
 
             try
             {
-                TryTimes(3, trigger);
-                Settle(300);
-                Save(page, state, size, frame);
+                var shot = TryTimes(3, () => {
+                    start();
+
+                    if (!Retry.WhileFalse(() => IsBusy(shows), _findTimeout, _poll).Result)
+                    {
+                        throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
+                    }
+
+                    Settle(150);
+                    var image = FlaUICapture.Rectangle(frame);
+
+                    return IsBusy(shows) ? image : throw new TimeoutException($"{page} {state} ended as it was taken.");
+                });
+                Save(page, state, size, shot);
             }
             finally
             {
@@ -120,15 +140,13 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <remarks>A state that lasts a second or two can still end between two UI Automation queries.</remarks>
-    private static void TryTimes(int times, Action action)
+    private static T TryTimes<T>(int times, Func<T> action)
     {
         for (int attempt = 1; attempt < times; attempt++)
         {
             try
             {
-                action();
-
-                return;
+                return action();
             }
             catch (TimeoutException)
             {
@@ -136,7 +154,22 @@ internal sealed class StudioDriver : IDisposable
             }
         }
 
-        action();
+        return action();
+    }
+
+    private bool IsBusy(Func<ConditionFactory, ConditionBase> shows)
+    {
+        try
+        {
+            var element = _window.FindFirstDescendant(shows);
+
+            return element is not null
+                && (!element.Patterns.RangeValue.TryGetPattern(out var range) || range.Value.ValueOrDefault > 0);
+        }
+        catch (COMException)
+        {
+            return false;
+        }
     }
 
     /// <summary>Captures one part of the window at 1280 × 800: the title bar or the navigation pane.</summary>
@@ -146,7 +179,7 @@ internal sealed class StudioDriver : IDisposable
         var part = pane
             ? new Rectangle(frame.Left, frame.Top + _titleBarHeight, _paneWidth, frame.Height - _titleBarHeight)
             : new Rectangle(frame.Left, frame.Top, frame.Width, _titleBarHeight);
-        Save(page, state, part.Size, part);
+        Save(page, state, part.Size, FlaUICapture.Rectangle(part));
     }
 
     /// <summary>Sizes the window and moves the pointer off it, so nothing shows hovered.</summary>
@@ -162,7 +195,7 @@ internal sealed class StudioDriver : IDisposable
         }
 
         _window.SetForeground();
-        Desktop.MovePointer(new Point(frame.Right + 40, frame.Bottom + 40));
+        MovePointerOff();
         Settle(1200);
 
         return frame;
@@ -240,7 +273,8 @@ internal sealed class StudioDriver : IDisposable
     }
 
     /// <summary>Opens the list row whose name contains <paramref name="text"/>; UIA cannot raise ItemClick.</summary>
-    public void ClickItem(string listName, string text)
+    /// <param name="settle">0 when a brief state follows, such as the Overview loading after a workspace opens.</param>
+    public void ClickItem(string listName, string text, int settle = 4000)
     {
         var list = Find(e => Type(e) == ControlType.List && NameOf(e) == listName, listName);
         var row = Retry
@@ -252,7 +286,7 @@ internal sealed class StudioDriver : IDisposable
                 ignoreException: true)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
         ClickOn(row, text);
-        Settle(4000);
+        Settle(settle);
     }
 
     /// <summary>Selects the list, radio or SelectorBar item whose name starts with <paramref name="name"/>.</summary>
@@ -292,16 +326,22 @@ internal sealed class StudioDriver : IDisposable
         Settle(2500);
     }
 
-    /// <summary>Types into the text box with this name, then moves focus on as a person tabbing out would.</summary>
+    /// <summary>Types into the text box with this name, or into it and on, as a person tabbing out would.</summary>
     /// <remarks>
-    /// Focus moves without a key: after keyboard input XAML draws a focus ring wherever focus goes next, such as on
-    /// Browse… or a button the page focuses, which the canvas does not draw.
+    /// The text is set without focus, which the canvas never draws in a box; the studio's boxes take their value as
+    /// it changes. Tabbing out focuses the box and then the next control without a key: after keyboard input XAML
+    /// draws a focus ring wherever focus goes next, such as on Browse… or a button the page focuses.
     /// </remarks>
     /// <param name="settle">0 when a brief state follows, such as the preview that tabbing out starts.</param>
     public void Type(string name, string text, bool tabOut = false, int settle = 800)
     {
         var box = Find(e => Type(e) == ControlType.Edit && Matches(e, name), name);
-        box.Focus();
+
+        if (tabOut)
+        {
+            box.Focus();
+        }
+
         box.Patterns.Value.Pattern.SetValue(text);
 
         if (tabOut)
@@ -484,6 +524,7 @@ internal sealed class StudioDriver : IDisposable
     /// <remarks>
     /// A list's ScrollIntoView scrolls the list but not the page around it, and an element below the fold has an
     /// empty rectangle; focus scrolls every scroll viewer around it, and after pointer input it draws no focus ring.
+    /// The pointer leaves the window after the click, so a state captured right after it shows nothing hovered.
     /// </remarks>
     private void ClickOn(AutomationElement element, string what)
     {
@@ -501,6 +542,13 @@ internal sealed class StudioDriver : IDisposable
         }
 
         Desktop.Click(element.BoundingRectangle.Center());
+        MovePointerOff();
+    }
+
+    private void MovePointerOff()
+    {
+        var frame = Desktop.VisibleFrame(Handle);
+        Desktop.MovePointer(new Point(frame.Right + 40, frame.Bottom + 40));
     }
 
     private bool InWindow(AutomationElement element)
@@ -597,12 +645,10 @@ internal sealed class StudioDriver : IDisposable
         return element.Properties.ControlType.ValueOrDefault;
     }
 
-    private void Save(string page, string state, Size size, Rectangle area)
+    private void Save(string page, string state, Size size, CaptureImage image)
     {
         string file = Path.Combine(_output, $"{page}-{state}-{size.Width}x{size.Height}-{_theme}.png");
-        FlaUICapture
-            .Rectangle(area)
-            .ToFile(file);
+        image.ToFile(file);
         _manifest.Add(Path.GetFileName(file), page, state, _theme, size.Width);
         Console.WriteLine($"  {Path.GetFileName(file)}");
     }

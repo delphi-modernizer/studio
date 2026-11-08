@@ -34,21 +34,20 @@ internal static class Groups
     ];
 
     /// <summary>Start, New workspace and Settings.</summary>
-    /// <remarks>Settings is drawn with a workspace open and the wizard without one, which Create leaves open.</remarks>
+    /// <remarks>
+    /// First run is a launch of its own, so that Back has nowhere to go, as drawn. Settings is drawn with a workspace
+    /// open and the wizard without one.
+    /// </remarks>
     public static void Start(Harness h, string theme)
     {
+        h.Run(
+            theme,
+            new Launch([]),
+            app => h.Step(app, theme, "start first run", () => app.Capture("start", "first-run")));
+
         h.Run(theme, new Launch([Sample]), app => {
             h.Step(app, theme, "start", () => app.Capture("start", "default"));
-            h.Step(app, theme, "start first run", () => {
-                h.Data.WriteRecent([]);
-                app.Navigate("Settings");
-                app.Navigate("Start");
-                app.Capture("start", "first-run");
-                h.Data.WriteRecent([h.Opened[Sample]]);
-            });
             h.Step(app, theme, "settings", () => {
-                app.Navigate("Settings");
-                app.Navigate("Start");
                 app.ClickItem(_recent, h.Opened[Sample]);
                 app.Navigate("Settings", 5000);
                 app.Capture("settings", "found");
@@ -135,9 +134,10 @@ internal static class Groups
                 () => ApproveDialog(h, app, "Approve the Project setup sign-off?", "approve-dialog"));
 
             // A keyboard focus ring stays on whatever holds focus, so this comes after the Overview, title bar, pane and
-            // Sign-offs states, which the canvas draws without one.
+            // Sign-offs states, which the canvas draws without one. The workspace is opened again, so Back is off.
             h.Step(app, theme, "overview focus", () => {
-                app.Navigate("Overview");
+                app.Navigate("Start");
+                app.ClickItem(_recent, h.Opened[Sample]);
                 app.Capture("overview", "focus", () => {
                     app.ScrollTo("Team0", 0);
                     app.FocusWithKeyboard("Gate1");
@@ -219,21 +219,35 @@ internal static class Groups
                 app.Navigate("Inventory");
                 app.Capture("inventory", "not-scanned");
             });
+            // The canvas draws a first scan, so each size scans the large tree with no scan before it.
             h.Step(app, theme, "inventory large", () => {
+                string scans = Path.Combine(h.Opened[Large], ".modernizer", "scans");
                 app.Navigate("Start");
                 app.ClickItem(_recent, h.Opened[Large]);
-                app.Navigate("Inventory", 6000);
-                app.Capture("inventory", "large");
-                app.CaptureWhileBusy("inventory", "scanning", () => {
-                    app.WaitGone("Scanning legacy/…", _run);
-                    app.Invoke("Rescan", 0);
-                    app.WaitBriefly(c => c.ByName("Scanning legacy/…"), "Scanning legacy/…", _brief);
-                });
+                app.CaptureWhileBusy(
+                    "inventory",
+                    "scanning",
+                    () => {
+                        app.WaitGone("Scanning legacy/…", _run);
+
+                        if (Directory.Exists(scans))
+                        {
+                            Directory.Delete(scans, recursive: true);
+                        }
+
+                        app.Navigate("Overview");
+                        app.Navigate("Inventory", 4000);
+                        app.Invoke("Scan", 0);
+                    },
+                    c => c.ByName("Scanning legacy/…"));
                 app.WaitGone("Scanning legacy/…", _run);
+                app.Capture("inventory", "large");
             });
+
+            // Opened again from Start, as the canvas draws it: Back has nowhere to go.
             h.Step(app, theme, "overview loading", () => app.Capture("overview", "loading", () => {
-                app.Navigate("Inventory", 4000);
-                app.Navigate("Overview", 0);
+                app.Navigate("Start");
+                app.ClickItem(_recent, h.Opened[Large], settle: 0);
                 app.WaitBriefly(
                     c => c.ByName("Checking sign-offs, deliverables and traceability"),
                     "Overview's loading state",
@@ -358,16 +372,15 @@ internal static class Groups
         app.Type("Legacy source folder", h.Workspaces.Legacy, tabOut: true);
         app.WaitEnabled("Next", _run);
         app.Capture("newworkspace", "step2", sizes: at);
+        // A preview starts only when the folder changes, so a second try clears it first.
         app.CaptureWhileBusy(
             "newworkspace",
             "preview-running",
             () => {
+                app.Type("Legacy source folder", string.Empty, settle: 0);
                 app.Type("Legacy source folder", h.Workspaces.LargeLegacy, tabOut: true, settle: 0);
-                app.WaitBriefly(
-                    c => c.ByControlType(FlaUI.Core.Definitions.ControlType.ProgressBar),
-                    "The preview's progress bar",
-                    _brief);
             },
+            c => c.ByControlType(FlaUI.Core.Definitions.ControlType.ProgressBar),
             at);
         app.WaitEnabled("Next", _run);
         app.Invoke("Next");
@@ -375,12 +388,9 @@ internal static class Groups
         app.Select("C#/.NET");
         app.Capture("newworkspace", "step3", sizes: at);
         app.Invoke("Next");
-        // At 1280 × 800 every field shows, so focusing one scrolls nothing; focus ends on an Unknown box, unmarked.
-        app.Resize(StudioDriver.Wide);
-
         foreach (var (field, answer) in _context)
         {
-            app.Type(field, answer, tabOut: true);
+            app.Type(field, answer);
         }
 
         app.Toggle("Constraints unknown. Adds an open question.");
