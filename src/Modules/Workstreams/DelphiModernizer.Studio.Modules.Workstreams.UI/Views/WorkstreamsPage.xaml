@@ -341,7 +341,7 @@
                                                             Text="{x:Bind WritesLine}"
                                                             TextWrapping="Wrap" />
                                                     </controls:WrapPanel>
-                                                    <!--  The pill, then the reason with Open run inline, as drawn.  -->
+                                                    <!--  Pill, then the reason with Open run inline and unbroken, as drawn.  -->
                                                     <Grid
                                                         Margin="0,4,0,0"
                                                         ColumnSpacing="6"
@@ -360,7 +360,7 @@
                                                             Visibility="{x:Bind CanOpenBlocker}">
                                                             <Run Text="{x:Bind BlockedReason}" />
                                                             <Hyperlink Click="OnOpenBlockingRun" UnderlineStyle="None">
-                                                                <Run Text="Open run" />
+                                                                <Run Text="Open&#160;run" />
                                                             </Hyperlink>
                                                         </TextBlock>
                                                         <TextBlock
