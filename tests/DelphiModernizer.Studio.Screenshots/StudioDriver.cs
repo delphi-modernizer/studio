@@ -100,8 +100,9 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Captures a state that shows only while the app works, with the app held to one processor.</summary>
     /// <remarks>
     /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
-    /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway,
-    /// since the canvas draws one partly filled.
+    /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway, before
+    /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so the
+    /// screen waits a little after the state shows.
     /// </remarks>
     /// <param name="start">Starts the work.</param>
     /// <param name="shows">The element that shows only while the app works.</param>
@@ -125,17 +126,13 @@ internal sealed class StudioDriver : IDisposable
                 var shot = TryTimes(3, () => {
                     start();
 
-                    if (!Retry.WhileFalse(() => IsBusy(shows), _findTimeout, _poll).Result)
-                    {
-                        throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
-                    }
-
-                    Settle(150);
+                    var bars = Retry.WhileNull(() => Busy(shows), _findTimeout, _poll).Result
+                        ?? throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
+                    Settle(400);
                     var image = FlaUICapture.Rectangle(frame);
+                    bool still = bars.Count > 0 ? bars.Any(IsPartway) : StillShows(shows);
 
-                    return StillShows(shows)
-                        ? image
-                        : throw new TimeoutException($"{page} {state} ended as it was taken.");
+                    return still ? image : throw new TimeoutException($"{page} {state} ended as it was taken.");
                 });
                 Save(page, state, size, shot);
             }
@@ -164,7 +161,11 @@ internal sealed class StudioDriver : IDisposable
         return action();
     }
 
-    private bool IsBusy(Func<ConditionFactory, ConditionBase> shows)
+    /// <summary>What shows of a state that lasts only while the app works.</summary>
+    /// <returns>
+    /// Null while the state does not show; the bars that show partway, or none when the state is not a bar.
+    /// </returns>
+    private List<IRangeValuePattern>? Busy(Func<ConditionFactory, ConditionBase> shows)
     {
         try
         {
@@ -172,7 +173,7 @@ internal sealed class StudioDriver : IDisposable
 
             if (found.Any(e => Type(e) != ControlType.ProgressBar))
             {
-                return true;
+                return [];
             }
 
             // A bar keeps the last work's value while it is indeterminate again, so it counts only partway, as the
@@ -182,11 +183,11 @@ internal sealed class StudioDriver : IDisposable
                 .OfType<IRangeValuePattern>()
                 .ToList();
 
-            return bars.Count > 0 && GoesPartway(bars);
+            return bars.Count > 0 && GoesPartway(bars) ? bars : null;
         }
         catch (COMException)
         {
-            return false;
+            return null;
         }
     }
 
