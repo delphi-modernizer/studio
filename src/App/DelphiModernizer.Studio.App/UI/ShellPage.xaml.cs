@@ -55,7 +55,14 @@ public sealed partial class ShellPage : Page
         AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
         AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
         NavView.Loaded += (_, _) => MakePaneOneTabStop();
-        AppTitleBar.Loaded += (_, _) => DrawPaneToggleGlyph();
+        EventHandler<object>? drawToggle = null;
+        drawToggle = (_, _) => {
+            if (DrawPaneToggleGlyph())
+            {
+                AppTitleBar.LayoutUpdated -= drawToggle;
+            }
+        };
+        AppTitleBar.LayoutUpdated += drawToggle;
     }
 
     public ShellViewModel ViewModel { get; }
@@ -276,14 +283,21 @@ public sealed partial class ShellPage : Page
     }
 
     /// <summary>Draws the pane toggle's glyph from Studio Icons, 12 wide as the TitleBar board has it.</summary>
-    /// <remarks>WinUI's toggle draws Segoe Fluent's 16 wide glyph and exposes no property for it.</remarks>
-    private void DrawPaneToggleGlyph()
+    /// <remarks>
+    /// WinUI's toggle draws Segoe Fluent's 16 wide glyph and exposes no property for it. The template loads the toggle
+    /// lazily, after the title bar's Loaded, so the constructor calls this on each layout until it has drawn it.
+    /// </remarks>
+    /// <returns>Whether the toggle was there to draw.</returns>
+    private bool DrawPaneToggleGlyph()
     {
-        if (Descendant(AppTitleBar, "PART_PaneToggleButton") is Button toggle)
+        if (Descendant(AppTitleBar, "PART_PaneToggleButton") is not Button toggle)
         {
-            toggle.FontFamily = (FontFamily)Microsoft.UI.Xaml.Application.Current.Resources["StudioIconsFontFamily"];
-            toggle.Content = StudioIcons.Navigation;
+            return false;
         }
+
+        toggle.FontFamily = (FontFamily)Microsoft.UI.Xaml.Application.Current.Resources["StudioIconsFontFamily"];
+        toggle.Content = StudioIcons.Navigation;
+        return true;
     }
 
     private static FrameworkElement? Descendant(DependencyObject root, string name)
