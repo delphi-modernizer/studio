@@ -95,7 +95,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Captures a state that shows only while the app works, with the app held to one processor.</summary>
     /// <remarks>
     /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
-    /// The screen is kept only if the state still shows once it is taken; a progress bar counts once it has moved,
+    /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway,
     /// since the canvas draws one partly filled.
     /// </remarks>
     /// <param name="start">Starts the work.</param>
@@ -161,12 +161,14 @@ internal sealed class StudioDriver : IDisposable
     {
         try
         {
-            // A ring and an indeterminate bar, drawn while the total is still counted, offer no value; any match counts
-            // once one has a value.
+            // A ring offers no value, and a bar keeps the last work's value while it is indeterminate again, so a bar
+            // counts only partway, as the canvas draws it.
             return _window
                 .FindAllDescendants(shows)
                 .Any(e => Type(e) != ControlType.ProgressBar
-                    || (e.Patterns.RangeValue.TryGetPattern(out var range) && range.Value.ValueOrDefault > 0));
+                    || (e.Patterns.RangeValue.TryGetPattern(out var range)
+                        && range.Value.ValueOrDefault > 0
+                        && range.Value.ValueOrDefault < range.Maximum.ValueOrDefault));
         }
         catch (COMException)
         {

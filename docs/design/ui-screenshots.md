@@ -96,7 +96,7 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    preview running, creating) are triggered once per size and captured as soon as they show; the large tree makes them
    last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
    processor while scanning and preview running are captured, and a capture is kept only if the state still shows
-   once it is taken; a progress bar counts once it has moved, as the canvas draws it partly filled. Each size's scan
+   once it is taken; a progress bar counts only partway, as the canvas draws it partly filled. Each size's scan
    starts from no scan, so the button reads Scan. Overview's loading is captured the same way, once Back is off.
    Creating is captured once the kit is copied, while the tree is, so that a step shows done, one working and the
    rest waiting.
