@@ -51,7 +51,7 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <controls:FullWidthStackPanel
+            <StackPanel
                 x:Name="PageContent"
                 MaxWidth="1000"
                 HorizontalAlignment="Left"
@@ -431,7 +431,7 @@
                         </Grid>
                     </Border>
                 </StackPanel>
-            </controls:FullWidthStackPanel>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </Page>

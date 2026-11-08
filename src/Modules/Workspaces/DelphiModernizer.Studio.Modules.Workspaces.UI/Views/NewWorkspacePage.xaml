@@ -63,7 +63,7 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer x:Name="PageScroller">
-            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+            <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                 <controls:PageHeader
                     Purpose="Five steps. Nothing is written to disk until you choose Create."
                     Title="New workspace" />
@@ -428,34 +428,34 @@
                                         <AutomationProperties.Name>
                                             C#/.NET. Writes DEC-001 to the decision log with you as the decider.
                                         </AutomationProperties.Name>
-                                        <controls:FullWidthStackPanel Spacing="2">
+                                        <StackPanel Spacing="2">
                                             <TextBlock
                                                 Style="{StaticResource BodyStrongTextBlockStyle}"
                                                 Text="C#/.NET" />
                                             <TextBlock
                                                 Style="{StaticResource SecondaryCaptionTextStyle}"
                                                 Text="Recorded in the decision log, with you as the decider." />
-                                        </controls:FullWidthStackPanel>
+                                        </StackPanel>
                                     </RadioButton>
                                     <RadioButton Style="{StaticResource ChoiceStyle}">
                                         <AutomationProperties.Name>
                                             Java/JVM. Writes DEC-001 to the decision log with you as the decider.
                                         </AutomationProperties.Name>
-                                        <controls:FullWidthStackPanel Spacing="2">
+                                        <StackPanel Spacing="2">
                                             <TextBlock
                                                 Style="{StaticResource BodyStrongTextBlockStyle}"
                                                 Text="Java/JVM" />
                                             <TextBlock
                                                 Style="{StaticResource SecondaryCaptionTextStyle}"
                                                 Text="Recorded in the decision log, with you as the decider." />
-                                        </controls:FullWidthStackPanel>
+                                        </StackPanel>
                                     </RadioButton>
                                     <RadioButton Style="{StaticResource ChoiceStyle}">
                                         <AutomationProperties.Name>
                                             Decide after discovery. Adds an open question; the Architecture sign-off
                                             stays blocked until someone decides.
                                         </AutomationProperties.Name>
-                                        <controls:FullWidthStackPanel Spacing="2">
+                                        <StackPanel Spacing="2">
                                             <TextBlock
                                                 Style="{StaticResource BodyStrongTextBlockStyle}"
                                                 Text="Decide after discovery" />
@@ -463,7 +463,7 @@
                                                 Adds an open question. The Architecture sign-off stays blocked until
                                                 someone decides.
                                             </TextBlock>
-                                        </controls:FullWidthStackPanel>
+                                        </StackPanel>
                                     </RadioButton>
                                 </RadioButtons>
                                 <StackPanel MaxWidth="420" HorizontalAlignment="Left" Spacing="4">
@@ -766,7 +766,7 @@
                         </StackPanel>
                     </Border>
                 </Grid>
-            </controls:FullWidthStackPanel>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </Page>

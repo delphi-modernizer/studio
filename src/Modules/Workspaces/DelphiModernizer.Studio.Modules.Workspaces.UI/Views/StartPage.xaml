@@ -48,7 +48,7 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+            <StackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                 <controls:PageHeader
                     Purpose="Reopen a workspace, or start one from a Delphi source tree."
                     Title="Start" />
@@ -396,7 +396,7 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-            </controls:FullWidthStackPanel>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </Page>
