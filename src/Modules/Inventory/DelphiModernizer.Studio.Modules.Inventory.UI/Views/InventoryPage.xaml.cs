@@ -68,7 +68,11 @@ public sealed partial class InventoryPage : Page, IHasViewModel
     /// <summary>A tab's label, then its count in smaller secondary text, as the design draws it.</summary>
     private static StackPanel Counted(string label, string count)
     {
-        var panel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+        var panel = new StackPanel {
+            Orientation = Orientation.Horizontal,
+            Spacing = 8,
+            Margin = new Thickness(12, 0, 12, 0),
+        };
         panel.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
         panel.Children.Add(new TextBlock {
             Text = count,
