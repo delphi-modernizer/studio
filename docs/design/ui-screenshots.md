@@ -139,7 +139,7 @@ Cycles and Diagnostics), pair with the page's main boards: light, dark, `Min`, `
 | `start` | `workstreams` | `claude-update-dialog`: the dialog for a Claude Code that is too old |
 | `overview` | `overview` | `no-workspace`, `no-scan`, `default`, `hover`, `focus`, `scrolled` (960 × 576 only), `pane-compact`, `running`, `no-claude` |
 | `overview` | `shared` | `title-bar` (1280 × 48) and `nav-pane` (240 × 752), cut from a 1280 × 800 Overview |
-| `overview` | `signoffs` | `blocked` (Discovery expanded), `approve-dialog`, `no-identity` |
+| `overview` | `signoffs` | `blocked` (Project setup expanded), `approve-dialog`, `no-identity` |
 | `pages` | `inventory` | `no-workspace`, one per section (`code-modules`, `screens`, `data-and-libraries`, `sql-and-risks`, `cycles`, `diagnostics`), `not-scanned`, `large`, `scanning` |
 | `pages` | `traceability` | `issues`, `errors-only`, `strict`, `matrix`, `clean` |
 | `pages` | `deliverables` | `all`, `draft`, `missing`, `templates` |

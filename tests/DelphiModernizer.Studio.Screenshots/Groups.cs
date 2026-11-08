@@ -131,7 +131,9 @@ internal static class Groups
 
                 // The canvas draws the title bar with Back on, so it is taken once a page has opened from another.
                 app.CapturePart("shared", "title-bar", pane: false);
-                app.Expand("Discovery");
+
+                // The canvas opens Project setup only; Discovery shows its header and why it is blocked.
+                app.Expand("Project setup");
                 app.Capture("signoffs", "blocked");
             });
             h.Step(
@@ -183,7 +185,7 @@ internal static class Groups
             });
             h.Step(app, theme, "sign-offs", () => {
                 app.Navigate("SignOffs");
-                app.Expand("Discovery");
+                app.Expand("Project setup");
                 app.Capture("signoffs", "blocked");
             });
         });
