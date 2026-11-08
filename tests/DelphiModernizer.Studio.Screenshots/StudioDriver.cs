@@ -108,7 +108,7 @@ internal sealed class StudioDriver : IDisposable
 
             try
             {
-                trigger();
+                TryTimes(3, trigger);
                 Settle(300);
                 Save(page, state, size, frame);
             }
@@ -117,6 +117,26 @@ internal sealed class StudioDriver : IDisposable
                 process.ProcessorAffinity = every;
             }
         }
+    }
+
+    /// <remarks>A state that lasts a second or two can still end between two UI Automation queries.</remarks>
+    private static void TryTimes(int times, Action action)
+    {
+        for (int attempt = 1; attempt < times; attempt++)
+        {
+            try
+            {
+                action();
+
+                return;
+            }
+            catch (TimeoutException)
+            {
+                Console.WriteLine($"  missed, trying again ({attempt} of {times})");
+            }
+        }
+
+        action();
     }
 
     /// <summary>Captures one part of the window at 1280 × 800: the title bar or the navigation pane.</summary>
