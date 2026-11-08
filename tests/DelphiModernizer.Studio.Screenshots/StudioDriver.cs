@@ -165,10 +165,10 @@ internal sealed class StudioDriver : IDisposable
         Settle(settle);
     }
 
-    /// <summary>Clicks the button showing <paramref name="name"/> level with the text <paramref name="row"/>.</summary>
+    /// <summary>Presses the button showing <paramref name="name"/> beside the text <paramref name="row"/>.</summary>
     /// <remarks>
-    /// UI Automation exposes neither the row's panel nor a name for a button with a glyph and text, so the button is
-    /// the one around its own text, level with the row's title.
+    /// UI Automation exposes no name for a button with a glyph and text, so the button is the one around its own
+    /// text, level with the row's title; it is pressed from the keyboard, focus then Space.
     /// </remarks>
     public void ClickBeside(string row, string name)
     {
@@ -185,7 +185,8 @@ internal sealed class StudioDriver : IDisposable
             throw new InvalidOperationException($"{name} beside {row} is disabled.");
         }
 
-        button.Patterns.Invoke.Pattern.Invoke();
+        button.Focus();
+        Keyboard.Type(VirtualKeyShort.SPACE);
         Settle(2500);
     }
 
@@ -374,17 +375,30 @@ internal sealed class StudioDriver : IDisposable
         Settle(2500);
     }
 
-    /// <summary>Waits until no element whose name starts with <paramref name="name"/> shows.</summary>
+    /// <summary>Waits until no element called <paramref name="name"/> shows.</summary>
     public void WaitGone(string name, TimeSpan timeout)
     {
         EnsureRunning();
+        var clock = Stopwatch.StartNew();
 
-        if (!Retry.WhileTrue(() => Descendants().Any(e => Starts(e, name)), timeout, throwOnTimeout: false).Result)
+        while (_window.FindFirstDescendant(c => c.ByName(name)) is not null)
         {
-            return;
-        }
+            if (clock.Elapsed > timeout)
+            {
+                throw new TimeoutException($"{name} still shows after {timeout.TotalSeconds} s.");
+            }
 
-        throw new TimeoutException($"{name} still shows after {timeout.TotalSeconds} s.");
+            Thread.Sleep(_poll);
+        }
+    }
+
+    /// <summary>Presses a button as a keyboard user does: focus, then Space.</summary>
+    public void PressWithKeyboard(string name)
+    {
+        var element = Find(e => IsAction(e) && Matches(e, name), name);
+        element.Focus();
+        Keyboard.Type(VirtualKeyShort.SPACE);
+        Settle(2500);
     }
 
     public static string Slug(string name)

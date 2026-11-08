@@ -21,6 +21,9 @@ internal static class Groups
     private static readonly TimeSpan _run = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan _brief = TimeSpan.FromSeconds(30);
 
+    /// <summary>Creating from the large tree copies 10,000 files and commits them.</summary>
+    private static readonly TimeSpan _create = TimeSpan.FromMinutes(5);
+
     /// <summary>Start, New workspace and Settings.</summary>
     public static void Start(Harness h, string theme, int themeValue)
     {
@@ -196,11 +199,11 @@ internal static class Groups
                 app.Navigate("Inventory", 6000);
                 app.Capture("inventory", "large");
                 app.Capture("inventory", "scanning", () => {
-                    app.WaitGone("Scanning legacy/", _run);
+                    app.WaitGone("Scanning legacy/…", _run);
                     app.Invoke("Scan again", 0);
                     app.WaitBriefly(c => c.ByName("Scanning legacy/…"), "Scanning legacy/…", _brief);
                 });
-                app.WaitGone("Scanning legacy/", _run);
+                app.WaitGone("Scanning legacy/…", _run);
             });
             h.Step(app, theme, "overview loading", () => app.Capture("overview", "loading", () => {
                 app.Navigate("Inventory", 4000);
@@ -338,10 +341,10 @@ internal static class Groups
             "creating",
             () => {
                 app.Invoke("Create", 0);
-                app.WaitBriefly(c => c.ByName("Creating the workspace"), "Creating the workspace", _brief);
+                app.WaitBriefly(c => c.ByName("Copy the kit into the folder"), "The creating steps", _brief);
             },
             at);
-        app.WaitFor("Open the Overview", _run);
+        app.WaitFor("Open the Overview", _create);
         app.Capture("newworkspace", "created", sizes: at);
     }
 
@@ -376,7 +379,7 @@ internal static class Groups
         string record = Path.Combine(h.Opened[Sample], _approvals);
         string? before = File.Exists(record) ? File.ReadAllText(record) : null;
         app.Expand("Project setup");
-        app.Invoke("Approve Project setup");
+        app.PressWithKeyboard("Approve Project setup");
         app.WaitFor(shows, _brief);
         app.Capture("signoffs", state);
         app.Invoke("Cancel");
