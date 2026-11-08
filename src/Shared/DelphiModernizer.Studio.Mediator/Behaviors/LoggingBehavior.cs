@@ -24,7 +24,7 @@ public sealed partial class LoggingBehavior<TRequest, TResponse> : IPipelineBeha
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(next);
-        var name = typeof(TRequest).Name;
+        string name = typeof(TRequest).Name;
         LogHandling(_logger, name);
 
         try

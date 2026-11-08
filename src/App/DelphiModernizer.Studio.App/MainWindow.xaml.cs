@@ -16,7 +16,7 @@ public sealed partial class MainWindow : WindowEx
     {
         InitializeComponent();
 
-        var icon = Path.Combine(AppContext.BaseDirectory, "Assets", "app.ico");
+        string icon = Path.Combine(AppContext.BaseDirectory, "Assets", "app.ico");
 
         if (File.Exists(icon))
         {

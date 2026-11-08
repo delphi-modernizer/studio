@@ -8,14 +8,15 @@ namespace DelphiModernizer.Studio.UI.Contracts;
 /// <remarks>Everything else uses constructor injection. The App configures this once, at startup.</remarks>
 public static class ContractServices
 {
-    private static IServiceProvider? _provider;
-
-    public static IServiceProvider Provider =>
-        _provider ?? throw new InvalidOperationException("ContractServices.Configure has not been called.");
+    public static IServiceProvider Provider
+    {
+        get => field ?? throw new InvalidOperationException("ContractServices.Configure has not been called.");
+        private set;
+    }
 
     public static void Configure(IServiceProvider provider)
     {
         ArgumentNullException.ThrowIfNull(provider);
-        _provider = provider;
+        Provider = provider;
     }
 }

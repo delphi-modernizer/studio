@@ -22,7 +22,7 @@ internal sealed class GetInventoryQueryHandler(IWorkspaceSession session)
             return Result.Failure<LegacyInventory>(WorkspaceRequired.Error);
         }
 
-        var path = InventoryFiles.JsonPath(workspace);
+        string path = InventoryFiles.JsonPath(workspace);
 
         if (!File.Exists(path))
         {

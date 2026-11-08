@@ -137,8 +137,8 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
     private void Show(TraceabilityReport report, DateTimeOffset checkedAt)
     {
         var trace = report.Trace;
-        var time = checkedAt.LocalDateTime.ToString("t", CultureInfo.CurrentCulture);
-        var questions = report.Problems.Count(p => p.Issue.Rule == "open-question");
+        string time = checkedAt.LocalDateTime.ToString("t", CultureInfo.CurrentCulture);
+        int questions = report.Problems.Count(p => p.Issue.Rule == "open-question");
         _all = [.. report.Problems.Select(Row)];
         Stats = [
             new StatCard(
@@ -206,7 +206,7 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
             return "Clean for the final plan too";
         }
 
-        var noun = questions == 1 ? "question" : "questions";
+        string noun = questions == 1 ? "question" : "questions";
 
         return questions == 0 ? "The final plan needs none" : $"Including {Number(questions)} open {noun}";
     }
@@ -225,16 +225,16 @@ public sealed partial class TraceabilityViewModel : WorkspacePageViewModel
     {
         var issue = problem.Issue;
         var pill = issue.Severity == "error" ? PillState.Error : PillState.Warning;
-        var subject = problem.Subject is null ? string.Empty : $" · {problem.Subject}";
-        var promoted = issue.Severity == "error"
+        string subject = problem.Subject is null ? string.Empty : $" · {problem.Subject}";
+        bool promoted = issue.Severity == "error"
             && KitBundle.Embedded.Spec.TraceRules.Rules.Any(r => r.Id == issue.RuleId && r.Severity == "warning");
-        var rule = $"{problem.Wording.Label}{subject}{(promoted ? " · counts as an error now" : string.Empty)}";
-        var folder = Path.GetDirectoryName(issue.Path)?.Replace('\\', '/') is { Length: > 0 } directory
+        string rule = $"{problem.Wording.Label}{subject}{(promoted ? " · counts as an error now" : string.Empty)}";
+        string folder = Path.GetDirectoryName(issue.Path)?.Replace('\\', '/') is { Length: > 0 } directory
             ? directory + "/"
             : string.Empty;
-        var file = Path.GetFileName(issue.Path);
-        var link = issue.Line > 0 ? $"{file}#L{issue.Line}" : file;
-        var announced = ProblemWordings.Announced(
+        string file = Path.GetFileName(issue.Path);
+        string link = issue.Line > 0 ? $"{file}#L{issue.Line}" : file;
+        string announced = ProblemWordings.Announced(
             PillLook.Of(pill).Word,
             problem.Description,
             problem.Wording.Label,

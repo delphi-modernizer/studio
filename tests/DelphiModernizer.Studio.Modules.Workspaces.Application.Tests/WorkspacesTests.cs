@@ -95,7 +95,7 @@ public sealed class WorkspacesTests : IDisposable
             TestContext.Current.CancellationToken);
 
         Assert.True(preview.IsSuccess, preview.Error.Message);
-        var files = preview.Value.Summary.Files;
+        int files = preview.Value.Summary.Files;
         Assert.Equal(new ScanProgress(0, files), reports.Items[0]);
         Assert.Equal(new ScanProgress(files, files), reports.Items[^1]);
     }
@@ -103,7 +103,7 @@ public sealed class WorkspacesTests : IDisposable
     [Fact]
     public async Task A_folder_without_Delphi_source_is_not_previewed()
     {
-        var empty = Directory.CreateDirectory(Path.Combine(_folder, "empty")).FullName;
+        string empty = Directory.CreateDirectory(Path.Combine(_folder, "empty")).FullName;
 
         var preview = await _sender.Send(new PreviewLegacyQuery(empty, 1252), TestContext.Current.CancellationToken);
 
@@ -113,7 +113,7 @@ public sealed class WorkspacesTests : IDisposable
     [Fact]
     public async Task Only_a_new_or_empty_folder_can_hold_a_workspace()
     {
-        var used = Directory.CreateDirectory(Path.Combine(_folder, "used")).FullName;
+        string used = Directory.CreateDirectory(Path.Combine(_folder, "used")).FullName;
         await File.WriteAllTextAsync(Path.Combine(used, "notes.txt"), "kept", TestContext.Current.CancellationToken);
 
         var fresh = await _sender.Send(

@@ -22,7 +22,7 @@ public sealed class MediatorTests
             services.AddTransient<IPipelineBehavior<Echo, string>, Inner>();
         });
 
-        var answer = await sender.Send(new Echo("hello"), TestContext.Current.CancellationToken);
+        string answer = await sender.Send(new Echo("hello"), TestContext.Current.CancellationToken);
 
         Assert.Equal("hello", answer);
         Assert.Equal(["outer", "inner", "handler"], journal.Entries);
@@ -59,7 +59,7 @@ public sealed class MediatorTests
         var sender = page.ServiceProvider.GetRequiredService<ISender>();
 
         page.Dispose();
-        var answer = await sender.Send(new Echo("after"), TestContext.Current.CancellationToken);
+        string answer = await sender.Send(new Echo("after"), TestContext.Current.CancellationToken);
 
         Assert.Equal("after", answer);
         Assert.Equal(["handler"], journal.Entries);

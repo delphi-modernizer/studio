@@ -60,7 +60,7 @@ public sealed class ThemeService : IThemeService
 
     private void PaintCaptionButtons()
     {
-        var dark = (_window.Content as FrameworkElement)?.ActualTheme == ElementTheme.Dark;
+        bool dark = _window.Content is FrameworkElement { ActualTheme: ElementTheme.Dark };
         AppWindowTitleBar bar = _window.AppWindow.TitleBar;
         var foreground = dark ? Colors.White : Colors.Black;
         bar.ButtonBackgroundColor = Colors.Transparent;

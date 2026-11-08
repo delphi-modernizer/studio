@@ -194,7 +194,7 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
             w,
             _states.Count(s => s.Owner == w.Role.Code && s.Status is not ("template" or "missing")),
             _runs.Any(r => r.Agent == w.Role.Agent && r.Outcome == RunOutcome.Running)))];
-        SelectedRole = Roles.FirstOrDefault(r => r.Code == selected) ?? Roles.FirstOrDefault();
+        SelectedRole = Roles.FirstOrDefault(r => r.Code == selected) ?? (Roles.Count > 0 ? Roles[0] : null);
         ShowRole();
     }
 
@@ -205,12 +205,12 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
             return;
         }
 
-        var ready = Claude is { IsReady: true };
+        bool ready = Claude is { IsReady: true };
         Deliverables = [.. role.Workstream.Deliverables.Select(d => new DeliverableRow(d.Title, PillOf(d.Id, d.Gate)))];
         Tasks = [.. role.Workstream.Recipes.Select(recipe => {
             var blocker = _blockers.GetValueOrDefault(recipe.Id);
 
-            var reason = blocker is null ? string.Empty : BlockedReason(blocker, recipe, role);
+            string reason = blocker is null ? string.Empty : BlockedReason(blocker, recipe, role);
 
             return new TaskRow(recipe, role.Name, ready, blocker, reason);
         })];
@@ -225,8 +225,8 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
     /// </summary>
     private PillState PillOf(string deliverable, string gate)
     {
-        var status = _states.FirstOrDefault(s => s.Id == deliverable)?.Status ?? "missing";
-        var approved = _gates.Any(g => g.Gate == gate && g.State == "approved");
+        string status = _states.FirstOrDefault(s => s.Id == deliverable)?.Status ?? "missing";
+        bool approved = _gates.Any(g => g.Gate == gate && g.State == "approved");
 
         return approved && status != "missing" ? PillState.Approved : PillStates.OfDeliverable(status);
     }
@@ -238,12 +238,12 @@ public sealed partial class WorkstreamsViewModel : WorkspacePageViewModel
             return RunNames.BlockedByOtherRun(blocker.RunId, RunWords.Time(blocker.TakenAt));
         }
 
-        var agent = run.Recipe.Agent;
-        var owner = agent == role.Workstream.Role.Agent
+        string agent = run.Recipe.Agent;
+        string? owner = agent == role.Workstream.Role.Agent
             ? null
             : _workstreams.FirstOrDefault(w => w.Role.Agent == agent)?.Role.Name ?? agent;
 
-        var started = RunWords.Time(run.StartedAt);
+        string started = RunWords.Time(run.StartedAt);
 
         return RunNames.BlockedReason(RunWords.Writes(recipe), run.Recipe.Title, owner, started);
     }

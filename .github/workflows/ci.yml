@@ -13,14 +13,14 @@ concurrency:
 
 jobs:
   comments:
-    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/comment-lint.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
-      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
+      standards-ref: b4e362bb70af1ac86b6501accce2edf69e47b401
 
   drift:
-    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/standards-drift.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
-      standards-ref: e9debe4d0a96e6268ba2466a631732ced7c74591
+      standards-ref: b4e362bb70af1ac86b6501accce2edf69e47b401
       files: |
         .editorconfig=standards/csharp/.editorconfig
         tests/.editorconfig=standards/csharp/tests.editorconfig
@@ -28,7 +28,7 @@ jobs:
         docs/csharp-style.md=standards/csharp/csharp-style.md
 
   dependencies:
-    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/dependency-review.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
 
   # The engine is built from source at the commit engine.lock pins (docs/BUILDING.md).
   engine:
@@ -43,13 +43,13 @@ jobs:
         run: echo "ref=$(tr -d '[:space:]' < engine.lock)" >> "$GITHUB_OUTPUT"
 
   python:
-    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/python-ci.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
       sources: scripts
 
   build:
     needs: engine
-    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@e9debe4d0a96e6268ba2466a631732ced7c74591
+    uses: delphi-modernizer/.github/.github/workflows/dotnet-ci.yml@b4e362bb70af1ac86b6501accce2edf69e47b401
     with:
       solution: DelphiModernizer.Studio.slnx
       os: '["windows-latest"]'
@@ -57,6 +57,10 @@ jobs:
       companion-repository: delphi-modernizer/engine
       companion-ref: ${{ needs.engine.outputs.ref }}
       companion-path: .engine
+      sonar-organization: delphi-modernizer
+      sonar-project-key: delphi-modernizer_studio
+      sonar-exclusions: .engine/**
+      sonar-coverage-exclusions: src/App/**,src/**/*.UI/**,src/**/*.UI.*/**
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -172,7 +176,9 @@ jobs:
           version: '0.13.6'
       - name: Require the committed icon font to match its sources
         run: |
-          uv run --frozen python scripts/build_icon_font.py
+          uv run --frozen --no-build python scripts/build_icon_font.py
           git diff --exit-code -- src
       - name: Lint the Markdown
-        run: npx --yes markdownlint-cli2@0.24.0
+        run: |
+          npm install --global --ignore-scripts markdownlint-cli2@0.24.0
+          markdownlint-cli2
