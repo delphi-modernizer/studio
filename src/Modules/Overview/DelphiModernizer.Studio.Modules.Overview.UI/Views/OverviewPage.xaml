@@ -76,7 +76,7 @@
                 <Setter Property="CornerRadius" Value="8" />
             </Style>
 
-            <!--  Canvas .fl-tip: 236 wide, set 12 in from the team card's left edge, padding 6 8 7.  -->
+            <!--  Canvas .fl-tip: 236 wide, padding 6 8 7; OverviewPage.Flow places it.  -->
             <Style x:Key="TeamToolTipStyle" TargetType="ToolTip">
                 <Setter Property="Width" Value="236" />
                 <Setter Property="Padding" Value="8,6,8,7" />
@@ -549,7 +549,6 @@
                                             <ToolTipService.ToolTip>
                                                 <ToolTip
                                                     Content="{x:Bind ViewModel.Teams[0].ToolTip}"
-                                                    PlacementRect="12,0,236,52"
                                                     Style="{StaticResource TeamToolTipStyle}" />
                                             </ToolTipService.ToolTip>
                                         </Button>
@@ -567,7 +566,6 @@
                                             <ToolTipService.ToolTip>
                                                 <ToolTip
                                                     Content="{x:Bind ViewModel.Teams[1].ToolTip}"
-                                                    PlacementRect="12,0,236,52"
                                                     Style="{StaticResource TeamToolTipStyle}" />
                                             </ToolTipService.ToolTip>
                                         </Button>
@@ -585,7 +583,6 @@
                                             <ToolTipService.ToolTip>
                                                 <ToolTip
                                                     Content="{x:Bind ViewModel.Teams[2].ToolTip}"
-                                                    PlacementRect="12,0,236,52"
                                                     Style="{StaticResource TeamToolTipStyle}" />
                                             </ToolTipService.ToolTip>
                                         </Button>
@@ -603,7 +600,6 @@
                                             <ToolTipService.ToolTip>
                                                 <ToolTip
                                                     Content="{x:Bind ViewModel.Teams[3].ToolTip}"
-                                                    PlacementRect="12,0,236,52"
                                                     Style="{StaticResource TeamToolTipStyle}" />
                                             </ToolTipService.ToolTip>
                                         </Button>
@@ -621,7 +617,6 @@
                                             <ToolTipService.ToolTip>
                                                 <ToolTip
                                                     Content="{x:Bind ViewModel.Teams[4].ToolTip}"
-                                                    PlacementRect="12,0,236,52"
                                                     Style="{StaticResource TeamToolTipStyle}" />
                                             </ToolTipService.ToolTip>
                                         </Button>
@@ -639,7 +634,6 @@
                                             <ToolTipService.ToolTip>
                                                 <ToolTip
                                                     Content="{x:Bind ViewModel.Teams[5].ToolTip}"
-                                                    PlacementRect="12,0,236,52"
                                                     Style="{StaticResource TeamToolTipStyle}" />
                                             </ToolTipService.ToolTip>
                                         </Button>
