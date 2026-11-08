@@ -142,7 +142,7 @@ internal sealed class StudioDriver : IDisposable
         }
 
         _window.SetForeground();
-        Mouse.MoveTo(new Point(frame.Right + 40, frame.Bottom + 40));
+        Desktop.MovePointer(new Point(frame.Right + 40, frame.Bottom + 40));
         Settle(1200);
 
         return frame;
