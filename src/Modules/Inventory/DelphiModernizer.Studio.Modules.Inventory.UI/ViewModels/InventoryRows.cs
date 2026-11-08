@@ -142,6 +142,9 @@ public sealed record ConnectionCard(
 {
     public string Shown => InventoryWords.InLegacy(Link);
 
+    /// <summary>"TDatabase · BDE ·", which the evidence link follows.</summary>
+    public string MetaWithDot => $"{Meta} ·";
+
     public string LinkName => InventoryWords.Evidence(Link);
 }
 

@@ -116,6 +116,12 @@ public sealed partial class ShellPage : Page
         if (item.Badge is { } badge)
         {
             var source = badge(_services);
+            string style = source.Tone == BadgeTone.Critical
+                ? "CriticalValueInfoBadgeStyle"
+                : "AccentValueInfoBadgeStyle";
+            container.InfoBadge = new InfoBadge {
+                Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],
+            };
             _badges.Add((container, item, source));
             source.Changed += (_, _) => DispatcherQueue.TryEnqueue(() => ShowBadge(container, item, source));
             ShowBadge(container, item, source);
@@ -145,25 +151,26 @@ public sealed partial class ShellPage : Page
         };
     }
 
+    /// <summary>Shows the count on the item's own badge, hidden at zero.</summary>
+    /// <remarks>
+    /// The badge is updated, never replaced: a new or removed InfoBadge drops the selected item's backplate, as on Run
+    /// while the Workstreams badge counts the run.
+    /// </remarks>
     private void ShowBadge(NavigationViewItem container, NavigationItem item, IBadgeSource source)
     {
         int count = _session.Current is null ? 0 : source.Count;
+        var shown = container.InfoBadge;
 
         if (count == 0)
         {
-            container.InfoBadge = null;
+            shown.Visibility = Visibility.Collapsed;
             AutomationProperties.SetName(container, item.Title);
 
             return;
         }
 
-        string style = source.Tone == BadgeTone.Critical
-            ? "CriticalValueInfoBadgeStyle"
-            : "AccentValueInfoBadgeStyle";
-        container.InfoBadge = new InfoBadge {
-            Value = count,
-            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],
-        };
+        shown.Value = count;
+        shown.Visibility = Visibility.Visible;
         AutomationProperties.SetName(container, $"{item.Title}, {source.Describe(count)}");
     }
 
