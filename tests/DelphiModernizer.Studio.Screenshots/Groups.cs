@@ -389,7 +389,10 @@ internal static class Groups
         string folder = h.Workspaces.NewFolder();
         app.Invoke("New workspace");
         app.Type("Workspace name", Workspaces.Name);
-        app.Type("Folder", folder);
+
+        // A box takes focus as its text is set, and the canvas draws none focused; with no key pressed yet, Browse…
+        // takes it without a ring.
+        app.Type("Folder", folder, tabOut: true);
 
         // Step 1 comes first: once a folder is refused, the page moves focus to it, which the canvas draws only there.
         app.Capture("newworkspace", "step1", sizes: at);
@@ -422,6 +425,11 @@ internal static class Groups
         app.Select("C#/.NET");
         app.Capture("newworkspace", "step3", sizes: at);
         app.Invoke("Next");
+
+        // Filled at the wide size, where every row shows: at 960 each box brings itself into view as it is set, and
+        // the canvas draws step 4 from the top.
+        app.Resize(StudioDriver.Wide);
+
         foreach (var (field, answer) in _context)
         {
             app.Type(field, answer);

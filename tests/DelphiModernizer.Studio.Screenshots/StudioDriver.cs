@@ -360,8 +360,8 @@ internal sealed class StudioDriver : IDisposable
 
     /// <summary>Types into the text box with this name, or into it and on, as a person tabbing out would.</summary>
     /// <remarks>
-    /// The text is set without focus, which the canvas never draws in a box; the studio's boxes take their value as
-    /// it changes. Tabbing out focuses the box and then the next control without a key: after keyboard input XAML
+    /// The text is set through UI Automation, which gives the box focus as it does; the studio's boxes take their
+    /// value as it changes. Tabbing out moves focus to the next control without a key: after keyboard input XAML
     /// draws a focus ring wherever focus goes next, such as on Browse… or a button the page focuses.
     /// </remarks>
     /// <param name="settle">0 when a brief state follows, such as the preview that tabbing out starts.</param>

@@ -103,9 +103,11 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    window is slow on one processor. Each size's scan starts from no scan, so the button reads Scan. Overview's loading
    is captured the same way. Creating is captured once the kit is copied, while the tree is, so that a step shows done,
    one working and the rest waiting.
-   - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set in a box without
-     focusing it, and tabbing out moves focus without a key, since after keyboard input XAML draws a focus ring
-     wherever focus goes next. Only Overview's focus state presses Tab.
+   - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set through UI
+     Automation, which focuses the box, and tabbing out moves focus without a key, since after keyboard input XAML
+     draws a focus ring wherever focus goes next. Only Overview's focus state presses Tab. The wizard's step 1 tabs
+     out of Folder, since the canvas draws no box focused, and step 4 is filled at 1280, where every row shows, so
+     that at 960 it is captured from the top.
    - The stand-in writes its standard-error note half a second after its last event, since the app reads the two
      streams apart and the canvas draws the note last.
    - WinUI shows a page's scroll indicator for a moment after the page scrolls, resizes or meets the pointer, and the
