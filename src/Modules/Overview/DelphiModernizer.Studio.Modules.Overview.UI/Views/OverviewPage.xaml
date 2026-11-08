@@ -327,7 +327,7 @@
                         </controls:NoWorkspaceState.Message>
                     </controls:NoWorkspaceState>
 
-                    <!--  Centred in the page's first 520, as drawn.  -->
+                    <!--  Centred in the page's first 520, as drawn; the ring sits 8 + 8 above the title.  -->
                     <Grid MinHeight="520" Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}">
                         <StackPanel
                             HorizontalAlignment="Center"
@@ -337,7 +337,7 @@
                             <controls:Spinner
                                 Width="32"
                                 Height="32"
-                                Margin="0,0,0,12"
+                                Margin="0,0,0,8"
                                 IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
                             <TextBlock
                                 HorizontalAlignment="Center"
