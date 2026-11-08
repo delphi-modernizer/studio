@@ -34,7 +34,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     private readonly RunMonitor _monitor;
     private readonly DispatcherQueue _dispatcher;
     private readonly DispatcherQueueTimer _clock;
-    private readonly Dictionary<string, (ToolRow Row, string? Path, bool Edits)> _calls = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, (ToolRow Row, ToolCall Call)> _calls = new(StringComparer.Ordinal);
     private LiveRun? _live;
     private RunRecord? _record;
     private string _roleCode = string.Empty;
@@ -308,7 +308,9 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         Items.Add(Session);
         Describe(run.Recipe, run.Argument, run.BudgetUsd);
         Outcome = RunOutcome.Running;
-        Cost = $"— of {RunWords.Dollars(run.BudgetUsd)}";
+        // Nothing spent and no turn taken yet, as drawn; "—" is kept for a value a run never reported.
+        Cost = $"{RunWords.Dollars(0m)} of {RunWords.Dollars(run.BudgetUsd)}";
+        Turns = "0";
         ShowTime();
         _clock.Start();
 
@@ -419,8 +421,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 break;
             case ToolCall call:
                 var row = new ToolRow(call.Id, call.Name, RunTranscript.ShortInput(call), RunTranscript.Edits(call));
-                string? path = _session.Current is { } workspace ? RunTranscript.PathOf(call, workspace.Root) : null;
-                _calls[call.Id] = (row, path, RunTranscript.Edits(call));
+                _calls[call.Id] = (row, call);
                 Items.Add(row);
                 break;
             case ToolResult result:
@@ -448,7 +449,14 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         call.Row.IsError = result.IsError;
         call.Row.Result = result.Content;
 
-        if (!result.IsError && call.Path is { } path)
+        if (result.IsError || _session.Current is not { } workspace)
+        {
+            return;
+        }
+
+        bool edits = RunTranscript.Edits(call.Call);
+
+        foreach (string path in RunTranscript.FilesOf(call.Call, result.Content, workspace.Root))
         {
             var file = Files.FirstOrDefault(f => f.Path == path);
 
@@ -459,7 +467,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
             }
 
             // Files touched lists what the run edited first, as drawn.
-            if (call.Edits && !file.IsEdited)
+            if (edits && !file.IsEdited)
             {
                 file.IsEdited = true;
                 Files.Move(Files.IndexOf(file), 0);
@@ -472,7 +480,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     {
         if (_calls.TryGetValue(refused.ToolCallId, out var call))
         {
-            var row = new RefusalRow(refused.Tool, call.Row.Input, refused.Target, refused.Reason, call.Edits);
+            bool edits = RunTranscript.Edits(call.Call);
+            var row = new RefusalRow(refused.Tool, call.Row.Input, refused.Target, refused.Reason, edits);
             Items[Items.IndexOf(call.Row)] = row;
         }
         else

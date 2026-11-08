@@ -54,15 +54,27 @@
                 Text="error_max_budget_usd" />
         </Grid>
         <StackPanel MaxWidth="240" HorizontalAlignment="Left" Spacing="8">
-            <NumberBox
-                x:Name="BudgetBox"
-                AutomationProperties.HelpText="A new run starts the task again with the same scope."
-                Header="Budget for a new run"
-                LargeChange="1"
-                Minimum="0.1"
-                NumberFormatter="{StaticResource Dollars}"
-                SmallChange="0.5"
-                SpinButtonPlacementMode="Inline" />
+            <TextBlock Text="Budget for a new run" />
+            <!--  Canvas .nbx, as Settings draws it: the grey "$" inside the box, before the value.  -->
+            <Grid>
+                <NumberBox
+                    x:Name="BudgetBox"
+                    Padding="24,5,6,6"
+                    AutomationProperties.HelpText="A new run starts the task again with the same scope."
+                    AutomationProperties.Name="Budget for a new run"
+                    LargeChange="1"
+                    Minimum="0.1"
+                    NumberFormatter="{StaticResource Dollars}"
+                    SmallChange="0.5"
+                    SpinButtonPlacementMode="Inline" />
+                <TextBlock
+                    Margin="11,0,0,0"
+                    VerticalAlignment="Center"
+                    AutomationProperties.AccessibilityView="Raw"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    IsHitTestVisible="False"
+                    Text="$" />
+            </Grid>
             <TextBlock
                 Style="{StaticResource SecondaryCaptionTextStyle}"
                 Text="A new run starts the task again with the same scope." />

@@ -103,11 +103,16 @@
 - Run's transcript starts with the session, divides its items, shows each fact label right after its claim and each
   evidence link only under it, an edit's input as its file, and a starting run's budget; the end card spreads its
   numbers over four columns and shows what the run spent.
-- Run an agent task and the budget dialog show the budget as "$2.00" and Run with its play icon; the budget,
-  approve and revoke dialogs have no default button, so Enter never spends money or approves, and Cancel and Close are
-  drawn plain.
-- The approve dialog and Sign-offs show covered paths whole and the fingerprint wrapped with its label; Sign-offs'
-  checks are divided by hairlines.
+- Run an agent task and the budget dialog show the budget as "2.00" after a grey "$", as Settings does, and Run with
+  its play icon; the budget, approve and revoke dialogs have no default button, so Enter never spends money or
+  approves, and Cancel and Close are drawn plain.
+- The approve dialog and Sign-offs show the fingerprint on one line, whole on hover; the dialog lists every covered
+  file, and Sign-offs trims covered paths instead of wrapping them and divides its checks by hairlines.
+- The no-identity approve dialog keeps its note label in full colour while the box is off.
+- Workstreams shows a Blocked reason on one line with Open run, and a run's time alone when it started today.
+- Run's Files touched lists the files a folder search matched, not the folder, and puts edited files first; a starting
+  run shows $0.00 spent and 0 turns, and the session strip's model and version read at body size.
+- The screenshot harness's stand-in edits the deliverable on every run, so each run's Files touched shows the draft.
 - New workspace opens the workspace it created on Open the Overview, so the Created step shows no subtitle; Create
   lists it in Recent workspaces.
 - New workspace's step list sets the current step in semibold and the steps ahead in secondary text; waiting
@@ -116,7 +121,7 @@
 - StatusPill's word takes the pill's FontWeight, so a semibold row can make its pills semibold.
 - PathText keeps a long path's file name whole and the start of its folders, as "docs/02-…/business-rules.md".
 - DialogMargins keeps a dialog 24 from the window's top and bottom, as the canvas's scrim does, also when the window
-  changes size while the dialog is open; the Claude Code dialog uses it.
+  changes size while the dialog is open; the Claude Code, approve, run and budget dialogs use it.
 
 ### Fixed
 

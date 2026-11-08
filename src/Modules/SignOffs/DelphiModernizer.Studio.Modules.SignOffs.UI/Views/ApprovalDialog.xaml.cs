@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Threading;
 using DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
@@ -16,6 +17,7 @@ public sealed partial class ApprovalDialog : ContentDialog
         ArgumentNullException.ThrowIfNull(viewModel);
         ViewModel = viewModel;
         InitializeComponent();
+        DialogMargins.Apply(this);
 
         if (viewModel.IsApprove)
         {
