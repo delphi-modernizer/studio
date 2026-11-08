@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DelphiModernizer.Engine.Agents;
+using DelphiModernizer.Engine.Workspaces;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Settings;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
@@ -21,6 +22,19 @@ public sealed class RunTests
     private const string _init =
         """{"type":"system","subtype":"init","session_id":"s-1","""
         + """ "model":"claude-test","claude_code_version":"2.1.300"}""";
+
+    private const string _success =
+        """{"type":"result","subtype":"success","is_error":false,"total_cost_usd":0.25,"num_turns":3}""";
+
+    /// <summary>An Edit of the legacy tree, and the guard hook's refusal as Claude Code reports it.</summary>
+    private static readonly string[] _refusedEdit =
+    [
+        """{"type":"assistant","message":{"content":[{"type":"tool_use","id":"t-1","name":"Edit","""
+            + """ "input":{"file_path":"legacy/Sales/Pricing.pas"}}]}}""",
+        """{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"t-1","is_error":true,"""
+            + """ "content":"PreToolUse:Edit hook error: [dmz guard pre-tool-use || exit 2]: """
+            + """legacy/ is read-only evidence; record findings in docs/ instead."}]}}""",
+    ];
 
     [Fact]
     public async Task A_run_streams_its_events_and_joins_the_history_when_it_ends()
@@ -79,7 +93,7 @@ public sealed class RunTests
             new StartRunCommand("ws01-business-rules", "legacy/Sales", 1m), TestContext.Current.CancellationToken);
         var second = await sender.Send(
             new StartRunCommand("ws02-frs", null, 1m), TestContext.Current.CancellationToken);
-        var writing = monitor.Writing(workspace.Workspace.Root, ["D03"]);
+        var blockers = await sender.Send(new GetRunBlockersQuery(), TestContext.Current.CancellationToken);
         Assert.Equal(1, monitor.InProgress);
         first.Value.Stop();
         var stopped = await first.Value.Ended;
@@ -87,11 +101,71 @@ public sealed class RunTests
         again.Value.Stop();
         await again.Value.Ended;
 
+        var after = await sender.Send(new GetRunBlockersQuery(), TestContext.Current.CancellationToken);
+
         Assert.True(second.IsFailure);
-        Assert.Same(first.Value, writing);
+        Assert.Same(first.Value, blockers.Value["ws02-frs"].Run);
         Assert.Equal(RunOutcome.Stopped, RunOutcomes.Of(stopped.Outcome));
         Assert.True(again.IsSuccess);
-        Assert.Null(monitor.Writing(workspace.Workspace.Root, ["D03"]));
+        Assert.Empty(after.Value);
+    }
+
+    [Fact]
+    public async Task A_lease_held_by_a_run_the_studio_did_not_start_blocks_the_tasks_that_write_it()
+    {
+        using var workspace = await TestWorkspace.CreateAsync();
+        var (sender, _) = Build(workspace.Session, new FakeClaude(workspace.Parent, _init));
+        var held = RunLocks.Acquire(workspace.Workspace, "20261108101500-ws01-business-rules", ["D03"]);
+
+        var blockers = await sender.Send(new GetRunBlockersQuery(), TestContext.Current.CancellationToken);
+        var started = await sender.Send(
+            new StartRunCommand("ws02-frs", null, 1m), TestContext.Current.CancellationToken);
+
+        Assert.True(held.IsSuccess);
+        var blocker = blockers.Value["ws02-frs"];
+        Assert.Equal("20261108101500-ws01-business-rules", blocker.RunId);
+        Assert.Null(blocker.Run);
+        Assert.False(blockers.Value.ContainsKey("ws02-nfr"));
+        Assert.Equal("Run.Locked", started.Error.Code);
+    }
+
+    [Fact]
+    public async Task A_refused_tool_call_arrives_as_the_guards_refusal_in_place_of_its_result()
+    {
+        using var workspace = await TestWorkspace.CreateAsync();
+        var fake = new FakeClaude(workspace.Parent, [_init, .. _refusedEdit, _success]);
+        var (sender, _) = Build(workspace.Session, fake);
+
+        var started = await sender.Send(
+            new StartRunCommand("ws01-business-rules", "legacy/Sales", 1m), TestContext.Current.CancellationToken);
+        await started.Value.Ended;
+        var events = started.Value.Subscribe((_, _) => { });
+
+        var refused = Assert.Single(events.OfType<GuardRefused>());
+        Assert.Equal(("t-1", "Edit", "legacy/Sales/Pricing.pas"), (refused.ToolCallId, refused.Tool, refused.Target));
+        Assert.Equal("legacy/ is read-only evidence; record findings in docs/ instead.", refused.Reason);
+        Assert.DoesNotContain(events, e => e is ToolResult);
+    }
+
+    [Fact]
+    public async Task An_earlier_run_reads_back_as_the_events_it_streamed()
+    {
+        using var workspace = await TestWorkspace.CreateAsync();
+        var fake = new FakeClaude(workspace.Parent, [_init, .. _refusedEdit, _success]);
+        var (sender, _) = Build(workspace.Session, fake);
+        var started = await sender.Send(
+            new StartRunCommand("ws01-business-rules", "legacy/Sales", 1m), TestContext.Current.CancellationToken);
+        await started.Value.Ended;
+        var live = started.Value.Subscribe((_, _) => { });
+
+        var replayed = await sender.Send(
+            new GetRunTranscriptQuery(started.Value.RunId), TestContext.Current.CancellationToken);
+        var outside = await sender.Send(new GetRunTranscriptQuery("../x"), TestContext.Current.CancellationToken);
+
+        Assert.Equal(live.Where(e => e is not Diagnostic { Source: "stderr" }), replayed.Value);
+        Assert.Contains(replayed.Value, e => e is GuardRefused);
+        Assert.Equal("success", Assert.IsType<RunCompleted>(replayed.Value[^1]).Outcome);
+        Assert.Equal("Workstreams.UnknownRun", outside.Error.Code);
     }
 
     [Fact]
@@ -154,23 +228,6 @@ public sealed class RunTests
                 new AgentLine("Gold follows the limit.", "Inferred"),
             ],
             lines);
-    }
-
-    [Fact]
-    public void A_call_the_guard_blocked_is_a_refusal_with_the_guard_reason()
-    {
-        var refused = new ToolResult(
-            "t-1",
-            true,
-            "PreToolUse:Edit hook error: [dmz guard pre-tool-use]: "
-                + "legacy/ is read-only evidence; record findings in docs/ instead.");
-        var failed = new ToolResult("t-2", true, "File does not exist.");
-
-        Assert.True(RunTranscript.IsRefusal(refused));
-        Assert.Equal(
-            "legacy/ is read-only evidence; record findings in docs/ instead.",
-            RunTranscript.RefusalReason(refused));
-        Assert.False(RunTranscript.IsRefusal(failed));
     }
 
     [Fact]

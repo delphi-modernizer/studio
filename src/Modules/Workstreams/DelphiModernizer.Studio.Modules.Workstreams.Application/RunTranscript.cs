@@ -19,18 +19,10 @@ namespace DelphiModernizer.Studio.Modules.Workstreams.Application;
 public sealed record AgentLine(string Text, string? Label);
 
 /// <summary>
-/// What the Run page reads from the engine's events: fact labels, guard refusals and the files a tool used.
+/// What the Run page reads from the engine's events: fact labels, evidence links and the files a tool used.
 /// </summary>
 public static partial class RunTranscript
 {
-    /// <summary>
-    /// Claude Code's words for a tool call its PreToolUse hook (the guard) or the workspace's permissions blocked.
-    /// </summary>
-    /// <remarks>
-    /// The engine streams these as failed tool results; the markers live here until it types them (open questions).
-    /// </remarks>
-    private static readonly string[] _refusalMarkers = ["PreToolUse:", "Permission to use "];
-
     private static readonly FrozenSet<string> _editingTools =
         new[] { "Edit", "Write", "MultiEdit", "NotebookEdit" }.ToFrozenSet(StringComparer.Ordinal);
 
@@ -62,20 +54,6 @@ public static partial class RunTranscript
         return [.. _evidence.Value
             .Matches(text)
             .Select(m => m.Value)];
-    }
-
-    public static bool IsRefusal(ToolResult result)
-    {
-        return result.IsError && _refusalMarkers.Any(m => result.Content.Contains(m, StringComparison.Ordinal));
-    }
-
-    /// <summary>The guard's own sentence: what follows the hook's name, or the whole text when it has none.</summary>
-    public static string RefusalReason(ToolResult result)
-    {
-        var content = result.Content.Trim();
-        var end = content.LastIndexOf("]: ", StringComparison.Ordinal);
-
-        return end < 0 ? content : content[(end + 3)..].Trim();
     }
 
     public static bool Edits(ToolCall call)

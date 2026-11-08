@@ -139,12 +139,6 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
     public bool HasProblem => Problem is not null;
 
-    /// <summary>
-    /// A run from an earlier session: the store keeps its summary, and its transcript only as the raw file.
-    /// </summary>
-    [ObservableProperty]
-    public partial bool IsRecordOnly { get; set; }
-
     public string WritesNote => IsLive
         ? "Locked while this run writes it; other tasks that write it wait."
         : "Lands as Draft for a person to review.";
@@ -180,8 +174,6 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
             return tools.Count > 0 && tools.TrueForAll(r => r.IsExpanded);
         }
     }
-
-    public string TranscriptFile => _record is null ? string.Empty : $".modernizer/runs/{_record.RunId}.jsonl";
 
     public Recipe? Recipe { get; private set; }
 
@@ -309,6 +301,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
         }
     }
 
+    /// <summary>A run from an earlier session: its recorded transcript, shown as the live view shows events.</summary>
     private async Task ShowRecordAsync(string runId)
     {
         var runs = await _sender.Send(new GetRunsQuery(), CancellationToken.None);
@@ -320,16 +313,24 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
             return;
         }
 
+        var transcript = await _sender.Send(new GetRunTranscriptQuery(runId), CancellationToken.None);
         _record = record;
-        IsRecordOnly = true;
         IsStarting = false;
         Describe(record.Recipe, record.Argument, budgetUsd: 0);
+        SessionLine = $"Started {RunWords.Time(record.StartedAt)}";
+        Problem = transcript.IsFailure ? transcript.Error.Message : null;
+        IReadOnlyList<AgentEvent> events = transcript.IsSuccess ? transcript.Value : [];
+
+        foreach (var item in events)
+        {
+            Show(item, live: false);
+        }
+
+        // The summary's numbers, as Workstreams lists them; a recorded run has no budget to measure the cost against.
         Outcome = record.Outcome;
         Cost = record.CostUsd is { } cost ? RunWords.Dollars(cost) : "—";
         Turns = record.Turns?.ToString(CultureInfo.CurrentCulture) ?? "—";
         Time = record.FinishedAt is { } finished ? RunWords.Duration(finished - record.StartedAt) : "—";
-        SessionLine = $"Started {RunWords.Time(record.StartedAt)}";
-        OnPropertyChanged(nameof(TranscriptFile));
     }
 
     private void Describe(Recipe? recipe, string? argument, decimal budgetUsd)
@@ -368,7 +369,7 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
                 IsStarting = false;
                 Model = session.Model ?? "—";
                 CliVersion = session.CliVersion ?? "—";
-                var started = RunWords.Time(_live?.StartedAt ?? DateTimeOffset.Now);
+                var started = RunWords.Time(_live?.StartedAt ?? _record?.StartedAt ?? DateTimeOffset.Now);
                 SessionLine = $"Started {started} · model {Model} · Claude Code {CliVersion}";
                 break;
             case AssistantText text:
@@ -389,6 +390,9 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
             case ToolResult result:
                 ShowResult(result);
                 break;
+            case GuardRefused refused:
+                ShowRefusal(refused);
+                break;
             case Diagnostic diagnostic:
                 Items.Add(new DiagnosticRow(diagnostic.Source, diagnostic.Text));
                 break;
@@ -402,16 +406,6 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     {
         if (!_calls.TryGetValue(result.ToolCallId, out var call))
         {
-            return;
-        }
-
-        if (RunTranscript.IsRefusal(result))
-        {
-            var reason = RunTranscript.RefusalReason(result);
-            Items[Items.IndexOf(call.Row)] = new RefusalRow(call.Row.Name, call.Row.Input, call.Path, reason);
-            Refusals++;
-            OnPropertyChanged(nameof(GuardCount));
-
             return;
         }
 
@@ -430,6 +424,23 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
 
             file.IsEdited |= call.Edits;
         }
+    }
+
+    /// <summary>Shows the refusal in place of the call it refused; the engine sends it instead of the result.</summary>
+    private void ShowRefusal(GuardRefused refused)
+    {
+        if (_calls.TryGetValue(refused.ToolCallId, out var call))
+        {
+            var row = new RefusalRow(refused.Tool, call.Row.Input, refused.Target, refused.Reason);
+            Items[Items.IndexOf(call.Row)] = row;
+        }
+        else
+        {
+            Items.Add(new RefusalRow(refused.Tool, refused.Target ?? string.Empty, refused.Target, refused.Reason));
+        }
+
+        Refusals++;
+        OnPropertyChanged(nameof(GuardCount));
     }
 
     private void End(RunCompleted completed, bool live)

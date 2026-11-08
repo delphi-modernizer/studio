@@ -15,15 +15,13 @@ change.
 | Browse… for the workspace folder when the folder picked already holds files | A new folder named after the workspace inside it, shown in the box before Next | `NewWorkspaceViewModel.BrowseFolder` |
 | Short names for deliverables in sign-off checks: the canvas names D01 to D09 ("System inventory", "Technology evaluation"); D10 to D20 are new | "Data migration strategy", "Testing strategy" and the like, one place to change | `SignOffWordings` |
 | The refusal's words for a check other than problems in the documents: the canvas words only "1 problem in the documents" | The check's name with its detail, as "System inventory in review (it is a draft)", one place to change | `SignOffRefusal` |
-| The preview's "[n] of [total] files" while scanning: the engine's scanner reports no progress | "Scanning the folder…" with an indeterminate bar | `NewWorkspacePage` |
 | Problem wording: the canvas words three trace rules (broken evidence, missing evidence, open question); the other eleven are new | Labels and sentences in the same style, one place to change | `ProblemWordings` |
 | Default window height | 760, as the brief says | `MainWindow.xaml` |
 | When does the pane collapse on its own? | Never; only from the title-bar toggle | `ShellPage` |
-| Guard refusals: the engine streams a refused tool call as a failed tool result, with no event of its own | A failed result whose text carries Claude Code's hook or permission wording reads as a refusal | `RunTranscript` |
 | A run's cost and turns while it runs: the stream reports them only in its result | "—" until the run ends, then the result's numbers | `RunViewModel` |
-| A run from an earlier session: the engine's transcript parser is internal, so the studio cannot replay the recorded `.jsonl` | The summary the run store keeps, and the transcript file with Open in editor | `RunViewModel.ShowRecordAsync` |
 | The budget a new run offers after one reached its own ("[higher budget]") | Twice the budget that was reached | `RunPage` |
-| Blocked by a run the studio did not start, such as `dmz run` in a terminal: the engine's leases name no holder publicly | Run… is offered; the engine refuses the lease and the dialog shows its reason | `StartRunCommand` |
+| A task blocked by a run the studio did not start, such as `dmz run` in a terminal: the canvas words only a blocking run the studio started ("Extract business rules (Legacy discovery) is writing them") | "Run [run id], which this studio did not start, is writing them, started [time]." | `RunNames.BlockedByOtherRun` |
+| Open run for a task blocked by a run the studio did not start: the canvas draws Open run beside every Blocked pill, but the Run page has no drawn state for a run in progress that the studio neither follows nor can stop | The reason without Open run; the run joins the history once it ends | `TaskRow.CanOpenBlocker` |
 | The Run an agent task dialog's description: the kit has none per recipe; the canvas draws one for Extract business rules | One sentence from what the recipe writes | `RunRecipeDialog` |
 | Short names for what a recipe writes ("Writes the functional requirements") | The kit's deliverable titles | `RunWords.Writes` |
 | Title-bar Back from a New workspace with fields filled: the navigation model says it asks first, but no dialog is drawn | Leaves without asking; nothing is on disk before Create | `NewWorkspaceViewModel` |

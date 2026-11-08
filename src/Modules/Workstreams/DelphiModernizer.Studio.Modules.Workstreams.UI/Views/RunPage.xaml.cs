@@ -168,9 +168,4 @@ public sealed partial class RunPage : Page, IHasViewModel
             await ViewModel.OpenFileAsync(row.Path);
         }
     }
-
-    private async void OnOpenTranscript(object sender, RoutedEventArgs e)
-    {
-        await ViewModel.OpenFileAsync(ViewModel.TranscriptFile);
-    }
 }

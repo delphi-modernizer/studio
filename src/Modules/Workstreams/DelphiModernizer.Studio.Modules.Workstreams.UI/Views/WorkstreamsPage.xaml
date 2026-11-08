@@ -337,7 +337,8 @@
                                                         <HyperlinkButton
                                                             Padding="4,0"
                                                             Click="OnOpenBlockingRun"
-                                                            Content="Open run" />
+                                                            Content="Open run"
+                                                            Visibility="{x:Bind CanOpenBlocker}" />
                                                     </StackPanel>
                                                 </StackPanel>
                                                 <Button
