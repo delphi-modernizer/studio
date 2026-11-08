@@ -59,6 +59,8 @@ public sealed record TaskRow(
     /// <summary>Only the studio's own run has a Run page to open (open questions).</summary>
     public bool CanOpenBlocker => Blocker?.Run is not null;
 
+    public bool IsBlockedElsewhere => IsBlocked && !CanOpenBlocker;
+
     /// <summary>Run… stays on without Claude Code, as drawn; it then opens the Claude Code dialog.</summary>
     public bool CanRun => !IsBlocked;
 

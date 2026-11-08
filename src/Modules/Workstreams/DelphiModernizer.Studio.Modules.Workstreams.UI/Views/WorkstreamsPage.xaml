@@ -341,28 +341,36 @@
                                                             Text="{x:Bind WritesLine}"
                                                             TextWrapping="Wrap" />
                                                     </controls:WrapPanel>
-                                                    <!--  One line as drawn: pill, reason, Open run; it wraps only when narrow.  -->
-                                                    <controls:WrapPanel
+                                                    <!--  The pill, then the reason with Open run inline, as drawn.  -->
+                                                    <Grid
                                                         Margin="0,4,0,0"
-                                                        HorizontalSpacing="6"
-                                                        VerticalSpacing="4"
+                                                        ColumnSpacing="6"
                                                         Visibility="{x:Bind IsBlocked}">
-                                                        <controls:StatusPill VerticalAlignment="Center" State="Blocked" />
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <controls:StatusPill VerticalAlignment="Top" State="Blocked" />
                                                         <TextBlock
-                                                            VerticalAlignment="Center"
+                                                            Grid.Column="1"
+                                                            Margin="0,2,0,0"
+                                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                                            Tag="{x:Bind}"
+                                                            TextWrapping="Wrap"
+                                                            Visibility="{x:Bind CanOpenBlocker}">
+                                                            <Run Text="{x:Bind BlockedReason}" />
+                                                            <Hyperlink Click="OnOpenBlockingRun" UnderlineStyle="None">
+                                                                <Run Text="Open run" />
+                                                            </Hyperlink>
+                                                        </TextBlock>
+                                                        <TextBlock
+                                                            Grid.Column="1"
+                                                            Margin="0,2,0,0"
                                                             Style="{StaticResource CaptionTextBlockStyle}"
                                                             Text="{x:Bind BlockedReason}"
-                                                            TextWrapping="Wrap" />
-                                                        <HyperlinkButton
-                                                            MinHeight="0"
-                                                            Padding="0"
-                                                            VerticalAlignment="Center"
-                                                            FontSize="12"
-                                                            Click="OnOpenBlockingRun"
-                                                            Content="Open run"
-                                                            Tag="{x:Bind}"
-                                                            Visibility="{x:Bind CanOpenBlocker}" />
-                                                    </controls:WrapPanel>
+                                                            TextWrapping="Wrap"
+                                                            Visibility="{x:Bind IsBlockedElsewhere}" />
+                                                    </Grid>
                                                 </StackPanel>
                                                 <Button
                                                     Grid.Column="1"
