@@ -217,7 +217,10 @@ internal static class Groups
             h.Step(app, theme, "overview loading", () => app.Capture("overview", "loading", () => {
                 app.Navigate("Inventory", 4000);
                 app.Navigate("Overview", 0);
-                app.WaitBriefly(c => c.ByName("Reading the workspace"), "Reading the workspace", _brief);
+                app.WaitBriefly(
+                    c => c.ByName("Checking sign-offs, deliverables and traceability"),
+                    "Overview's loading state",
+                    _brief);
             }));
         });
     }
