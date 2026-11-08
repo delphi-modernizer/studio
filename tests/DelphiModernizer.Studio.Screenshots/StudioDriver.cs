@@ -91,6 +91,54 @@ internal sealed class StudioDriver : IDisposable
         }
     }
 
+    /// <summary>Captures a state that shows only while the app works, with the app held to one processor.</summary>
+    /// <remarks>
+    /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
+    /// </remarks>
+    /// <param name="trigger">Starts the work and waits until the state shows.</param>
+    public void CaptureWhileBusy(string page, string state, Action trigger, IReadOnlyList<Size>? sizes = null)
+    {
+        var process = Process.GetProcessById(_app.ProcessId);
+        nint every = process.ProcessorAffinity;
+
+        foreach (var size in sizes ?? Sizes)
+        {
+            var frame = Resize(size);
+            process.ProcessorAffinity = 1;
+
+            try
+            {
+                TryTimes(3, trigger);
+                Settle(300);
+                Save(page, state, size, frame);
+            }
+            finally
+            {
+                process.ProcessorAffinity = every;
+            }
+        }
+    }
+
+    /// <remarks>A state that lasts a second or two can still end between two UI Automation queries.</remarks>
+    private static void TryTimes(int times, Action action)
+    {
+        for (int attempt = 1; attempt < times; attempt++)
+        {
+            try
+            {
+                action();
+
+                return;
+            }
+            catch (TimeoutException)
+            {
+                Console.WriteLine($"  missed, trying again ({attempt} of {times})");
+            }
+        }
+
+        action();
+    }
+
     /// <summary>Captures one part of the window at 1280 × 800: the title bar or the navigation pane.</summary>
     public void CapturePart(string page, string state, bool pane)
     {
@@ -114,7 +162,7 @@ internal sealed class StudioDriver : IDisposable
         }
 
         _window.SetForeground();
-        Mouse.MoveTo(new Point(frame.Right + 40, frame.Bottom + 40));
+        Desktop.MovePointer(new Point(frame.Right + 40, frame.Bottom + 40));
         Settle(1200);
 
         return frame;
@@ -170,7 +218,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Presses the button showing <paramref name="name"/> beside the text <paramref name="row"/>.</summary>
     /// <remarks>
     /// UI Automation exposes no name for a button with a glyph and text, so the button is the one around its own
-    /// text, level with the row's title; it is pressed from the keyboard, focus then Space.
+    /// text, level with the row's title; it is clicked.
     /// </remarks>
     public void ClickBeside(string row, string name)
     {
@@ -187,8 +235,7 @@ internal sealed class StudioDriver : IDisposable
             throw new InvalidOperationException($"{name} beside {row} is disabled.");
         }
 
-        button.Focus();
-        Keyboard.Type(VirtualKeyShort.SPACE);
+        ClickOn(button, name);
         Settle(2500);
     }
 
@@ -204,10 +251,7 @@ internal sealed class StudioDriver : IDisposable
                 _findTimeout,
                 ignoreException: true)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
-        // Enter opens a row, as the handoff's keyboard order says; a row below the fold has no point to click.
-        row.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
-        row.Focus();
-        Keyboard.Type(VirtualKeyShort.ENTER);
+        ClickOn(row, text);
         Settle(4000);
     }
 
@@ -287,7 +331,9 @@ internal sealed class StudioDriver : IDisposable
     {
         var element = Find(e => Id(e) == automationId, automationId);
         element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
-        Mouse.MoveTo(element.BoundingRectangle.Center());
+        var center = element.BoundingRectangle.Center();
+        Desktop.MovePointer(new Point(center.X - 20, center.Y));
+        Desktop.MovePointer(center);
         Settle(2500);
     }
 
@@ -301,10 +347,25 @@ internal sealed class StudioDriver : IDisposable
         Settle(1500);
     }
 
-    public void ScrollIntoView(string automationId)
+    /// <summary>Scrolls the scroll viewer that holds this element to an offset from its top.</summary>
+    /// <remarks>UI Automation scrolls by percent; the viewport's share of the extent turns pixels into one.</remarks>
+    public void ScrollTo(string automationId, double pixels)
     {
-        Find(e => Id(e) == automationId, automationId).Patterns.ScrollItem.Pattern.ScrollIntoView();
-        Settle(1500);
+        for (var element = Find(e => Id(e) == automationId, automationId); element is not null; element = element.Parent)
+        {
+            if (element.Patterns.Scroll.TryGetPattern(out var scroll) && scroll.VerticallyScrollable.Value)
+            {
+                double viewport = element.BoundingRectangle.Height;
+                double extent = viewport * 100 / scroll.VerticalViewSize.Value;
+                double percent = Math.Clamp(pixels * 100 / (extent - viewport), 0, 100);
+                scroll.SetScrollPercent(ScrollPatternConstants.NoScroll, percent);
+                Settle(1500);
+
+                return;
+            }
+        }
+
+        throw new InvalidOperationException($"Nothing scrolls {automationId}.");
     }
 
     /// <summary>Waits until an element with this name, or whose name starts with it, shows.</summary>
@@ -393,13 +454,41 @@ internal sealed class StudioDriver : IDisposable
         }
     }
 
-    /// <summary>Presses a button as a keyboard user does: focus, then Space.</summary>
-    public void PressWithKeyboard(string name)
+    /// <summary>Clicks a button with the pointer, as a person does.</summary>
+    public void Click(string name)
     {
-        var element = Find(e => IsAction(e) && Matches(e, name), name);
-        element.Focus();
-        Keyboard.Type(VirtualKeyShort.SPACE);
+        ClickOn(Find(e => IsAction(e) && Matches(e, name), name), name);
         Settle(2500);
+    }
+
+    /// <remarks>
+    /// A list's ScrollIntoView scrolls the list but not the page around it, and an element below the fold has an
+    /// empty rectangle; focus scrolls every scroll viewer around it, and after pointer input it draws no focus ring.
+    /// </remarks>
+    private void ClickOn(AutomationElement element, string what)
+    {
+        element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
+
+        if (!InWindow(element))
+        {
+            element.Focus();
+            Settle(500);
+        }
+
+        if (!InWindow(element))
+        {
+            throw new InvalidOperationException($"{what} is not in the window to click.");
+        }
+
+        Desktop.Click(element.BoundingRectangle.Center());
+    }
+
+    private bool InWindow(AutomationElement element)
+    {
+        var bounds = element.BoundingRectangle;
+        var window = Desktop.VisibleFrame(Handle);
+
+        return !bounds.IsEmpty && window.Contains(bounds.Center());
     }
 
     public static string Slug(string name)
