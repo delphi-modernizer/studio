@@ -93,6 +93,8 @@
   so a deliverable deleted outside the studio counts as soon as another page opens.
 - Deliverables sets the gate pills of its sign-off headings in semibold, as the rest of the heading row.
 - Inventory's scanning card draws the design's 12 px busy ring.
+- Inventory stacks its data cards under 1100, spaces their places as the canvas does and sets Types in semibold with
+  its dash centred; Traceability keeps each problem's rule on one line and narrows Where at 960, trimming its path.
 - Deliverables names a missing file by its short name ("The testing strategy file is missing."); the deliverables'
   short names are shared, so Sign-offs reads the same words.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed

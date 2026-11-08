@@ -318,8 +318,8 @@
                             <Grid Style="{StaticResource TableHeaderStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="96" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="240" />
+                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="2*" MaxWidth="240" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Severity" />
                                 <TextBlock
@@ -344,8 +344,8 @@
                                         <Grid ColumnSpacing="12">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="96" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="240" />
+                                                <ColumnDefinition Width="3*" />
+                                                <ColumnDefinition Width="2*" MaxWidth="240" />
                                             </Grid.ColumnDefinitions>
                                             <controls:StatusPill
                                                 HorizontalAlignment="Left"
@@ -358,7 +358,9 @@
                                                     TextWrapping="Wrap" />
                                                 <TextBlock
                                                     Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                    Text="{x:Bind Rule}" />
+                                                    Text="{x:Bind Rule}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap" />
                                             </StackPanel>
                                             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                                 <HyperlinkButton
