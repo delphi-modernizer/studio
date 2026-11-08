@@ -11,7 +11,8 @@ using DelphiModernizer.Studio.UI.Common.Icons;
 namespace DelphiModernizer.Studio.Modules.SignOffs.UI.ViewModels;
 
 /// <summary>One check of a sign-off: met, not yet met, or failing on problems in the documents.</summary>
-public sealed record CheckRow(SignOffCheck Check)
+/// <param name="IsFirst">The first check, which has no divider above it.</param>
+public sealed record CheckRow(SignOffCheck Check, bool IsFirst)
 {
     public string Name => Check.Name;
 
@@ -85,7 +86,7 @@ public sealed partial class SignOffRow : ObservableObject
         Approves = signOff.Approves;
         Pill = PillStates.OfGate(signOff.Status.State);
         IsLast = signOff.Number == count;
-        Checks = [.. signOff.Checks.Select(c => new CheckRow(c))];
+        Checks = [.. signOff.Checks.Select((c, i) => new CheckRow(c, i == 0))];
         int passed = Checks.Count(c => c.Passed);
         PassCount = $"{passed} of {Checks.Count} pass";
         int failing = Checks.Count - passed;

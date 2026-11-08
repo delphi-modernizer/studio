@@ -73,6 +73,18 @@
 - Table rows show their dividers, the Workstreams badge is the accent fill, and a status pill can take its own glyph.
 - Busy rings are the design's 12 px half arc, still when Windows turns animations off; a Starting pill joins Running.
 - Fact labels are 18 tall with their whole word visible, and a path can take a colour of its own.
+- Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
+  notice no longer leaves a gap.
+- Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code
+  (it then opens the Claude Code dialog), and reads a task's argument as "Scope, required: a unit, form…".
+- Run's transcript starts with the session, divides its items, shows each fact label right after its claim and each
+  evidence link only under it, an edit's input as its file, and a starting run's budget; the end card spreads its
+  numbers over four columns and shows what the run spent.
+- Run an agent task and the budget dialog show the budget as "$2.00" and Run with its play icon; the budget,
+  approve and revoke dialogs have no default button, so Enter never spends money or approves, and Cancel and Close are
+  drawn plain.
+- The approve dialog and Sign-offs show covered paths whole and the fingerprint wrapped with its label; Sign-offs'
+  checks are divided by hairlines.
 
 ### Fixed
 

@@ -105,9 +105,11 @@
         <Setter Property="Background" Value="{ThemeResource AccentFillColorDefaultBrush}" />
     </Style>
 
+    <FontFamily x:Key="MonoFontFamily">Cascadia Mono,Consolas</FontFamily>
+
     <!--  Paths, fingerprints, commits, commands and the document IDs people search for.  -->
     <Style x:Key="MonoTextStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Cascadia Mono,Consolas" />
+        <Setter Property="FontFamily" Value="{StaticResource MonoFontFamily}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="LineHeight" Value="16" />
         <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
