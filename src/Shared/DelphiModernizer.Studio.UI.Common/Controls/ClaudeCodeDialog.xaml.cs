@@ -26,6 +26,7 @@ public sealed partial class ClaudeCodeDialog : ContentDialog
         PrimaryButtonText = IsUpdate ? "Test again" : "Get Claude Code";
         SecondaryButtonText = IsUpdate ? "Open Settings" : "Choose claude.exe…";
         Opened += (_, _) => FocusPrimary();
+        DialogMargins.Apply(this);
     }
 
     /// <summary>Joins each slash of a link to what follows it, so a link wraps whole and never after "https://".</summary>
