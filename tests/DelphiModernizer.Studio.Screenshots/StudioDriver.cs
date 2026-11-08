@@ -161,12 +161,12 @@ internal sealed class StudioDriver : IDisposable
     {
         try
         {
-            // An indeterminate bar, drawn while the total is still counted, offers no value; only a value counts.
-            var element = _window.FindFirstDescendant(shows);
-
-            return element is not null
-                && (Type(element) != ControlType.ProgressBar
-                    || (element.Patterns.RangeValue.TryGetPattern(out var range) && range.Value.ValueOrDefault > 0));
+            // A ring and an indeterminate bar, drawn while the total is still counted, offer no value; any match counts
+            // once one has a value.
+            return _window
+                .FindAllDescendants(shows)
+                .Any(e => Type(e) != ControlType.ProgressBar
+                    || (e.Patterns.RangeValue.TryGetPattern(out var range) && range.Value.ValueOrDefault > 0));
         }
         catch (COMException)
         {
