@@ -83,6 +83,8 @@
   inventory.
 - Traceability lists errors before warnings, says where the errors are and how strict mode splits them, shows its
   status glyphs in the page's theme, and sets file links in Cascadia Mono.
+- Inventory's Cycle, Text and Embedded password pills show the canvas's cycle, document and key glyphs, and the
+  sign-off and folder headings of Deliverables and Inventory keep the row divider above them.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
   notice no longer leaves a gap.
 - Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code

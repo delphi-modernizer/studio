@@ -30,9 +30,9 @@
 
             <DataTemplate x:Key="DeliverableRowTemplate" x:DataType="vm:DeliverableRow">
                 <Grid>
-                    <!--  A sign-off's heading fills its row, padding included.  -->
+                    <!--  A sign-off's heading fills its row under the divider, padding included.  -->
                     <Grid
-                        Margin="-16,-6"
+                        Margin="-16,-5,-16,-6"
                         Padding="16,6"
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                         ColumnSpacing="8"
@@ -100,9 +100,9 @@
             <!--  Under 1100 Drafted by is 128 wide, as the canvas draws it.  -->
             <DataTemplate x:Key="DeliverableRowNarrowTemplate" x:DataType="vm:DeliverableRow">
                 <Grid>
-                    <!--  A sign-off's heading fills its row, padding included.  -->
+                    <!--  A sign-off's heading fills its row under the divider, padding included.  -->
                     <Grid
-                        Margin="-16,-6"
+                        Margin="-16,-5,-16,-6"
                         Padding="16,6"
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                         ColumnSpacing="8"
@@ -192,137 +192,128 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <!--  The page fills the width up to its MaxWidth and stays left-aligned beyond it.  -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MaxWidth="{StaticResource PageMaxWidth}" />
-                </Grid.ColumnDefinitions>
-                <StackPanel
-                    x:Name="PageContent"
-                    HorizontalAlignment="Stretch"
-                    Style="{StaticResource PageContentStyle}">
-                    <controls:PageHeader Title="Deliverables">
-                        <controls:PageHeader.Purpose>
-                            The 20 documents of the modernization plan: which team drafts each one, which sign-off needs
-                            it, and where it stands.
-                        </controls:PageHeader.Purpose>
-                        <controls:PageHeader.Actions>
-                            <Button Click="OnOpenDocs" Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon
-                                        Glyph="{x:Bind icons:StudioIcons.OpenFolder}"
-                                        Style="{StaticResource IconStyle}" />
-                                    <TextBlock Text="Open docs/" />
-                                </StackPanel>
-                            </Button>
-                        </controls:PageHeader.Actions>
-                    </controls:PageHeader>
+            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+                <controls:PageHeader Title="Deliverables">
+                    <controls:PageHeader.Purpose>
+                        The 20 documents of the modernization plan: which team drafts each one, which sign-off needs
+                        it, and where it stands.
+                    </controls:PageHeader.Purpose>
+                    <controls:PageHeader.Actions>
+                        <Button Click="OnOpenDocs" Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon
+                                    Glyph="{x:Bind icons:StudioIcons.OpenFolder}"
+                                    Style="{StaticResource IconStyle}" />
+                                <TextBlock Text="Open docs/" />
+                            </StackPanel>
+                        </Button>
+                    </controls:PageHeader.Actions>
+                </controls:PageHeader>
 
-                    <controls:NoWorkspaceState
-                        Glyph="{x:Bind icons:StudioIcons.Deliverables}"
-                        Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
-                        <controls:NoWorkspaceState.Message>
-                            Deliverables lists a workspace’s 20 documents: which team drafts each one, which sign-off
-                            needs it, and where it stands. Open or start a workspace to see them.
-                        </controls:NoWorkspaceState.Message>
-                    </controls:NoWorkspaceState>
+                <controls:NoWorkspaceState
+                    Glyph="{x:Bind icons:StudioIcons.Deliverables}"
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        Deliverables lists a workspace’s 20 documents: which team drafts each one, which sign-off
+                        needs it, and where it stands. Open or start a workspace to see them.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
 
+                <InfoBar
+                    IsClosable="False"
+                    IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
+                    Message="{x:Bind ViewModel.Problem, Mode=OneWay}"
+                    Severity="Error"
+                    Title="Couldn’t read the deliverables."
+                    Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}">
+                    <InfoBar.IconSource>
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                    </InfoBar.IconSource>
+                </InfoBar>
+
+                <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsOpen, Mode=OneWay}">
                     <InfoBar
                         IsClosable="False"
-                        IsOpen="{x:Bind ViewModel.HasProblem, Mode=OneWay}"
-                        Message="{x:Bind ViewModel.Problem, Mode=OneWay}"
+                        IsOpen="{x:Bind ViewModel.AllTemplates, Mode=OneWay}"
+                        Severity="Informational"
+                        Title="Every deliverable is still a template."
+                        Visibility="{x:Bind ViewModel.AllTemplates, Mode=OneWay}">
+                        <InfoBar.Message>
+                            Write them yourself, or run a team’s agent task so an agent drafts them for you to
+                            review.
+                        </InfoBar.Message>
+                        <InfoBar.IconSource>
+                            <FontIconSource
+                                FontFamily="{StaticResource StudioIconsFontFamily}"
+                                Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
+                        </InfoBar.IconSource>
+                        <InfoBar.ActionButton>
+                            <Button Click="OnGoToWorkstreams" Content="Go to Workstreams" />
+                        </InfoBar.ActionButton>
+                    </InfoBar>
+                    <InfoBar
+                        AutomationProperties.LiveSetting="Assertive"
+                        IsClosable="False"
+                        IsOpen="{x:Bind ViewModel.HasMissing, Mode=OneWay}"
+                        Message="{x:Bind ViewModel.MissingMessage, Mode=OneWay}"
                         Severity="Error"
-                        Title="Couldn’t read the deliverables."
-                        Visibility="{x:Bind ViewModel.HasProblem, Mode=OneWay}">
+                        Title="{x:Bind ViewModel.MissingTitle, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.HasMissing, Mode=OneWay}">
                         <InfoBar.IconSource>
                             <FontIconSource
                                 FontFamily="{StaticResource StudioIconsFontFamily}"
                                 Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
                         </InfoBar.IconSource>
+                        <InfoBar.ActionButton>
+                            <Button Command="{x:Bind ViewModel.RestoreCommand}" Content="Restore from template" />
+                        </InfoBar.ActionButton>
                     </InfoBar>
 
-                    <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsOpen, Mode=OneWay}">
-                        <InfoBar
-                            IsClosable="False"
-                            IsOpen="{x:Bind ViewModel.AllTemplates, Mode=OneWay}"
-                            Severity="Informational"
-                            Title="Every deliverable is still a template."
-                            Visibility="{x:Bind ViewModel.AllTemplates, Mode=OneWay}">
-                            <InfoBar.Message>
-                                Write them yourself, or run a team’s agent task so an agent drafts them for you to
-                                review.
-                            </InfoBar.Message>
-                            <InfoBar.IconSource>
-                                <FontIconSource
-                                    FontFamily="{StaticResource StudioIconsFontFamily}"
-                                    Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
-                            </InfoBar.IconSource>
-                            <InfoBar.ActionButton>
-                                <Button Click="OnGoToWorkstreams" Content="Go to Workstreams" />
-                            </InfoBar.ActionButton>
-                        </InfoBar>
-                        <InfoBar
-                            AutomationProperties.LiveSetting="Assertive"
-                            IsClosable="False"
-                            IsOpen="{x:Bind ViewModel.HasMissing, Mode=OneWay}"
-                            Message="{x:Bind ViewModel.MissingMessage, Mode=OneWay}"
-                            Severity="Error"
-                            Title="{x:Bind ViewModel.MissingTitle, Mode=OneWay}"
-                            Visibility="{x:Bind ViewModel.HasMissing, Mode=OneWay}">
-                            <InfoBar.IconSource>
-                                <FontIconSource
-                                    FontFamily="{StaticResource StudioIconsFontFamily}"
-                                    Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
-                            </InfoBar.IconSource>
-                            <InfoBar.ActionButton>
-                                <Button Command="{x:Bind ViewModel.RestoreCommand}" Content="Restore from template" />
-                            </InfoBar.ActionButton>
-                        </InfoBar>
+                    <SelectorBar
+                        x:Name="FilterBar"
+                        AutomationProperties.Name="Filter by status"
+                        SelectionChanged="OnFilterChanged" />
 
-                        <SelectorBar
-                            x:Name="FilterBar"
-                            AutomationProperties.Name="Filter by status"
-                            SelectionChanged="OnFilterChanged" />
-
-                        <Border Style="{StaticResource FlushCardStyle}">
-                            <StackPanel>
-                                <Grid Style="{StaticResource TableHeaderStyle}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition x:Name="OwnerColumn" Width="168" />
-                                        <ColumnDefinition Width="112" />
-                                        <ColumnDefinition Width="32" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Deliverable and file" />
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Drafted by" />
-                                    <TextBlock
-                                        Grid.Column="2"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Status" />
-                                </Grid>
-                                <ListView
-                                    x:Name="Table"
-                                    AutomationProperties.Name="Deliverables"
-                                    IsItemClickEnabled="True"
-                                    ItemClick="OnRowClicked"
-                                    ItemContainerStyle="{StaticResource TableRowStyle}"
-                                    ItemTemplate="{StaticResource DeliverableRowTemplate}"
-                                    ItemsSource="{x:Bind ViewModel.Rows, Mode=OneWay}"
-                                    SelectionMode="None" />
-                            </StackPanel>
-                        </Border>
-                        <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
-                            Approved shows only while the sign-off’s approval is current. Status is read from each
-                            file; agents can move a file to Draft, never to Approved.
-                        </TextBlock>
-                    </StackPanel>
+                    <Border Style="{StaticResource FlushCardStyle}">
+                        <StackPanel>
+                            <Grid Style="{StaticResource TableHeaderStyle}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition x:Name="OwnerColumn" Width="168" />
+                                    <ColumnDefinition Width="112" />
+                                    <ColumnDefinition Width="32" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Deliverable and file" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Drafted by" />
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Status" />
+                            </Grid>
+                            <ListView
+                                x:Name="Table"
+                                AutomationProperties.Name="Deliverables"
+                                IsItemClickEnabled="True"
+                                ItemClick="OnRowClicked"
+                                ItemContainerStyle="{StaticResource TableRowStyle}"
+                                ItemTemplate="{StaticResource DeliverableRowTemplate}"
+                                ItemsSource="{x:Bind ViewModel.Rows, Mode=OneWay}"
+                                SelectionMode="None" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                        Approved shows only while the sign-off’s approval is current. Status is read from each
+                        file; agents can move a file to Draft, never to Approved.
+                    </TextBlock>
                 </StackPanel>
-            </Grid>
+            </controls:FullWidthStackPanel>
         </ScrollViewer>
     </Grid>
 </Page>
