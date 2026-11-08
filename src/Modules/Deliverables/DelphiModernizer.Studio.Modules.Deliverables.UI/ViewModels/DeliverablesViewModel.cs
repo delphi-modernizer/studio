@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DelphiModernizer.Engine.Traceability;
+using DelphiModernizer.Studio.Application.Abstractions.Deliverables;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.SignOffs;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
@@ -63,7 +64,9 @@ public sealed partial class DeliverablesViewModel : WorkspacePageViewModel
 
     public bool HasMissing => Missing is not null;
 
-    public string MissingTitle => Missing is null ? string.Empty : $"{Missing.Title} is missing.";
+    public string MissingTitle => Missing is null
+        ? string.Empty
+        : $"The {DeliverableNames.ShortName(Missing.Id, Missing.Title).ToLowerInvariant()} file is missing.";
 
     public string MissingMessage => Missing is null
         ? string.Empty

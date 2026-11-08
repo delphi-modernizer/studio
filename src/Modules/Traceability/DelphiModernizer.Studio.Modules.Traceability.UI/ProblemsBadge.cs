@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using DelphiModernizer.Studio.Application.Abstractions.Messaging;
 using DelphiModernizer.Studio.Application.Abstractions.Workspaces;
@@ -10,14 +11,15 @@ namespace DelphiModernizer.Studio.Modules.Traceability.UI;
 
 /// <summary>The Traceability item's badge: the problems the trace finds in the open workspace's documents.</summary>
 /// <remarks>
-/// It checks again on every navigation, so a document changed outside the studio, such as one deleted, shows on the
-/// next page; it keeps the strictness of the Traceability page's last check.
+/// It checks again on every navigation, off the UI thread and never twice at once, so a document changed outside the
+/// studio, such as one deleted, shows on the next page; it keeps the strictness of the Traceability page's last check.
 /// </remarks>
 public sealed class ProblemsBadge : IBadgeSource
 {
     private readonly IWorkspaceSession _session;
     private readonly ISender _sender;
     private bool _strict;
+    private int _checking;
 
     public ProblemsBadge(IWorkspaceSession session, ISender sender, INavigationService navigation)
     {
@@ -51,7 +53,22 @@ public sealed class ProblemsBadge : IBadgeSource
 
     private async Task RefreshAsync()
     {
-        var trace = _session.Current is null ? null : await _sender.Send(new RunTraceQuery(_strict));
-        Show(trace is { IsSuccess: true } ? trace.Value.Trace.Errors : 0, _strict);
+        if (Interlocked.Exchange(ref _checking, 1) == 1)
+        {
+            return;
+        }
+
+        try
+        {
+            bool strict = _strict;
+            var trace = _session.Current is null
+                ? null
+                : await Task.Run(() => _sender.Send(new RunTraceQuery(strict))).ConfigureAwait(false);
+            Show(trace is { IsSuccess: true } ? trace.Value.Trace.Errors : 0, _strict);
+        }
+        finally
+        {
+            Volatile.Write(ref _checking, 0);
+        }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using DelphiModernizer.Engine.Kit;
+using DelphiModernizer.Studio.Application.Abstractions.Deliverables;
 using DelphiModernizer.Studio.Application.Abstractions.SignOffs;
 using DelphiModernizer.Studio.Application.Abstractions.Workstreams;
 using Xunit;
@@ -21,6 +22,19 @@ public sealed class NameMappingTests
         Assert.Equal(ids, SignOffNames.Gates.Order());
         Assert.All(gates, gate => Assert.Equal(gate.Name, SignOffNames.Of(gate.Id)));
         Assert.All(gates, gate => Assert.DoesNotContain(gate.Id, SignOffNames.Of(gate.Id), StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Every_deliverable_in_the_kit_has_a_short_name()
+    {
+        var deliverables = KitBundle.Embedded.Spec.Deliverables.Deliverables;
+        var ids = deliverables
+            .Select(d => d.Id)
+            .Order();
+
+        Assert.Equal(ids, DeliverableNames.Deliverables.Order());
+        Assert.Equal("Testing strategy", DeliverableNames.ShortName("D14", "D14 Testing strategy"));
+        Assert.Equal("Kit title", DeliverableNames.ShortName("D99", "Kit title"));
     }
 
     [Fact]
