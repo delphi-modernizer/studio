@@ -183,6 +183,9 @@ public sealed partial class ShellPage : Page
     /// </remarks>
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
+        Services.NavTrace.Write(
+            $"SelectionChanged {(args.SelectedItemContainer as NavigationViewItem)?.Tag} shown={_shownOwner?.Tag}");
+
         if (args.SelectedItemContainer is NavigationViewItem { Tag: string key } container
             && !ReferenceEquals(container, _shownOwner))
         {
@@ -195,6 +198,8 @@ public sealed partial class ShellPage : Page
     /// </summary>
     private void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
+        Services.NavTrace.Write($"ItemInvoked {(args.InvokedItemContainer as NavigationViewItem)?.Tag}");
+
         if (args.InvokedItemContainer is NavigationViewItem { Tag: string key } container
             && ReferenceEquals(container, NavView.SelectedItem)
             && NavFrame.Content?.GetType().Name != key + "Page")

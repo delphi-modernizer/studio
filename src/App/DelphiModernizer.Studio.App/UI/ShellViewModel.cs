@@ -54,5 +54,6 @@ public sealed partial class ShellViewModel : ViewModel
     private void OnNavigated(object? sender, NavigationEvent e)
     {
         CanGoBack = _navigation.CanGoBack;
+        Services.NavTrace.Write($"Navigated {e.PageKey} CanGoBack={CanGoBack}");
     }
 }

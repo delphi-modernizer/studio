@@ -62,6 +62,8 @@ public sealed class NavigationService : INavigationService
 
     public bool NavigateTo(string pageKey, object? parameter = null)
     {
+        NavTrace.Write($"NavigateTo {pageKey} from {_current?.Key} back={_back.Count}");
+
         if (Create(pageKey, parameter) is not { } entry)
         {
             return false;
@@ -85,6 +87,8 @@ public sealed class NavigationService : INavigationService
 
     public bool NavigateFresh(string pageKey, object? parameter = null)
     {
+        NavTrace.Write($"NavigateFresh {pageKey} from {_current?.Key} back={_back.Count}");
+
         if (Create(pageKey, parameter) is not { } entry)
         {
             return false;
