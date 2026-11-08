@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using DelphiModernizer.Studio.Application.Abstractions.Agents;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -21,11 +22,22 @@ public sealed partial class ClaudeCodeDialog : ContentDialog
                 + "nothing else in the workspace is affected."
             : "Running an agent task needs Claude Code on this PC. Install it, or point the studio at claude.exe "
                 + "in Settings.";
-        EngineMessage.Text = status.Problem ?? string.Empty;
+        EngineMessage.Text = KeepLinksWhole(status.Problem ?? string.Empty);
         PrimaryButtonText = IsUpdate ? "Test again" : "Get Claude Code";
         SecondaryButtonText = IsUpdate ? "Open Settings" : "Choose claude.exe…";
         Opened += (_, _) => FocusPrimary();
     }
+
+    /// <summary>Joins each slash of a link to what follows it, so a link wraps whole and never after "https://".</summary>
+    /// <remarks>U+2060, the word joiner, is invisible; the engine's words are shown as written.</remarks>
+    private static string KeepLinksWhole(string text)
+    {
+        return Links()
+            .Replace(text, link => link.Value.Replace("/", "/\u2060", StringComparison.Ordinal));
+    }
+
+    [GeneratedRegex(@"https?://\S+")]
+    private static partial Regex Links();
 
     /// <summary>True when Claude Code is found but too old, so the buttons offer a test and Settings.</summary>
     public bool IsUpdate { get; }
