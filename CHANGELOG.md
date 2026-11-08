@@ -97,8 +97,8 @@
 - Run an agent task and the budget dialog show the budget as "2.00" after a grey "$", as Settings does, and Run with
   its play icon; the budget, approve and revoke dialogs have no default button, so Enter never spends money or
   approves, and Cancel and Close are drawn plain.
-- The approve dialog lists every covered file and its fingerprint on one line; Sign-offs trims covered paths instead
-  of wrapping them, and its checks are divided by hairlines.
+- The approve dialog and Sign-offs show the fingerprint on one line, whole on hover; the dialog lists every covered
+  file, and Sign-offs trims covered paths instead of wrapping them and divides its checks by hairlines.
 - The no-identity approve dialog keeps its note label in full colour while the box is off.
 - Workstreams shows a Blocked reason on one line with Open run, and a run's time alone when it started today.
 - Run's Files touched lists the files a folder search matched, not the folder, and puts edited files first; a starting

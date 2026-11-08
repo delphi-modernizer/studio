@@ -469,17 +469,19 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <FontIcon
-                                                    VerticalAlignment="Top"
+                                                    VerticalAlignment="Center"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Glyph="{x:Bind icons:StudioIcons.Fingerprint}"
                                                     Style="{StaticResource IconStyle}" />
+                                                <!--  Label and hash on one line as drawn; trimmed, whole on hover.  -->
                                                 <TextBlock
                                                     Grid.Column="1"
                                                     VerticalAlignment="Center"
                                                     IsTextSelectionEnabled="True"
                                                     Style="{StaticResource MonoTextStyle}"
-                                                    TextTrimming="None"
-                                                    TextWrapping="Wrap">
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap"
+                                                    ToolTipService.ToolTip="{x:Bind Fingerprint}">
                                                     <Run Text="Fingerprint" />
                                                     <Run Text="{x:Bind Fingerprint}" />
                                                 </TextBlock>
