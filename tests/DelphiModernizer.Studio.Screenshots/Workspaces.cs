@@ -102,6 +102,12 @@ internal sealed class Workspaces : IDisposable
     {
         try
         {
+            // git writes its objects read-only, and Windows does not delete a read-only file.
+            foreach (var file in Directory.EnumerateFiles(_root, "*", SearchOption.AllDirectories))
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+            }
+
             Directory.Delete(_root, recursive: true);
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)

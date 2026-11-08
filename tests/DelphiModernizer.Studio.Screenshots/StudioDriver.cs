@@ -121,7 +121,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Selects a pane item by its automation ID, the page key such as <c>SignOffs</c>.</summary>
     public void Navigate(string pageKey, int settle = 2500)
     {
-        var item = Find(e => e.AutomationId == pageKey, pageKey);
+        var item = Find(e => Id(e) == pageKey, pageKey);
 
         if (item.Patterns.SelectionItem.TryGetPattern(out var selection))
         {
@@ -138,7 +138,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Invokes the button with this automation ID, such as the title bar's PaneToggleButton.</summary>
     public void InvokeById(string automationId)
     {
-        Find(e => e.AutomationId == automationId, automationId).Patterns.Invoke.Pattern.Invoke();
+        Find(e => Id(e) == automationId, automationId).Patterns.Invoke.Pattern.Invoke();
         Settle(2500);
     }
 
@@ -147,7 +147,7 @@ internal sealed class StudioDriver : IDisposable
     {
         var element = Find(e => IsAction(e) && Matches(e, name), name);
 
-        if (!element.IsEnabled)
+        if (!element.Properties.IsEnabled.ValueOrDefault)
         {
             throw new InvalidOperationException($"{name} is disabled.");
         }
@@ -164,7 +164,7 @@ internal sealed class StudioDriver : IDisposable
             .WhileNull(() => parent.FindFirstDescendant(c => c.ByControlType(ControlType.Button)), _findTimeout)
             .Result ?? throw new InvalidOperationException($"{container} has no {name} button.");
 
-        if (!button.IsEnabled)
+        if (!button.Properties.IsEnabled.ValueOrDefault)
         {
             throw new InvalidOperationException($"{name} in {container} is disabled.");
         }
@@ -176,12 +176,12 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Clicks the list row whose name contains <paramref name="text"/>; UIA cannot raise ItemClick.</summary>
     public void ClickItem(string listName, string text)
     {
-        var list = Find(e => e.ControlType == ControlType.List && e.Name == listName, listName);
+        var list = Find(e => Type(e) == ControlType.List && NameOf(e) == listName, listName);
         var row = Retry
             .WhileNull(
                 () => list
                     .FindAllChildren(c => c.ByControlType(ControlType.ListItem))
-                    .FirstOrDefault(r => r.Name.Contains(text, StringComparison.Ordinal)),
+                    .FirstOrDefault(r => NameOf(r).Contains(text, StringComparison.Ordinal)),
                 _findTimeout)
             .Result ?? throw new InvalidOperationException($"{listName} has no row with {text}.");
         row.Click();
@@ -199,7 +199,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Selects each item of a SelectorBar in turn, calling back with the item's name.</summary>
     public void ForEachSection(string barName, Action<string> capture)
     {
-        var bar = Find(e => e.Name == barName, barName);
+        var bar = Find(e => NameOf(e) == barName, barName);
         var items = bar
             .FindAllDescendants()
             .Where(e => e.Patterns.SelectionItem.IsSupported)
@@ -212,7 +212,7 @@ internal sealed class StudioDriver : IDisposable
 
         foreach (var item in items)
         {
-            var name = item.Name;
+            var name = NameOf(item);
             item.Patterns.SelectionItem.Pattern.Select();
             Settle(1500);
             capture(name);
@@ -228,7 +228,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Types into the text box with this name, then moves focus on as a person tabbing out would.</summary>
     public void Type(string name, string text, bool tabOut = false)
     {
-        var box = Find(e => e.ControlType == ControlType.Edit && Matches(e, name), name);
+        var box = Find(e => Type(e) == ControlType.Edit && Matches(e, name), name);
         box.Focus();
         box.Patterns.Value.Pattern.SetValue(text);
 
@@ -258,7 +258,7 @@ internal sealed class StudioDriver : IDisposable
 
     public void Hover(string automationId)
     {
-        var element = Find(e => e.AutomationId == automationId, automationId);
+        var element = Find(e => Id(e) == automationId, automationId);
         element.Patterns.ScrollItem.PatternOrDefault?.ScrollIntoView();
         Mouse.MoveTo(element.BoundingRectangle.Center());
         Settle(2500);
@@ -267,7 +267,7 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Gives keyboard focus as Tab would, so the focus ring shows.</summary>
     public void FocusWithKeyboard(string automationId)
     {
-        var element = Find(e => e.AutomationId == automationId, automationId);
+        var element = Find(e => Id(e) == automationId, automationId);
         element.Focus();
         Keyboard.Type(VirtualKeyShort.TAB);
         Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.TAB);
@@ -276,7 +276,7 @@ internal sealed class StudioDriver : IDisposable
 
     public void ScrollIntoView(string automationId)
     {
-        Find(e => e.AutomationId == automationId, automationId).Patterns.ScrollItem.Pattern.ScrollIntoView();
+        Find(e => Id(e) == automationId, automationId).Patterns.ScrollItem.Pattern.ScrollIntoView();
         Settle(1500);
     }
 
@@ -353,21 +353,37 @@ internal sealed class StudioDriver : IDisposable
 
     private static bool IsAction(AutomationElement element)
     {
-        return element.ControlType is ControlType.Button or ControlType.Hyperlink or ControlType.SplitButton
+        return Type(element) is ControlType.Button or ControlType.Hyperlink or ControlType.SplitButton
             && element.Patterns.Invoke.IsSupported;
     }
 
     /// <summary>A name equal to the text, or starting with it and a comma, as names with a count do.</summary>
     private static bool Matches(AutomationElement element, string name)
     {
-        var actual = element.Properties.Name.ValueOrDefault ?? string.Empty;
+        var actual = NameOf(element);
 
         return actual == name || actual.StartsWith(name + ",", StringComparison.Ordinal);
     }
 
     private static bool Starts(AutomationElement element, string text)
     {
-        return (element.Properties.Name.ValueOrDefault ?? string.Empty).StartsWith(text, StringComparison.Ordinal);
+        return NameOf(element).StartsWith(text, StringComparison.Ordinal);
+    }
+
+    /// <remarks>A plain property getter throws where the element lacks the property; these read it as empty.</remarks>
+    private static string NameOf(AutomationElement element)
+    {
+        return element.Properties.Name.ValueOrDefault ?? string.Empty;
+    }
+
+    private static string Id(AutomationElement element)
+    {
+        return element.Properties.AutomationId.ValueOrDefault ?? string.Empty;
+    }
+
+    private static ControlType Type(AutomationElement element)
+    {
+        return element.Properties.ControlType.ValueOrDefault;
     }
 
     private void Save(string page, string state, Size size, Rectangle area)
