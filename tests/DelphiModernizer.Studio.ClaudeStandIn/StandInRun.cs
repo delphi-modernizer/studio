@@ -28,7 +28,7 @@ internal sealed class StandInRun(
     /// <summary>The command the kit's .claude/settings.json gives the hook; Claude Code names it on refusal.</summary>
     private const string _hookCommand = "dmz guard pre-tool-use || exit 2";
 
-    /// <summary>The duration the result reports, a scripted run's length rather than the milliseconds it takes.</summary>
+    /// <summary>The duration the result reports: a scripted run's length, not the milliseconds it takes.</summary>
     private const long _durationMs = 252_000;
 
     /// <summary>The harness stops a waiting run within minutes; a stand-in left behind ends on its own.</summary>

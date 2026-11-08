@@ -136,7 +136,7 @@ public static class RunWords
         return argument is null ? $"no {recipe.Argument.Name}" : $"{recipe.Argument.Name} {argument}";
     }
 
-    /// <summary>The argument as typed, such as <c>legacy/Sales</c>; null for none or a sign-off, shown by name.</summary>
+    /// <summary>The argument as typed, such as <c>legacy/Sales</c>; null for none or a sign-off's code.</summary>
     public static string? ArgumentValue(Recipe? recipe, string? argument)
     {
         return recipe is null || recipe.Argument.Name == _gateArgument ? null : argument;

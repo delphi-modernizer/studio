@@ -87,7 +87,9 @@
                             <DataTemplate x:DataType="vm:AgentLineRow">
                                 <StackPanel Spacing="6">
                                     <!--  The fact label sits inline after the claim, on its baseline.  -->
-                                    <RichTextBlock IsTextSelectionEnabled="True" Style="{StaticResource BodyRichTextBlockStyle}">
+                                    <RichTextBlock
+                                        IsTextSelectionEnabled="True"
+                                        Style="{StaticResource BodyRichTextBlockStyle}">
                                         <Paragraph>
                                             <Run Text="{x:Bind Claim}" />
                                             <InlineUIContainer>

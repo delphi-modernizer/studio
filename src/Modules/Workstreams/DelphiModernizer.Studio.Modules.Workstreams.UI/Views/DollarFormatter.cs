@@ -24,7 +24,10 @@ public sealed partial class DollarFormatter : INumberFormatter2, INumberParser
 
     public double? ParseDouble(string text)
     {
-        string number = text.Trim().TrimStart('$').Trim();
+        string number = text
+            .Trim()
+            .TrimStart('$')
+            .Trim();
 
         return double.TryParse(number, NumberStyles.Number, CultureInfo.InvariantCulture, out double value)
             ? value

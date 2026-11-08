@@ -242,8 +242,8 @@ public sealed class RunTests
     [Fact]
     public void An_edit_shows_its_file_and_an_ellipsis_and_other_calls_their_whole_input()
     {
-        var edit = new ToolCall(
-            "t-1", "Edit", """{"file_path":"legacy/Sales/Pricing.pas","old_string":"  Gold","new_string":"x"}""", false);
+        const string input = """{"file_path":"legacy/Sales/Pricing.pas","old_string":"  Gold","new_string":"x"}""";
+        var edit = new ToolCall("t-1", "Edit", input, false);
         var read = new ToolCall("t-2", "Read", """{"file_path":"legacy/Sales/Pricing.pas"}""", false);
 
         Assert.Equal("""{"file_path":"legacy/Sales/Pricing.pas", …}""", RunTranscript.ShortInput(edit));

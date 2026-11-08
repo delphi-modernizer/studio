@@ -134,8 +134,8 @@ public sealed partial class RunViewModel : WorkspacePageViewModel
     [ObservableProperty]
     public partial string SubtitleEnd { get; set; } = string.Empty;
 
-    public string StartingText =>
-        $"Loading the {RoleName} agent, the guard that keeps it in docs/, and the {RunWords.Dollars(BudgetUsd)} budget.";
+    public string StartingText => $"Loading the {RoleName} agent, the guard that keeps it in docs/, "
+        + $"and the {RunWords.Dollars(BudgetUsd)} budget.";
 
     [ObservableProperty]
     public partial string Denials { get; set; } = "0";

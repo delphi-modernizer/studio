@@ -48,7 +48,7 @@ public sealed partial class SignOffsPage : Page, IHasViewModel
         return isNarrow ? 0 : 1;
     }
 
-    /// <summary>Checks are divided by a hairline, as drawn: none above the first, which sits 2 from the title.</summary>
+    /// <summary>A hairline above each check but the first, as drawn.</summary>
     public static Thickness TopDivider(bool isFirst)
     {
         return new Thickness(0, isFirst ? 0 : 1, 0, 0);

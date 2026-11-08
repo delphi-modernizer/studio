@@ -102,7 +102,9 @@ public sealed class RefusalRow(string name, string input, string? target, string
 
     public string Reason { get; } = reason;
 
-    public string Outcome => edits ? "The edit was not made. The run carries on." : "The call was not made. The run carries on.";
+    public string Outcome => edits
+        ? "The edit was not made. The run carries on."
+        : "The call was not made. The run carries on.";
 
     public override string AnnouncedName => RunNames.Refusal(Name, target ?? Input, Reason);
 }
