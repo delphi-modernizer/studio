@@ -23,7 +23,8 @@
             IsClosable="False"
             IsOpen="{x:Bind ViewModel.IsFinalPlan}"
             Severity="Warning"
-            Title="This allows building the new system.">
+            Title="This allows building the new system."
+            Visibility="{x:Bind ViewModel.IsFinalPlan}">
             <InfoBar.Message>
                 Agents may then write the new code under target/ until a document the final plan covers changes, or
                 someone revokes this approval.
@@ -43,7 +44,8 @@
             IsOpen="{x:Bind ViewModel.IsRefused, Mode=OneWay}"
             Message="{x:Bind ViewModel.Refusal, Mode=OneWay}"
             Severity="Error"
-            Title="Approval refused.">
+            Title="Approval refused."
+            Visibility="{x:Bind ViewModel.IsRefused, Mode=OneWay}">
             <InfoBar.IconSource>
                 <FontIconSource
                     FontFamily="{StaticResource StudioIconsFontFamily}"
