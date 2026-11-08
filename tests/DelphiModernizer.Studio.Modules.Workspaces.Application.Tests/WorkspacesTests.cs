@@ -28,7 +28,7 @@ public sealed class WorkspacesTests : IDisposable
     }
 
     [Fact]
-    public async Task Creating_a_workspace_opens_it_and_remembers_it()
+    public async Task Creating_a_workspace_remembers_it_and_leaves_opening_it_to_the_person()
     {
         var request = new InitRequest(
             Path.Combine(_folder, "ws"),
@@ -46,7 +46,7 @@ public sealed class WorkspacesTests : IDisposable
         var recent = await _sender.Send(new GetRecentWorkspacesQuery(), TestContext.Current.CancellationToken);
 
         Assert.True(created.IsSuccess, created.Error.Message);
-        Assert.Same(created.Value, _session.Current);
+        Assert.Null(_session.Current);
         Assert.Equal("Acme ERP", Assert.Single(recent).Name);
     }
 

@@ -95,6 +95,8 @@
   drawn plain.
 - The approve dialog and Sign-offs show covered paths whole and the fingerprint wrapped with its label; Sign-offs'
   checks are divided by hairlines.
+- New workspace opens the workspace it created on Open the Overview, so the Created step shows no subtitle; Create
+  lists it in Recent workspaces.
 
 ### Fixed
 

@@ -21,19 +21,16 @@ internal sealed class OpenWorkspaceCommandHandler(IWorkspaceSession session, Rec
 
         if (found.IsSuccess)
         {
-            Activate(session, recent, clock, found.Value);
+            session.Open(found.Value);
+            Remember(recent, clock, found.Value);
         }
 
         return Task.FromResult(found);
     }
 
-    internal static void Activate(
-        IWorkspaceSession session,
-        RecentWorkspaceStore recent,
-        IClock clock,
-        Workspace workspace)
+    /// <summary>Lists the workspace first in Recent workspaces, opened now.</summary>
+    internal static void Remember(RecentWorkspaceStore recent, IClock clock, Workspace workspace)
     {
-        session.Open(workspace);
         recent.Remember(new RecentWorkspace(
             workspace.Manifest.Name,
             workspace.Root,
