@@ -112,7 +112,8 @@ internal static class Groups
                 app.Navigate("Start");
                 app.ClickItem(_recent, h.Opened[Sample]);
                 app.Capture("overview", "default");
-                app.Capture("overview", "hover", () => app.Hover("Team0"));
+                // WinUI centres a pointer's tool tip on the pointer; the canvas draws it 236 wide, 12 in from the card.
+                app.Capture("overview", "hover", () => app.Hover("Team0", fromLeft: 12 + (236 / 2)));
                 app.Capture("overview", "scrolled", () => app.ScrollTo("Team0", 250), [StudioDriver.Minimum]);
             });
             h.Step(app, theme, "shared", () => {
