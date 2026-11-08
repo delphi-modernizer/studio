@@ -112,6 +112,9 @@ public sealed partial class ShellPage : Page
         AutomationProperties.SetName(container, item.Title);
         AutomationProperties.SetAutomationId(container, key);
         _containers[key] = container;
+        container.RegisterPropertyChangedCallback(
+            NavigationViewItem.IsSelectedProperty,
+            (_, _) => Trace($"IsSelected {key}={container.IsSelected} {State()}\n{Environment.StackTrace}"));
 
         if (item.Badge is { } badge)
         {
@@ -189,8 +192,23 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    private static void Trace(string what)
+    {
+        System.IO.File.AppendAllText(
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "dmz-pane.log"),
+            $"{DateTime.Now:HH:mm:ss.fff} {what}{Environment.NewLine}");
+    }
+
+    private string State()
+    {
+        var selected = _containers.Where(c => c.Value.IsSelected).Select(c => c.Key);
+        return $"SelectedItem={(NavView.SelectedItem as NavigationViewItem)?.Tag ?? NavView.SelectedItem ?? "null"} "
+            + $"IsSelected=[{string.Join(",", selected)}] frame={NavFrame.Content?.GetType().Name}";
+    }
+
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
+        Trace($"SelectionChanged to={(args.SelectedItemContainer as NavigationViewItem)?.Tag} syncing={_isSyncingSelection} {State()}");
         if (!_isSyncingSelection && args.SelectedItemContainer is NavigationViewItem { Tag: string key })
         {
             _navigation.NavigateTo(key);
@@ -202,6 +220,7 @@ public sealed partial class ShellPage : Page
     /// </summary>
     private void OnItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
+        Trace($"ItemInvoked {(args.InvokedItemContainer as NavigationViewItem)?.Tag} {State()}");
         if (args.InvokedItemContainer is NavigationViewItem { Tag: string key } container
             && ReferenceEquals(container, NavView.SelectedItem)
             && NavFrame.Content?.GetType().Name != key + "Page")
@@ -214,6 +233,8 @@ public sealed partial class ShellPage : Page
     private void OnNavigated(object? sender, NavigationEvent e)
     {
         var owner = _containers.GetValueOrDefault(e.PageKey) ?? OwnerOf(e.PageType);
+        Trace($"Navigated {e.PageKey} owner={owner?.Tag} before {State()}");
+        DispatcherQueue.TryEnqueue(() => Trace($"Navigated {e.PageKey} later {State()}"));
         _isSyncingSelection = true;
 
         try
@@ -226,6 +247,7 @@ public sealed partial class ShellPage : Page
         }
 
         ShowSelectedGlyphs(owner?.Tag as string);
+        Trace($"Navigated {e.PageKey} after {State()}");
     }
 
     /// <summary>The pane item of the module a page belongs to, such as Workstreams for Run.</summary>
