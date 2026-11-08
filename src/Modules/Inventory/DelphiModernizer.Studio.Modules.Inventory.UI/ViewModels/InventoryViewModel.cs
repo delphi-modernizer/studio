@@ -299,7 +299,7 @@ public sealed partial class InventoryViewModel : WorkspacePageViewModel
         var cycleUnits = inventory.Dependencies.Cycles
             .SelectMany(c => c)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
-        int secrets = inventory.Connections.Count(c => c.HasEmbeddedPassword);
+        int secrets = inventory.RiskMarkers.Count(r => r.Kind == "hard-coded-credential");
         int cycles = inventory.Dependencies.Cycles.Length;
         var extensions = summary.FilesByExtension
             .OrderByDescending(e => e.Count)
