@@ -65,11 +65,13 @@
                 VerticalAlignment="Center"
                 IsActive="False"
                 Visibility="Collapsed" />
-            <!--  Trimmed to the cap height on top only: centred like Tight, with room for descenders.  -->
+            <!--  Trimmed to the cap height on top only: centred like Tight, with room for descenders. The pill's
+                  FontWeight carries through, so a semibold row (canvas .trow.group) sets it on the pill.  -->
             <TextBlock
                 x:Name="Word"
                 AutomationProperties.AccessibilityView="Raw"
                 VerticalAlignment="Center"
+                FontWeight="{x:Bind FontWeight, Mode=OneWay}"
                 Foreground="{ThemeResource StatusPillText}"
                 Style="{StaticResource CaptionTextBlockStyle}"
                 TextLineBounds="TrimToCapHeight" />

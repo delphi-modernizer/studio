@@ -12,24 +12,35 @@
             x:Name="Lead"
             Style="{StaticResource BodyTextBlockStyle}"
             TextWrapping="Wrap" />
-        <InfoBar
-            IsClosable="False"
-            IsOpen="True"
-            Severity="Warning">
-            <InfoBar.IconSource>
-                <FontIconSource
-                    FontFamily="{StaticResource StudioIconsFontFamily}"
-                    Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
-            </InfoBar.IconSource>
-            <TextBlock
-                x:Name="EngineMessage"
-                Margin="0,0,0,14"
-                FontWeight="Normal"
-                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                Style="{StaticResource MonoTextStyle}"
-                TextTrimming="None"
-                TextWrapping="Wrap" />
-        </InfoBar>
+        <!--  Canvas .ibar.warn: the icon 16 from the top and 14 from the text, the text 14 above and below.  -->
+        <Border
+            Padding="16,0,4,0"
+            Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="1"
+            CornerRadius="4">
+            <Grid ColumnSpacing="14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <FontIcon
+                    Margin="0,16"
+                    VerticalAlignment="Top"
+                    AutomationProperties.AccessibilityView="Raw"
+                    Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                    Glyph="{x:Bind icons:StudioIcons.WarningFilled}"
+                    Style="{StaticResource IconStyle}" />
+                <TextBlock
+                    x:Name="EngineMessage"
+                    Grid.Column="1"
+                    Margin="0,14"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                    Style="{StaticResource MonoTextStyle}"
+                    TextTrimming="None"
+                    TextWrapping="Wrap" />
+            </Grid>
+        </Border>
         <!--  Canvas ClaudeDialog: a disc list with a hanging indent, 6 between items.  -->
         <StackPanel Spacing="6">
             <TextBlock

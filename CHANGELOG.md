@@ -14,8 +14,8 @@
 - The New workspace wizard: name and folder, a read-only preview of the legacy source, the target platform, the
   essential context with Unknown as an answer, and creation step by step.
 - Overview's flow from the Delphi code through the teams and the Principal Architect to the sign-offs, with the next
-  step, open questions and recent agent runs; the teams and the sign-offs sit on tinted panels, and Overview names the
-  workspace while it loads.
+  step, open questions and recent agent runs; the teams and the sign-offs sit on tinted panels, a team's tooltip opens
+  under its card, and Overview names the workspace while it loads.
 - Inventory by tab, Deliverables by sign-off, Traceability with its problems and matrix, the sign-offs' checks and
   approvals, and Settings.
 - Approve and revoke sign-offs from a dialog that shows your git identity, requires a note, never approves on Enter,
@@ -86,6 +86,13 @@
   status glyphs in the page's theme, and sets file links in Cascadia Mono.
 - Inventory's Cycle, Text and Embedded password pills show the canvas's cycle, document and key glyphs, and the
   sign-off and folder headings of Deliverables and Inventory keep the row divider above them.
+- Inventory counts hard-coded credentials from its risk markers, keeps the code module columns where the canvas
+  draws them, trims the data cards' text at 960 × 576 instead of cutting it, follows a connection's class with " · "
+  before its link, sets connection values in semibold, and lets its tabs scroll sideways when they run past the page.
+- The Traceability badge checks the documents again on every page change, off the UI thread and one check at a time,
+  so a deliverable deleted outside the studio counts as soon as another page opens.
+- Deliverables names a missing file by its short name ("The testing strategy file is missing."); the deliverables'
+  short names are shared, so Sign-offs reads the same words.
 - Workstreams, Run and Sign-offs start their content under the page description and fill the page width; a closed
   notice no longer leaves a gap.
 - Workstreams opens on Legacy discovery, shows the selected role with a fill only, keeps Run… on without Claude Code
@@ -104,7 +111,27 @@
 - Run's Files touched lists the files a folder search matched, not the folder, and puts edited files first; a starting
   run shows $0.00 spent and 0 turns, and the session strip's model and version read at body size.
 - The screenshot harness's stand-in edits the deliverable on every run, so each run's Files touched shows the draft.
+- New workspace opens the workspace it created on Open the Overview, so the Created step shows no subtitle; Create
+  lists it in Recent workspaces.
+- New workspace's step list sets the current step in semibold and the steps ahead in secondary text; waiting
+  creation steps read in secondary text, and the records step names "the open question" or "questions" by count.
+- The Claude Code dialog draws its engine message as the canvas's warning bar, with links that wrap whole.
+- StatusPill's word takes the pill's FontWeight, so a semibold row can make its pills semibold.
+- PathText keeps a long path's file name whole and the start of its folders, as "docs/02-…/business-rules.md".
+- DialogMargins keeps a dialog 24 from the window's top and bottom, as the canvas's scrim does; the Claude Code,
+  approve, run and budget dialogs use it.
 
 ### Fixed
 
+- The pane keeps Workstreams' selection on Run and back on Workstreams while its badge counts a run.
+- At 960 with a workspace open, the title bar keeps its title and subtitle beside a 240 wide search box.
+- Opening a workspace leaves Back off on a slow PC: the pane's own selection of the shown page navigates nowhere.
+- New workspace's target choices keep the radio inside the card on the title line, and keep the card on pointer-over;
+  an Unknown context box reads as a normal box with its placeholder; step 5 leaves the design's gap before the
+  checkbox.
+- Start's Recent workspaces header and the first-run card are the design's height, and an empty state without
+  actions ends at its text.
+- Settings' Default code page ends a long name in an ellipsis.
+- High contrast: busy rings draw in the highlight colour, and text inside the accent, such as the selected pane item
+  and Review sign-offs, is no longer drawn white on a black box.
 - New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".

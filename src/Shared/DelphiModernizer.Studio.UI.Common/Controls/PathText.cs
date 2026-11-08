@@ -6,7 +6,10 @@ using Windows.Foundation;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
 
-/// <summary>A path in Cascadia Mono, secondary unless Foreground is set, that keeps its end: "…Sales/Pricing.pas".</summary>
+/// <summary>
+/// A path in Cascadia Mono, secondary unless Foreground is set, that keeps its file name whole and as much of its start
+/// as fits: "docs/02-…/business-rules.md" (canvas Run, Files touched).
+/// </summary>
 /// <remarks>WinUI trims text only at the end. Narrator always reads the whole path.</remarks>
 public sealed partial class PathText : UserControl
 {
@@ -70,12 +73,21 @@ public sealed partial class PathText : UserControl
         path.InvalidateMeasure();
     }
 
-    /// <summary>The whole path when it fits, else "…" and the longest end of it that does.</summary>
+    /// <summary>
+    /// The whole path when it fits; else its start, "…" and the file name; else "…" and the longest end that fits.
+    /// </summary>
     private string Fit(string path, double width)
     {
         if (double.IsInfinity(width) || Fits(path, width))
         {
             return path;
+        }
+
+        int slash = path.LastIndexOfAny(['/', '\\']);
+
+        if (slash > 0 && Fits(_ellipsis + path[slash..], width))
+        {
+            return KeepName(path, slash, width);
         }
 
         int kept = 0;
@@ -96,6 +108,30 @@ public sealed partial class PathText : UserControl
         }
 
         return _ellipsis + path[^kept..];
+    }
+
+    /// <summary>The longest start of the folders that fits before "…" and the separator and file name.</summary>
+    private string KeepName(string path, int slash, double width)
+    {
+        string end = _ellipsis + path[slash..];
+        int kept = 0;
+        int most = slash - 1;
+
+        while (kept < most)
+        {
+            int middle = (kept + most + 1) / 2;
+
+            if (Fits(path[..middle] + end, width))
+            {
+                kept = middle;
+            }
+            else
+            {
+                most = middle - 1;
+            }
+        }
+
+        return path[..kept] + end;
     }
 
     private bool Fits(string text, double width)

@@ -28,7 +28,7 @@ public sealed partial class ShellPage : Page
     private readonly Dictionary<string, NavigationViewItem> _containers = new(StringComparer.Ordinal);
     private readonly List<(NavigationViewItem Container, NavigationItem Item, IBadgeSource Source)> _badges = [];
     private bool _isLoaded;
-    private bool _isSyncingSelection;
+    private NavigationViewItem? _shownOwner;
 
     public ShellPage(
         ShellViewModel viewModel,
@@ -54,13 +54,6 @@ public sealed partial class ShellPage : Page
         AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
         AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
         NavView.Loaded += (_, _) => MakePaneOneTabStop();
-        SizeChanged += (_, _) => SizeSearch();
-        ViewModel.PropertyChanged += (_, e) => {
-            if (e.PropertyName == nameof(ShellViewModel.Subtitle))
-            {
-                SizeSearch();
-            }
-        };
     }
 
     public ShellViewModel ViewModel { get; }
@@ -88,19 +81,6 @@ public sealed partial class ShellPage : Page
         _navigation.NavigateTo("Start");
     }
 
-    /// <summary>Search is 360 wide, 240 under 1100 (handoff part 1).</summary>
-    /// <remarks>
-    /// Under 1100 with a subtitle it sizes itself up to 240: a fixed 240 makes WinUI's TitleBar hide the title and
-    /// subtitle (docs/open-questions.md).
-    /// </remarks>
-    private void SizeSearch()
-    {
-        bool wide = ActualWidth >= 1100;
-        bool sizesItself = !wide && ViewModel.Subtitle.Length > 0;
-        SearchBox.MaxWidth = wide ? 360 : 240;
-        SearchBox.Width = sizesItself ? double.NaN : SearchBox.MaxWidth;
-    }
-
     private void AddItem(NavigationItem item)
     {
         string key = _navigation.GetPageKey(item.PageType);
@@ -116,6 +96,12 @@ public sealed partial class ShellPage : Page
         if (item.Badge is { } badge)
         {
             var source = badge(_services);
+            string style = source.Tone == BadgeTone.Critical
+                ? "CriticalValueInfoBadgeStyle"
+                : "AccentValueInfoBadgeStyle";
+            container.InfoBadge = new InfoBadge {
+                Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],
+            };
             _badges.Add((container, item, source));
             source.Changed += (_, _) => DispatcherQueue.TryEnqueue(() => ShowBadge(container, item, source));
             ShowBadge(container, item, source);
@@ -145,25 +131,26 @@ public sealed partial class ShellPage : Page
         };
     }
 
+    /// <summary>Shows the count on the item's own badge, hidden at zero.</summary>
+    /// <remarks>
+    /// The badge is updated, never replaced: a new or removed InfoBadge drops the selected item's backplate, as on Run
+    /// while the Workstreams badge counts the run.
+    /// </remarks>
     private void ShowBadge(NavigationViewItem container, NavigationItem item, IBadgeSource source)
     {
         int count = _session.Current is null ? 0 : source.Count;
+        var shown = container.InfoBadge;
 
         if (count == 0)
         {
-            container.InfoBadge = null;
+            shown.Visibility = Visibility.Collapsed;
             AutomationProperties.SetName(container, item.Title);
 
             return;
         }
 
-        string style = source.Tone == BadgeTone.Critical
-            ? "CriticalValueInfoBadgeStyle"
-            : "AccentValueInfoBadgeStyle";
-        container.InfoBadge = new InfoBadge {
-            Value = count,
-            Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],
-        };
+        shown.Value = count;
+        shown.Visibility = Visibility.Visible;
         AutomationProperties.SetName(container, $"{item.Title}, {source.Describe(count)}");
     }
 
@@ -189,9 +176,15 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    /// <summary>Opens the page of an item a person selects; selecting the shown page's own item navigates nowhere.</summary>
+    /// <remarks>
+    /// OnNavigated selects the shown page's item, and NavigationView may raise this after it returns, as under load
+    /// after a fresh navigation; navigating again would put the page on the back stack a second time and turn Back on.
+    /// </remarks>
     private void OnSelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (!_isSyncingSelection && args.SelectedItemContainer is NavigationViewItem { Tag: string key })
+        if (args.SelectedItemContainer is NavigationViewItem { Tag: string key } container
+            && !ReferenceEquals(container, _shownOwner))
         {
             _navigation.NavigateTo(key);
         }
@@ -214,16 +207,8 @@ public sealed partial class ShellPage : Page
     private void OnNavigated(object? sender, NavigationEvent e)
     {
         var owner = _containers.GetValueOrDefault(e.PageKey) ?? OwnerOf(e.PageType);
-        _isSyncingSelection = true;
-
-        try
-        {
-            NavView.SelectedItem = owner;
-        }
-        finally
-        {
-            _isSyncingSelection = false;
-        }
+        _shownOwner = owner;
+        NavView.SelectedItem = owner;
 
         ShowSelectedGlyphs(owner?.Tag as string);
     }
