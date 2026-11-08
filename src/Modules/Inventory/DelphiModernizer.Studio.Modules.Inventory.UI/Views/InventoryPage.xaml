@@ -149,11 +149,11 @@
                         <TextBlock
                             Grid.Column="7"
                             VerticalAlignment="Center"
+                            FontFamily="{StaticResource MonoFontFamily}"
                             FontSize="13"
                             FontWeight="SemiBold"
-                            Style="{StaticResource ValueTextStyle}"
                             Text="{x:Bind Types}"
-                            TextLineBounds="Tight" />
+                            TextTrimming="CharacterEllipsis" />
                         <Button
                             Grid.Column="8"
                             Padding="8"
