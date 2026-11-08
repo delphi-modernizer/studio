@@ -3,6 +3,7 @@
     x:Class="DelphiModernizer.Studio.Modules.Workstreams.UI.Views.BudgetDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
     xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons"
     xmlns:local="using:DelphiModernizer.Studio.Modules.Workstreams.UI.Views"
     CloseButtonText="Close"
@@ -64,6 +65,7 @@
                 <NumberBox
                     x:Name="BudgetBox"
                     Padding="24,5,6,6"
+                    controls:SpinButtons.IsCanvas="True"
                     AutomationProperties.HelpText="A new run starts the task again with the same scope."
                     AutomationProperties.Name="Budget for a new run"
                     LargeChange="1"

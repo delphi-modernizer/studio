@@ -134,7 +134,8 @@
   step 5 leaves 32 above its summary, and the Created text is secondary and at most 368 wide.
 - Settings' cards are 4 apart, and the not-on-PATH message keeps its link on one line; links in the Claude Code
   dialog also stay whole at a hyphen, and its message lines are 20 apart.
-- SpinButtons draws a NumberBox's inline spin buttons as the canvas does: 24 square, subtle, with 12 px chevrons.
+- SpinButtons draws a NumberBox's inline spin buttons as the canvas does: 24 square, subtle, with 12 px chevrons;
+  Settings and the run and budget dialogs use it.
 - A page-level empty state's text is 20 between lines and at most 368 wide, so it wraps as the canvas does.
 
 ### Fixed
