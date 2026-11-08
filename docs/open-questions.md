@@ -35,6 +35,7 @@ change.
 | A settings card's control takes the card's Name: on About that would rename Copy versions | Copy versions keeps its own name | `SettingsPage` |
 | Is an artboard's 1280 × 800 the window's visible frame, title bar included? | Yes: screenshots size the frame Windows draws, without the invisible resize borders | `Desktop.SetVisibleFrame` |
 | The brief's sample shows G0 and D01 approved; only a person approves, so the harness's workspace has no approval | Screenshots show the freshly scanned workspace: no sign-off approved, every deliverable a template | `tests/DelphiModernizer.Studio.Screenshots` |
+| When New workspace opens the workspace it created: the Created artboard draws no subtitle, and opening a workspace lands on Overview | On Open the Overview; Create lists it in Recent workspaces, so leaving the Created step another way leaves it closed but listed | `NewWorkspaceViewModel.OpenOverview` |
 | Title-bar search is 240 wide under 1100, but at 960 with a workspace open WinUI's TitleBar then hides the title and subtitle | 240 without a workspace; with one, search sizes itself up to 240, which keeps the title | `ShellPage.SizeSearch` |
 | The other handoff questions (stale on answered questions, settings defaults, `inventory.md`, Unknown context wording, task ownership, fan-in wording) | Taken up in the milestone that needs them | |
 | The Delphi code node names the legacy system ("Acme ERP · Delphi 7"); the manifest holds only the workspace's name | The Delphi version alone | `OverviewWords.DelphiCode` |

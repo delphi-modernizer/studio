@@ -24,6 +24,7 @@
             <StaticResource x:Key="StatusPillCautionGlyph" ResourceKey="SystemFillColorCautionBrush" />
             <StaticResource x:Key="StatusPillCriticalGlyph" ResourceKey="SystemFillColorCriticalBrush" />
             <StaticResource x:Key="StatusPillAttentionForeground" ResourceKey="AccentTextFillColorPrimaryBrush" />
+            <StaticResource x:Key="SpinnerForeground" ResourceKey="AccentFillColorDefaultBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
             <StaticResource
@@ -43,6 +44,7 @@
             <StaticResource x:Key="StatusPillCautionGlyph" ResourceKey="SystemFillColorCautionBrush" />
             <StaticResource x:Key="StatusPillCriticalGlyph" ResourceKey="SystemFillColorCriticalBrush" />
             <StaticResource x:Key="StatusPillAttentionForeground" ResourceKey="AccentTextFillColorPrimaryBrush" />
+            <StaticResource x:Key="SpinnerForeground" ResourceKey="AccentFillColorDefaultBrush" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
             <StaticResource x:Key="StatusPillNeutralBackground" ResourceKey="SubtleFillColorTransparentBrush" />
@@ -58,6 +60,8 @@
             <SolidColorBrush x:Key="StatusPillCautionGlyph" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="StatusPillCriticalGlyph" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="StatusPillAttentionForeground" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <!--  The accent fill is the window colour in high contrast, so the ring takes the highlight colour.  -->
+            <SolidColorBrush x:Key="SpinnerForeground" Color="{ThemeResource SystemColorHighlightColor}" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 

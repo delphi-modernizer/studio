@@ -106,7 +106,12 @@
   drawn plain.
 - The approve dialog and Sign-offs show covered paths whole and the fingerprint wrapped with its label; Sign-offs'
   checks are divided by hairlines.
+- New workspace opens the workspace it created on Open the Overview, so the Created step shows no subtitle; Create
+  lists it in Recent workspaces.
 
 ### Fixed
 
+- The pane keeps Workstreams' selection on Run and back on Workstreams while its badge counts a run.
+- High contrast: busy rings draw in the highlight colour, and text inside the accent, such as the selected pane item
+  and Review sign-offs, is no longer drawn white on a black box.
 - New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".
