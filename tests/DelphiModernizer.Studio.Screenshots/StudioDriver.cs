@@ -305,18 +305,14 @@ internal sealed class StudioDriver : IDisposable
     public void WaitFor(string name, TimeSpan timeout)
     {
         EnsureRunning();
-        var found = Retry
-            .WhileNull(
-                () => _window.FindFirstDescendant(c => c.ByName(name))
-                    ?? Descendants().FirstOrDefault(e => Starts(e, name)),
-                timeout,
-                TimeSpan.FromMilliseconds(500))
-            .Result;
-
-        if (found is null)
-        {
-            throw new TimeoutException($"{name} did not show within {timeout.TotalSeconds} s.");
-        }
+        _ = Retry
+                .WhileNull(
+                    () => _window.FindFirstDescendant(c => c.ByName(name))
+                        ?? Descendants().FirstOrDefault(e => Starts(e, name)),
+                    timeout,
+                    TimeSpan.FromMilliseconds(500))
+                .Result
+            ?? throw new TimeoutException($"{name} did not show within {timeout.TotalSeconds} s.");
     }
 
     /// <summary>Waits for a state that lasts a second or so, with one native query every few milliseconds.</summary>
@@ -324,14 +320,10 @@ internal sealed class StudioDriver : IDisposable
     public void WaitBriefly(Func<ConditionFactory, ConditionBase> condition, string what, TimeSpan timeout)
     {
         EnsureRunning();
-        var found = Retry
-            .WhileNull(() => _window.FindFirstDescendant(condition), timeout, _poll)
-            .Result;
-
-        if (found is null)
-        {
-            throw new TimeoutException($"{what} did not show within {timeout.TotalSeconds} s.");
-        }
+        _ = Retry
+                .WhileNull(() => _window.FindFirstDescendant(condition), timeout, _poll)
+                .Result
+            ?? throw new TimeoutException($"{what} did not show within {timeout.TotalSeconds} s.");
     }
 
     /// <summary>Waits until the button with this name can be pressed, as a person waits before pressing it.</summary>
