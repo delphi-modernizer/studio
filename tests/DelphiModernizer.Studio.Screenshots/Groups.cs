@@ -209,7 +209,7 @@ internal static class Groups
                 app.Capture("inventory", "large");
                 app.CaptureWhileBusy("inventory", "scanning", () => {
                     app.WaitGone("Scanning legacy/…", _run);
-                    app.Invoke("Scan again", 0);
+                    app.Invoke("Rescan", 0);
                     app.WaitBriefly(c => c.ByName("Scanning legacy/…"), "Scanning legacy/…", _brief);
                 });
                 app.WaitGone("Scanning legacy/…", _run);

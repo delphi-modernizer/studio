@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using DelphiModernizer.Studio.Modules.Traceability.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 
 namespace DelphiModernizer.Studio.Modules.Traceability.UI.Views;
 
@@ -34,19 +34,6 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
 
     DelphiModernizer.Studio.UI.Contracts.ViewModel IHasViewModel.ViewModel => ViewModel;
 
-    /// <summary>The brush of a stat's status glyph; x:Bind calls it from the stat template.</summary>
-    public static Brush ToneBrush(StatTone tone)
-    {
-        string key = tone switch {
-            StatTone.Success => "SystemFillColorSuccessBrush",
-            StatTone.Caution => "SystemFillColorCautionBrush",
-            StatTone.Critical => "SystemFillColorCriticalBrush",
-            _ => "TextFillColorSecondaryBrush",
-        };
-
-        return (Brush)Microsoft.UI.Xaml.Application.Current.Resources[key];
-    }
-
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.CheckCommand.ExecuteAsync(parameter: null);
@@ -57,14 +44,17 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
     {
         if (e.PropertyName == nameof(TraceabilityViewModel.Views))
         {
-            Fill(ViewBar, ViewModel.Views.Select(v => (v.Text, v.AnnouncedName, (object)v.Value)), ViewModel.View);
+            Fill(
+                ViewBar,
+                ViewModel.Views.Select(v => (v.Label, v.Count, v.AnnouncedName, (object)v.Value)),
+                ViewModel.View);
         }
 
         if (e.PropertyName == nameof(TraceabilityViewModel.Severities))
         {
             Fill(
                 SeverityBar,
-                ViewModel.Severities.Select(v => (v.Text, v.AnnouncedName, (object)v.Value)),
+                ViewModel.Severities.Select(v => (v.Label, v.Count, v.AnnouncedName, (object)v.Value)),
                 ViewModel.Severity);
         }
     }
@@ -133,16 +123,14 @@ public sealed partial class TraceabilityPage : Page, IHasViewModel
 
     private static void Fill(
         SelectorBar bar,
-        IEnumerable<(string Text, string Name, object Value)> choices,
+        IEnumerable<(string Label, string Count, string Name, object Value)> choices,
         object selected)
     {
         bar.Items.Clear();
 
-        foreach (var (text, name, value) in choices)
+        foreach (var (label, count, name, value) in choices)
         {
-            var item = new SelectorBarItem { Text = text, Tag = value };
-            AutomationProperties.SetName(item, name);
-            bar.Items.Add(item);
+            bar.Items.Add(CountedSelectorBarItem.Create(label, count, name, value));
         }
 
         bar.SelectedItem = bar.Items.FirstOrDefault(i => Equals(i.Tag, selected));

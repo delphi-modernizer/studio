@@ -30,9 +30,9 @@ public enum UnitSort
 /// <summary>A tab of the inventory with how many findings it holds.</summary>
 public sealed record InventoryTabChoice(InventoryTab Tab, string Label, int Count)
 {
-    public string Text => $"{Label} {Count}";
+    public string CountText => Count.ToString("N0", CultureInfo.CurrentCulture);
 
-    public string AnnouncedName => $"{Label}, {Count}";
+    public string AnnouncedName => $"{Label}, {CountText}";
 }
 
 /// <summary>A column header of the code modules table; the one the table is sorted by shows a chevron.</summary>
@@ -47,6 +47,9 @@ public sealed record SortHeader(UnitSort Column, string Label, bool IsSorted, bo
 
 /// <summary>One of the four summary cards above the tabs.</summary>
 public sealed record InventoryStat(string Label, string Glyph, string Number, string Unit, string Detail);
+
+/// <summary>The line under the summary: Delphi version, encodings, when the scan ran and its fingerprint.</summary>
+public sealed record ScanFacts(string Version, string Encodings, string Scanned, string Fingerprint);
 
 /// <summary>A row of the code modules table; a folder heading when <see cref="IsFolder"/> is set.</summary>
 public sealed record UnitRow(
@@ -67,18 +70,40 @@ public sealed record UnitRow(
 {
     public bool IsUnit => !IsFolder;
 
-    public string CodeLinesText =>
-        $"{CodeLines.ToString("N0", CultureInfo.CurrentCulture)} / {Lines.ToString("N0", CultureInfo.CurrentCulture)}";
+    public string CodeLinesText => $"{Number(CodeLines)} / {Number(Lines)}";
+
+    public string RoutinesText => Number(Routines);
+
+    public string GlobalsText => Number(Globals);
+
+    public string FanInText => Number(FanIn);
+
+    public string FanOutText => Number(FanOut);
+
+    public string UsesText => Number(Uses);
 
     public string OpenName => $"Open {Path} in your editor";
+
+    private static string Number(int value)
+    {
+        return value.ToString("N0", CultureInfo.CurrentCulture);
+    }
 }
 
+/// <summary>A form file; a binary one cannot be read, so its counts show as a dash.</summary>
 public sealed record ScreenRow(string Root, string Path, bool IsBinary, int Controls, int Events)
 {
     public string Format => IsBinary ? "Binary" : "Text";
 
-    public string AnnouncedName =>
-        $"{Root}, {Path}, {Format}, {Counted(Controls, "control")}, {Counted(Events, "event")}";
+    public bool IsText => !IsBinary;
+
+    public string ControlsText => IsBinary ? "—" : Controls.ToString(CultureInfo.CurrentCulture);
+
+    public string EventsText => IsBinary ? "—" : Events.ToString(CultureInfo.CurrentCulture);
+
+    public string AnnouncedName => IsBinary
+        ? $"{Root}, {Path}, {Format}"
+        : $"{Root}, {Path}, {Format}, {Counted(Controls, "control")}, {Counted(Events, "event")}";
 
     public string OpenName => $"Open {Path} in your editor";
 
@@ -91,13 +116,21 @@ public sealed record ScreenRow(string Root, string Path, bool IsBinary, int Cont
 public sealed record ControlRow(string ClassName, int Count, string Vendor, string Category);
 
 /// <summary>One place in the code, as a link that opens it.</summary>
+/// <param name="Link">A path relative to legacy/; the Data and libraries tab shows it with legacy/ in front.</param>
 public sealed record Place(string Link, string Detail)
 {
+    public string Shown => InventoryWords.InLegacy(Link);
+
     public string LinkName => InventoryWords.Evidence(Link);
 }
 
 /// <summary>A database technology or third-party library and where the code uses it.</summary>
-public sealed record TechnologyCard(string Name, string Category, string Places, IReadOnlyList<Place> Evidence);
+public sealed record TechnologyCard(
+    string Name,
+    string Category,
+    string Glyph,
+    string Places,
+    IReadOnlyList<Place> Evidence);
 
 /// <summary>A connection a form declares; secret values arrive as *** and stay that way.</summary>
 public sealed record ConnectionCard(
@@ -107,17 +140,17 @@ public sealed record ConnectionCard(
     bool HasEmbeddedPassword,
     IReadOnlyList<Setting> Settings)
 {
+    public string Shown => InventoryWords.InLegacy(Link);
+
     public string LinkName => InventoryWords.Evidence(Link);
 }
 
-/// <summary>Two technology cards side by side; a row is as tall as its taller card.</summary>
-public sealed record TechnologyPair(TechnologyCard Left, TechnologyCard? Right)
-{
-    public bool HasRight => Right is not null;
-}
+/// <summary>The external routines the code declares and the COM objects it creates.</summary>
+public sealed record ExternalsCard(IReadOnlyList<ExternalRow> Rows, string ComNote);
 
-/// <summary>Two connection cards side by side; a row is as tall as its taller card.</summary>
-public sealed record ConnectionPair(ConnectionCard Left, ConnectionCard? Right)
+/// <summary>Two data cards side by side; a row is as tall as its taller card.</summary>
+/// <param name="Left">A technology, connection or externals card.</param>
+public sealed record DataCardPair(object Left, object? Right)
 {
     public bool HasRight => Right is not null;
 }
@@ -130,11 +163,16 @@ public sealed record Setting(string Key, string Value)
 
 public sealed record ExternalRow(string Routine, string Library, string Link)
 {
+    public string Shown => InventoryWords.InLegacy(Link);
+
     public string LinkName => InventoryWords.Evidence(Link);
 }
 
+/// <summary>A SQL statement; one built by concatenation shows that pill where the others show their owner.</summary>
 public sealed record SqlRow(string Link, string Kind, string Text, string Note, bool BuiltByConcatenation)
 {
+    public bool ShowsNote => !BuiltByConcatenation;
+
     public string AnnouncedName =>
         $"{Kind}: {Text}. {Note}{(BuiltByConcatenation ? ", built by concatenation" : string.Empty)}";
 

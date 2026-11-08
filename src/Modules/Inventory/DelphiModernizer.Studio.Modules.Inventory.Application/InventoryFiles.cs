@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading;
@@ -13,6 +14,11 @@ internal static class InventoryFiles
     public static string JsonPath(Workspace workspace)
     {
         return Path.Combine(workspace.LatestScanFolder, "inventory.json");
+    }
+
+    public static DateTimeOffset WrittenAt(Workspace workspace)
+    {
+        return new DateTimeOffset(File.GetLastWriteTimeUtc(JsonPath(workspace)), TimeSpan.Zero);
     }
 
     public static async Task WriteAsync(

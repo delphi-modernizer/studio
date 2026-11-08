@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using DelphiModernizer.Studio.Modules.Deliverables.UI.ViewModels;
+using DelphiModernizer.Studio.UI.Common.Controls;
 using DelphiModernizer.Studio.UI.Contracts;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
@@ -42,9 +43,8 @@ public sealed partial class DeliverablesPage : Page, IHasViewModel
 
         foreach (var choice in ViewModel.Filters)
         {
-            var item = new SelectorBarItem { Text = choice.Text, Tag = choice.Filter };
-            AutomationProperties.SetName(item, choice.AnnouncedName);
-            FilterBar.Items.Add(item);
+            FilterBar.Items.Add(
+                CountedSelectorBarItem.Create(choice.Label, choice.CountText, choice.AnnouncedName, choice.Filter));
         }
 
         FilterBar.SelectedItem = FilterBar.Items.FirstOrDefault(i => (DeliverableFilter)i.Tag == ViewModel.Filter);
