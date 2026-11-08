@@ -26,10 +26,7 @@ public static class DialogMargins
 
         void Fit(XamlRoot root, XamlRootChangedEventArgs? args)
         {
-            if (surface is not null)
-            {
-                surface.MaxHeight = Math.Min(templateMax, root.Size.Height - (2 * _edge));
-            }
+            surface?.MaxHeight = Math.Min(templateMax, root.Size.Height - (2 * _edge));
         }
 
         dialog.Opened += (_, _) => {
@@ -48,11 +45,8 @@ public static class DialogMargins
             }
         };
         dialog.Closed += (_, _) => {
-            if (watched is not null)
-            {
-                watched.Changed -= Fit;
-                watched = null;
-            }
+            watched?.Changed -= Fit;
+            watched = null;
         };
     }
 
