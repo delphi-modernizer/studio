@@ -41,7 +41,7 @@ Traceability, Sign-offs and Settings ([ADR 0001](adr/0001-modular-monolith-on-th
 - The solution lists every project.
 
 Unit tests cover the Domain and Application layers, the abstractions and the mediator. The WinUI projects, the App and
-every `*.UI` project, are checked by the `screenshots` job instead, so SonarQube Cloud leaves them out of the coverage
+every `*.UI` project, are checked by QA with the screenshot harness instead, so SonarQube Cloud leaves them out of the coverage
 figure (`sonar-coverage-exclusions` in [ci.yml](../.github/workflows/ci.yml)); their issues are still analyzed and kept
 at zero.
 

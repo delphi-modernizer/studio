@@ -47,10 +47,11 @@
 - Every brush in the shared styles and on Sign-offs is a theme resource that resolves in high contrast, where the next
   sign-off's border and hovered rows stay readable.
 - Paths trim at the start in narrow columns, so the file name stays visible, and Narrator reads the whole path.
-- A `screenshots` CI job captures every artboard state of the studio, driven through the app, `dmz` and workspace
-  files: light and dark at 1280 × 800 and 960 × 576, and Overview and Sign-offs in high contrast. A manifest pairs each
-  screenshot with its canvas board, and the job fails when the app does not start or a state cannot be reached.
-- A stand-in Claude Code for CI that replays the engine's stream-json for completed, failed, stopped, budget-reached and
-  starting runs, a guard refusal included.
-- CI builds the app it uploads and the one it captures on the engine 0.1.0 packages from GitHub Packages, and tests
-  against the engine's v0.1.0 tag.
+- A screenshot harness for QA captures every artboard state of the studio on a Windows PC, driven through the app,
+  `dmz` and workspace files: light and dark at 1280 × 800 and 960 × 576, and Overview and Sign-offs in high contrast. A
+  manifest pairs each screenshot with its canvas board, and the harness fails when the app does not start or a state
+  cannot be reached.
+- A stand-in Claude Code for the harness that replays the engine's stream-json for completed, failed, stopped,
+  budget-reached and starting runs, a guard refusal included.
+- CI builds the app it uploads on the engine 0.1.0 packages from GitHub Packages, and tests against the engine's
+  v0.1.0 tag.

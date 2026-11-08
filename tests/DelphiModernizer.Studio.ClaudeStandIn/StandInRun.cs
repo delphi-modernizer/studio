@@ -118,7 +118,7 @@ internal sealed class StandInRun(
             .ReadLines(Path.Combine(workspaceRoot, deliverableFile))
             .First(l => l.StartsWith("status:", StringComparison.Ordinal));
         Edit(deliverableFile, status, "status: draft");
-        Console.Error.WriteLine("stand-in: the screenshots job's Claude Code; no model was called.");
+        Console.Error.WriteLine("stand-in: the screenshot harness's Claude Code; no model was called.");
     }
 
     private void Say(string text)
