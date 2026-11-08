@@ -168,12 +168,21 @@ internal sealed class StudioDriver : IDisposable
     {
         try
         {
-            // A ring offers no value, and a bar keeps the last work's value while it is indeterminate again, so a bar
-            // counts only partway, as the canvas draws it.
-            return _window
-                .FindAllDescendants(shows)
-                .Any(e => Type(e) != ControlType.ProgressBar
-                    || (e.Patterns.RangeValue.TryGetPattern(out var range) && GoesPartway(range)));
+            var found = _window.FindAllDescendants(shows);
+
+            if (found.Any(e => Type(e) != ControlType.ProgressBar))
+            {
+                return true;
+            }
+
+            // A bar keeps the last work's value while it is indeterminate again, so it counts only partway, as the
+            // canvas draws it.
+            var bars = found
+                .Select(e => e.Patterns.RangeValue.PatternOrDefault)
+                .OfType<IRangeValuePattern>()
+                .ToList();
+
+            return bars.Count > 0 && GoesPartway(bars);
         }
         catch (COMException)
         {
@@ -181,24 +190,31 @@ internal sealed class StudioDriver : IDisposable
         }
     }
 
-    /// <summary>Whether a bar once found shows partway within a few seconds.</summary>
+    /// <summary>Whether any of the bars found shows partway within a few seconds.</summary>
     /// <remarks>
-    /// Its value is read on its own: with the app on one processor, a walk of the window can take longer than the
-    /// bar's partway does once the files are cached.
+    /// Their values are read on their own, all together: with the app on one processor, a walk of the window can take
+    /// longer than a bar's partway does once the files are cached, and a spinner beside a bar may offer a value that
+    /// never moves.
     /// </remarks>
-    private static bool GoesPartway(IRangeValuePattern range)
+    private static bool GoesPartway(IReadOnlyList<IRangeValuePattern> bars)
     {
         return Retry
-            .WhileFalse(
-                () => {
-                    double value = range.Value.ValueOrDefault;
-
-                    return value > 0 && value < range.Maximum.ValueOrDefault;
-                },
-                _barWatch,
-                _poll,
-                ignoreException: true)
+            .WhileFalse(() => bars.Any(IsPartway), _barWatch, _poll)
             .Result;
+    }
+
+    private static bool IsPartway(IRangeValuePattern bar)
+    {
+        try
+        {
+            double value = bar.Value.ValueOrDefault;
+
+            return value > 0 && value < bar.Maximum.ValueOrDefault;
+        }
+        catch (COMException)
+        {
+            return false;
+        }
     }
 
     /// <summary>Captures one part of the window at 1280 × 800: the title bar or the navigation pane.</summary>
