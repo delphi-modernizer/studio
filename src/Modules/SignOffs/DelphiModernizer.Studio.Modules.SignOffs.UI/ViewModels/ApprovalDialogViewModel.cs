@@ -80,7 +80,6 @@ public sealed partial class ApprovalDialogViewModel : ObservableObject
 
     public string PrimaryText => IsRevoke ? "Revoke approval" : "Approve";
 
-
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanConfirm))]
     public partial string Note { get; set; } = string.Empty;

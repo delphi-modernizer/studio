@@ -145,10 +145,7 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <StackPanel
-                x:Name="PageContent"
-                HorizontalAlignment="Stretch"
-                Style="{StaticResource PageContentStyle}">
+            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                 <controls:PageHeader Title="Sign-offs">
                     <controls:PageHeader.Purpose>
                         Five sign-offs, in order. Approving one records who you are (from git), your note and a
@@ -539,7 +536,7 @@
                         </HyperlinkButton>
                     </Grid>
                 </StackPanel>
-            </StackPanel>
+            </controls:FullWidthStackPanel>
         </ScrollViewer>
     </Grid>
 </Page>

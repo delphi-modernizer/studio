@@ -113,10 +113,7 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer>
-            <StackPanel
-                x:Name="PageContent"
-                HorizontalAlignment="Stretch"
-                Style="{StaticResource PageContentStyle}">
+            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
                 <controls:PageHeader Title="Workstreams">
                     <controls:PageHeader.Purpose>
                         The Principal Architect and six teams: what each one drafts, and the tasks its agent can run.
@@ -205,12 +202,8 @@
                                                 Text="{x:Bind Name}"
                                                 TextTrimming="CharacterEllipsis"
                                                 TextWrapping="NoWrap" />
-                                            <ProgressRing
+                                            <controls:Spinner
                                                 Grid.Column="2"
-                                                Width="12"
-                                                Height="12"
-                                                MinWidth="12"
-                                                MinHeight="12"
                                                 IsActive="{x:Bind IsRunning}"
                                                 Visibility="{x:Bind IsRunning}" />
                                         </Grid>
@@ -469,7 +462,7 @@
                         </Border>
                     </StackPanel>
                 </Grid>
-            </StackPanel>
+            </controls:FullWidthStackPanel>
         </ScrollViewer>
     </Grid>
 </Page>
