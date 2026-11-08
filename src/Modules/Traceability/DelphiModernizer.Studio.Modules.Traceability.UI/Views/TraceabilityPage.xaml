@@ -159,364 +159,356 @@
         </VisualStateManager.VisualStateGroups>
 
         <ScrollViewer x:Name="PageScroller">
-            <!--  The page fills the width up to its MaxWidth and stays left-aligned beyond it.  -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MaxWidth="{StaticResource PageMaxWidth}" />
-                </Grid.ColumnDefinitions>
-                <StackPanel
-                    x:Name="PageContent"
-                    HorizontalAlignment="Stretch"
-                    Style="{StaticResource PageContentStyle}">
-                    <controls:PageHeader Title="Traceability">
-                        <controls:PageHeader.Purpose>
-                            Checks that every claim in the documents is backed by evidence and that every reference points
-                            to something real.
-                        </controls:PageHeader.Purpose>
-                        <controls:PageHeader.Actions>
-                            <StackPanel
-                                Orientation="Horizontal"
-                                Spacing="8"
-                                Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
-                                <ToggleSwitch
-                                    AutomationProperties.Name="Strict: warnings count as errors"
-                                    IsOn="{x:Bind ViewModel.Strict, Mode=TwoWay}"
-                                    OffContent="Count warnings as errors"
-                                    OnContent="Count warnings as errors" />
-                                <Button
-                                    Command="{x:Bind ViewModel.CheckCommand}"
-                                    Style="{StaticResource AccentButtonStyle}">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon
-                                            Glyph="{x:Bind icons:StudioIcons.Refresh}"
-                                            Style="{StaticResource IconStyle}" />
-                                        <TextBlock Text="Check again" />
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
-                        </controls:PageHeader.Actions>
-                    </controls:PageHeader>
+            <controls:FullWidthStackPanel x:Name="PageContent" Style="{StaticResource PageContentStyle}">
+                <controls:PageHeader Title="Traceability">
+                    <controls:PageHeader.Purpose>
+                        Checks that every claim in the documents is backed by evidence and that every reference points
+                        to something real.
+                    </controls:PageHeader.Purpose>
+                    <controls:PageHeader.Actions>
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Spacing="8"
+                            Visibility="{x:Bind ViewModel.HasWorkspace, Mode=OneWay}">
+                            <ToggleSwitch
+                                AutomationProperties.Name="Strict: warnings count as errors"
+                                IsOn="{x:Bind ViewModel.Strict, Mode=TwoWay}"
+                                OffContent="Count warnings as errors"
+                                OnContent="Count warnings as errors" />
+                            <Button
+                                Command="{x:Bind ViewModel.CheckCommand}"
+                                Style="{StaticResource AccentButtonStyle}">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon
+                                        Glyph="{x:Bind icons:StudioIcons.Refresh}"
+                                        Style="{StaticResource IconStyle}" />
+                                    <TextBlock Text="Check again" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </controls:PageHeader.Actions>
+                </controls:PageHeader>
 
-                    <controls:NoWorkspaceState
-                        Glyph="{x:Bind icons:StudioIcons.Traceability}"
-                        Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
-                        <controls:NoWorkspaceState.Message>
-                            Traceability checks a workspace’s documents: every claim backed by evidence, every reference
-                            pointing to something real. Open or start a workspace to check it.
-                        </controls:NoWorkspaceState.Message>
-                    </controls:NoWorkspaceState>
+                <controls:NoWorkspaceState
+                    Glyph="{x:Bind icons:StudioIcons.Traceability}"
+                    Visibility="{x:Bind ViewModel.HasNoWorkspace, Mode=OneWay}">
+                    <controls:NoWorkspaceState.Message>
+                        Traceability checks a workspace’s documents: every claim backed by evidence, every reference
+                        pointing to something real. Open or start a workspace to check it.
+                    </controls:NoWorkspaceState.Message>
+                </controls:NoWorkspaceState>
 
+                <InfoBar
+                    IsClosable="False"
+                    IsOpen="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}"
+                    Message="{x:Bind ViewModel.LoadProblem, Mode=OneWay}"
+                    Severity="Error"
+                    Title="Couldn’t check the documents."
+                    Visibility="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}">
+                    <InfoBar.IconSource>
+                        <FontIconSource
+                            FontFamily="{StaticResource StudioIconsFontFamily}"
+                            Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                    </InfoBar.IconSource>
+                </InfoBar>
+
+                <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsOpen, Mode=OneWay}">
                     <InfoBar
                         IsClosable="False"
-                        IsOpen="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}"
-                        Message="{x:Bind ViewModel.LoadProblem, Mode=OneWay}"
-                        Severity="Error"
-                        Title="Couldn’t check the documents."
-                        Visibility="{x:Bind ViewModel.HasLoadProblem, Mode=OneWay}">
+                        IsOpen="{x:Bind ViewModel.Strict, Mode=OneWay}"
+                        Message="This is how the final plan’s sign-off checks the documents."
+                        Severity="Informational"
+                        Title="Warnings count as errors."
+                        Visibility="{x:Bind ViewModel.Strict, Mode=OneWay}">
                         <InfoBar.IconSource>
                             <FontIconSource
                                 FontFamily="{StaticResource StudioIconsFontFamily}"
-                                Glyph="{x:Bind icons:StudioIcons.ErrorFilled}" />
+                                Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
                         </InfoBar.IconSource>
                     </InfoBar>
 
-                    <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsOpen, Mode=OneWay}">
-                        <InfoBar
-                            IsClosable="False"
-                            IsOpen="{x:Bind ViewModel.Strict, Mode=OneWay}"
-                            Message="This is how the final plan’s sign-off checks the documents."
-                            Severity="Informational"
-                            Title="Warnings count as errors."
-                            Visibility="{x:Bind ViewModel.Strict, Mode=OneWay}">
-                            <InfoBar.IconSource>
-                                <FontIconSource
-                                    FontFamily="{StaticResource StudioIconsFontFamily}"
-                                    Glyph="{x:Bind icons:StudioIcons.InfoFilled}" />
-                            </InfoBar.IconSource>
-                        </InfoBar>
+                    <!--  Four cards in one row at every width, each as tall as the tallest.  -->
+                    <Grid AutomationProperties.Name="Summary" ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter
+                            x:Name="Stat0"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Content="{x:Bind ViewModel.Stats[0], Mode=OneWay}"
+                            ContentTemplate="{StaticResource StatTemplate}" />
+                        <ContentPresenter
+                            x:Name="Stat1"
+                            Grid.Column="1"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Content="{x:Bind ViewModel.Stats[1], Mode=OneWay}"
+                            ContentTemplate="{StaticResource StatTemplate}" />
+                        <ContentPresenter
+                            x:Name="Stat2"
+                            Grid.Column="2"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Content="{x:Bind ViewModel.Stats[2], Mode=OneWay}"
+                            ContentTemplate="{StaticResource StatTemplate}" />
+                        <ContentPresenter
+                            x:Name="Stat3"
+                            Grid.Column="3"
+                            HorizontalContentAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Content="{x:Bind ViewModel.Stats[3], Mode=OneWay}"
+                            ContentTemplate="{StaticResource StatTemplate}" />
+                    </Grid>
 
-                        <!--  Four cards in one row at every width, each as tall as the tallest.  -->
-                        <Grid AutomationProperties.Name="Summary" ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <ContentPresenter
-                                x:Name="Stat0"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"
-                                Content="{x:Bind ViewModel.Stats[0], Mode=OneWay}"
-                                ContentTemplate="{StaticResource StatTemplate}" />
-                            <ContentPresenter
-                                x:Name="Stat1"
-                                Grid.Column="1"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"
-                                Content="{x:Bind ViewModel.Stats[1], Mode=OneWay}"
-                                ContentTemplate="{StaticResource StatTemplate}" />
-                            <ContentPresenter
-                                x:Name="Stat2"
-                                Grid.Column="2"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"
-                                Content="{x:Bind ViewModel.Stats[2], Mode=OneWay}"
-                                ContentTemplate="{StaticResource StatTemplate}" />
-                            <ContentPresenter
-                                x:Name="Stat3"
-                                Grid.Column="3"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"
-                                Content="{x:Bind ViewModel.Stats[3], Mode=OneWay}"
-                                ContentTemplate="{StaticResource StatTemplate}" />
-                        </Grid>
+                    <SelectorBar
+                        x:Name="ViewBar"
+                        AutomationProperties.Name="Traceability views"
+                        SelectionChanged="OnViewChanged" />
 
-                        <SelectorBar
-                            x:Name="ViewBar"
-                            AutomationProperties.Name="Traceability views"
-                            SelectionChanged="OnViewChanged" />
-
-                        <Border Style="{StaticResource CardStyle}" Visibility="{x:Bind ViewModel.IsClean, Mode=OneWay}">
-                            <StackPanel
-                                Padding="16,32"
+                    <Border Style="{StaticResource CardStyle}" Visibility="{x:Bind ViewModel.IsClean, Mode=OneWay}">
+                        <StackPanel
+                            Padding="16,32"
+                            HorizontalAlignment="Center"
+                            Spacing="8">
+                            <FontIcon
+                                FontSize="48"
+                                Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                Glyph="{x:Bind icons:StudioIcons.CheckPassed}"
+                                Style="{StaticResource IconStyle}" />
+                            <TextBlock
                                 HorizontalAlignment="Center"
-                                Spacing="8">
-                                <FontIcon
-                                    FontSize="48"
-                                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
-                                    Glyph="{x:Bind icons:StudioIcons.CheckPassed}"
-                                    Style="{StaticResource IconStyle}" />
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    AutomationProperties.HeadingLevel="Level2"
-                                    Style="{StaticResource SubtitleTextBlockStyle}"
-                                    Text="No errors or warnings" />
-                                <TextBlock
-                                    MaxWidth="480"
-                                    Style="{StaticResource BodyTextBlockStyle}"
-                                    TextAlignment="Center"
-                                    TextWrapping="Wrap">
-                                    Sign-offs that need clean documents can pass now. The final plan also counts
-                                    warnings, such as open questions and requirements without a test.
-                                </TextBlock>
-                            </StackPanel>
-                        </Border>
+                                AutomationProperties.HeadingLevel="Level2"
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="No errors or warnings" />
+                            <TextBlock
+                                MaxWidth="344"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource BodyTextBlockStyle}"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap">
+                                Sign-offs that need clean documents can pass now. The final plan also counts
+                                warnings, such as open questions and requirements without a test.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
 
-                        <Border
-                            Style="{StaticResource FlushCardStyle}"
-                            Visibility="{x:Bind ViewModel.HasProblems, Mode=OneWay}">
-                            <StackPanel>
-                                <Grid Padding="16,6,8,0" ColumnSpacing="8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                                        Text="Opening an issue opens its file at the line in your editor." />
-                                    <SelectorBar
-                                        x:Name="SeverityBar"
-                                        Grid.Column="1"
-                                        AutomationProperties.Name="Severity"
-                                        SelectionChanged="OnSeverityChanged" />
-                                </Grid>
-                                <Grid Style="{StaticResource TableHeaderStyle}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="96" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="240" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Severity" />
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Problem" />
-                                    <TextBlock
-                                        Grid.Column="2"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Where" />
-                                </Grid>
-                                <ListView
-                                    x:Name="ProblemsList"
-                                    AutomationProperties.Name="Issues"
-                                    IsItemClickEnabled="True"
-                                    ItemClick="OnRowClicked"
-                                    ItemContainerStyle="{StaticResource TableRowStyle}"
-                                    ItemsSource="{x:Bind ViewModel.Problems, Mode=OneWay}"
-                                    SelectionMode="None">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ProblemRow">
-                                            <Grid ColumnSpacing="12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="96" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="240" />
-                                                </Grid.ColumnDefinitions>
-                                                <controls:StatusPill
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    State="{x:Bind Pill}" />
-                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                    <TextBlock
-                                                        Style="{StaticResource BodyTextBlockStyle}"
-                                                        Text="{x:Bind Description}"
-                                                        TextWrapping="Wrap" />
-                                                    <TextBlock
-                                                        Style="{StaticResource SecondaryCaptionTextStyle}"
-                                                        Text="{x:Bind Rule}" />
-                                                </StackPanel>
-                                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                                    <HyperlinkButton
-                                                        Padding="0"
-                                                        AutomationProperties.Name="{x:Bind FileLink}"
-                                                        Click="OnProblemClicked"
-                                                        Tag="{x:Bind}">
-                                                        <TextBlock
-                                                            FontFamily="Cascadia Mono,Consolas"
-                                                            FontSize="12"
-                                                            Text="{x:Bind FileLink}"
-                                                            TextTrimming="CharacterEllipsis" />
-                                                    </HyperlinkButton>
-                                                    <controls:PathText Text="{x:Bind Folder}" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                            </StackPanel>
-                        </Border>
-
-                        <Border
-                            Style="{StaticResource FlushCardStyle}"
-                            Visibility="{x:Bind ViewModel.IsMatrix, Mode=OneWay}">
-                            <StackPanel>
-                                <Grid Style="{StaticResource TableHeaderStyle}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="1.4*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Requirement" />
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Business rules" />
-                                    <TextBlock
-                                        Grid.Column="2"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Evidence" />
-                                    <TextBlock
-                                        Grid.Column="3"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Decisions" />
-                                    <TextBlock
-                                        Grid.Column="4"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Work packages" />
-                                    <TextBlock
-                                        Grid.Column="5"
-                                        Style="{StaticResource TableHeaderTextStyle}"
-                                        Text="Tests" />
-                                </Grid>
-                                <ListView
-                                    x:Name="MatrixList"
-                                    AutomationProperties.Name="Traceability matrix"
-                                    IsItemClickEnabled="True"
-                                    ItemClick="OnRowClicked"
-                                    ItemContainerStyle="{StaticResource TableRowStyle}"
-                                    ItemsSource="{x:Bind ViewModel.Matrix, Mode=OneWay}"
-                                    SelectionMode="None">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:MatrixRow">
-                                            <Grid ColumnSpacing="12">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="1.4*" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
+                    <Border
+                        Style="{StaticResource FlushCardStyle}"
+                        Visibility="{x:Bind ViewModel.HasProblems, Mode=OneWay}">
+                        <StackPanel>
+                            <Grid Padding="16,6,8,0" ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                    Text="Opening an issue opens its file at the line in your editor." />
+                                <SelectorBar
+                                    x:Name="SeverityBar"
+                                    Grid.Column="1"
+                                    AutomationProperties.Name="Severity"
+                                    SelectionChanged="OnSeverityChanged" />
+                            </Grid>
+                            <Grid Style="{StaticResource TableHeaderStyle}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="96" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="240" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Severity" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Problem" />
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Where" />
+                            </Grid>
+                            <ListView
+                                x:Name="ProblemsList"
+                                AutomationProperties.Name="Issues"
+                                IsItemClickEnabled="True"
+                                ItemClick="OnRowClicked"
+                                ItemContainerStyle="{StaticResource TableRowStyle}"
+                                ItemsSource="{x:Bind ViewModel.Problems, Mode=OneWay}"
+                                SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:ProblemRow">
+                                        <Grid ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="96" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="240" />
+                                            </Grid.ColumnDefinitions>
+                                            <controls:StatusPill
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                State="{x:Bind Pill}" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock
+                                                    Style="{StaticResource BodyTextBlockStyle}"
+                                                    Text="{x:Bind Description}"
+                                                    TextWrapping="Wrap" />
+                                                <TextBlock
+                                                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                                                    Text="{x:Bind Rule}" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                                 <HyperlinkButton
                                                     Padding="0"
-                                                    VerticalAlignment="Top"
-                                                    Click="OnRequirementClicked"
+                                                    AutomationProperties.Name="{x:Bind FileLink}"
+                                                    Click="OnProblemClicked"
                                                     Tag="{x:Bind}">
                                                     <TextBlock
-                                                        FontFamily="Cascadia Mono,Consolas"
+                                                        FontFamily="{StaticResource MonoFontFamily}"
                                                         FontSize="12"
-                                                        Text="{x:Bind Id}" />
+                                                        Text="{x:Bind FileLink}"
+                                                        TextTrimming="CharacterEllipsis" />
                                                 </HyperlinkButton>
+                                                <controls:PathText Text="{x:Bind Folder}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Style="{StaticResource FlushCardStyle}"
+                        Visibility="{x:Bind ViewModel.IsMatrix, Mode=OneWay}">
+                        <StackPanel>
+                            <Grid Style="{StaticResource TableHeaderStyle}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="1.4*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Style="{StaticResource TableHeaderTextStyle}" Text="Requirement" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Business rules" />
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Evidence" />
+                                <TextBlock
+                                    Grid.Column="3"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Decisions" />
+                                <TextBlock
+                                    Grid.Column="4"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Work packages" />
+                                <TextBlock
+                                    Grid.Column="5"
+                                    Style="{StaticResource TableHeaderTextStyle}"
+                                    Text="Tests" />
+                            </Grid>
+                            <ListView
+                                x:Name="MatrixList"
+                                AutomationProperties.Name="Traceability matrix"
+                                IsItemClickEnabled="True"
+                                ItemClick="OnRowClicked"
+                                ItemContainerStyle="{StaticResource TableRowStyle}"
+                                ItemsSource="{x:Bind ViewModel.Matrix, Mode=OneWay}"
+                                SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:MatrixRow">
+                                        <Grid ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="1.4*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <HyperlinkButton
+                                                Padding="0"
+                                                VerticalAlignment="Top"
+                                                Click="OnRequirementClicked"
+                                                Tag="{x:Bind}">
                                                 <TextBlock
-                                                    Grid.Column="1"
-                                                    FontFamily="Cascadia Mono,Consolas"
+                                                    FontFamily="{StaticResource MonoFontFamily}"
                                                     FontSize="12"
-                                                    Text="{x:Bind BusinessRules}"
-                                                    TextWrapping="Wrap" />
-                                                <ItemsRepeater
-                                                    Grid.Column="2"
-                                                    ItemsSource="{x:Bind Evidence}"
-                                                    Visibility="{x:Bind HasEvidence}">
-                                                    <ItemsRepeater.ItemTemplate>
-                                                        <DataTemplate x:DataType="x:String">
-                                                            <controls:EvidenceLink Reference="{x:Bind}" />
-                                                        </DataTemplate>
-                                                    </ItemsRepeater.ItemTemplate>
-                                                </ItemsRepeater>
-                                                <TextBlock
-                                                    Grid.Column="2"
-                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Text="—"
-                                                    Visibility="{x:Bind HasNoEvidence}" />
-                                                <TextBlock
-                                                    Grid.Column="3"
-                                                    FontFamily="Cascadia Mono,Consolas"
-                                                    FontSize="12"
-                                                    Text="{x:Bind Decisions}"
-                                                    TextWrapping="Wrap" />
-                                                <TextBlock
-                                                    Grid.Column="4"
-                                                    FontFamily="Cascadia Mono,Consolas"
-                                                    FontSize="12"
-                                                    Text="{x:Bind WorkPackages}"
-                                                    TextWrapping="Wrap" />
-                                                <TextBlock
-                                                    Grid.Column="5"
-                                                    FontFamily="Cascadia Mono,Consolas"
-                                                    FontSize="12"
-                                                    Text="{x:Bind Tests}"
-                                                    TextWrapping="Wrap"
-                                                    Visibility="{x:Bind HasTests}" />
-                                                <controls:StatusPill
-                                                    Grid.Column="5"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Top"
-                                                    State="Warning"
-                                                    Text="None"
-                                                    Visibility="{x:Bind HasNoTests}" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                                <Border
-                                    Padding="16,10"
-                                    BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
-                                    BorderThickness="0,1,0,0">
-                                    <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
-                                        Rows appear as the functional requirements grow. A requirement with no test is a
-                                        warning; one with no business rule and no evidence is an error.
-                                    </TextBlock>
-                                </Border>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                                                    Text="{x:Bind Id}" />
+                                            </HyperlinkButton>
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                FontFamily="{StaticResource MonoFontFamily}"
+                                                FontSize="12"
+                                                Text="{x:Bind BusinessRules}"
+                                                TextWrapping="Wrap" />
+                                            <ItemsRepeater
+                                                Grid.Column="2"
+                                                ItemsSource="{x:Bind Evidence}"
+                                                Visibility="{x:Bind HasEvidence}">
+                                                <ItemsRepeater.ItemTemplate>
+                                                    <DataTemplate x:DataType="x:String">
+                                                        <controls:EvidenceLink Reference="{x:Bind}" />
+                                                    </DataTemplate>
+                                                </ItemsRepeater.ItemTemplate>
+                                            </ItemsRepeater>
+                                            <TextBlock
+                                                Grid.Column="2"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Text="—"
+                                                Visibility="{x:Bind HasNoEvidence}" />
+                                            <TextBlock
+                                                Grid.Column="3"
+                                                FontFamily="{StaticResource MonoFontFamily}"
+                                                FontSize="12"
+                                                Text="{x:Bind Decisions}"
+                                                TextWrapping="Wrap" />
+                                            <TextBlock
+                                                Grid.Column="4"
+                                                FontFamily="{StaticResource MonoFontFamily}"
+                                                FontSize="12"
+                                                Text="{x:Bind WorkPackages}"
+                                                TextWrapping="Wrap" />
+                                            <TextBlock
+                                                Grid.Column="5"
+                                                FontFamily="{StaticResource MonoFontFamily}"
+                                                FontSize="12"
+                                                Text="{x:Bind Tests}"
+                                                TextWrapping="Wrap"
+                                                Visibility="{x:Bind HasTests}" />
+                                            <controls:StatusPill
+                                                Grid.Column="5"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Top"
+                                                State="Warning"
+                                                Text="None"
+                                                Visibility="{x:Bind HasNoTests}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <Border
+                                Padding="16,10"
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,1,0,0">
+                                <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}">
+                                    Rows appear as the functional requirements grow. A requirement with no test is a
+                                    warning; one with no business rule and no evidence is an error.
+                                </TextBlock>
+                            </Border>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
-            </Grid>
+            </controls:FullWidthStackPanel>
         </ScrollViewer>
     </Grid>
 </Page>
