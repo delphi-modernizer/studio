@@ -60,7 +60,8 @@
 
 - Info bars on every page colour their icon by severity and keep their action at the right end, beside the text.
 - Start, New workspace and Settings keep one width from state to state; Start keeps its action tiles under 1100 with
-  16 between the actions and Recent workspaces, and says a too-old Claude Code must be updated to run agents.
+  16 between the actions and Recent workspaces, and says a too-old Claude Code, when its version is known, must be
+  updated to run agents.
 - New workspace: the target choices span the card and the chosen one has an accent border, step 4 has a Field and
   Value header with rows 16 apart, the summary labels are body size, every step shows done while creating, a step
   opens at the top of the page, and the folder box underlines in red when the folder can't be used.
