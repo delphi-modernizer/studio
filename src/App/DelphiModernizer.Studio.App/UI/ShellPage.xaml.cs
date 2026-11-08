@@ -159,7 +159,7 @@ public sealed partial class ShellPage : Page
 
         string style = source.Tone == BadgeTone.Critical
             ? "CriticalValueInfoBadgeStyle"
-            : "AttentionValueInfoBadgeStyle";
+            : "AccentValueInfoBadgeStyle";
         container.InfoBadge = new InfoBadge {
             Value = count,
             Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style],

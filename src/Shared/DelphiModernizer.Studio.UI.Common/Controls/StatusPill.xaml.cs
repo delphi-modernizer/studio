@@ -18,6 +18,9 @@ public sealed partial class StatusPill : UserControl
     public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
         nameof(Text), typeof(string), typeof(StatusPill), new PropertyMetadata(null, OnStateChanged));
 
+    public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register(
+        nameof(Glyph), typeof(string), typeof(StatusPill), new PropertyMetadata(null, OnStateChanged));
+
     public StatusPill()
     {
         InitializeComponent();
@@ -39,6 +42,13 @@ public sealed partial class StatusPill : UserControl
         set => SetValue(TextProperty, value);
     }
 
+    /// <summary>A Studio Icons glyph that replaces the state's own, such as the key on a credential; null keeps it.</summary>
+    public string? Glyph
+    {
+        get => (string?)GetValue(GlyphProperty);
+        set => SetValue(GlyphProperty, value);
+    }
+
     protected override AutomationPeer OnCreateAutomationPeer()
     {
         return new TextAutomationPeer(this, nameof(StatusPill));
@@ -56,8 +66,8 @@ public sealed partial class StatusPill : UserControl
         string word = string.IsNullOrEmpty(Text) ? look.Word : Text;
         bool changed = Word.Text != word;
         Word.Text = word;
-        Glyph.Glyph = look.Glyph;
-        Glyph.Visibility = running ? Visibility.Collapsed : Visibility.Visible;
+        Icon.Glyph = string.IsNullOrEmpty(Glyph) ? look.Glyph : Glyph;
+        Icon.Visibility = running ? Visibility.Collapsed : Visibility.Visible;
         Ring.Visibility = running ? Visibility.Visible : Visibility.Collapsed;
         Ring.IsActive = running;
         AutomationProperties.SetName(this, word);

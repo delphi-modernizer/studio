@@ -68,6 +68,9 @@
   placeholder, and an unusable claude.exe underlines the path in red with the whole message wrapped below.
 - The Claude Code dialog lists what agents add with round bullets and a hanging indent.
 - Title-bar search is 240 wide under 1100 when no workspace is open.
+- The no-workspace state sits centred in a 520-tall area with its description at body size, and can show Clone from
+  Git… turned off; empty cards keep their caption at 44 characters.
+- Table rows show their dividers, the Workstreams badge is the accent fill, and a status pill can take its own glyph.
 
 ### Fixed
 

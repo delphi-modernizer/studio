@@ -81,7 +81,9 @@ public sealed partial class NewWorkspacePage : Page, IHasViewModel
     /// <summary>The chosen target card carries the accent border (canvas .choice.on).</summary>
     private void OnTargetChoicesChanged(object sender, RoutedEventArgs e)
     {
-        var choices = TargetChoices.Items.OfType<RadioButton>().ToList();
+        var choices = TargetChoices.Items
+            .OfType<RadioButton>()
+            .ToList();
 
         for (int i = 0; i < choices.Count; i++)
         {

@@ -21,27 +21,27 @@
                     <VisualState.Setters>
                         <Setter Target="Chip.Background" Value="{ThemeResource StatusPillSuccessBackground}" />
                         <Setter Target="Chip.BorderBrush" Value="{ThemeResource StatusPillToneOutline}" />
-                        <Setter Target="Glyph.Foreground" Value="{ThemeResource StatusPillSuccessGlyph}" />
+                        <Setter Target="Icon.Foreground" Value="{ThemeResource StatusPillSuccessGlyph}" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="Caution">
                     <VisualState.Setters>
                         <Setter Target="Chip.Background" Value="{ThemeResource StatusPillCautionBackground}" />
                         <Setter Target="Chip.BorderBrush" Value="{ThemeResource StatusPillToneOutline}" />
-                        <Setter Target="Glyph.Foreground" Value="{ThemeResource StatusPillCautionGlyph}" />
+                        <Setter Target="Icon.Foreground" Value="{ThemeResource StatusPillCautionGlyph}" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="Critical">
                     <VisualState.Setters>
                         <Setter Target="Chip.Background" Value="{ThemeResource StatusPillCriticalBackground}" />
                         <Setter Target="Chip.BorderBrush" Value="{ThemeResource StatusPillToneOutline}" />
-                        <Setter Target="Glyph.Foreground" Value="{ThemeResource StatusPillCriticalGlyph}" />
+                        <Setter Target="Icon.Foreground" Value="{ThemeResource StatusPillCriticalGlyph}" />
                     </VisualState.Setters>
                 </VisualState>
                 <VisualState x:Name="Attention">
                     <VisualState.Setters>
                         <Setter Target="Chip.Background" Value="{ThemeResource StatusPillAttentionBackground}" />
-                        <Setter Target="Glyph.Foreground" Value="{ThemeResource StatusPillAttentionForeground}" />
+                        <Setter Target="Icon.Foreground" Value="{ThemeResource StatusPillAttentionForeground}" />
                         <Setter Target="Ring.Foreground" Value="{ThemeResource StatusPillAttentionForeground}" />
                         <Setter Target="Word.Foreground" Value="{ThemeResource StatusPillAttentionForeground}" />
                     </VisualState.Setters>
@@ -54,7 +54,7 @@
             Orientation="Horizontal"
             Spacing="4">
             <FontIcon
-                x:Name="Glyph"
+                x:Name="Icon"
                 VerticalAlignment="Center"
                 FontFamily="{StaticResource StudioIconsFontFamily}"
                 FontSize="12"
