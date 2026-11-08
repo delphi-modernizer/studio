@@ -158,18 +158,18 @@
                     <DataTemplate x:DataType="vm:CoveredFileRow">
                         <TextBlock
                             Padding="0,1"
-                            AutomationProperties.Name="{x:Bind Path}"
                             LineHeight="18"
                             Style="{StaticResource MonoTextStyle}"
-                            Text="{x:Bind PathText}"
+                            Text="{x:Bind Path}"
                             TextTrimming="None"
                             TextWrapping="Wrap" />
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
             </ItemsRepeater>
-            <!--  Whole, as drawn: the hash wraps anywhere, so it starts beside its label.  -->
+            <!--  The label, then the whole hash wrapping beside it, as drawn.  -->
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -180,12 +180,15 @@
                     Style="{StaticResource IconStyle}" />
                 <TextBlock
                     Grid.Column="1"
-                    AutomationProperties.Name="{x:Bind ViewModel.SignOff.FingerprintName}"
                     Style="{StaticResource SecondaryCaptionTextStyle}"
-                    TextWrapping="Wrap">
-                    <Run Text="Fingerprint of these files:" />
-                    <Run FontFamily="Cascadia Mono,Consolas" Text="{x:Bind ViewModel.SignOff.FingerprintText}" />
-                </TextBlock>
+                    Text="Fingerprint of these files:" />
+                <TextBlock
+                    Grid.Column="2"
+                    FontFamily="Cascadia Mono,Consolas"
+                    IsTextSelectionEnabled="True"
+                    Style="{StaticResource SecondaryCaptionTextStyle}"
+                    Text="{x:Bind ViewModel.SignOff.Fingerprint}"
+                    TextWrapping="Wrap" />
             </Grid>
         </StackPanel>
 

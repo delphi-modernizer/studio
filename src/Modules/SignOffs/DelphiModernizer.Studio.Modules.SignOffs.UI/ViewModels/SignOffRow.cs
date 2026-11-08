@@ -49,23 +49,7 @@ public enum CheckTone
 }
 
 /// <summary>One file a sign-off covers, marked when it changed since the approval.</summary>
-public sealed record CoveredFileRow(string Path, bool Changed)
-{
-    public string PathText => Wrapping.Anywhere(Path);
-}
-
-/// <summary>Text the canvas wraps with <c>overflow-wrap: anywhere</c>: paths and hashes.</summary>
-/// <remarks>
-/// A zero-width space after each character lets WinUI end a line there. The text is shown, never selected or copied,
-/// since the spaces would come with it.
-/// </remarks>
-internal static class Wrapping
-{
-    public static string Anywhere(string text)
-    {
-        return string.Join('\u200B', text.ToCharArray());
-    }
-}
+public sealed record CoveredFileRow(string Path, bool Changed);
 
 /// <summary>One approval or revocation in a sign-off's history.</summary>
 public sealed record HistoryRow(string Text, string Detail, bool IsApproval)
@@ -176,10 +160,6 @@ public sealed partial class SignOffRow : ObservableObject
 
     public string Fingerprint { get; }
 
-    /// <summary>The fingerprint to show, wrapping anywhere; Copy copies <see cref="Fingerprint"/>.</summary>
-    public string FingerprintText => Wrapping.Anywhere(Fingerprint);
-
-    public string FingerprintName => $"Fingerprint {Fingerprint}";
 
     public IReadOnlyList<CoveredFileRow> Covers { get; }
 

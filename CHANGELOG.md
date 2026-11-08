@@ -106,7 +106,7 @@
 - Run an agent task and the budget dialog show the budget as "2.00" after a grey "$", as Settings does, and Run with
   its play icon; the budget, approve and revoke dialogs have no default button, so Enter never spends money or
   approves, and Cancel and Close are drawn plain.
-- The approve dialog and Sign-offs show the whole fingerprint and every covered path, wrapping anywhere as drawn; the
+- The approve dialog and Sign-offs show the whole fingerprint beside its label and every covered path, wrapped; the
   dialog lists every covered file, and Sign-offs divides its checks by hairlines and gives a blocked sign-off the
   reason its first unmet check gives, such as "It is ready".
 - The approve dialog's note box is 76 tall and stays open without a git identity; Approve still waits for one.

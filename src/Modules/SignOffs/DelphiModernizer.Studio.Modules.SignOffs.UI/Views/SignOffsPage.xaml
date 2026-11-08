@@ -98,7 +98,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="CoveredFileTemplate" x:DataType="vm:CoveredFileRow">
-            <!--  Each path whole, wrapping anywhere as drawn; a changed file adds a caution mark.  -->
+            <!--  Each path whole, wrapping where it must, as drawn; a changed file adds a caution mark.  -->
             <Grid
                 Padding="0,2"
                 ColumnSpacing="8">
@@ -107,10 +107,9 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock
-                    AutomationProperties.Name="{x:Bind Path}"
                     LineHeight="18"
                     Style="{StaticResource MonoTextStyle}"
-                    Text="{x:Bind PathText}"
+                    Text="{x:Bind Path}"
                     TextTrimming="None"
                     TextWrapping="Wrap" />
                 <TextBlock
@@ -462,8 +461,10 @@
                                             <ItemsRepeater
                                                 ItemTemplate="{StaticResource CoveredFileTemplate}"
                                                 ItemsSource="{x:Bind Covers}" />
+                                            <!--  The label, then the whole hash wrapping beside it, as drawn.  -->
                                             <Grid ColumnSpacing="8">
                                                 <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
@@ -473,18 +474,20 @@
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Glyph="{x:Bind icons:StudioIcons.Fingerprint}"
                                                     Style="{StaticResource IconStyle}" />
-                                                <!--  Whole: the hash wraps anywhere, beside its label.  -->
                                                 <TextBlock
                                                     Grid.Column="1"
-                                                    AutomationProperties.Name="{x:Bind FingerprintName}"
                                                     Style="{StaticResource MonoTextStyle}"
-                                                    TextTrimming="None"
-                                                    TextWrapping="Wrap">
-                                                    <Run Text="Fingerprint" />
-                                                    <Run Text="{x:Bind FingerprintText}" />
-                                                </TextBlock>
-                                                <Button
+                                                    Text="Fingerprint" />
+                                                <TextBlock
                                                     Grid.Column="2"
+                                                    IsTextSelectionEnabled="True"
+                                                    Style="{StaticResource MonoTextStyle}"
+                                                    Text="{x:Bind Fingerprint}"
+                                                    TextTrimming="None"
+                                                    TextWrapping="Wrap" />
+                                                <Button
+                                                    Grid.Column="3"
+                                                    VerticalAlignment="Top"
                                                     AutomationProperties.Name="Copy the fingerprint"
                                                     Click="OnCopyFingerprint"
                                                     Style="{StaticResource SubtleButtonStyle}"

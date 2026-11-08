@@ -678,11 +678,18 @@
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Glyph="{x:Bind Glyph, Mode=OneWay}"
                                                     Style="{StaticResource IconStyle}" />
+                                                <!--  Edited files in primary text, as drawn.  -->
                                                 <controls:PathText
                                                     Grid.Column="1"
                                                     VerticalAlignment="Center"
-                                                    Foreground="{x:Bind local:RunPage.PathBrush(IsEdited), Mode=OneWay}"
-                                                    Text="{x:Bind Path}" />
+                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    Text="{x:Bind Path}"
+                                                    Visibility="{x:Bind IsEdited, Mode=OneWay}" />
+                                                <controls:PathText
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    Text="{x:Bind Path}"
+                                                    Visibility="{x:Bind local:RunPage.Not(IsEdited), Mode=OneWay}" />
                                                 <Button
                                                     Grid.Column="2"
                                                     Padding="6"
