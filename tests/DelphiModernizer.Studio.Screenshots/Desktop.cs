@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace DelphiModernizer.Studio.Screenshots;
 
-/// <summary>The Win32 calls the capture needs: window frames, the display mode and high contrast.</summary>
+/// <summary>The Win32 calls the capture needs: window frames, the display mode, high contrast and the pointer.</summary>
 internal static partial class Desktop
 {
     private const int _extendedFrameBounds = 9;
@@ -16,6 +16,12 @@ internal static partial class Desktop
     private const uint _setHighContrast = 0x0043;
     private const int _highContrastOn = 0x0001;
     private const uint _sendChange = 0x0002;
+    private const uint _mouseInput = 0;
+    private const uint _moveAbsolute = 0x0001 | 0x8000;
+    private const uint _leftDown = 0x0002;
+    private const uint _leftUp = 0x0004;
+    private const int _screenWidth = 0;
+    private const int _screenHeight = 1;
 
     public static string DisplayMode
     {
@@ -101,6 +107,38 @@ internal static partial class Desktop
         return IsHighContrast == on;
     }
 
+    /// <summary>Moves the pointer as a mouse does, so the app sees pointer input and not only a new cursor position.</summary>
+    /// <remarks>XAML takes its pointer-over states and tool tips from pointer input, which SetCursorPos does not send.</remarks>
+    public static void MovePointer(Point to)
+    {
+        int width = GetSystemMetrics(_screenWidth);
+        int height = GetSystemMetrics(_screenHeight);
+        Send(new MouseInput {
+            X = (int)Math.Round(to.X * 65535.0 / (width - 1)),
+            Y = (int)Math.Round(to.Y * 65535.0 / (height - 1)),
+            Flags = _moveAbsolute,
+        });
+    }
+
+    /// <summary>Clicks the left button at a point, as a mouse does.</summary>
+    /// <remarks>After pointer input XAML draws no focus ring where focus moves next; after keyboard input it does.</remarks>
+    public static void Click(Point at)
+    {
+        MovePointer(at);
+        Send(new MouseInput { Flags = _leftDown });
+        Send(new MouseInput { Flags = _leftUp });
+    }
+
+    private static void Send(MouseInput mouse)
+    {
+        var input = new Input { Type = _mouseInput, Mouse = mouse };
+
+        if (SendInput(1, ref input, Marshal.SizeOf<Input>()) != 1)
+        {
+            throw new InvalidOperationException($"SendInput failed with {Marshal.GetLastPInvokeError()}.");
+        }
+    }
+
     private static DevMode CurrentMode()
     {
         var mode = new DevMode { Size = (short)Marshal.SizeOf<DevMode>() };
@@ -132,6 +170,12 @@ internal static partial class Desktop
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool SystemParametersInfo(uint action, uint parameter, ref HighContrast value, uint update);
 
+    [LibraryImport("user32.dll", SetLastError = true)]
+    private static partial uint SendInput(uint count, ref Input input, int size);
+
+    [LibraryImport("user32.dll")]
+    private static partial int GetSystemMetrics(int index);
+
     [StructLayout(LayoutKind.Sequential)]
     private struct Rect
     {
@@ -161,6 +205,25 @@ internal static partial class Desktop
 
         [FieldOffset(176)]
         public int PelsHeight;
+    }
+
+    /// <remarks>INPUT with its MOUSEINPUT member, the largest of its union.</remarks>
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Input
+    {
+        public uint Type;
+        public MouseInput Mouse;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MouseInput
+    {
+        public int X;
+        public int Y;
+        public uint Data;
+        public uint Flags;
+        public uint Time;
+        public nint ExtraInfo;
     }
 
     [StructLayout(LayoutKind.Sequential)]

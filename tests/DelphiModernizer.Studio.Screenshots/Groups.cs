@@ -97,14 +97,13 @@ internal static class Groups
                 app.ClickItem(_recent, h.Opened[Sample]);
                 app.Capture("overview", "default");
                 app.Capture("overview", "hover", () => app.Hover("Team0"));
-                app.Capture("overview", "focus", () => app.FocusWithKeyboard("Team1"));
-                app.Capture("overview", "scrolled", () => app.ScrollIntoView("Gate4"), [StudioDriver.Minimum]);
+                app.Capture("overview", "scrolled", () => app.ScrollTo("Team0", 250), [StudioDriver.Minimum]);
             });
             h.Step(app, theme, "shared", () => {
                 app.CapturePart("shared", "title-bar", pane: false);
                 app.CapturePart("shared", "nav-pane", pane: true);
                 app.TogglePane();
-                app.Capture("overview", "pane-compact");
+                app.Capture("overview", "pane-compact", () => app.ScrollTo("Team0", 0));
                 app.TogglePane();
             });
             h.Step(app, theme, "sign-offs", () => {
@@ -117,6 +116,16 @@ internal static class Groups
                 theme,
                 "approve dialog",
                 () => ApproveDialog(h, app, "Approve the Project setup sign-off?", "approve-dialog"));
+
+            // A keyboard focus ring stays on whatever holds focus, so this comes after the Overview, title bar, pane and
+            // Sign-offs states, which the canvas draws without one.
+            h.Step(app, theme, "overview focus", () => {
+                app.Navigate("Overview");
+                app.Capture("overview", "focus", () => {
+                    app.ScrollTo("Team0", 0);
+                    app.FocusWithKeyboard("Gate1");
+                });
+            });
             h.Step(app, theme, "overview running", () => {
                 StartRun(app);
                 app.WaitFor("Working…", _run);
@@ -198,7 +207,7 @@ internal static class Groups
                 app.ClickItem(_recent, h.Opened[Large]);
                 app.Navigate("Inventory", 6000);
                 app.Capture("inventory", "large");
-                app.Capture("inventory", "scanning", () => {
+                app.CaptureWhileBusy("inventory", "scanning", () => {
                     app.WaitGone("Scanning legacy/…", _run);
                     app.Invoke("Scan again", 0);
                     app.WaitBriefly(c => c.ByName("Scanning legacy/…"), "Scanning legacy/…", _brief);
@@ -208,7 +217,10 @@ internal static class Groups
             h.Step(app, theme, "overview loading", () => app.Capture("overview", "loading", () => {
                 app.Navigate("Inventory", 4000);
                 app.Navigate("Overview", 0);
-                app.WaitBriefly(c => c.ByName("Reading the workspace"), "Reading the workspace", _brief);
+                app.WaitBriefly(
+                    c => c.ByName("Checking sign-offs, deliverables and traceability"),
+                    "Overview's loading state",
+                    _brief);
             }));
         });
     }
@@ -315,7 +327,7 @@ internal static class Groups
         app.Type("Legacy source folder", h.Workspaces.Legacy, tabOut: true);
         app.WaitEnabled("Next", _run);
         app.Capture("newworkspace", "step2", sizes: at);
-        app.Capture(
+        app.CaptureWhileBusy(
             "newworkspace",
             "preview-running",
             () => {
@@ -379,7 +391,7 @@ internal static class Groups
         string record = Path.Combine(h.Opened[Sample], _approvals);
         string? before = File.Exists(record) ? File.ReadAllText(record) : null;
         app.Expand("Project setup");
-        app.PressWithKeyboard("Approve Project setup");
+        app.Click("Approve Project setup");
         app.WaitFor(shows, _brief);
         app.Capture("signoffs", state);
         app.Invoke("Cancel");
