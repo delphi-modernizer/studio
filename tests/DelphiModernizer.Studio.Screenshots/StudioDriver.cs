@@ -33,6 +33,7 @@ internal sealed class StudioDriver : IDisposable
     private static readonly TimeSpan _findTimeout = TimeSpan.FromSeconds(20);
     private static readonly TimeSpan _poll = TimeSpan.FromMilliseconds(20);
     private static readonly TimeSpan _stillShowsTimeout = TimeSpan.FromMilliseconds(500);
+    private static readonly TimeSpan _barWatch = TimeSpan.FromSeconds(3);
 
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
     private static readonly Point _origin = new(480, 120);
@@ -169,14 +170,32 @@ internal sealed class StudioDriver : IDisposable
             return _window
                 .FindAllDescendants(shows)
                 .Any(e => Type(e) != ControlType.ProgressBar
-                    || (e.Patterns.RangeValue.TryGetPattern(out var range)
-                        && range.Value.ValueOrDefault > 0
-                        && range.Value.ValueOrDefault < range.Maximum.ValueOrDefault));
+                    || (e.Patterns.RangeValue.TryGetPattern(out var range) && GoesPartway(range)));
         }
         catch (COMException)
         {
             return false;
         }
+    }
+
+    /// <summary>Whether a bar once found shows partway within a few seconds.</summary>
+    /// <remarks>
+    /// Its value is read on its own: with the app on one processor, a walk of the window can take longer than the
+    /// bar's partway does once the files are cached.
+    /// </remarks>
+    private static bool GoesPartway(IRangeValuePattern range)
+    {
+        return Retry
+            .WhileFalse(
+                () => {
+                    double value = range.Value.ValueOrDefault;
+
+                    return value > 0 && value < range.Maximum.ValueOrDefault;
+                },
+                _barWatch,
+                _poll,
+                ignoreException: true)
+            .Result;
     }
 
     /// <summary>Captures one part of the window at 1280 × 800: the title bar or the navigation pane.</summary>

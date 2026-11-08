@@ -99,9 +99,10 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
    processor while scanning and preview running are captured, and a capture is kept only if the state still shows once
    it is taken, asked again for half a second, since a walk can meet the page as it changes; a progress bar counts only
-   partway, as the canvas draws it partly filled. Each size's scan starts from no scan, so the button reads Scan.
-   Overview's loading is captured the same way. Creating is captured once the kit is copied, while the tree is, so that
-   a step shows done, one working and the rest waiting.
+   partway, as the canvas draws it partly filled, and once found its value is read on its own, since a walk of the
+   window is slow on one processor. Each size's scan starts from no scan, so the button reads Scan. Overview's loading
+   is captured the same way. Creating is captured once the kit is copied, while the tree is, so that a step shows done,
+   one working and the rest waiting.
    - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set in a box without
      focusing it, and tabbing out moves focus without a key, since after keyboard input XAML draws a focus ring
      wherever focus goes next. Only Overview's focus state presses Tab.
