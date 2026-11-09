@@ -78,10 +78,10 @@ public sealed partial class EmptyState : UserControl
         state.Icon.FontSize = pageLevel ? 48 : 32;
         string style = pageLevel ? "SubtitleTextBlockStyle" : "BodyStrongTextBlockStyle";
         state.Heading.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[style];
-        // Canvas .empty p: 44ch, in body text on a page and in caption text in a card. 44ch of the canvas's body text is
-        // about 368 in Segoe UI, so a page-level line wraps where the canvas wraps it.
+        // Canvas .empty p: 44ch, in body text on a page and in caption text in a card. A "0" is about 0.6 em in Segoe
+        // UI, so 44ch is about 368 at 14 px and 316 at 12 px, and a line wraps where the canvas wraps it.
         string description = pageLevel ? "SecondaryBodyTextStyle" : "SecondaryCaptionTextStyle";
         state.Description.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[description];
-        state.Description.MaxWidth = pageLevel ? 368 : 296;
+        state.Description.MaxWidth = pageLevel ? 368 : 316;
     }
 }

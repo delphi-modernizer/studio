@@ -437,7 +437,8 @@
                                     AutomationProperties.IsRequiredForForm="True"
                                     Header="Workspace name"
                                     Text="{x:Bind ViewModel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                <StackPanel Spacing="4">
+                                <!--  Canvas .fld: 8 between the folder row, its error and its help.  -->
+                                <StackPanel Spacing="8">
                                     <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />

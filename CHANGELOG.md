@@ -164,6 +164,9 @@
 - Table rows draw their divider across the row's full width, right under the header, where WinUI's rounded
   backplate had inset it 4 at the sides and 2 from the top.
 - Settings' Default code page ends a long name in an ellipsis.
+- Start's recent workspace chevron starts its column, its Versions card sets each 11 px version on its label's
+  baseline as the canvas does, and a card's empty state wraps at the canvas's 44 characters; New workspace keeps 8
+  between the folder, its error and its help.
 - High contrast: busy rings draw in the highlight colour, and text inside the accent, such as the selected pane item
   and Review sign-offs, is no longer drawn white on a black box.
 - New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".
