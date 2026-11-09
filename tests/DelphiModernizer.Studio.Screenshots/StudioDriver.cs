@@ -107,9 +107,9 @@ internal sealed class StudioDriver : IDisposable
     /// <remarks>
     /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
     /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway, before
-    /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so the
-    /// screen waits a quarter second after the state shows. A state can end within that, so it is tried up to five
-    /// times; the check after the screen keeps only one that shows it.
+    /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so another
+    /// state's screen waits a quarter second after it shows. A state can end before it is taken, so it is tried up to
+    /// five times.
     /// </remarks>
     /// <param name="start">Starts the work.</param>
     /// <param name="shows">The element that shows only while the app works.</param>
@@ -135,13 +135,9 @@ internal sealed class StudioDriver : IDisposable
 
                     var bars = Retry.WhileNull(() => Busy(shows), _findTimeout, _poll).Result
                         ?? throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
-                    Settle(250);
-                    var image = FlaUICapture.Rectangle(frame);
-                    bool still = bars.Count > 0
-                        ? bars.Any(b => IsPartway(b.Range) && DrawnPartway(image, frame, b.Bounds))
-                        : StillShows(shows);
+                    var image = bars.Count > 0 ? DrawnWhilePartway(frame, bars) : ShotWhileShows(frame, shows);
 
-                    return still ? image : throw new TimeoutException($"{page} {state} ended as it was taken.");
+                    return image ?? throw new TimeoutException($"{page} {state} ended as it was taken.");
                 });
                 Save(page, state, size, shot);
             }
@@ -213,6 +209,56 @@ internal sealed class StudioDriver : IDisposable
         return Retry
             .WhileFalse(() => bars.Any(b => IsPartway(b.Range)), _barWatch, _poll)
             .Result;
+    }
+
+    /// <summary>The screen once the state has had a quarter second to draw, or null if the state has ended.</summary>
+    private CaptureImage? ShotWhileShows(Rectangle frame, Func<ConditionFactory, ConditionBase> shows)
+    {
+        Settle(250);
+        var image = FlaUICapture.Rectangle(frame);
+
+        if (StillShows(shows))
+        {
+            return image;
+        }
+
+        image.Dispose();
+
+        return null;
+    }
+
+    /// <summary>The first screen that draws a bar partway while its value still is, or null once none is.</summary>
+    /// <remarks>
+    /// A scan of cached files stays partway for only a few frames, which a fixed wait can miss, so the screen is taken
+    /// again and again until one draws a bar partway.
+    /// </remarks>
+    private static CaptureImage? DrawnWhilePartway(Rectangle frame, IReadOnlyList<Bar> bars)
+    {
+        var watch = Stopwatch.StartNew();
+
+        while (watch.Elapsed < _barWatch)
+        {
+            var image = FlaUICapture.Rectangle(frame);
+            var partway = bars
+                .Where(b => IsPartway(b.Range))
+                .ToList();
+
+            if (partway.Any(b => DrawnPartway(image, frame, b.Bounds)))
+            {
+                return image;
+            }
+
+            image.Dispose();
+
+            if (partway.Count == 0)
+            {
+                return null;
+            }
+
+            Thread.Sleep(_poll);
+        }
+
+        return null;
     }
 
     /// <summary>Whether the screen shows the bar partly filled: its fill at one end, its track at the other.</summary>
