@@ -116,7 +116,8 @@
 - Workstreams shows Open run inline after a Blocked reason, kept whole, and a run's time alone when it started today.
 - Run's Files touched lists the files a folder search matched, not the folder, puts edited files first in primary
   text and says so while it is empty; a starting run shows $0.00 spent and 0 turns, the session strip's model and
-  version read at body size, and a refusal carries the canvas's warning pill, in the row's fill without an outline.
+  version read at body size, and a refusal carries the canvas's warning pill in the row's fill, outlined only in
+  high contrast.
 - The run and budget dialogs' budget field is 240 wide, as drawn.
 - The screenshot harness's stand-in searches the units only and records its rule in business-rules.md on every run,
   so Files touched lists the canvas's three files.
