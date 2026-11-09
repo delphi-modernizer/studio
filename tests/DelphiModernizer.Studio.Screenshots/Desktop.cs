@@ -6,7 +6,8 @@ using Microsoft.Win32;
 namespace DelphiModernizer.Studio.Screenshots;
 
 /// <summary>
-/// The Win32 calls the capture needs: window frames, the display mode, Windows' theme, high contrast and the pointer.
+/// The Win32 calls the capture needs: window frames and threads, the display mode, Windows' theme, high contrast and
+/// the pointer.
 /// </summary>
 internal static partial class Desktop
 {
@@ -79,6 +80,12 @@ internal static partial class Desktop
         Marshal.ThrowExceptionForHR(result);
 
         return frame.ToRectangle();
+    }
+
+    /// <summary>The thread that created the window and runs its messages.</summary>
+    public static int WindowThread(nint window)
+    {
+        return (int)GetWindowThreadProcessId(window, out _);
     }
 
     /// <summary>Moves and sizes the window so that its visible frame is exactly the size asked for.</summary>
@@ -184,6 +191,9 @@ internal static partial class Desktop
     [LibraryImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool GetWindowRect(nint window, out Rect rect);
+
+    [LibraryImport("user32.dll")]
+    private static partial uint GetWindowThreadProcessId(nint window, out uint process);
 
     [LibraryImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

@@ -38,7 +38,7 @@ internal sealed class StudioDriver : IDisposable
     private static readonly TimeSpan _stillShowsTimeout = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan _barWatch = TimeSpan.FromSeconds(3);
 
-    /// <summary>How far apart, summed over red, green and blue, a bar's fill and track are drawn.</summary>
+    /// <summary>How far apart, summed over red, green and blue, a bar's fill, track and card are drawn.</summary>
     private const int _drawnApart = 60;
 
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
@@ -107,9 +107,10 @@ internal sealed class StudioDriver : IDisposable
     /// <remarks>
     /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
     /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway, before
-    /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so the
-    /// screen waits a quarter second after the state shows. A state can end within that, so it is tried up to five
-    /// times; the check after the screen keeps only one that shows it.
+    /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so another
+    /// state's screen waits a quarter second after it shows. A state can end before it is taken, so it is tried up to
+    /// five times. UI Automation asks the window's thread for every element it walks, so that thread runs above the
+    /// app's others meanwhile: on the same processor as a scan's worker, a walk otherwise waits on it past the scan.
     /// </remarks>
     /// <param name="start">Starts the work.</param>
     /// <param name="shows">The element that shows only while the app works.</param>
@@ -122,11 +123,17 @@ internal sealed class StudioDriver : IDisposable
     {
         var process = Process.GetProcessById(_app.ProcessId);
         nint every = process.ProcessorAffinity;
+        int windowThread = Desktop.WindowThread(Handle);
+        var ui = process.Threads
+            .Cast<ProcessThread>()
+            .First(t => t.Id == windowThread);
+        var level = ui.PriorityLevel;
 
         foreach (var size in sizes ?? Sizes)
         {
             var frame = Resize(size);
             process.ProcessorAffinity = 1;
+            ui.PriorityLevel = ThreadPriorityLevel.Highest;
 
             try
             {
@@ -135,19 +142,16 @@ internal sealed class StudioDriver : IDisposable
 
                     var bars = Retry.WhileNull(() => Busy(shows), _findTimeout, _poll).Result
                         ?? throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
-                    Settle(250);
-                    var image = FlaUICapture.Rectangle(frame);
-                    bool still = bars.Count > 0
-                        ? bars.Any(b => IsPartway(b.Range) && DrawnPartway(image, frame, b.Bounds))
-                        : StillShows(shows);
+                    var image = bars.Count > 0 ? DrawnWhilePartway(frame, bars) : ShotWhileShows(frame, shows);
 
-                    return still ? image : throw new TimeoutException($"{page} {state} ended as it was taken.");
+                    return image ?? throw new TimeoutException($"{page} {state} ended as it was taken.");
                 });
                 Save(page, state, size, shot);
             }
             finally
             {
                 process.ProcessorAffinity = every;
+                ui.PriorityLevel = level;
             }
         }
     }
@@ -215,10 +219,61 @@ internal sealed class StudioDriver : IDisposable
             .Result;
     }
 
+    /// <summary>The screen once the state has had a quarter second to draw, or null if the state has ended.</summary>
+    private CaptureImage? ShotWhileShows(Rectangle frame, Func<ConditionFactory, ConditionBase> shows)
+    {
+        Settle(250);
+        var image = FlaUICapture.Rectangle(frame);
+
+        if (StillShows(shows))
+        {
+            return image;
+        }
+
+        image.Dispose();
+
+        return null;
+    }
+
+    /// <summary>The first screen that draws a bar partway while its value still is, or null once none is.</summary>
+    /// <remarks>
+    /// A scan of cached files stays partway for only a few frames, which a fixed wait can miss, so the screen is taken
+    /// again and again until one draws a bar partway.
+    /// </remarks>
+    private static CaptureImage? DrawnWhilePartway(Rectangle frame, IReadOnlyList<Bar> bars)
+    {
+        var watch = Stopwatch.StartNew();
+
+        while (watch.Elapsed < _barWatch)
+        {
+            var image = FlaUICapture.Rectangle(frame);
+            var partway = bars
+                .Where(b => IsPartway(b.Range))
+                .ToList();
+
+            if (partway.Any(b => DrawnPartway(image, frame, b.Bounds)))
+            {
+                return image;
+            }
+
+            image.Dispose();
+
+            if (partway.Count == 0)
+            {
+                return null;
+            }
+
+            Thread.Sleep(_poll);
+        }
+
+        return null;
+    }
+
     /// <summary>Whether the screen shows the bar partly filled: its fill at one end, its track at the other.</summary>
     /// <remarks>
     /// On one processor the app can report a value some time before it draws it, so the screen itself is read: a bar
-    /// not drawn yet shows its track at both ends, and a full one its fill.
+    /// not drawn yet shows its track at both ends, a full one its fill, and one still moving as indeterminate a short
+    /// fill with no track, the one-pixel line on the bar's middle row.
     /// </remarks>
     private static bool DrawnPartway(CaptureImage image, Rectangle frame, Rectangle bar)
     {
@@ -226,15 +281,21 @@ internal sealed class StudioDriver : IDisposable
         int start = bar.Left + 2 - frame.Left;
         int end = bar.Right - 3 - frame.Left;
 
-        if (y < 0 || y >= image.Bitmap.Height || start < 0 || end >= image.Bitmap.Width || start >= end)
+        if (y < 3 || y >= image.Bitmap.Height || start < 0 || end >= image.Bitmap.Width || start >= end)
         {
             return false;
         }
 
         var fill = image.Bitmap.GetPixel(start, y);
         var track = image.Bitmap.GetPixel(end, y);
+        var behind = image.Bitmap.GetPixel(end, y - 3);
 
-        return Math.Abs(fill.R - track.R) + Math.Abs(fill.G - track.G) + Math.Abs(fill.B - track.B) > _drawnApart;
+        return Apart(fill, track) && Apart(track, behind);
+    }
+
+    private static bool Apart(Color one, Color other)
+    {
+        return Math.Abs(one.R - other.R) + Math.Abs(one.G - other.G) + Math.Abs(one.B - other.B) > _drawnApart;
     }
 
     private static bool IsPartway(IRangeValuePattern bar)
