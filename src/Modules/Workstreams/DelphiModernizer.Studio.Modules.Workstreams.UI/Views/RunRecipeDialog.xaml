@@ -96,11 +96,13 @@
                     Glyph="{x:Bind icons:StudioIcons.GuardRefused}" />
             </InfoBar.IconSource>
         </InfoBar>
+        <!--  Collapsed until shown: a closed InfoBar still takes the panel's 16 above it.  -->
         <InfoBar
             x:Name="StartProblem"
             IsClosable="False"
             Severity="Error"
-            Title="The run didn’t start.">
+            Title="The run didn’t start."
+            Visibility="Collapsed">
             <InfoBar.IconSource>
                 <FontIconSource
                     FontFamily="{StaticResource StudioIconsFontFamily}"

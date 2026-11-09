@@ -32,14 +32,15 @@
             <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
-        <!--  One transcript item per row, divided as the design draws them; the templates carry the padding, so the
-              item keeps only TableRowStyle's 4,2.  -->
+        <!--  One transcript item per row; the templates carry the padding and the divider, so the item keeps only
+              TableRowStyle's 4,2 and draws no divider of its own over theirs.  -->
         <Style
             x:Key="TranscriptItemContainerStyle"
             BasedOn="{StaticResource TableRowStyle}"
             TargetType="ListViewItem">
             <Setter Property="MinHeight" Value="0" />
             <Setter Property="Padding" Value="4,2" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style
             x:Key="ResultTextStyle"
@@ -52,7 +53,12 @@
         </Style>
 
         <DataTemplate x:Key="SessionTemplate" x:DataType="vm:SessionRow">
-            <Grid AutomationProperties.Name="{x:Bind AnnouncedName}" Style="{StaticResource TranscriptItemStyle}">
+            <!--  Always the first item, which the canvas draws without a divider (.ti:first-child); the 1 stays, so the
+                  next divider falls 111 below the card's top, as drawn.  -->
+            <Grid
+                AutomationProperties.Name="{x:Bind AnnouncedName}"
+                BorderBrush="Transparent"
+                Style="{StaticResource TranscriptItemStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="20" />
                     <ColumnDefinition Width="*" />

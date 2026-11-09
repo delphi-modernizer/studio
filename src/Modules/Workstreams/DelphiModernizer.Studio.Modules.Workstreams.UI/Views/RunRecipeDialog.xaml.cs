@@ -86,6 +86,7 @@ public sealed partial class RunRecipeDialog : ContentDialog
     {
         StartProblem.Message = message;
         StartProblem.IsOpen = true;
+        StartProblem.Visibility = Visibility.Visible;
     }
 
     private void ShowGates(string name, string? selected)

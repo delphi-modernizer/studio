@@ -398,7 +398,12 @@
 
                         <Border Style="{StaticResource FlushCardStyle}">
                             <StackPanel>
-                                <Grid BorderThickness="0" Style="{StaticResource CardHeaderStyle}">
+                                <!--  The canvas's history header: 12,4 around the title, 36 tall, no divider.  -->
+                                <Grid
+                                    MinHeight="0"
+                                    Padding="16,12,16,4"
+                                    BorderThickness="0"
+                                    Style="{StaticResource CardHeaderStyle}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
@@ -422,7 +427,12 @@
                                     a person to review.
                                 </TextBlock>
                                 <StackPanel Visibility="{x:Bind ViewModel.HasHistory, Mode=OneWay}">
-                                    <Grid x:Name="HistoryHeader" Style="{StaticResource TableHeaderStyle}">
+                                    <!--  .trow.th border-top: the rule under "Run history".  -->
+                                    <Grid
+                                        x:Name="HistoryHeader"
+                                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                        BorderThickness="0,1,0,0"
+                                        Style="{StaticResource TableHeaderStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition x:Name="StartedColumn" Width="150" />
