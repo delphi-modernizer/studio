@@ -288,6 +288,11 @@
         <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBrush}" />
     </Style>
 
+    <!--  Canvas .ibar .txt: 14 above and below a wrapped bar's 20 px lines, 2 apart. A 20 px block line sets 14 px text
+          2 lower than the canvas does, so 2 of the 14 above go below.  -->
+    <Thickness x:Key="InfoBarPanelVerticalOrientationPadding">0,12,0,16</Thickness>
+    <Thickness x:Key="InfoBarMessageVerticalOrientationMargin">0,2,0,0</Thickness>
+
     <!--  Info bars (canvas .ibar): WinUI's template with two changes. A page's own icon takes the severity colour, as
           the standard icon does, and the action sits at the right end beside the text instead of wrapping below it.  -->
     <Style TargetType="InfoBar">
@@ -445,6 +450,8 @@
                                 VerticalOrientationPadding="{StaticResource InfoBarPanelVerticalOrientationPadding}">
                                 <TextBlock
                                     x:Name="Title"
+                                    LineHeight="20"
+                                    LineStackingStrategy="BlockLineHeight"
                                     primitives:InfoBarPanel.HorizontalOrientationMargin="{StaticResource InfoBarTitleHorizontalOrientationMargin}"
                                     primitives:InfoBarPanel.VerticalOrientationMargin="{StaticResource InfoBarTitleVerticalOrientationMargin}"
                                     FontSize="{StaticResource InfoBarTitleFontSize}"
@@ -454,6 +461,8 @@
                                     TextWrapping="WrapWholeWords" />
                                 <TextBlock
                                     x:Name="Message"
+                                    LineHeight="20"
+                                    LineStackingStrategy="BlockLineHeight"
                                     primitives:InfoBarPanel.HorizontalOrientationMargin="{StaticResource InfoBarMessageHorizontalOrientationMargin}"
                                     primitives:InfoBarPanel.VerticalOrientationMargin="{StaticResource InfoBarMessageVerticalOrientationMargin}"
                                     FontSize="{StaticResource InfoBarMessageFontSize}"

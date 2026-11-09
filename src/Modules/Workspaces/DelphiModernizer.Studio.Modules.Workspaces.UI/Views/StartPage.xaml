@@ -271,9 +271,10 @@
                                                         Style="{StaticResource SecondaryCaptionTextStyle}"
                                                         Text="{x:Bind OpenedAt}"
                                                         Visibility="{Binding Visibility, ElementName=LastOpened}" />
+                                                    <!--  Canvas .t-recent: the chevron starts its 32 column.  -->
                                                     <FontIcon
                                                         Grid.Column="3"
-                                                        HorizontalAlignment="Right"
+                                                        HorizontalAlignment="Left"
                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                         Glyph="{x:Bind icons:StudioIcons.ChevronRight}"
                                                         Style="{StaticResource IconStyle}" />
@@ -355,22 +356,38 @@
                                         AutomationProperties.HeadingLevel="Level2"
                                         Style="{StaticResource BodyStrongTextBlockStyle}"
                                         Text="Versions" />
-                                    <Grid ColumnSpacing="16" RowSpacing="8">
+                                    <!--  Canvas .kv: 11 px mono values on their labels' baseline make each row 17 tall,
+                                          and the list keeps its 12 bottom margin.  -->
+                                    <Grid
+                                        Margin="0,0,0,12"
+                                        ColumnSpacing="16"
+                                        RowSpacing="8">
+                                        <Grid.Resources>
+                                            <Style
+                                                x:Key="VersionValueStyle"
+                                                BasedOn="{StaticResource MonoTextStyle}"
+                                                TargetType="TextBlock">
+                                                <!--  2 lower than its 16 line's top puts the value on its label's baseline.  -->
+                                                <Setter Property="Margin" Value="0,2,0,-2" />
+                                                <Setter Property="VerticalAlignment" Value="Top" />
+                                                <Setter Property="FontSize" Value="11" />
+                                                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                <Setter Property="IsTextSelectionEnabled" Value="True" />
+                                            </Style>
+                                        </Grid.Resources>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="17" />
+                                            <RowDefinition Height="17" />
+                                            <RowDefinition Height="17" />
                                         </Grid.RowDefinitions>
                                         <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="Studio" />
                                         <TextBlock
                                             Grid.Column="1"
-                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                            IsTextSelectionEnabled="True"
-                                            Style="{StaticResource MonoTextStyle}"
+                                            Style="{StaticResource VersionValueStyle}"
                                             Text="{x:Bind abstractions:StudioVersions.Current.Studio}" />
                                         <TextBlock
                                             Grid.Row="1"
@@ -379,9 +396,7 @@
                                         <TextBlock
                                             Grid.Row="1"
                                             Grid.Column="1"
-                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                            IsTextSelectionEnabled="True"
-                                            Style="{StaticResource MonoTextStyle}"
+                                            Style="{StaticResource VersionValueStyle}"
                                             Text="{x:Bind abstractions:StudioVersions.Current.Engine}" />
                                         <TextBlock
                                             Grid.Row="2"
@@ -390,9 +405,7 @@
                                         <TextBlock
                                             Grid.Row="2"
                                             Grid.Column="1"
-                                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                            IsTextSelectionEnabled="True"
-                                            Style="{StaticResource MonoTextStyle}"
+                                            Style="{StaticResource VersionValueStyle}"
                                             Text="{x:Bind abstractions:StudioVersions.Current.Kit}" />
                                     </Grid>
                                 </StackPanel>
