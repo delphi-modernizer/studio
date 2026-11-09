@@ -831,7 +831,7 @@
                         </ScrollViewer>
 
                         <!--  Code modules.  -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsUnits, Mode=OneWay}">
+                        <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsUnits, Mode=OneWay}">
                             <StackPanel
                                 Orientation="Horizontal"
                                 Spacing="12"
@@ -1116,7 +1116,7 @@
                         </StackPanel>
 
                         <!--  Screens and the controls on them.  -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsScreens, Mode=OneWay}">
+                        <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsScreens, Mode=OneWay}">
                             <InfoBar
                                 IsClosable="False"
                                 IsOpen="{x:Bind ViewModel.HasUnreadable, Mode=OneWay}"
@@ -1325,7 +1325,8 @@
                         <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsRisks, Mode=OneWay}">
                             <Border Style="{StaticResource FlushCardStyle}">
                                 <StackPanel>
-                                    <Grid Padding="16,12,16,8" ColumnSpacing="8">
+                                    <!--  Canvas .card-h: 12 above, 4 below a 20 line; the header draws the rule.  -->
+                                    <Grid Padding="16,12,16,4" ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
@@ -1338,6 +1339,8 @@
                                         <TextBlock
                                             Grid.Column="1"
                                             AutomationProperties.HeadingLevel="Level2"
+                                            LineHeight="20"
+                                            LineStackingStrategy="BlockLineHeight"
                                             Style="{StaticResource BodyStrongTextBlockStyle}"
                                             Text="SQL statements" />
                                         <TextBlock
@@ -1348,6 +1351,8 @@
                                     </Grid>
                                     <Grid
                                         x:Name="SqlHeader"
+                                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                        BorderThickness="0,1,0,0"
                                         Style="{StaticResource TableHeaderStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="220" />
@@ -1367,6 +1372,8 @@
                                     </Grid>
                                     <Grid
                                         x:Name="SqlHeaderNarrow"
+                                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                        BorderThickness="0,1,0,0"
                                         Style="{StaticResource TableHeaderStyle}"
                                         Visibility="Collapsed">
                                         <Grid.ColumnDefinitions>
@@ -1393,7 +1400,8 @@
                             </Border>
                             <Border Style="{StaticResource FlushCardStyle}">
                                 <StackPanel>
-                                    <Grid Padding="16,12,16,8" ColumnSpacing="8">
+                                    <!--  Canvas .card-h: 12 above, 4 below a 20 line; the header draws the rule.  -->
+                                    <Grid Padding="16,12,16,4" ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
@@ -1406,6 +1414,8 @@
                                         <TextBlock
                                             Grid.Column="1"
                                             AutomationProperties.HeadingLevel="Level2"
+                                            LineHeight="20"
+                                            LineStackingStrategy="BlockLineHeight"
                                             Style="{StaticResource BodyStrongTextBlockStyle}"
                                             Text="Risk markers" />
                                         <TextBlock
@@ -1414,7 +1424,10 @@
                                             Style="{StaticResource SecondaryCaptionTextStyle}"
                                             Text="{x:Bind ViewModel.RiskCount, Mode=OneWay}" />
                                     </Grid>
-                                    <Grid Style="{StaticResource TableHeaderStyle}">
+                                    <Grid
+                                        BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                        BorderThickness="0,1,0,0"
+                                        Style="{StaticResource TableHeaderStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="200" />
                                             <ColumnDefinition Width="230" />
