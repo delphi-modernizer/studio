@@ -99,16 +99,16 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    last long enough. A scan of the large tree still ends in about 0.6 s on four processors, so the app is held to one
    processor while scanning and preview running are captured; a state that ends before it is taken is tried again, up to
    five times. A progress bar counts only partway, before the screen and after it, as the canvas draws it partly filled,
-   and the screen itself must show it so, its fill at one end and its track at the other, since on one processor the app
-   draws its frames late. Its screen is taken again and again from the moment its value is partway until one draws it
-   so, since a scan of cached files stays partway for only a few frames; another state's screen is taken a quarter
-   second after it shows. Once found, a bar's value is read on its own, since a walk of the window is slow on one
-   processor; another state need only still show once the screen is taken, asked again for half a second, since a walk
-   can meet the page as it changes. Each size's scan starts from no scan, so the button reads Scan, on a launch of its
-   own with a fresh copy of the large workspace: a launch's first scan runs before its code is compiled, and a scan of
-   files another launch has just read often ended before it could be taken. Overview's loading is captured the same way,
-   on the last scanned copy. Creating is captured once the kit is copied, while the tree is, so that a step shows done,
-   one working and the rest waiting.
+   and the screen itself must show it so, its fill at one end and its track at the other, the track's line drawn over
+   the card, since on one processor the app draws its frames late and first draws the bar as indeterminate. Its screen
+   is taken again and again from the moment its value is partway until one draws it so, since a scan of cached files
+   stays partway for only a few frames; another state's screen is taken a quarter second after it shows. Once found, a
+   bar's value is read on its own, since a walk of the window is slow on one processor; another state need only still
+   show once the screen is taken, asked again for half a second, since a walk can meet the page as it changes. Each
+   size's scan starts from no scan, so the button reads Scan, on a launch of its own with a fresh copy of the large
+   workspace: a launch's first scan runs before its code is compiled, and a scan of files another launch has just read
+   often ended before it could be taken. Overview's loading is captured the same way, on the last scanned copy. Creating
+   is captured once the kit is copied, while the tree is, so that a step shows done, one working and the rest waiting.
    - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set through UI
      Automation, which focuses the box, and tabbing out moves focus without a key, since after keyboard input XAML
      draws a focus ring wherever focus goes next. Only Overview's focus state presses Tab. The wizard's step 1 tabs

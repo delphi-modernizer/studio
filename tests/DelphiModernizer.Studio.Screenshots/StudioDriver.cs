@@ -38,7 +38,7 @@ internal sealed class StudioDriver : IDisposable
     private static readonly TimeSpan _stillShowsTimeout = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan _barWatch = TimeSpan.FromSeconds(3);
 
-    /// <summary>How far apart, summed over red, green and blue, a bar's fill and track are drawn.</summary>
+    /// <summary>How far apart, summed over red, green and blue, a bar's fill, track and card are drawn.</summary>
     private const int _drawnApart = 60;
 
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
@@ -264,7 +264,8 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Whether the screen shows the bar partly filled: its fill at one end, its track at the other.</summary>
     /// <remarks>
     /// On one processor the app can report a value some time before it draws it, so the screen itself is read: a bar
-    /// not drawn yet shows its track at both ends, and a full one its fill.
+    /// not drawn yet shows its track at both ends, a full one its fill, and one still moving as indeterminate a short
+    /// fill with no track, the one-pixel line on the bar's middle row.
     /// </remarks>
     private static bool DrawnPartway(CaptureImage image, Rectangle frame, Rectangle bar)
     {
@@ -272,15 +273,21 @@ internal sealed class StudioDriver : IDisposable
         int start = bar.Left + 2 - frame.Left;
         int end = bar.Right - 3 - frame.Left;
 
-        if (y < 0 || y >= image.Bitmap.Height || start < 0 || end >= image.Bitmap.Width || start >= end)
+        if (y < 3 || y >= image.Bitmap.Height || start < 0 || end >= image.Bitmap.Width || start >= end)
         {
             return false;
         }
 
         var fill = image.Bitmap.GetPixel(start, y);
         var track = image.Bitmap.GetPixel(end, y);
+        var behind = image.Bitmap.GetPixel(end, y - 3);
 
-        return Math.Abs(fill.R - track.R) + Math.Abs(fill.G - track.G) + Math.Abs(fill.B - track.B) > _drawnApart;
+        return Apart(fill, track) && Apart(track, behind);
+    }
+
+    private static bool Apart(Color one, Color other)
+    {
+        return Math.Abs(one.R - other.R) + Math.Abs(one.G - other.G) + Math.Abs(one.B - other.B) > _drawnApart;
     }
 
     private static bool IsPartway(IRangeValuePattern bar)
