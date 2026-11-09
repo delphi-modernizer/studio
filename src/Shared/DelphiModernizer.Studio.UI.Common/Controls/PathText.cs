@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Windows.Foundation;
 
 namespace DelphiModernizer.Studio.UI.Common.Controls;
@@ -31,7 +32,8 @@ public sealed partial class PathText : UserControl
         AutomationProperties.SetAccessibilityView(_shown, AccessibilityView.Raw);
         IsTabStop = false;
         Content = _shown;
-        RegisterPropertyChangedCallback(ForegroundProperty, (_, _) => _shown.Foreground = Foreground);
+        RegisterPropertyChangedCallback(ForegroundProperty, (_, _) => FollowForeground());
+        Loaded += (_, _) => FollowForeground();
     }
 
     public string Text
@@ -55,6 +57,21 @@ public sealed partial class PathText : UserControl
         }
 
         return base.MeasureOverride(availableSize);
+    }
+
+    /// <summary>
+    /// A Foreground set on the control, such as a ThemeResource, replaces the style's secondary text and follows theme
+    /// changes. It is checked on load too, since the callback alone missed the value a template sets.
+    /// </summary>
+    private void FollowForeground()
+    {
+        if (ReadLocalValue(ForegroundProperty) != DependencyProperty.UnsetValue
+            && _shown.ReadLocalValue(TextBlock.ForegroundProperty) == DependencyProperty.UnsetValue)
+        {
+            _shown.SetBinding(
+                TextBlock.ForegroundProperty,
+                new Binding { Source = this, Path = new PropertyPath(nameof(Foreground)) });
+        }
     }
 
     private static TextBlock Mono()

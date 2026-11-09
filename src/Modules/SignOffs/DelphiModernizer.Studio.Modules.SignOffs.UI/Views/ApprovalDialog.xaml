@@ -13,7 +13,11 @@
     Style="{StaticResource DefaultContentDialogStyle}">
 
     <!--  548 wide with the dialog's 24 padding on each side.  -->
-    <StackPanel Width="500" Spacing="16">
+    <!--  The bottom padding keeps the last caption's descenders clear of the footer.  -->
+    <StackPanel
+        Width="500"
+        Padding="0,0,0,4"
+        Spacing="16">
         <TextBlock
             Style="{StaticResource BodyTextBlockStyle}"
             Text="{x:Bind ViewModel.Lead}"

@@ -189,14 +189,14 @@
                             Style="{StaticResource MonoTextStyle}"
                             Text="{x:Bind Input}"
                             TextWrapping="NoWrap" />
-                        <!--  The canvas's filled warning pill (.pill.warn), with the guard's icon.  -->
+                        <!--  Canvas .pill.warn: the row's own caution fill, no outline, as drawn.  -->
                         <Border
                             Grid.Column="2"
                             Height="20"
                             Padding="6,0,8,0"
                             VerticalAlignment="Center"
                             Background="{ThemeResource StatusPillCautionBackground}"
-                            BorderBrush="{ThemeResource StatusPillToneOutline}"
+                            BorderBrush="Transparent"
                             BorderThickness="1"
                             CornerRadius="10">
                             <StackPanel
