@@ -233,13 +233,11 @@ internal static class Groups
             });
         });
 
-        // The canvas draws a first scan: each size scans the large copy on a launch of its own, since a launch's first
-        // scan runs before its code is compiled and so stays partway long enough to take.
-        var scanned = new Launch([Large], Reuse: true);
-
+        // The canvas draws a first scan: each size scans a fresh copy of the large workspace on a launch of its own.
+        // A launch's first scan runs before its code is compiled; a scan of files another launch has read ends sooner.
         foreach (var size in StudioDriver.Sizes)
         {
-            h.Run(theme, scanned, app => h.Step(app, theme, $"inventory large {size.Width}", () => {
+            h.Run(theme, new Launch([Large]), app => h.Step(app, theme, $"inventory large {size.Width}", () => {
                 string scans = Path.Combine(h.Opened[Large], ".modernizer", "scans");
                 app.ClickItem(_recent, h.Opened[Large]);
                 app.CaptureWhileBusy(
@@ -266,6 +264,8 @@ internal static class Groups
 
         // Opened from Start right after a launch, as the canvas draws it: Back is off before the click and after it.
         // A Back that turns off as the brief state shows can still be drawn on when the screen is taken.
+        var scanned = new Launch([Large], Reuse: true);
+
         foreach (var size in StudioDriver.Sizes)
         {
             h.Run(theme, scanned, app => h.Step(app, theme, $"overview loading {size.Width}", () => {
