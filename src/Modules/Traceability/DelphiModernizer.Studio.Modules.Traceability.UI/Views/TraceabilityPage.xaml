@@ -267,16 +267,23 @@
                     <SelectorBar
                         x:Name="ViewBar"
                         AutomationProperties.Name="Traceability views"
-                        SelectionChanged="OnViewChanged" />
+                        SelectionChanged="OnViewChanged">
+                        <!--  Canvas .selbar: underline 6 lower, 2 above the tab bottom.  -->
+                        <SelectorBar.Resources>
+                            <Thickness x:Key="SelectorBarItemPadding">12,10,12,13</Thickness>
+                            <Thickness x:Key="SelectorBarItemSelectionVisualMargin">0,0,0,2</Thickness>
+                        </SelectorBar.Resources>
+                    </SelectorBar>
 
                     <Border Style="{StaticResource CardStyle}" Visibility="{x:Bind ViewModel.IsClean, Mode=OneWay}">
                         <StackPanel
                             Padding="16,32"
                             HorizontalAlignment="Center"
                             Spacing="8">
+                            <!--  Canvas .empty > .ic outranks .c-ok, so the empty state's check is secondary grey.  -->
                             <FontIcon
                                 FontSize="48"
-                                Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Glyph="{x:Bind icons:StudioIcons.CheckPassed}"
                                 Style="{StaticResource IconStyle}" />
                             <TextBlock
@@ -353,6 +360,8 @@
                                                 State="{x:Bind Pill}" />
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                                 <TextBlock
+                                                    LineHeight="20"
+                                                    LineStackingStrategy="BlockLineHeight"
                                                     Style="{StaticResource BodyTextBlockStyle}"
                                                     Text="{x:Bind Description}"
                                                     TextWrapping="Wrap" />

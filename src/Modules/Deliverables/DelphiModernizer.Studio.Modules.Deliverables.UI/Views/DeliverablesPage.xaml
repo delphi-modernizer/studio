@@ -280,7 +280,13 @@
                     <SelectorBar
                         x:Name="FilterBar"
                         AutomationProperties.Name="Filter by status"
-                        SelectionChanged="OnFilterChanged" />
+                        SelectionChanged="OnFilterChanged">
+                        <!--  Canvas .selbar: underline 6 lower, 2 above the tab bottom.  -->
+                        <SelectorBar.Resources>
+                            <Thickness x:Key="SelectorBarItemPadding">12,10,12,13</Thickness>
+                            <Thickness x:Key="SelectorBarItemSelectionVisualMargin">0,0,0,2</Thickness>
+                        </SelectorBar.Resources>
+                    </SelectorBar>
 
                     <Border Style="{StaticResource FlushCardStyle}">
                         <StackPanel>
