@@ -565,10 +565,7 @@
                                 Style="{StaticResource IconStyle}" />
                             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
                         </StackPanel>
-                        <StackPanel
-                            Margin="0,2,0,0"
-                            Orientation="Horizontal"
-                            Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="{x:Bind Number}" />
                             <TextBlock
                                 Margin="0,0,0,5"
@@ -591,10 +588,7 @@
                                 Style="{StaticResource IconStyle}" />
                             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
                         </StackPanel>
-                        <StackPanel
-                            Margin="0,2,0,0"
-                            Orientation="Horizontal"
-                            Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
                             <TextBlock
                                 FontSize="24"
                                 LineHeight="32"
@@ -795,7 +789,7 @@
                         </controls:EmptyState>
                     </Border>
 
-                    <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsScanned, Mode=OneWay}">
+                    <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsScanned, Mode=OneWay}">
                         <controls:WrapPanel HorizontalSpacing="16" VerticalSpacing="4">
                             <TextBlock
                                 IsTextSelectionEnabled="True"

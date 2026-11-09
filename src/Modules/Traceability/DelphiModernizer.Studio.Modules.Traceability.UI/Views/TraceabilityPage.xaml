@@ -39,10 +39,7 @@
                                 Style="{StaticResource IconStyle}" />
                             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
                         </StackPanel>
-                        <StackPanel
-                            Margin="0,2,0,0"
-                            Orientation="Horizontal"
-                            Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon
                                 VerticalAlignment="Center"
                                 FontSize="20"
@@ -90,10 +87,7 @@
                                 Style="{StaticResource IconStyle}" />
                             <TextBlock Style="{StaticResource SecondaryCaptionTextStyle}" Text="{x:Bind Label}" />
                         </StackPanel>
-                        <StackPanel
-                            Margin="0,2,0,0"
-                            Orientation="Horizontal"
-                            Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
                             <FontIcon
                                 VerticalAlignment="Center"
                                 FontSize="20"

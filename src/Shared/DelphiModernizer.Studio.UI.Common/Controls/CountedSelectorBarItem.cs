@@ -10,10 +10,12 @@ public static class CountedSelectorBarItem
     /// <param name="announcedName">What Narrator reads, such as "Code modules, 7".</param>
     public static SelectorBarItem Create(string label, string count, string announcedName, object tag)
     {
+        // The template puts Child outside its padded StackPanel, so this margin draws the canvas's 40 tall .seli:
+        // with the bar's 4, the label sits 10 below the bar top and 11 above the underline.
         var panel = new StackPanel {
             Orientation = Orientation.Horizontal,
             Spacing = 8,
-            Margin = new Thickness(12, 0, 12, 0),
+            Margin = new Thickness(12, 6, 12, 6),
         };
         panel.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
         panel.Children.Add(new TextBlock {

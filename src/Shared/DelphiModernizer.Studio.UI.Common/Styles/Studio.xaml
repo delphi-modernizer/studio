@@ -170,9 +170,10 @@
         x:Key="TableRowStyle"
         BasedOn="{StaticResource DefaultListViewItemStyle}"
         TargetType="ListViewItem">
+        <!--  Canvas .trow is border-box: the 1 border-top and 6 padding are the 7 on top, so two-line rows are 49.  -->
         <Setter Property="MinHeight" Value="44" />
         <Setter Property="Margin" Value="0" />
-        <Setter Property="Padding" Value="16,6" />
+        <Setter Property="Padding" Value="16,7,16,6" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <!--  The presenter draws no BorderBrush and must stay the template's root, so the 1 divider on top is the
               background: absolute stops at 0 and 1, transparent below.  -->
