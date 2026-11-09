@@ -825,9 +825,11 @@
                                 x:Name="TabBar"
                                 AutomationProperties.Name="Inventory sections"
                                 SelectionChanged="OnTabChanged">
-                                <!--  Canvas .selbar: underline 6 lower, 2 above the tab bottom.  -->
+                                <!--  Canvas .selbar: underline 6 lower, 2 up; Padding is static, so a style.  -->
                                 <SelectorBar.Resources>
-                                    <Thickness x:Key="SelectorBarItemPadding">12,10,12,13</Thickness>
+                                    <Style TargetType="SelectorBarItem">
+                                        <Setter Property="Padding" Value="12,10,12,13" />
+                                    </Style>
                                     <Thickness x:Key="SelectorBarItemSelectionVisualMargin">0,0,0,2</Thickness>
                                 </SelectorBar.Resources>
                             </SelectorBar>
