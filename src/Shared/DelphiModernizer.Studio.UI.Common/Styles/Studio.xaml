@@ -288,8 +288,9 @@
         <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBrush}" />
     </Style>
 
-    <!--  Canvas .ibar .txt: 14 above and below a wrapped bar's 20 px lines, 2 apart.  -->
-    <Thickness x:Key="InfoBarPanelVerticalOrientationPadding">0,14,0,14</Thickness>
+    <!--  Canvas .ibar .txt: 14 above and below a wrapped bar's 20 px lines, 2 apart. A 20 px block line sets 14 px text
+          2 lower than the canvas does, so 2 of the 14 above go below.  -->
+    <Thickness x:Key="InfoBarPanelVerticalOrientationPadding">0,12,0,16</Thickness>
     <Thickness x:Key="InfoBarMessageVerticalOrientationMargin">0,2,0,0</Thickness>
 
     <!--  Info bars (canvas .ibar): WinUI's template with two changes. A page's own icon takes the severity colour, as
