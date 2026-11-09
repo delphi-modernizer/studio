@@ -231,10 +231,16 @@ internal static class Groups
                 app.Navigate("Inventory");
                 app.Capture("inventory", "not-scanned");
             });
-            // The canvas draws a first scan, so each size scans the large tree with no scan before it.
-            h.Step(app, theme, "inventory large", () => {
+        });
+
+        // The canvas draws a first scan: each size scans the large copy on a launch of its own, since a launch's first
+        // scan runs before its code is compiled and so stays partway long enough to take.
+        var scanned = new Launch([Large], Reuse: true);
+
+        foreach (var size in StudioDriver.Sizes)
+        {
+            h.Run(theme, scanned, app => h.Step(app, theme, $"inventory large {size.Width}", () => {
                 string scans = Path.Combine(h.Opened[Large], ".modernizer", "scans");
-                app.Navigate("Start");
                 app.ClickItem(_recent, h.Opened[Large]);
                 app.CaptureWhileBusy(
                     "inventory",
@@ -251,14 +257,12 @@ internal static class Groups
                         app.Navigate("Inventory", 4000);
                         app.Invoke("Scan", 0);
                     },
-                    c => c.ByControlType(FlaUI.Core.Definitions.ControlType.ProgressBar));
+                    c => c.ByControlType(FlaUI.Core.Definitions.ControlType.ProgressBar),
+                    [size]);
                 app.WaitGone("Scanning legacy/…", _run);
-                app.Capture("inventory", "large");
-            });
-        });
-
-        // The copy scanned above, whose inventory makes the loading last.
-        var scanned = new Launch([Large], Reuse: true);
+                app.Capture("inventory", "large", sizes: [size]);
+            }));
+        }
 
         // Opened from Start right after a launch, as the canvas draws it: Back is off before the click and after it.
         // A Back that turns off as the brief state shows can still be drawn on when the screen is taken.
