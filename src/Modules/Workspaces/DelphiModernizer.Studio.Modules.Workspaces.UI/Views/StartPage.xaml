@@ -367,12 +367,12 @@
                                                 x:Key="VersionValueStyle"
                                                 BasedOn="{StaticResource MonoTextStyle}"
                                                 TargetType="TextBlock">
-                                                <Setter Property="Margin" Value="0,0,0,5" />
-                                                <Setter Property="VerticalAlignment" Value="Bottom" />
+                                                <!--  2 lower than its 16 line's top puts the value on its label's baseline.  -->
+                                                <Setter Property="Margin" Value="0,2,0,-2" />
+                                                <Setter Property="VerticalAlignment" Value="Top" />
                                                 <Setter Property="FontSize" Value="11" />
                                                 <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
                                                 <Setter Property="IsTextSelectionEnabled" Value="True" />
-                                                <Setter Property="TextLineBounds" Value="Tight" />
                                             </Style>
                                         </Grid.Resources>
                                         <Grid.ColumnDefinitions>
