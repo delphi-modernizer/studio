@@ -109,7 +109,8 @@ internal sealed class StudioDriver : IDisposable
     /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway, before
     /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so another
     /// state's screen waits a quarter second after it shows. A state can end before it is taken, so it is tried up to
-    /// five times.
+    /// five times. UI Automation asks the window's thread for every element it walks, so that thread runs above the
+    /// app's others meanwhile: on the same processor as a scan's worker, a walk otherwise waits on it past the scan.
     /// </remarks>
     /// <param name="start">Starts the work.</param>
     /// <param name="shows">The element that shows only while the app works.</param>
@@ -122,11 +123,17 @@ internal sealed class StudioDriver : IDisposable
     {
         var process = Process.GetProcessById(_app.ProcessId);
         nint every = process.ProcessorAffinity;
+        int windowThread = Desktop.WindowThread(Handle);
+        var ui = process.Threads
+            .Cast<ProcessThread>()
+            .First(t => t.Id == windowThread);
+        var level = ui.PriorityLevel;
 
         foreach (var size in sizes ?? Sizes)
         {
             var frame = Resize(size);
             process.ProcessorAffinity = 1;
+            ui.PriorityLevel = ThreadPriorityLevel.Highest;
 
             try
             {
@@ -144,6 +151,7 @@ internal sealed class StudioDriver : IDisposable
             finally
             {
                 process.ProcessorAffinity = every;
+                ui.PriorityLevel = level;
             }
         }
     }
