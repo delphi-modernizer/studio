@@ -509,7 +509,8 @@
 
                             <!--  Step 2: the legacy source, its code page and a read-only preview.  -->
                             <StackPanel Spacing="16" Visibility="{x:Bind ViewModel.IsStep2, Mode=OneWay}">
-                                <StackPanel Spacing="4">
+                                <!--  Canvas .fld: 8 between the folder row and its help.  -->
+                                <StackPanel Spacing="8">
                                     <Grid ColumnSpacing="8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
@@ -713,7 +714,8 @@
                                         </controls:FullWidthStackPanel>
                                     </RadioButton>
                                 </RadioButtons>
-                                <StackPanel MaxWidth="420" HorizontalAlignment="Left" Spacing="4">
+                                <!--  Canvas .fld: 8 between the box and its help.  -->
+                                <StackPanel MaxWidth="420" HorizontalAlignment="Left" Spacing="8">
                                     <TextBox
                                         MinWidth="420"
                                         AutomationProperties.IsRequiredForForm="True"

@@ -307,10 +307,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="InfoBar">
+                    <!--  Canvas .ibar: the translucent card stroke lies over the bar's own severity colour, as a CSS
+                          background runs under its border, so the background reaches the outer edge.  -->
                     <Border
                         x:Name="ContentRoot"
                         VerticalAlignment="Top"
                         Background="{ThemeResource InfoBarInformationalSeverityBackgroundBrush}"
+                        BackgroundSizing="OuterBorderEdge"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
