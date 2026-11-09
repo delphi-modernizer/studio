@@ -57,8 +57,8 @@ public sealed partial class ShellPage : Page
         NavView.Loaded += (_, _) => MakePaneOneTabStop();
         EventHandler<object>? drawGlyphs = null;
         drawGlyphs = (_, _) => {
-            var back = DrawTitleBarGlyph("PART_BackButton", StudioIcons.Back);
-            var toggle = DrawTitleBarGlyph("PART_PaneToggleButton", StudioIcons.Navigation);
+            bool back = DrawTitleBarGlyph("PART_BackButton", StudioIcons.Back);
+            bool toggle = DrawTitleBarGlyph("PART_PaneToggleButton", StudioIcons.Navigation);
 
             if (back && toggle)
             {
