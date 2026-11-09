@@ -167,6 +167,7 @@
 - Start's recent workspace chevron starts its column, its Versions card sets each 11 px version on its label's
   baseline as the canvas does, and a card's empty state wraps at the canvas's 44 characters; New workspace keeps 8
   between the folder, its error and its help.
+- A wrapped info bar keeps 14 above and below its text and 2 between its title and message, as the canvas does.
 - High contrast: busy rings draw in the highlight colour, and text inside the accent, such as the selected pane item
   and Review sign-offs, is no longer drawn white on a black box.
 - New workspace's step title no longer disappears after Next, and step 5 reads "1 field filled".
