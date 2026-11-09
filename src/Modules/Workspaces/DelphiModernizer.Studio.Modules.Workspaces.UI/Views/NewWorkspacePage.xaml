@@ -630,10 +630,12 @@
                                     </Border>
                                 </StackPanel>
 
+                                <!--  Collapsed while closed: a closed InfoBar still takes its stack's spacing.  -->
                                 <InfoBar
                                     AutomationProperties.LiveSetting="Polite"
                                     IsClosable="False"
                                     IsOpen="{x:Bind ViewModel.IsPreviewFailed, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.IsPreviewFailed, Mode=OneWay}"
                                     Message="{x:Bind ViewModel.PreviewProblem, Mode=OneWay}"
                                     Severity="Error"
                                     Title="Couldn’t preview this folder.">
@@ -664,6 +666,10 @@
                                     Loaded="OnTargetChoicesChanged"
                                     SelectedIndex="{x:Bind ViewModel.TargetIndex, Mode=TwoWay}"
                                     SelectionChanged="OnTargetChoicesChanged">
+                                    <RadioButtons.Resources>
+                                        <!--  WinUI leaves 8 below the empty header; the board has none.  -->
+                                        <Thickness x:Key="RadioButtonsTopHeaderMargin">0</Thickness>
+                                    </RadioButtons.Resources>
                                     <RadioButton Style="{StaticResource ChoiceStyle}">
                                         <AutomationProperties.Name>
                                             C#/.NET. Writes DEC-001 to the decision log with you as the decider.
@@ -880,10 +886,12 @@
                                             Glyph="{x:Bind icons:StudioIcons.WarningFilled}" />
                                     </InfoBar.IconSource>
                                 </InfoBar>
+                                <!--  Collapsed while closed: a closed InfoBar still takes its stack's spacing.  -->
                                 <InfoBar
                                     AutomationProperties.LiveSetting="Polite"
                                     IsClosable="False"
                                     IsOpen="{x:Bind ViewModel.HasCreateProblem, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.HasCreateProblem, Mode=OneWay}"
                                     Message="{x:Bind ViewModel.CreateProblem, Mode=OneWay}"
                                     Severity="Error"
                                     Title="The workspace wasn’t created.">

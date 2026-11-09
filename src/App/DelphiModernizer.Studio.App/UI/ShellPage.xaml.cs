@@ -55,14 +55,17 @@ public sealed partial class ShellPage : Page
         AppTitleBar.BackRequested += (_, _) => _navigation.GoBack();
         AppTitleBar.PaneToggleRequested += (_, _) => NavView.IsPaneOpen = !NavView.IsPaneOpen;
         NavView.Loaded += (_, _) => MakePaneOneTabStop();
-        EventHandler<object>? drawToggle = null;
-        drawToggle = (_, _) => {
-            if (DrawPaneToggleGlyph())
+        EventHandler<object>? drawGlyphs = null;
+        drawGlyphs = (_, _) => {
+            var back = DrawTitleBarGlyph("PART_BackButton", StudioIcons.Back);
+            var toggle = DrawTitleBarGlyph("PART_PaneToggleButton", StudioIcons.Navigation);
+
+            if (back && toggle)
             {
-                AppTitleBar.LayoutUpdated -= drawToggle;
+                AppTitleBar.LayoutUpdated -= drawGlyphs;
             }
         };
-        AppTitleBar.LayoutUpdated += drawToggle;
+        AppTitleBar.LayoutUpdated += drawGlyphs;
     }
 
     public ShellViewModel ViewModel { get; }
@@ -282,25 +285,30 @@ public sealed partial class ShellPage : Page
         }
     }
 
-    /// <summary>Draws the pane toggle's glyph from Studio Icons, 12 wide as the TitleBar board has it.</summary>
+    /// <summary>Draws a title bar button's glyph from Studio Icons as the board does: 16, in primary text.</summary>
     /// <remarks>
-    /// WinUI's toggle plays a 16 wide animated icon and falls back to a glyph from its own font, size and content only
-    /// without one; clearing the animation draws that fallback. The template loads the toggle lazily, after the title
-    /// bar's Loaded, so the constructor calls this on each layout until it has drawn it.
+    /// WinUI's Back and pane toggle play 16 wide animated icons, and fall back to a glyph from the button's own font,
+    /// size and content only without one; clearing the animation draws that fallback. The template loads both buttons
+    /// lazily, after the title bar's Loaded, so the constructor calls this on each layout until it has drawn them. The
+    /// board puts the toggle 2 nearer Back than WinUI's margins do.
     /// </remarks>
-    /// <returns>Whether the toggle was there to draw.</returns>
-    private bool DrawPaneToggleGlyph()
+    /// <returns>Whether the button was there to draw.</returns>
+    private bool DrawTitleBarGlyph(string part, string glyph)
     {
-        if (Descendant(AppTitleBar, "PART_PaneToggleButton") is not Button toggle
-            || Descendant(toggle, "Content") is not AnimatedIcon icon)
+        if (Descendant(AppTitleBar, part) is not Button button
+            || Descendant(button, "Content") is not AnimatedIcon icon)
         {
             return false;
         }
 
-        toggle.FontFamily = (FontFamily)Microsoft.UI.Xaml.Application.Current.Resources["StudioIconsFontFamily"];
-        toggle.FontSize = 12;
-        toggle.Content = StudioIcons.Navigation;
+        button.FontFamily = (FontFamily)Microsoft.UI.Xaml.Application.Current.Resources["StudioIconsFontFamily"];
+        button.Content = glyph;
         icon.Source = null;
+
+        if (part == "PART_PaneToggleButton")
+        {
+            button.Margin = new Thickness(0, 2, 2, 2);
+        }
 
         return true;
     }

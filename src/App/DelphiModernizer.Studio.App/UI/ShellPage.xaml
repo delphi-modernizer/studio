@@ -69,8 +69,9 @@
                             <StaticResource x:Key="TitleBarSubtitleForegroundBrush" ResourceKey="SystemColorWindowTextColorBrush" />
                         </ResourceDictionary>
                     </ResourceDictionary.ThemeDictionaries>
-                    <!--  The TitleBar board: the icon 12 after the pane toggle, 12 to the title, 12 to the subtitle.  -->
-                    <x:Double x:Key="TitleBarLeftHeaderPaddingWidth">7</x:Double>
+                    <!--  The TitleBar board: the icon 12 after the pane toggle, 12 to the title, 12 to the subtitle. The padding is 2
+                         wider because the toggle drops its left margin (ShellPage.DrawTitleBarGlyph).  -->
+                    <x:Double x:Key="TitleBarLeftHeaderPaddingWidth">9</x:Double>
                     <Thickness x:Key="TitleBarIconMargin">0,0,12,0</Thickness>
                     <Thickness x:Key="TitleBarTitleMargin">0,0,12,0</Thickness>
                 </ResourceDictionary>
