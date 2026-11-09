@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:DelphiModernizer.Studio.UI.Common.Controls"
     xmlns:icons="using:DelphiModernizer.Studio.UI.Common.Icons"
+    xmlns:local="using:DelphiModernizer.Studio.Modules.Deliverables.UI.Views"
     xmlns:vm="using:DelphiModernizer.Studio.Modules.Deliverables.UI.ViewModels"
     Loaded="OnLoaded">
 
@@ -176,6 +177,19 @@
                     </Grid>
                 </Grid>
             </DataTemplate>
+
+            <!--  Canvas .trow.group: 36 tall, its band stretched from divider to divider.  -->
+            <Style
+                x:Key="GroupRowStyle"
+                BasedOn="{StaticResource TableRowStyle}"
+                TargetType="ListViewItem">
+                <Setter Property="MinHeight" Value="40" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            </Style>
+            <local:DeliverableRowStyles
+                x:Key="DeliverableRowStyles"
+                Deliverable="{StaticResource TableRowStyle}"
+                Group="{StaticResource GroupRowStyle}" />
         </ResourceDictionary>
     </Page.Resources>
 
@@ -317,7 +331,7 @@
                                 AutomationProperties.Name="Deliverables"
                                 IsItemClickEnabled="True"
                                 ItemClick="OnRowClicked"
-                                ItemContainerStyle="{StaticResource TableRowStyle}"
+                                ItemContainerStyleSelector="{StaticResource DeliverableRowStyles}"
                                 ItemTemplate="{StaticResource DeliverableRowTemplate}"
                                 ItemsSource="{x:Bind ViewModel.Rows, Mode=OneWay}"
                                 SelectionMode="None" />

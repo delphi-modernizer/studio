@@ -258,8 +258,10 @@
                             ContentTemplate="{StaticResource StatTemplate}" />
                     </Grid>
 
+                    <!--  The -4 takes back the bar's bottom padding, so the card starts 16 under the tab.  -->
                     <SelectorBar
                         x:Name="ViewBar"
+                        Margin="0,0,0,-4"
                         AutomationProperties.Name="Traceability views"
                         SelectionChanged="OnViewChanged">
                         <!--  Canvas .selbar: the underline sits 2 above the tab bottom.  -->
@@ -309,11 +311,18 @@
                                     VerticalAlignment="Center"
                                     Style="{StaticResource SecondaryCaptionTextStyle}"
                                     Text="Opening an issue opens its file at the line in your editor." />
+                                <!--  Canvas .seli at 36 under the row's 6: the margin takes back the bar's 4 and 4
+                                      and the label's 6 above, less 4 that puts the label 8 down the tab.  -->
                                 <SelectorBar
                                     x:Name="SeverityBar"
                                     Grid.Column="1"
+                                    Margin="0,-2,0,-6"
                                     AutomationProperties.Name="Severity"
-                                    SelectionChanged="OnSeverityChanged" />
+                                    SelectionChanged="OnSeverityChanged">
+                                    <SelectorBar.Resources>
+                                        <Thickness x:Key="SelectorBarItemSelectionVisualMargin">0,0,0,2</Thickness>
+                                    </SelectorBar.Resources>
+                                </SelectorBar>
                             </Grid>
                             <Grid Style="{StaticResource TableHeaderStyle}">
                                 <Grid.ColumnDefinitions>

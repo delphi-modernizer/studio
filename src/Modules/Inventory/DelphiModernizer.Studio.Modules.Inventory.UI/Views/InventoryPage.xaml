@@ -482,7 +482,8 @@
                                 </DataTemplate>
                             </ItemsRepeater.ItemTemplate>
                         </ItemsRepeater>
-                        <TextBlock Margin="0,10,0,0" Style="{StaticResource SecondaryCaptionTextStyle}">
+                        <!--  Canvas .kv is a dl the reset skips: its 1em margin, 14, outweighs the note's 10.  -->
+                        <TextBlock Margin="0,14,0,0" Style="{StaticResource SecondaryCaptionTextStyle}">
                             Secrets found in legacy code always show as ***. The studio has
                             no control to reveal them.
                         </TextBlock>
@@ -809,8 +810,10 @@
                                 Style="{StaticResource MonoTextStyle}"
                                 Text="{x:Bind ViewModel.Facts.Fingerprint, Mode=OneWay}" />
                         </controls:WrapPanel>
-                        <!--  Canvas .selbar: tabs that run past the page scroll sideways, with no scroll bar.  -->
+                        <!--  Canvas .selbar: tabs that run past the page scroll sideways, with no scroll bar. The
+                              -4 takes back the bar's bottom padding, so the table starts 16 under the tab.  -->
                         <ScrollViewer
+                            Margin="0,0,0,-4"
                             HorizontalScrollBarVisibility="Hidden"
                             HorizontalScrollMode="Enabled"
                             IsTabStop="False"
