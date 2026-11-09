@@ -245,7 +245,10 @@
                                                         <ColumnDefinition Width="32" />
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel VerticalAlignment="Center">
+                                                        <!--  Canvas .trow: a 20 tall name line over the 16 path line.  -->
                                                         <TextBlock
+                                                            LineHeight="20"
+                                                            LineStackingStrategy="BlockLineHeight"
                                                             Style="{StaticResource BodyStrongTextBlockStyle}"
                                                             Text="{x:Bind Name}"
                                                             TextTrimming="CharacterEllipsis"

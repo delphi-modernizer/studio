@@ -156,7 +156,7 @@
   an Unknown context box reads as a normal box with its placeholder; step 5 leaves the design's gap before the
   checkbox.
 - Start's Recent workspaces header and the first-run card are the design's height, and an empty state without
-  actions ends at its text.
+  actions ends at its text; a recent workspace's name line is 20 tall, as the canvas's rows draw it.
 - Settings' Default code page ends a long name in an ellipsis.
 - High contrast: busy rings draw in the highlight colour, and text inside the accent, such as the selected pane item
   and Review sign-offs, is no longer drawn white on a black box.
