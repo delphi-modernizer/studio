@@ -398,9 +398,10 @@
 
                         <Border Style="{StaticResource FlushCardStyle}">
                             <StackPanel>
-                                <!--  The canvas's history header: 12,4 around the title, 36 tall, no divider.  -->
+                                <!--  The canvas's history header: 12,4 around the title, 36 tall (the title's line is 19 here, 20
+                                      there), no divider.  -->
                                 <Grid
-                                    MinHeight="0"
+                                    MinHeight="36"
                                     Padding="16,12,16,4"
                                     BorderThickness="0"
                                     Style="{StaticResource CardHeaderStyle}">
