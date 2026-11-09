@@ -93,6 +93,10 @@
   so a deliverable deleted outside the studio counts as soon as another page opens.
 - Deliverables sets the gate pills of its sign-off headings in semibold, as the rest of the heading row.
 - Inventory's scanning card draws the design's 12 px busy ring.
+- Counted tabs are the canvas's 40 tall tab, the label 11 above an underline 2 above the tab bottom; table rows take
+  the canvas's border-box top, so two-line rows are 49 apart. Inventory and Traceability stat cards are 2 shorter, the
+  Inventory tabs sit 16 under the scan facts, Types and connection values read in regular mono, the connection card
+  spaces its settings 28 apart, and Traceability's empty state draws its check in secondary grey.
 - Inventory stacks its data cards under 1100, spaces their places as the canvas does and sets Types in semibold with
   its dash centred; Traceability keeps each problem's rule on one line and narrows Where at 960, trimming its path.
 - Deliverables names a missing file by its short name ("The testing strategy file is missing."); the deliverables'
