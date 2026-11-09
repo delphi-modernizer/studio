@@ -10,6 +10,9 @@ namespace DelphiModernizer.Studio.Tests;
 /// <summary>A small Delphi tree and a workspace created from it in a temporary folder, opened in a session.</summary>
 internal sealed class TestWorkspace : IDisposable
 {
+    private const int _deleteAttempts = 10;
+    private static readonly TimeSpan _deleteRetryDelay = TimeSpan.FromMilliseconds(100);
+
     private TestWorkspace(string parent, Workspace workspace)
     {
         Parent = parent;
@@ -51,8 +54,26 @@ internal sealed class TestWorkspace : IDisposable
         return new TestWorkspace(parent, created.Value);
     }
 
+    /// <remarks>
+    /// A run ends only once its CLI has exited, but on Windows a file it read can stay held for a moment after that,
+    /// by something outside the test such as a scanner; the delete tries again for up to a second before failing.
+    /// </remarks>
     public void Dispose()
     {
+        for (int attempt = 1; attempt < _deleteAttempts; attempt++)
+        {
+            try
+            {
+                Directory.Delete(Parent, recursive: true);
+
+                return;
+            }
+            catch (IOException)
+            {
+                Thread.Sleep(_deleteRetryDelay);
+            }
+        }
+
         Directory.Delete(Parent, recursive: true);
     }
 }
