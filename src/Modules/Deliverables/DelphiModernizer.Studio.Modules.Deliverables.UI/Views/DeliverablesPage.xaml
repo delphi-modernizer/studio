@@ -281,11 +281,8 @@
                         x:Name="FilterBar"
                         AutomationProperties.Name="Filter by status"
                         SelectionChanged="OnFilterChanged">
-                        <!--  Canvas .selbar: underline 6 lower, 2 up; Padding is static, so a style.  -->
+                        <!--  Canvas .selbar: the underline sits 2 above the tab bottom.  -->
                         <SelectorBar.Resources>
-                            <Style TargetType="SelectorBarItem">
-                                <Setter Property="Padding" Value="12,10,12,13" />
-                            </Style>
                             <Thickness x:Key="SelectorBarItemSelectionVisualMargin">0,0,0,2</Thickness>
                         </SelectorBar.Resources>
                     </SelectorBar>
