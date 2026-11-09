@@ -100,10 +100,12 @@ on PATH and no path in Settings; "a script shim" is a `claude.cmd` the harness w
    processor while scanning and preview running are captured, and the screen is taken a quarter second after the state
    shows, since on one processor the app draws its frames late; a state that ends within it is tried again, up to five
    times. A progress bar counts only partway, before the screen and after it, as the canvas draws it partly filled, and
-   once found its value is read on its own, since a walk of the window is slow on one processor; another state need only
-   still show once the screen is taken, asked again for half a second, since a walk can meet the page as it changes.
-   Each size's scan starts from no scan, so the button reads Scan. Overview's loading is captured the same way. Creating
-   is captured once the kit is copied, while the tree is, so that a step shows done, one working and the rest waiting.
+   the screen itself must show it so, its fill at one end and its track at the other, since the app can report a value
+   before it draws it. Once found, a bar's value is read on its own, since a walk of the window is slow on one
+   processor; another state need only still show once the screen is taken, asked again for half a second, since a walk
+   can meet the page as it changes. Each size's scan starts from no scan, so the button reads Scan. Overview's loading
+   is captured the same way. Creating is captured once the kit is copied, while the tree is, so that a step shows done,
+   one working and the rest waiting.
    - Controls are clicked with the pointer, and the pointer then leaves the window. Text is set through UI
      Automation, which focuses the box, and tabbing out moves focus without a key, since after keyboard input XAML
      draws a focus ring wherever focus goes next. Only Overview's focus state presses Tab. The wizard's step 1 tabs
