@@ -128,8 +128,10 @@
 - PathText keeps a long path's file name whole and the start of its folders, as "docs/02-…/business-rules.md".
 - DialogMargins keeps a dialog 24 from the window's top and bottom, as the canvas's scrim does, also when the window
   changes size while the dialog is open; the Claude Code, approve, run and budget dialogs use it.
-- The title bar places its icon, title and subtitle as the canvas does and draws the pane toggle's glyph 12 wide; the
-  pane's items start 4 below the title bar, and the rule above Settings is inset 16.
+- The title bar places its icon, title and subtitle as the canvas does and draws Back and the pane toggle from Studio
+  Icons at 16 in primary text, the toggle right against Back; the pane's items start 4 below the title bar, and the
+  rule above Settings is inset 16.
+- Settings leaves 24 between the header and each group heading at every width, as its boards draw.
 - New workspace: under 1100 the step strip's labels are 12 and its steps padded 4; the target choices are 8 apart,
   step 5 leaves 32 above its summary, and the Created text is secondary and at most 368 wide.
 - Settings' cards are 4 apart, and the not-on-PATH message keeps its link on one line; links in the Claude Code
@@ -141,6 +143,9 @@
 ### Fixed
 
 - In high contrast, the title bar's subtitle is drawn in the window text colour.
+- A closed error or warning bar no longer leaves a gap: New workspace's steps 2 and 5 keep their buttons the design's
+  distance below the content, and Settings' Claude Code card ends 12 below its path box or error.
+- New workspace's step 3 starts its choices 16 below the text, without the empty header's 8.
 - The pane keeps Workstreams' selection on Run and back on Workstreams while its badge counts a run.
 - At 960 with a workspace open, the title bar keeps its title and subtitle beside a 240 wide search box.
 - Opening a workspace leaves Back off on a slow PC: the pane's own selection of the shown page navigates nowhere.

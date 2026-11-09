@@ -22,41 +22,24 @@
         <Style x:Key="SettingGridStyle" TargetType="Grid">
             <Setter Property="ColumnSpacing" Value="16" />
         </Style>
+        <!--  Canvas .sgroup: 8 above a group's heading, 16 between groups, so the header and every group heading are
+              24 apart at any width; the Settings boards draw no 20 or 16 header gap.  -->
         <Style
             x:Key="GroupHeadingStyle"
             BasedOn="{StaticResource BodyStrongTextBlockStyle}"
             TargetType="TextBlock">
-            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="Margin" Value="0,8,0,8" />
         </Style>
     </Page.Resources>
 
     <Grid>
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="Wide">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="1100" />
-                    </VisualState.StateTriggers>
-                </VisualState>
-                <!--  Under 1100 (handoff part 1): 16 between the header and the content.  -->
-                <VisualState x:Name="Narrow">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="PageContent.Spacing" Value="16" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
-
         <ScrollViewer>
             <controls:FullWidthStackPanel
                 x:Name="PageContent"
                 MaxWidth="1000"
                 HorizontalAlignment="Left"
                 Padding="{StaticResource PagePadding}"
-                Spacing="{StaticResource PageHeaderSpacing}">
+                Spacing="16">
                 <controls:PageHeader Title="Settings">
                     <controls:PageHeader.Purpose>
                         How agent runs use Claude Code, and the studio’s defaults. Settings apply to this PC, not to a
@@ -153,11 +136,13 @@
                                         Text="{x:Bind ViewModel.Problem, Mode=OneWay}"
                                         TextWrapping="Wrap" />
                                 </Grid>
+                                <!--  Collapsed while closed: a closed InfoBar still takes its stack's spacing.  -->
                                 <InfoBar
                                     Margin="0,10,0,0"
                                     AutomationProperties.LiveSetting="Polite"
                                     IsClosable="False"
                                     IsOpen="{x:Bind ViewModel.IsMissing, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.IsMissing, Mode=OneWay}"
                                     Severity="Warning">
                                     <!--  Word joiners (U+2060) after the link's slashes and hyphen keep it on one line.  -->
                                     <InfoBar.Message>
