@@ -171,13 +171,13 @@
         BasedOn="{StaticResource DefaultListViewItemStyle}"
         TargetType="ListViewItem">
         <!--  The presenter draws its background 4,2 inside itself, so each row reaches 4 past the list's sides and 2
-              over the row above: the background, with the 1 divider at its top, then spans the row as .trow's
-              border-top does. Padding, MinHeight and the focus margin add the same 4,2 back, so on screen the row
+              into the rows above and below: the background, with the 1 divider at its top, then fills the row as
+              .trow's does. Padding, MinHeight and the focus margin add the same 4,2 back, so on screen the row
               keeps 16,7,16,6 and 44: .trow is border-box, its 1 border-top inside the 7, so two-line rows are 49.  -->
-        <Setter Property="MinHeight" Value="46" />
-        <Setter Property="Margin" Value="-4,-2,-4,0" />
-        <Setter Property="Padding" Value="20,9,20,6" />
-        <Setter Property="FocusVisualMargin" Value="5,3,5,1" />
+        <Setter Property="MinHeight" Value="48" />
+        <Setter Property="Margin" Value="-4,-2" />
+        <Setter Property="Padding" Value="20,9,20,8" />
+        <Setter Property="FocusVisualMargin" Value="5,3" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <!--  The presenter draws no BorderBrush and must stay the template's root, so the 1 divider on top is the
               background: absolute stops at 0 and 1, transparent below.  -->

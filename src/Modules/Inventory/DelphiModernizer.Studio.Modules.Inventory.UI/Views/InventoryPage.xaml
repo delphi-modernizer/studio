@@ -612,8 +612,8 @@
                 x:Key="RiskRowStyle"
                 BasedOn="{StaticResource TableRowStyle}"
                 TargetType="ListViewItem">
-                <Setter Property="MinHeight" Value="36" />
-                <Setter Property="Padding" Value="20,6,20,4" />
+                <Setter Property="MinHeight" Value="38" />
+                <Setter Property="Padding" Value="20,6" />
             </Style>
         </ResourceDictionary>
     </Page.Resources>
