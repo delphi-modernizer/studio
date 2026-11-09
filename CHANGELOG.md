@@ -111,11 +111,13 @@
 - The approve dialog and Sign-offs show the whole fingerprint beside its label and every covered path, wrapped; the
   dialog lists every covered file, and Sign-offs divides its checks by hairlines and gives a blocked sign-off the
   reason its first unmet check gives, such as "It is ready".
-- The approve dialog's note box is 76 tall and stays open without a git identity; Approve still waits for one.
+- The approve dialog's note box is 76 tall and stays open without a git identity; Approve still waits for one. The
+  body's last line clears the footer.
 - Workstreams shows Open run inline after a Blocked reason, kept whole, and a run's time alone when it started today.
 - Run's Files touched lists the files a folder search matched, not the folder, puts edited files first in primary
   text and says so while it is empty; a starting run shows $0.00 spent and 0 turns, the session strip's model and
-  version read at body size, and a refusal carries the filled warning pill.
+  version read at body size, and a refusal carries the canvas's warning pill in the row's fill, outlined only in
+  high contrast.
 - The run and budget dialogs' budget field is 240 wide, as drawn.
 - The screenshot harness's stand-in searches the units only and records its rule in business-rules.md on every run,
   so Files touched lists the canvas's three files.
@@ -125,7 +127,8 @@
   creation steps read in secondary text, and the records step names "the open question" or "questions" by count.
 - The Claude Code dialog draws its engine message as the canvas's warning bar, with links that wrap whole.
 - StatusPill's word takes the pill's FontWeight, so a semibold row can make its pills semibold.
-- PathText keeps a long path's file name whole and the start of its folders, as "docs/02-…/business-rules.md".
+- PathText keeps a long path's file name whole and the start of its folders, as "docs/02-…/business-rules.md", and
+  takes a Foreground set on it, such as Files touched's primary text for an edited file.
 - DialogMargins keeps a dialog 24 from the window's top and bottom, as the canvas's scrim does, also when the window
   changes size while the dialog is open; the Claude Code, approve, run and budget dialogs use it.
 - The title bar places its icon, title and subtitle as the canvas does and draws Back and the pane toggle from Studio

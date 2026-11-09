@@ -189,7 +189,7 @@
                             Style="{StaticResource MonoTextStyle}"
                             Text="{x:Bind Input}"
                             TextWrapping="NoWrap" />
-                        <!--  The canvas's filled warning pill (.pill.warn), with the guard's icon.  -->
+                        <!--  Canvas .pill.warn: the row's caution fill, outlined in high contrast only.  -->
                         <Border
                             Grid.Column="2"
                             Height="20"
