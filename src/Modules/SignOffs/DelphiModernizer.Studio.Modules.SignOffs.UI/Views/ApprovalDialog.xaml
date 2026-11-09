@@ -15,6 +15,7 @@
     <!--  548 wide with the dialog's 24 padding on each side.  -->
     <!--  The bottom padding keeps the last caption's descenders clear of the footer.  -->
     <StackPanel
+        x:Name="Body"
         Width="500"
         Padding="0,0,0,4"
         Spacing="16">

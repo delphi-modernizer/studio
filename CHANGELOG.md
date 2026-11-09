@@ -130,6 +130,7 @@
   high contrast.
 - The run and budget dialogs' budget field is 240 wide, as drawn.
 - The budget dialog always opens with focus on Close, even when the dialog's own first focus comes after it opens.
+- The approve dialog likewise always opens with focus in the note, or on Cancel without a git identity.
 - Run's transcript draws one hairline between items and none under its header; Workstreams' Run history header is
   36 tall with a rule above its column names; Run an agent task ends 24 above its buttons.
 - The screenshot harness's stand-in searches the units only and records its rule in business-rules.md on every run,
