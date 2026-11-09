@@ -25,6 +25,9 @@ namespace DelphiModernizer.Studio.Screenshots;
 /// <summary>One running app: finds its parts by their automation names and captures the window at each size.</summary>
 internal sealed class StudioDriver : IDisposable
 {
+    /// <summary>A progress bar seen partway: its value and where it is on the screen.</summary>
+    private sealed record Bar(IRangeValuePattern Range, Rectangle Bounds);
+
     public static readonly Size Wide = new(1280, 800);
     public static readonly Size Minimum = new(960, 576);
     public static readonly IReadOnlyList<Size> Sizes = [Wide, Minimum];
@@ -34,6 +37,9 @@ internal sealed class StudioDriver : IDisposable
     private static readonly TimeSpan _poll = TimeSpan.FromMilliseconds(20);
     private static readonly TimeSpan _stillShowsTimeout = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan _barWatch = TimeSpan.FromSeconds(3);
+
+    /// <summary>How far apart, summed over red, green and blue, a bar's fill and track are drawn.</summary>
+    private const int _drawnApart = 60;
 
     /// <remarks>Away from the desktop's icons, which show through the window's one-pixel border.</remarks>
     private static readonly Point _origin = new(480, 120);
@@ -100,8 +106,10 @@ internal sealed class StudioDriver : IDisposable
     /// <summary>Captures a state that shows only while the app works, with the app held to one processor.</summary>
     /// <remarks>
     /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
-    /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway,
-    /// since the canvas draws one partly filled.
+    /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway, before
+    /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so the
+    /// screen waits a quarter second after the state shows. A state can end within that, so it is tried up to five
+    /// times; the check after the screen keeps only one that shows it.
     /// </remarks>
     /// <param name="start">Starts the work.</param>
     /// <param name="shows">The element that shows only while the app works.</param>
@@ -122,20 +130,18 @@ internal sealed class StudioDriver : IDisposable
 
             try
             {
-                var shot = TryTimes(3, () => {
+                var shot = TryTimes(5, () => {
                     start();
 
-                    if (!Retry.WhileFalse(() => IsBusy(shows), _findTimeout, _poll).Result)
-                    {
-                        throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
-                    }
-
-                    Settle(150);
+                    var bars = Retry.WhileNull(() => Busy(shows), _findTimeout, _poll).Result
+                        ?? throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
+                    Settle(250);
                     var image = FlaUICapture.Rectangle(frame);
+                    bool still = bars.Count > 0
+                        ? bars.Any(b => IsPartway(b.Range) && DrawnPartway(image, frame, b.Bounds))
+                        : StillShows(shows);
 
-                    return StillShows(shows)
-                        ? image
-                        : throw new TimeoutException($"{page} {state} ended as it was taken.");
+                    return still ? image : throw new TimeoutException($"{page} {state} ended as it was taken.");
                 });
                 Save(page, state, size, shot);
             }
@@ -164,7 +170,11 @@ internal sealed class StudioDriver : IDisposable
         return action();
     }
 
-    private bool IsBusy(Func<ConditionFactory, ConditionBase> shows)
+    /// <summary>What shows of a state that lasts only while the app works.</summary>
+    /// <returns>
+    /// Null while the state does not show; the bars that show partway, or none when the state is not a bar.
+    /// </returns>
+    private List<Bar>? Busy(Func<ConditionFactory, ConditionBase> shows)
     {
         try
         {
@@ -172,21 +182,23 @@ internal sealed class StudioDriver : IDisposable
 
             if (found.Any(e => Type(e) != ControlType.ProgressBar))
             {
-                return true;
+                return [];
             }
 
             // A bar keeps the last work's value while it is indeterminate again, so it counts only partway, as the
             // canvas draws it.
             var bars = found
-                .Select(e => e.Patterns.RangeValue.PatternOrDefault)
-                .OfType<IRangeValuePattern>()
+                .Select(e => e.Patterns.RangeValue.PatternOrDefault is { } range
+                    ? new Bar(range, e.BoundingRectangle)
+                    : null)
+                .OfType<Bar>()
                 .ToList();
 
-            return bars.Count > 0 && GoesPartway(bars);
+            return bars.Count > 0 && GoesPartway(bars) ? bars : null;
         }
         catch (COMException)
         {
-            return false;
+            return null;
         }
     }
 
@@ -196,11 +208,33 @@ internal sealed class StudioDriver : IDisposable
     /// longer than a bar's partway does once the files are cached, and a spinner beside a bar may offer a value that
     /// never moves.
     /// </remarks>
-    private static bool GoesPartway(IReadOnlyList<IRangeValuePattern> bars)
+    private static bool GoesPartway(IReadOnlyList<Bar> bars)
     {
         return Retry
-            .WhileFalse(() => bars.Any(IsPartway), _barWatch, _poll)
+            .WhileFalse(() => bars.Any(b => IsPartway(b.Range)), _barWatch, _poll)
             .Result;
+    }
+
+    /// <summary>Whether the screen shows the bar partly filled: its fill at one end, its track at the other.</summary>
+    /// <remarks>
+    /// On one processor the app can report a value some time before it draws it, so the screen itself is read: a bar
+    /// not drawn yet shows its track at both ends, and a full one its fill.
+    /// </remarks>
+    private static bool DrawnPartway(CaptureImage image, Rectangle frame, Rectangle bar)
+    {
+        int y = bar.Top + (bar.Height / 2) - frame.Top;
+        int start = bar.Left + 2 - frame.Left;
+        int end = bar.Right - 3 - frame.Left;
+
+        if (y < 0 || y >= image.Bitmap.Height || start < 0 || end >= image.Bitmap.Width || start >= end)
+        {
+            return false;
+        }
+
+        var fill = image.Bitmap.GetPixel(start, y);
+        var track = image.Bitmap.GetPixel(end, y);
+
+        return Math.Abs(fill.R - track.R) + Math.Abs(fill.G - track.G) + Math.Abs(fill.B - track.B) > _drawnApart;
     }
 
     private static bool IsPartway(IRangeValuePattern bar)
