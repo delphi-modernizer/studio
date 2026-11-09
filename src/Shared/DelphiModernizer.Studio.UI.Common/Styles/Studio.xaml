@@ -288,7 +288,7 @@
         <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBrush}" />
     </Style>
 
-    <!--  Canvas .ibar .txt: 14 above and below a wrapped bar's text, its lines 2 apart.  -->
+    <!--  Canvas .ibar .txt: 14 above and below a wrapped bar's 20 px lines, 2 apart.  -->
     <Thickness x:Key="InfoBarPanelVerticalOrientationPadding">0,14,0,14</Thickness>
     <Thickness x:Key="InfoBarMessageVerticalOrientationMargin">0,2,0,0</Thickness>
 
@@ -449,6 +449,8 @@
                                 VerticalOrientationPadding="{StaticResource InfoBarPanelVerticalOrientationPadding}">
                                 <TextBlock
                                     x:Name="Title"
+                                    LineHeight="20"
+                                    LineStackingStrategy="BlockLineHeight"
                                     primitives:InfoBarPanel.HorizontalOrientationMargin="{StaticResource InfoBarTitleHorizontalOrientationMargin}"
                                     primitives:InfoBarPanel.VerticalOrientationMargin="{StaticResource InfoBarTitleVerticalOrientationMargin}"
                                     FontSize="{StaticResource InfoBarTitleFontSize}"
@@ -458,6 +460,8 @@
                                     TextWrapping="WrapWholeWords" />
                                 <TextBlock
                                     x:Name="Message"
+                                    LineHeight="20"
+                                    LineStackingStrategy="BlockLineHeight"
                                     primitives:InfoBarPanel.HorizontalOrientationMargin="{StaticResource InfoBarMessageHorizontalOrientationMargin}"
                                     primitives:InfoBarPanel.VerticalOrientationMargin="{StaticResource InfoBarMessageVerticalOrientationMargin}"
                                     FontSize="{StaticResource InfoBarMessageFontSize}"
