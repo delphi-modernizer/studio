@@ -102,7 +102,8 @@ internal sealed class StudioDriver : IDisposable
     /// The large tree's scan takes about 0.6 s on a runner's four processors, less than finding its first frame can take.
     /// The screen is kept only if the state still shows once it is taken; a progress bar counts only partway, before
     /// and after, since the canvas draws one partly filled. On one processor the app draws its frames late, so the
-    /// screen waits a little after the state shows.
+    /// screen waits a quarter second after the state shows. A state can end within that, so it is tried up to five
+    /// times; the check after the screen keeps only one that shows it.
     /// </remarks>
     /// <param name="start">Starts the work.</param>
     /// <param name="shows">The element that shows only while the app works.</param>
@@ -123,12 +124,12 @@ internal sealed class StudioDriver : IDisposable
 
             try
             {
-                var shot = TryTimes(3, () => {
+                var shot = TryTimes(5, () => {
                     start();
 
                     var bars = Retry.WhileNull(() => Busy(shows), _findTimeout, _poll).Result
                         ?? throw new TimeoutException($"{page} {state} did not show in {_findTimeout.TotalSeconds} s.");
-                    Settle(400);
+                    Settle(250);
                     var image = FlaUICapture.Rectangle(frame);
                     bool still = bars.Count > 0 ? bars.Any(IsPartway) : StillShows(shows);
 
