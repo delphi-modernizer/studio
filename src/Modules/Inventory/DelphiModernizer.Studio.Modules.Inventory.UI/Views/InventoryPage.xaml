@@ -606,13 +606,14 @@
                 </Border>
             </DataTemplate>
 
-            <!--  Risk markers are denser than other tables: rows 34 tall, as the canvas draws them.  -->
+            <!--  Risk markers are denser than other tables: rows 34 tall, as the canvas draws them, with TableRowStyle's
+                  4,2 added back.  -->
             <Style
                 x:Key="RiskRowStyle"
                 BasedOn="{StaticResource TableRowStyle}"
                 TargetType="ListViewItem">
-                <Setter Property="MinHeight" Value="34" />
-                <Setter Property="Padding" Value="16,4" />
+                <Setter Property="MinHeight" Value="38" />
+                <Setter Property="Padding" Value="20,6" />
             </Style>
         </ResourceDictionary>
     </Page.Resources>

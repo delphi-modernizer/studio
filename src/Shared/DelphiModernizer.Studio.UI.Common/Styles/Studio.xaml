@@ -170,10 +170,14 @@
         x:Key="TableRowStyle"
         BasedOn="{StaticResource DefaultListViewItemStyle}"
         TargetType="ListViewItem">
-        <!--  Canvas .trow is border-box: the 1 border-top and 6 padding are the 7 on top, so two-line rows are 49.  -->
-        <Setter Property="MinHeight" Value="44" />
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Padding" Value="16,7,16,6" />
+        <!--  The presenter draws its background 4,2 inside itself, so each row reaches 4 past the list's sides and 2
+              into the rows above and below: the background, with the 1 divider at its top, then fills the row as
+              .trow's does. Padding, MinHeight and the focus margin add the same 4,2 back, so on screen the row
+              keeps 16,7,16,6 and 44: .trow is border-box, its 1 border-top inside the 7, so two-line rows are 49.  -->
+        <Setter Property="MinHeight" Value="48" />
+        <Setter Property="Margin" Value="-4,-2" />
+        <Setter Property="Padding" Value="20,9,20,8" />
+        <Setter Property="FocusVisualMargin" Value="5,3" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <!--  The presenter draws no BorderBrush and must stay the template's root, so the 1 divider on top is the
               background: absolute stops at 0 and 1, transparent below.  -->
@@ -187,6 +191,66 @@
             </Setter.Value>
         </Setter>
         <Setter Property="CornerRadius" Value="0" />
+        <!--  WinUI's template, its corners bound to CornerRadius in place of ListViewItemCornerRadius.  -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <ListViewItemPresenter
+                        x:Name="Root"
+                        CheckBoxBorderBrush="{ThemeResource ListViewItemCheckBoxBorderBrush}"
+                        CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}"
+                        CheckBoxCornerRadius="{ThemeResource ListViewItemCheckBoxCornerRadius}"
+                        CheckBoxDisabledBorderBrush="{ThemeResource ListViewItemCheckBoxDisabledBorderBrush}"
+                        CheckBoxDisabledBrush="{ThemeResource ListViewItemCheckBoxDisabledBrush}"
+                        CheckBoxPointerOverBorderBrush="{ThemeResource ListViewItemCheckBoxPointerOverBorderBrush}"
+                        CheckBoxPointerOverBrush="{ThemeResource ListViewItemCheckBoxPointerOverBrush}"
+                        CheckBoxPressedBorderBrush="{ThemeResource ListViewItemCheckBoxPressedBorderBrush}"
+                        CheckBoxPressedBrush="{ThemeResource ListViewItemCheckBoxPressedBrush}"
+                        CheckBoxSelectedBrush="{ThemeResource ListViewItemCheckBoxSelectedBrush}"
+                        CheckBoxSelectedDisabledBrush="{ThemeResource ListViewItemCheckBoxSelectedDisabledBrush}"
+                        CheckBoxSelectedPointerOverBrush="{ThemeResource ListViewItemCheckBoxSelectedPointerOverBrush}"
+                        CheckBoxSelectedPressedBrush="{ThemeResource ListViewItemCheckBoxSelectedPressedBrush}"
+                        CheckBrush="{ThemeResource ListViewItemCheckBrush}"
+                        CheckDisabledBrush="{ThemeResource ListViewItemCheckDisabledBrush}"
+                        CheckMode="{ThemeResource ListViewItemCheckMode}"
+                        CheckPressedBrush="{ThemeResource ListViewItemCheckPressedBrush}"
+                        ContentMargin="{TemplateBinding Padding}"
+                        ContentTransitions="{TemplateBinding ContentTransitions}"
+                        Control.IsTemplateFocusTarget="True"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
+                        DragBackground="{ThemeResource ListViewItemDragBackground}"
+                        DragForeground="{ThemeResource ListViewItemDragForeground}"
+                        DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
+                        FocusBorderBrush="{ThemeResource ListViewItemFocusBorderBrush}"
+                        FocusSecondaryBorderBrush="{ThemeResource ListViewItemFocusSecondaryBorderBrush}"
+                        FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
+                        FocusVisualPrimaryBrush="{TemplateBinding FocusVisualPrimaryBrush}"
+                        FocusVisualPrimaryThickness="{TemplateBinding FocusVisualPrimaryThickness}"
+                        FocusVisualSecondaryBrush="{TemplateBinding FocusVisualSecondaryBrush}"
+                        FocusVisualSecondaryThickness="{TemplateBinding FocusVisualSecondaryThickness}"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
+                        PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}"
+                        PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
+                        PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
+                        ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
+                        SelectedBackground="{ThemeResource ListViewItemBackgroundSelected}"
+                        SelectedDisabledBackground="{ThemeResource ListViewItemBackgroundSelectedDisabled}"
+                        SelectedForeground="{ThemeResource ListViewItemForegroundSelected}"
+                        SelectedPointerOverBackground="{ThemeResource ListViewItemBackgroundSelectedPointerOver}"
+                        SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}"
+                        SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}"
+                        SelectionIndicatorBrush="{ThemeResource ListViewItemSelectionIndicatorBrush}"
+                        SelectionIndicatorCornerRadius="{ThemeResource ListViewItemSelectionIndicatorCornerRadius}"
+                        SelectionIndicatorDisabledBrush="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}"
+                        SelectionIndicatorPointerOverBrush="{ThemeResource ListViewItemSelectionIndicatorPointerOverBrush}"
+                        SelectionIndicatorPressedBrush="{ThemeResource ListViewItemSelectionIndicatorPressedBrush}"
+                        SelectionIndicatorVisualEnabled="{ThemeResource ListViewItemSelectionIndicatorVisualEnabled}"
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!--  The tile in an action card or a role: 40 square, the accent fill for the one primary action.  -->
