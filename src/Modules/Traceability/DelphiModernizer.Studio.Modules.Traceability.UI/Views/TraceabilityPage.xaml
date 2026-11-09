@@ -277,6 +277,7 @@
                             Spacing="8">
                             <!--  Canvas .empty > .ic outranks .c-ok, so the empty state's check is secondary grey.  -->
                             <FontIcon
+                                Margin="0,0,0,4"
                                 FontSize="48"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Glyph="{x:Bind icons:StudioIcons.CheckPassed}"
@@ -289,6 +290,8 @@
                             <TextBlock
                                 MaxWidth="344"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                LineHeight="20"
+                                LineStackingStrategy="BlockLineHeight"
                                 Style="{StaticResource BodyTextBlockStyle}"
                                 TextAlignment="Center"
                                 TextWrapping="Wrap">
@@ -324,7 +327,11 @@
                                     </SelectorBar.Resources>
                                 </SelectorBar>
                             </Grid>
-                            <Grid Style="{StaticResource TableHeaderStyle}">
+                            <!--  Canvas .trow.th under the toolbar keeps its 1 border-top.  -->
+                            <Grid
+                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                BorderThickness="0,1,0,0"
+                                Style="{StaticResource TableHeaderStyle}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="96" />
                                     <ColumnDefinition Width="3*" />

@@ -100,6 +100,9 @@
 - Sign-off headings in Deliverables are the canvas's 36 tall, their band from divider to divider; Inventory and
   Traceability start their table 16 under the tabs, the Issues toolbar is 43 tall with 36 tall severity tabs, and the
   connection card's note sits 14 under its settings.
+- Traceability draws a rule above the Issues header, and its clean card spaces its lines 20 apart with the check 4
+  above the title; Inventory's SQL statements and Risk markers cards have a 36 tall title over a ruled header, and
+  Screens and the large-workspace search sit 16 from their tables.
 - Inventory stacks its data cards under 1100, spaces their places as the canvas does and sets Types in semibold with
   its dash centred; Traceability keeps each problem's rule on one line and narrows Where at 960, trimming its path.
 - Deliverables names a missing file by its short name ("The testing strategy file is missing."); the deliverables'
