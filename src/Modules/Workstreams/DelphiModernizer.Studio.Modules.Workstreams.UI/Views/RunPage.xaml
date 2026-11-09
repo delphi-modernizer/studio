@@ -32,13 +32,14 @@
             <Setter Property="BorderBrush" Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
             <Setter Property="BorderThickness" Value="1" />
         </Style>
-        <!--  One transcript item per row, divided as the design draws them; the templates carry the padding.  -->
+        <!--  One transcript item per row, divided as the design draws them; the templates carry the padding, so the
+              item keeps only TableRowStyle's 4,2.  -->
         <Style
             x:Key="TranscriptItemContainerStyle"
             BasedOn="{StaticResource TableRowStyle}"
             TargetType="ListViewItem">
             <Setter Property="MinHeight" Value="0" />
-            <Setter Property="Padding" Value="0" />
+            <Setter Property="Padding" Value="4,2,4,0" />
         </Style>
         <Style
             x:Key="ResultTextStyle"
