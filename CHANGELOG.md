@@ -123,6 +123,8 @@
   version read at body size, and a refusal carries the canvas's warning pill in the row's fill, outlined only in
   high contrast.
 - The run and budget dialogs' budget field is 240 wide, as drawn.
+- Run's transcript draws one hairline between items and none under its header; Workstreams' Run history header is
+  36 tall with a rule above its column names; Run an agent task ends 24 above its buttons.
 - The screenshot harness's stand-in searches the units only and records its rule in business-rules.md on every run,
   so Files touched lists the canvas's three files.
 - New workspace opens the workspace it created on Open the Overview, so the Created step shows no subtitle; Create
