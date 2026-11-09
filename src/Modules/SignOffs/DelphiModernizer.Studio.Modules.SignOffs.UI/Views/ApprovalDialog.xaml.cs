@@ -6,12 +6,15 @@ using DelphiModernizer.Studio.UI.Common.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 
 namespace DelphiModernizer.Studio.Modules.SignOffs.UI.Views;
 
 /// <summary>Asks the person to confirm an approval or a revocation, with their git identity and a note.</summary>
 public sealed partial class ApprovalDialog : ContentDialog
 {
+    private bool _targetTakesFirstFocus = true;
+
     public ApprovalDialog(ApprovalDialogViewModel viewModel)
     {
         ArgumentNullException.ThrowIfNull(viewModel);
@@ -25,6 +28,7 @@ public sealed partial class ApprovalDialog : ContentDialog
         }
 
         Opened += OnOpened;
+        Body.GettingFocus += OnBodyGettingFocus;
         PrimaryButtonClick += OnPrimaryButtonClick;
         ShowProblemsButton.Click += OnShowProblems;
         ViewModel.PropertyChanged += OnViewModelChanged;
@@ -38,8 +42,40 @@ public sealed partial class ApprovalDialog : ContentDialog
     /// </remarks>
     private void OnOpened(ContentDialog sender, ContentDialogOpenedEventArgs args)
     {
-        Control target = ViewModel.HasIdentity ? NoteBox : GetTemplateChild("CloseButton") as Control ?? NoteBox;
-        target.Focus(FocusState.Programmatic);
+        FocusTarget().Focus(FocusState.Programmatic);
+    }
+
+    /// <remarks>
+    /// The dialog also focuses its first field when its layout loads, which can come after Opened. That first
+    /// programmatic move onto the first field goes to the target; any other move, and every move the person makes,
+    /// stays as it is.
+    /// </remarks>
+    private void OnBodyGettingFocus(UIElement sender, GettingFocusEventArgs args)
+    {
+        if (!_targetTakesFirstFocus)
+        {
+            return;
+        }
+
+        if (args.FocusState != FocusState.Programmatic)
+        {
+            _targetTakesFirstFocus = false;
+
+            return;
+        }
+
+        var target = FocusTarget();
+
+        if (args.NewFocusedElement == FocusManager.FindFirstFocusableElement(Body) && args.NewFocusedElement != target)
+        {
+            args.TrySetNewFocusedElement(target);
+            _targetTakesFirstFocus = false;
+        }
+    }
+
+    private Control FocusTarget()
+    {
+        return ViewModel.HasIdentity ? NoteBox : GetTemplateChild("CloseButton") as Control ?? NoteBox;
     }
 
     /// <summary>
