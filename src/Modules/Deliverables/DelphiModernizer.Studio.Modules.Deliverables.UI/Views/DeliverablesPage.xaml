@@ -32,7 +32,7 @@
                 <Grid>
                     <!--  A sign-off's heading fills its row under the divider, padding included.  -->
                     <Grid
-                        Margin="-16,-5,-16,-6"
+                        Margin="-16,-6,-16,-6"
                         Padding="16,6"
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                         ColumnSpacing="8"
@@ -65,6 +65,8 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock
+                                LineHeight="20"
+                                LineStackingStrategy="BlockLineHeight"
                                 Style="{StaticResource BodyTextBlockStyle}"
                                 Text="{x:Bind Title}"
                                 TextTrimming="CharacterEllipsis"
@@ -105,7 +107,7 @@
                 <Grid>
                     <!--  A sign-off's heading fills its row under the divider, padding included.  -->
                     <Grid
-                        Margin="-16,-5,-16,-6"
+                        Margin="-16,-6,-16,-6"
                         Padding="16,6"
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                         ColumnSpacing="8"
@@ -138,6 +140,8 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock
+                                LineHeight="20"
+                                LineStackingStrategy="BlockLineHeight"
                                 Style="{StaticResource BodyTextBlockStyle}"
                                 Text="{x:Bind Title}"
                                 TextTrimming="CharacterEllipsis"
