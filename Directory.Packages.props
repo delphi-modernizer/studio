@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup Label="WinUI / Windows App SDK">
-    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.6.5" />
     <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
     <PackageVersion Include="WinUIEx" Version="2.9.2" />
   </ItemGroup>
